@@ -1,0 +1,5132 @@
+<!doctype html>
+<!-- Gerado por npm run build; edite src/client. -->
+<html lang="pt-BR" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark"><meta name="theme-color" content="#faf8f4">
+<title>Mukirana</title><script>/** Preferência visual local; nunca armazena e-mail, sessão ou credenciais. */
+(() => {
+  "use strict";
+  const STORAGE_KEY = "mukirana.theme";
+  const THEMES = ["light", "dark", "sepia"];
+  let initialTheme = "light";
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (THEMES.includes(saved)) initialTheme = saved;
+  } catch {
+    // A interface permanece utilizável quando o navegador bloqueia armazenamento.
+  }
+
+  /** Aplica tokens sem recarregar a View ou interromper o formulário. */
+  function applyTheme(theme) {
+    if (!THEMES.includes(theme)) return;
+    document.documentElement.dataset.theme = theme;
+    document.dispatchEvent(new window.CustomEvent("mukirana:theme", { detail: { theme } }));
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = { light: "#faf8f4", dark: "#1c1b29", sepia: "#f1e5cf" }[theme];
+  }
+  applyTheme(initialTheme);
+  document.addEventListener("DOMContentLoaded", () => {
+    const select = document.getElementById("theme-select");
+    if (!select) return;
+    select.value = document.documentElement.dataset.theme;
+    select.addEventListener("change", () => {
+      applyTheme(select.value);
+      try {
+        localStorage.setItem(STORAGE_KEY, select.value);
+      } catch {
+        // Sem persistência, a escolha ainda vale durante a página atual.
+      }
+    });
+  });
+})();
+</script><style>/* Tokens semânticos compartilhados: cada tema preserva a identidade índigo. */
+:root {
+  --primary: #343356;
+  --primary-hover: #45446e;
+  --on-primary: #ffffff;
+  --ink: #2d2b40;
+  --muted: #6c687b;
+  --paper: #faf8f4;
+  --surface: #ffffff;
+  --line: #e2ddd8;
+  --input-line: #b6afbd;
+  --accent: #edb5a0;
+  --soft-primary: #eeebf5;
+  --error: #a53630;
+  --focus: #895840;
+  --brand-bg: #343356;
+  --on-brand: #faf8f4;
+  --brand-muted: #dbd7e6;
+  --illustration-bg: #f2e7e1;
+  --illustration-ink: #343356;
+  --illustration-muted: #77616c;
+  --chart: #946779;
+  --chart-fill: #ac7c86;
+  --explanation-bg: #f5f1ed;
+  --note-line: #b37d65;
+  --note-ink: #705244;
+  --note-bg: #f4e8e0;
+  --radius: 12px;
+  color-scheme: light;
+  font-family: "Aptos", "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+}
+:root[data-theme="dark"] {
+  --primary: #d8ccff;
+  --primary-hover: #e5dcff;
+  --on-primary: #29233e;
+  --ink: #f3efea;
+  --muted: #bcb5c9;
+  --paper: #1c1b29;
+  --surface: #292737;
+  --line: #50495e;
+  --input-line: #81778f;
+  --soft-primary: #39334d;
+  --error: #ffb4ab;
+  --focus: #edb5a0;
+  --brand-bg: #25243c;
+  --on-brand: #faf8f4;
+  --brand-muted: #d2cbdf;
+  --illustration-bg: #3a3244;
+  --illustration-ink: #f3e9e2;
+  --illustration-muted: #dac2cb;
+  --chart: #edb5c2;
+  --chart-fill: #d6a2b1;
+  --explanation-bg: #282532;
+  --note-line: #d8a18a;
+  --note-ink: #f0c8b6;
+  --note-bg: #392d30;
+  color-scheme: dark;
+}
+:root[data-theme="sepia"] {
+  --primary: #51405d;
+  --primary-hover: #65516f;
+  --on-primary: #fff7eb;
+  --ink: #40332f;
+  --muted: #756054;
+  --paper: #f1e5cf;
+  --surface: #fbf1df;
+  --line: #d1bea1;
+  --input-line: #a78c70;
+  --accent: #f2c2a1;
+  --soft-primary: #e4d9d5;
+  --error: #9a332b;
+  --focus: #79503b;
+  --brand-bg: #46364a;
+  --on-brand: #fff3df;
+  --brand-muted: #ead7d4;
+  --illustration-bg: #e8d4b8;
+  --illustration-ink: #49364a;
+  --illustration-muted: #705348;
+  --chart: #8c5e69;
+  --chart-fill: #b57b77;
+  --explanation-bg: #eaddc5;
+  --note-line: #9a6d48;
+  --note-ink: #67482e;
+  --note-bg: #e8d9bc;
+}
+
+/* Componentes comuns às duas Views independentes. */
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-padding-block: 24px;
+}
+body {
+  margin: 0;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+}
+button,
+input,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 5px;
+}
+[hidden] {
+  display: none !important;
+}
+h1,
+h2,
+p {
+  margin: 0;
+}
+svg {
+  display: block;
+  flex-shrink: 0;
+}
+.icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  padding: 12px 20px;
+  background: var(--surface);
+  color: var(--primary);
+  transform: translateY(-160%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  width: fit-content;
+}
+.brand-symbol {
+  width: 38px;
+  height: 38px;
+}
+.brand-name {
+  font-size: 29px;
+  font-weight: 650;
+  letter-spacing: -1.3px;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 26px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+.step-line {
+  width: 25px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+.step-line.inactive {
+  background: var(--line);
+}
+.form-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 3.2vw, 44px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+}
+.form-title:focus {
+  outline: none;
+}
+.form-description {
+  margin-top: 15px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.form-description strong {
+  color: var(--ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+form {
+  margin-top: 32px;
+}
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 650;
+}
+.input-wrap {
+  position: relative;
+}
+.input-wrap > .icon {
+  position: absolute;
+  left: 17px;
+  top: 18px;
+  color: var(--muted);
+  pointer-events: none;
+}
+input {
+  width: 100%;
+  min-height: 56px;
+  padding: 16px 16px 16px 48px;
+  border: 1px solid var(--input-line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  font-size: 15px;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
+}
+input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+input:focus {
+  border-color: var(--primary-hover);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+input[aria-invalid="true"]:focus {
+  outline-color: var(--error);
+}
+.field-hint {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.field-error {
+  margin-top: 10px;
+  color: var(--error);
+  font-size: 12px;
+  line-height: 1.5;
+}
+/* Cores mudam juntas ao alternar o tema, preservando contraste durante a troca. */
+.primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  min-height: 54px;
+  margin-top: 25px;
+  padding: 14px 20px;
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  color: var(--on-primary);
+  background: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform 150ms;
+}
+.primary-button:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+.primary-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.primary-button:disabled {
+  opacity: 0.7;
+}
+.primary-button .icon {
+  width: 17px;
+  height: 17px;
+}
+.access-note {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 17px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+}
+.access-note .icon {
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+}
+.separator {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 30px 0 20px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.separator::before,
+.separator::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.explanation {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--explanation-bg);
+}
+.explanation summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 550;
+}
+.explanation summary::-webkit-details-marker {
+  display: none;
+}
+.explanation summary .icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 150ms;
+}
+.explanation[open] summary .icon {
+  transform: rotate(180deg);
+}
+.explanation-content {
+  padding: 0 16px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+.explanation-content p + p {
+  margin-top: 8px;
+}
+
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 9px 0;
+  border: 0;
+  color: var(--primary);
+  background: none;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.text-button:hover:not(:disabled) {
+  color: var(--primary-hover);
+}
+.text-button:disabled {
+  cursor: default;
+  color: var(--muted);
+  text-decoration: none;
+}
+.code-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+.code-input {
+  padding: 14px 12px;
+  font-size: 25px;
+  font-weight: 550;
+  letter-spacing: 0.5em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.demo-note {
+  margin-top: 24px;
+  padding: 12px 14px;
+  border-left: 2px solid var(--note-line);
+  color: var(--note-ink);
+  background: var(--note-bg);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.demo-note strong {
+  font-weight: 650;
+}
+.success-icon {
+  display: grid;
+  place-items: center;
+  width: 55px;
+  height: 55px;
+  margin-bottom: 25px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--primary);
+  background: var(--soft-primary);
+}
+.success-icon .icon {
+  width: 25px;
+  height: 25px;
+}
+.status-message {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.theme-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+.theme-select {
+  min-width: 108px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--input-line);
+  border-radius: 9px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--surface);
+}
+.theme-select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.version-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 0;
+  color: var(--primary);
+  font-size: 12px;
+  text-underline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* View de celular: fluxo direto em uma coluna, com navegação própria por etapa. */
+.mobile-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  min-height: 100svh;
+  margin: 0 auto;
+  background: var(--paper);
+}
+.mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(20px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 16px
+    max(24px, env(safe-area-inset-left));
+}
+.mobile-header .brand {
+  gap: 8px;
+}
+.mobile-header .brand-symbol {
+  width: 32px;
+  height: 32px;
+}
+.mobile-header .brand-name {
+  font-size: 24px;
+  letter-spacing: -1.2px;
+}
+.mobile-header .theme-select {
+  width: 102px;
+  min-width: 102px;
+}
+.mobile-main {
+  flex: 1;
+  padding: 24px max(24px, env(safe-area-inset-right)) 28px max(24px, env(safe-area-inset-left));
+}
+.mobile-kicker {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 1.4px;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+.mobile-main .form-title {
+  margin-top: 16px;
+  font-size: 38px;
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+}
+.mobile-main .form-description {
+  margin-top: 16px;
+  font-size: 16px;
+  line-height: 1.65;
+}
+.mobile-main form {
+  margin-top: 28px;
+}
+.mobile-main label {
+  font-size: 14px;
+}
+.mobile-main input {
+  font-size: 16px;
+  scroll-margin-block: 24px;
+}
+.mobile-main .code-input {
+  min-height: 72px;
+  font-size: 30px;
+  letter-spacing: 0.4em;
+}
+.mobile-main .field-hint {
+  font-size: 12px;
+}
+.mobile-main .field-error,
+.mobile-main .status-message {
+  font-size: 14px;
+}
+.mobile-main .primary-button {
+  min-height: 56px;
+  margin-top: 24px;
+  font-size: 16px;
+}
+.mobile-main .access-note {
+  justify-content: flex-start;
+  margin-top: 16px;
+  font-size: 12px;
+  text-align: left;
+}
+.mobile-main .explanation {
+  margin-top: 27px;
+}
+.mobile-main .explanation summary {
+  min-height: 52px;
+  font-size: 14px;
+}
+.mobile-main .explanation-content {
+  font-size: 14px;
+}
+.mobile-step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: -12px;
+  margin-bottom: 16px;
+}
+.mobile-step-nav .text-button {
+  min-height: 48px;
+  padding: 8px 0;
+  font-size: 14px;
+}
+.mobile-step-nav .icon {
+  width: 16px;
+  height: 16px;
+  transform: rotate(180deg);
+}
+.mobile-step-number {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.mobile-resend {
+  margin-top: 12px;
+}
+.mobile-resend .text-button {
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--input-line);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.mobile-main .demo-note {
+  margin-top: 20px;
+  font-size: 13px;
+}
+.mobile-main .status-message:empty {
+  display: none;
+}
+.mobile-main .success-icon {
+  width: 64px;
+  height: 64px;
+  margin: 12px 0 28px;
+}
+.mobile-main .success-icon .icon {
+  width: 30px;
+  height: 30px;
+}
+.mobile-footer {
+  padding: 0 max(24px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.mobile-footer .version-link {
+  font-size: 12px;
+}
+@media (max-width: 360px) {
+  .mobile-header,
+  .mobile-main,
+  .mobile-footer {
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+  }
+  .mobile-main .form-title {
+    font-size: 34px;
+  }
+}
+@media (max-height: 500px) {
+  /* A composição continua sendo a View móvel em paisagem ou com altura reduzida. */
+  .mobile-header {
+    padding-top: 12px;
+    padding-bottom: 8px;
+  }
+  .mobile-main {
+    padding-top: 16px;
+  }
+  .mobile-main .form-title {
+    margin-top: 10px;
+  }
+}
+
+/* View exclusiva de monitores e tablets: composição editorial em duas colunas. */
+.shell {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
+}
+.story {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding: 42px clamp(32px, 4.8vw, 78px) 30px;
+  color: var(--on-brand);
+  background: var(--brand-bg);
+}
+.story::before {
+  content: "";
+  position: absolute;
+  width: 640px;
+  height: 640px;
+  border: 1px solid #ffffff0a;
+  border-radius: 50%;
+  top: 19%;
+  right: -470px;
+  pointer-events: none;
+}
+.story-main {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: auto 0;
+  padding: 62px 0 48px;
+}
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.story .eyebrow {
+  color: var(--brand-muted);
+}
+.eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: currentColor;
+}
+.story-title {
+  margin-top: 25px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(48px, 5.1vw, 76px);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -2.7px;
+}
+.story-title em {
+  color: var(--accent);
+  font-weight: 400;
+}
+.story-description {
+  max-width: 340px;
+  margin-top: 25px;
+  color: var(--brand-muted);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* Ilustração editorial em HTML/SVG: funciona sem imagens ou fontes remotas. */
+.illustration {
+  position: relative;
+  max-width: 370px;
+  margin: 43px 0 0;
+  padding: 13px 17px 27px 0;
+}
+.illustration::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 15px 15px;
+  border: 1px solid #e5d4ea2e;
+  border-radius: 15px;
+  transform: rotate(4deg);
+}
+.illustration-card {
+  position: relative;
+  padding: 23px 25px 20px;
+  border-radius: var(--radius);
+  color: var(--illustration-ink);
+  background: var(--illustration-bg);
+  box-shadow: 0 15px 40px #1c193320;
+}
+.illustration-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.illustration-label {
+  font-size: 10px;
+  letter-spacing: 1.1px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.illustration-title {
+  margin-top: 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  line-height: 1.2;
+  letter-spacing: -0.7px;
+}
+.illustration-chart {
+  width: 100%;
+  height: 66px;
+  margin-top: 16px;
+  overflow: visible;
+}
+.illustration-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 13px;
+  border-top: 1px solid #3433561a;
+  font-size: 11px;
+  color: var(--illustration-muted);
+}
+.illustration-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+.illustration-check .icon {
+  width: 14px;
+  height: 14px;
+}
+.story-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--brand-muted);
+}
+.story-footer .icon {
+  width: 15px;
+  height: 15px;
+}
+.story-footer span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.access {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 42px clamp(28px, 5.4vw, 86px) 26px;
+}
+.access-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 38px;
+}
+.access-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.access-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--primary-hover);
+  border-radius: 50%;
+}
+.access-main {
+  width: 100%;
+  max-width: 396px;
+  margin: auto;
+  padding: 58px 0 64px;
+}
+
+.access-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px 15px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.access-header {
+  justify-content: space-between;
+  gap: 20px;
+}
+.access-footer {
+  gap: 8px 16px;
+}
+input {
+  font-size: 16px;
+}
+.text-button {
+  min-width: 48px;
+  min-height: 48px;
+}
+@media (min-width: 1500px) {
+  .story {
+    padding-left: max(78px, calc((100vw - 1350px) / 2));
+  }
+}
+@media (max-width: 1100px) {
+  .shell {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+  .story {
+    padding: 30px 26px;
+  }
+  .access {
+    padding: 30px 26px 20px;
+  }
+  .access-badge {
+    display: none;
+  }
+  .access-header {
+    justify-content: flex-end;
+  }
+  .story-title {
+    font-size: 48px;
+  }
+  .story-main {
+    padding-top: 45px;
+  }
+  .story-footer {
+    flex-wrap: wrap;
+  }
+  .illustration-label {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+  .illustration-card {
+    padding: 20px;
+  }
+  .form-title {
+    font-size: 36px;
+  }
+  .form-description {
+    font-size: 15px;
+  }
+  .primary-button {
+    font-size: 15px;
+    min-height: 56px;
+  }
+}
+
+/* Componentes de sessão e diagnóstico, compartilhados sem igualar as composições. */
+input {
+  font-size: 16px;
+}
+.text-button {
+  min-width: 48px;
+  min-height: 48px;
+}
+.session-options {
+  margin-top: 24px;
+}
+.session-options .text-button {
+  display: flex;
+  text-align: left;
+}
+.test-card {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.test-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  margin: 0;
+  font-size: 16px;
+  cursor: pointer;
+}
+.test-choice input {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  accent-color: var(--primary);
+}
+.test-result {
+  margin-top: 12px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+#tests-run {
+  overflow-wrap: anywhere;
+}
+.mobile-main #tests-view .form-title {
+  font-size: 34px;
+}
+@media (max-width: 1100px) {
+  /* As regras editoriais só afetam sua View, nunca a composição móvel. */
+  body[data-view="mobile"] .form-description {
+    font-size: 16px;
+  }
+}
+</style></head>
+<body><div id="app"></div><template id="mobile-template"><a class="skip-link" href="#access-title">Ir para o acesso</a>
+<!-- Símbolos locais compartilhados pelos componentes visuais. -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  width="0"
+  height="0"
+  style="position: absolute"
+>
+  <defs>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" /></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <path d="m4 7 8 6 8-6" />
+    </symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24">
+      <rect x="5" y="10" width="14" height="11" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3M12 15v2" />
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+    <symbol id="icon-leaf" viewBox="0 0 24 24">
+      <path d="M5 20C3 10 8 4 20 4c0 10-6 16-15 16ZM5 20 15 10" />
+    </symbol>
+  </defs>
+</svg>
+
+<div id="access-layout" class="mobile-shell">
+  <header class="mobile-header">
+    <div class="brand" aria-label="Mukirana">
+      <svg class="brand-symbol" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="1" y="1" width="38" height="38" rx="12" fill="var(--primary)" />
+        <path
+          d="M10 27V16c6 0 10 4 10 11V13c6 0 10 5 10 14"
+          fill="none"
+          stroke="var(--on-primary)"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span class="brand-name">mukirana.</span>
+    </div>
+    <label class="theme-control" for="theme-select"
+      ><span class="visually-hidden">Tema</span
+      ><select id="theme-select" class="theme-select" name="theme">
+        <option value="light">Claro</option>
+        <option value="dark">Escuro</option>
+        <option value="sepia">Sépia</option>
+      </select></label
+    >
+  </header>
+  <main class="mobile-main">
+    <section id="loading-view" aria-labelledby="loading-title">
+  <h1 id="loading-title" class="form-title" tabindex="-1">Abrindo seu espaço.</h1>
+  <p id="loading-message" class="form-description" role="status">Conferindo seu acesso…</p>
+  <button id="retry-session" class="primary-button" type="button" hidden>Tentar novamente</button>
+</section>
+
+    <section id="email-view" hidden aria-labelledby="access-title">
+      <p class="mobile-kicker">Seu dinheiro, no seu ritmo</p>
+      <h1 id="access-title" class="form-title" tabindex="-1">
+        Um bom começo<br />para seus planos.
+      </h1>
+      <p class="form-description">Entre ou comece pelo seu e-mail.<br />Sem senhas para lembrar.</p>
+      <form id="email-form" novalidate>
+        <label for="email">Seu e-mail</label>
+        <div class="input-wrap">
+          <svg class="icon" aria-hidden="true"><use href="#icon-mail" /></svg>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="voce@exemplo.com"
+            autocomplete="email"
+            inputmode="email"
+            enterkeyhint="go"
+            autocapitalize="none"
+            spellcheck="false"
+            maxlength="254"
+            required
+            aria-describedby="email-hint email-error"
+          />
+        </div>
+        <p id="email-hint" class="field-hint">Use um e-mail ao qual você tenha acesso.</p>
+        <p id="email-error" class="field-error" role="alert" hidden></p>
+        <button id="email-submit" class="primary-button" type="submit">
+          <span>Receber meu código</span
+          ><svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg>
+        </button>
+      </form>
+      <p class="access-note">
+        <svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg>Seu acesso começa com um
+        código de 6 dígitos.
+      </p>
+      <details class="explanation">
+        <summary>
+          Como funciona?<svg class="icon" aria-hidden="true"><use href="#icon-chevron" /></svg>
+        </summary>
+        <div class="explanation-content">
+          <p>
+            Você receberá um código por e-mail para entrar ou criar sua conta. Seu acesso continuará
+            neste navegador. Prefira um dispositivo de confiança.
+          </p>
+          <p>
+            O código vale por 10 minutos. Seu acesso dura até 30 dias neste navegador. Você pode
+            encerrá-lo a qualquer momento.
+          </p>
+        </div>
+      </details>
+    </section>
+    <section id="code-view" aria-labelledby="code-title" hidden>
+      <nav class="mobile-step-nav" aria-label="Etapas do acesso">
+        <button id="change-email" class="text-button" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg>Alterar e-mail
+        </button>
+        <span class="mobile-step-number" aria-label="Etapa 2 de 2">02 / 02</span>
+      </nav>
+      <h1 id="code-title" class="form-title" tabindex="-1">
+        Seu próximo passo<br />está no e-mail.
+      </h1>
+      <p class="form-description">
+        Enviamos um código para <strong id="destination-email"></strong>.
+      </p>
+      <form id="code-form" novalidate>
+        <label for="code">Seu código de 6 dígitos</label>
+        <input
+          id="code"
+          class="code-input"
+          name="code"
+          type="text"
+          inputmode="numeric"
+          enterkeyhint="go"
+          autocomplete="one-time-code"
+          placeholder="000000"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          required
+          aria-describedby="code-hint code-error"
+        />
+        <p id="code-hint" class="field-hint">Você pode digitar ou colar o código completo.</p>
+        <p id="code-error" class="field-error" role="alert" hidden></p>
+        <button id="code-submit" class="primary-button" type="submit">
+          <span>Confirmar acesso</span
+          ><svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg>
+        </button>
+      </form>
+      <div class="mobile-resend">
+        <button id="resend-code" class="text-button" type="button" disabled>Reenviar código</button>
+      </div>
+      <p id="resend-status" class="status-message" role="status"></p>
+      <p class="demo-note">
+        O código vale por 10 minutos e pode ser usado uma única vez. Nunca compartilhe seu código.
+      </p>
+    </section>
+    <section id="home-view" aria-labelledby="home-title" hidden>
+  <p class="mobile-kicker">Seu espaço</p>
+  <h1 id="home-title" class="form-title" tabindex="-1">Que bom<br />ter você aqui.</h1>
+  <p class="form-description">Você entrou como <strong id="session-email"></strong>.</p>
+  <p class="demo-note">Registre suas entradas e saídas e organize suas contas e categorias.</p>
+  <button id="open-transactions" class="primary-button" type="button">Meus lançamentos</button>
+  <button id="open-accounts" class="primary-button" type="button">Minhas contas</button>
+  <button id="open-categories" class="primary-button" type="button">Minhas categorias</button>
+  <button id="open-tests" class="primary-button" type="button">Testar meu acesso</button>
+  <details class="explanation session-options">
+    <summary>Gerenciar meu acesso</summary>
+    <div class="explanation-content">
+      <p>Em um dispositivo compartilhado, saia ao terminar.</p>
+      <button id="logout-current" class="text-button" type="button">Sair deste navegador</button>
+      <button id="logout-all" class="text-button" type="button">
+        Sair de todos os dispositivos
+      </button>
+    </div>
+  </details>
+  <p id="home-status" class="status-message" role="status"></p>
+</section>
+<section id="tests-view" aria-labelledby="tests-title" hidden>
+  <nav class="mobile-step-nav">
+    <button id="close-tests" class="text-button" type="button">Voltar ao meu espaço</button>
+  </nav>
+  <h1 id="tests-title" class="form-title" tabindex="-1">Seu acesso,<br />conferido.</h1>
+  <p class="form-description">
+  Selecione o que deseja conferir. Estes testes consultam os serviços reais e não alteram seus dados
+  nem enviam e-mails.
+</p>
+<div id="tests-catalog"></div>
+<button id="run-tests" class="primary-button" type="button" disabled>Executar selecionados</button>
+<p id="tests-summary" class="status-message" role="status"></p>
+<p id="tests-run" class="field-hint"></p>
+
+</section>
+
+    <p id="flow-status" class="visually-hidden" role="status"></p>
+  </main>
+  <footer class="mobile-footer">
+    <p>Mukirana · versão 0.2.0</p>
+  </footer>
+</div>
+<section id="accounts-view" hidden></section>
+      <template id="accounts-template"><style>:host {
+  display: block;
+}
+:host([hidden]) {
+  display: none !important;
+}
+#accounts-content {
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100svh;
+}
+/* Componentes do protótipo de Contas. Cores vêm da identidade homologada. */
+#accounts-content[data-theme="sepia"] {
+  /* As notas usam superfície mais escura; o texto secundário precisa de contraste extra. */
+  --muted: #705b50;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+summary {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+button,
+a,
+summary,
+input,
+select {
+  scroll-margin-block: 24px;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+svg {
+  display: block;
+  flex-shrink: 0;
+}
+.icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  padding: 14px;
+  color: var(--primary);
+  background: var(--surface);
+  transform: translateY(-180%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.brand-mark {
+  width: 34px;
+  height: 34px;
+}
+.brand-word {
+  font-size: 26px;
+  font-weight: 650;
+  letter-spacing: -1.1px;
+}
+.theme-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.theme-select {
+  min-height: 48px;
+  min-width: 103px;
+  padding: 10px;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--input-line);
+  border-radius: 10px;
+}
+.eyebrow {
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 1.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 42px;
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+h1:focus,
+h2:focus {
+  outline: none;
+}
+.description {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+  margin-top: 12px;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 12px 20px;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 600;
+  border: 1px solid var(--input-line);
+  border-radius: 10px;
+  color: var(--primary);
+  background: var(--surface);
+  text-decoration: none;
+}
+.button.primary {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.button.primary:hover {
+  background: var(--primary-hover);
+}
+.button.danger {
+  color: var(--error);
+  border-color: var(--error);
+}
+.button.danger-filled {
+  background: var(--error);
+  color: var(--paper);
+  border-color: var(--error);
+}
+.button.text {
+  padding: 10px 0;
+  background: none;
+  border-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 10px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--primary);
+}
+.icon-button:hover {
+  border-color: var(--input-line);
+  background: var(--soft-primary);
+}
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 0;
+  margin-bottom: 18px;
+  border: 0;
+  color: var(--primary);
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+.back-button .icon {
+  width: 18px;
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 550;
+  white-space: nowrap;
+}
+.filter[aria-pressed="true"] {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.filter-count {
+  opacity: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+.search-wrap {
+  position: relative;
+}
+.search-wrap .icon {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 20px;
+  color: var(--muted);
+  pointer-events: none;
+}
+.search-wrap input {
+  padding-left: 44px;
+}
+input[type="text"],
+input[type="search"] {
+  width: 100%;
+  min-height: 52px;
+  padding: 13px 15px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--input-line);
+  border-radius: 9px;
+  font-size: 16px;
+}
+input[type="search"] {
+  padding-left: 44px;
+}
+input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+.type-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: var(--soft-primary);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.type-icon[data-type="investment"] {
+  background: var(--illustration-bg);
+  color: var(--illustration-ink);
+}
+.type-icon[data-type="credit"] {
+  background: var(--explanation-bg);
+  color: var(--note-ink);
+}
+.type-tag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+.amount {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+}
+.unreported {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.list-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.privacy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.privacy .icon {
+  width: 14px;
+  height: 14px;
+}
+.reference-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 15px 17px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  background: var(--explanation-bg);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.reference-note .icon {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+.reference-note strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.empty-state {
+  padding: 48px 22px;
+  text-align: center;
+  border: 1px dashed var(--input-line);
+  border-radius: 16px;
+}
+.empty-state .type-icon {
+  margin: 0 auto 22px;
+  width: 60px;
+  height: 60px;
+}
+.empty-state h2 {
+  font-family: Georgia, serif;
+  font-size: 29px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.7px;
+}
+.empty-state p {
+  max-width: 350px;
+  margin: 12px auto 22px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.empty-state .button {
+  margin: auto;
+}
+.loading-bar {
+  height: 13px;
+  max-width: 75%;
+  margin-top: 12px;
+  border-radius: 5px;
+  background: var(--line);
+}
+.skeleton {
+  padding: 22px;
+  min-height: 116px;
+  margin: 12px 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.field {
+  margin-top: 25px;
+}
+.field label,
+legend {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.optional {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 12px;
+}
+.hint {
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.field-error {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--error);
+}
+[aria-invalid="true"] {
+  border-color: var(--error) !important;
+}
+fieldset {
+  margin: 25px 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+legend {
+  padding: 0;
+}
+.type-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 14px;
+  border: 1px solid var(--input-line);
+  border-radius: 11px;
+  color: var(--ink);
+  background: var(--surface);
+  cursor: pointer;
+}
+.type-choice:has(input:checked) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+  background: var(--soft-primary);
+}
+.type-choice input {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+.type-choice strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.type-choice small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.amount-wrap {
+  position: relative;
+}
+.amount-wrap > span {
+  position: absolute;
+  left: 15px;
+  top: 16px;
+  color: var(--muted);
+  font-size: 16px;
+}
+.amount-wrap input {
+  padding-left: 47px;
+}
+.check-label {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin: 0 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  cursor: pointer;
+}
+.check-label input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+}
+.change-warning {
+  padding: 14px 16px;
+  margin-top: 16px;
+  border-left: 3px solid var(--note-line);
+  border-radius: 6px;
+  color: var(--note-ink);
+  background: var(--note-bg);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+.detail-balance {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+  background: var(--surface);
+}
+.detail-balance .amount {
+  display: block;
+  margin-top: 14px;
+  font-size: 34px;
+}
+.detail-balance .hint {
+  margin-top: 18px;
+}
+.detail-actions {
+  display: flex;
+  gap: 12px;
+}
+.status-toast {
+  position: fixed;
+  z-index: 8;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 14px 20px;
+  border: 1px solid var(--input-line);
+  border-radius: 12px;
+  color: var(--on-primary);
+  background: var(--primary);
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 6px 25px #00000018;
+}
+.prototype-tools {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.prototype-tools summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.prototype-tools .tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.prototype-tools button {
+  min-height: 48px;
+  padding: 9px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--primary);
+  background: var(--surface);
+  font-size: 12px;
+}
+.prototype-tools a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  color: var(--primary);
+}
+dialog {
+  width: min(430px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 26px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 24px 80px #00000030;
+}
+dialog::backdrop {
+  background: #17132173;
+}
+dialog h2 {
+  font-family: Georgia, serif;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.7px;
+  overflow-wrap: anywhere;
+}
+dialog p {
+  margin-top: 15px;
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 14px;
+}
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+  }
+}
+
+.account-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+/* View de celular: cartões e páginas próprias para detalhes e formulário. */
+.mobile-shell {
+  max-width: 540px;
+  margin: auto;
+  min-height: 100svh;
+}
+.mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(20px, env(safe-area-inset-top)) max(22px, env(safe-area-inset-right)) 20px
+    max(22px, env(safe-area-inset-left));
+}
+.mobile-header .brand-word {
+  font-size: 24px;
+}
+.mobile-header .brand-mark {
+  width: 31px;
+  height: 31px;
+}
+.mobile-main {
+  padding: 18px max(22px, env(safe-area-inset-right)) 30px max(22px, env(safe-area-inset-left));
+}
+.mobile-main h1 {
+  margin-top: 12px;
+  font-size: 40px;
+}
+.mobile-main .description {
+  font-size: 15px;
+}
+.new-account {
+  width: 100%;
+  margin-top: 26px;
+  min-height: 54px;
+  font-size: 16px;
+}
+.mobile-main .filters {
+  margin-top: 26px;
+}
+.mobile-main .filter {
+  padding-inline: 12px;
+}
+.mobile-main .search-wrap {
+  margin-top: 15px;
+}
+.mobile-main .list-meta {
+  margin-top: 22px;
+  margin-bottom: 13px;
+}
+.account-cards {
+  display: grid;
+  gap: 12px;
+}
+.account-card {
+  display: block;
+  width: 100%;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  text-align: left;
+}
+.account-card:hover {
+  border-color: var(--input-line);
+}
+.card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.card-title {
+  flex: 1;
+  min-width: 0;
+}
+.card-title strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.card-title small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.card-arrow {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+}
+.card-value {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid var(--line);
+}
+.card-value > span:first-child {
+  font-size: 11px;
+  color: var(--muted);
+}
+.card-value .amount {
+  font-size: 21px;
+}
+.card-value .unreported {
+  font-size: 14px;
+}
+.mobile-main .reference-note {
+  margin-top: 20px;
+  padding: 14px;
+  font-size: 12px;
+}
+.mobile-main .type-options {
+  display: grid;
+  gap: 9px;
+}
+.mobile-main .type-choice {
+  margin: 0;
+}
+.mobile-main .form-actions {
+  flex-direction: column;
+}
+.mobile-main .form-actions .primary {
+  width: 100%;
+  min-height: 54px;
+  font-size: 16px;
+}
+.mobile-main .form-actions .button.text {
+  align-self: center;
+}
+.mobile-main .back-button {
+  margin-bottom: 5px;
+}
+.mobile-main .detail-type {
+  margin-top: 18px;
+}
+.mobile-main .detail-balance {
+  margin-top: 25px;
+}
+.mobile-main .detail-balance .amount {
+  font-size: clamp(21px, 6.9vw, 32px);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.mobile-main .detail-actions {
+  flex-direction: column;
+  margin-top: 24px;
+}
+.mobile-main .detail-actions .button {
+  min-height: 54px;
+  font-size: 16px;
+}
+.mobile-footer {
+  padding: 0 max(22px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+    max(22px, env(safe-area-inset-left));
+}
+.mobile-footer > p {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+@media (max-width: 360px) {
+  .mobile-header,
+  .mobile-main,
+  .mobile-footer {
+    padding-left: max(18px, env(safe-area-inset-left));
+    padding-right: max(18px, env(safe-area-inset-right));
+  }
+  .mobile-main h1 {
+    font-size: 36px;
+  }
+  .mobile-header .brand-word {
+    font-size: 23px;
+  }
+  .account-card {
+    padding: 16px;
+  }
+  .mobile-main .filter {
+    font-size: 12px;
+  }
+}
+@media (max-height: 500px) {
+  .mobile-header {
+    padding-top: 12px;
+    padding-bottom: 10px;
+  }
+  .mobile-main {
+    padding-top: 8px;
+  }
+}
+</style>
+      <div id="accounts-content"><a href="#page-title" class="skip-link">Ir para minhas contas</a>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  width="0"
+  height="0"
+  style="position: absolute"
+>
+  <defs>
+    <symbol id="i-wallet" viewBox="0 0 24 24">
+      <path d="M20 8V5a2 2 0 0 0-2-2H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14V8H6a2 2 0 0 1 0-4" />
+      <path d="M20 12h-5v5h5M16 14.5h.1" />
+    </symbol>
+    <symbol id="i-investment" viewBox="0 0 24 24">
+      <path d="M4 20h16M7 16v-3m5 3V9m5 7V5M5 9l6-5 4 2 5-4" />
+    </symbol>
+    <symbol id="i-card" viewBox="0 0 24 24">
+      <rect x="2" y="4" width="20" height="16" rx="3" />
+      <path d="M2 10h20M6 15h4" />
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H4m7-7-7 7 7 7" /></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24">
+      <path d="m15 4 5 5M4 15 15 4a3.5 3.5 0 0 1 5 5L9 20l-6 1 1-6Z" />
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24">
+      <rect x="5" y="10" width="14" height="11" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3M12 15v2" />
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v6M12 7h.01" />
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m16 16 5 5" />
+    </symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24">
+      <path d="M5 20C3 10 8 4 20 4c0 10-6 16-15 16ZM5 20 15 10" />
+    </symbol>
+    <symbol id="i-brand" viewBox="0 0 40 40">
+      <rect x="1" y="1" width="38" height="38" rx="12" fill="currentColor" />
+      <path
+        d="M10 27V16c6 0 10 4 10 11V13c6 0 10 5 10 14"
+        fill="none"
+        stroke="var(--paper)"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </symbol>
+  </defs>
+</svg>
+
+<div class="mobile-shell">
+  <header class="mobile-header">
+    <div class="brand">
+      <svg class="brand-mark" style="color: var(--primary)" aria-hidden="true">
+        <use href="#i-brand" /></svg
+      ><span class="brand-word">mukirana.</span>
+    </div>
+    <label class="theme-control"
+      ><span class="visually-hidden">Tema</span
+      ><select id="theme-select" class="theme-select" aria-label="Tema">
+        <option value="light">Claro</option>
+        <option value="dark">Escuro</option>
+        <option value="sepia">Sépia</option>
+      </select></label
+    >
+  </header>
+  <main class="mobile-main">
+    <div
+      id="account-operation-error"
+      class="change-warning"
+      role="alert"
+      tabindex="-1"
+      hidden
+    ></div>
+    <button id="reload-accounts" class="button" type="button" hidden>Recarregar contas</button>
+    <section id="list-screen" aria-labelledby="page-title">
+      <p class="eyebrow">Seu espaço financeiro</p>
+      <h1 id="page-title" tabindex="-1">Minhas contas.</h1>
+      <p class="description">Um lugar para cada parte<br />dos seus planos.</p>
+      <button class="button primary new-account" data-action="new" type="button">
+        <svg class="icon" aria-hidden="true"><use href="#i-plus" /></svg>Nova conta
+      </button>
+      <div class="filters" role="group" aria-label="Filtrar por tipo">
+        <button class="filter" data-filter="all" aria-pressed="true">
+          Todas <span class="filter-count"></span></button
+        ><button class="filter" data-filter="consumption" aria-pressed="false">
+          Consumo <span class="filter-count"></span></button
+        ><button class="filter" data-filter="investment" aria-pressed="false">
+          Investimento <span class="filter-count"></span></button
+        ><button class="filter" data-filter="credit" aria-pressed="false">
+          Cartão <span class="filter-count"></span>
+        </button>
+      </div>
+      <label for="search" class="visually-hidden">Buscar conta pelo nome</label>
+      <div class="search-wrap">
+        <svg class="icon" aria-hidden="true"><use href="#i-search" /></svg
+        ><input id="search" type="search" placeholder="Buscar conta" autocomplete="off" />
+      </div>
+      <div class="list-meta">
+        <span id="result-count" role="status">Carregando contas…</span
+        ><span class="privacy"
+          ><svg class="icon" aria-hidden="true"><use href="#i-lock" /></svg>Somente você</span
+        >
+      </div>
+      <div id="accounts-list" class="account-cards"></div>
+      <div id="list-state"></div>
+      <div class="reference-note" id="list-reference">
+        <svg class="icon" aria-hidden="true"><use href="#i-info" /></svg>
+        <p>
+          <strong>Seu saldo, atualizado.</strong> Calculado pelos lançamentos com data até hoje.
+        </p>
+      </div>
+    </section>
+    <section id="detail-screen" aria-labelledby="detail-title" hidden>
+      <button class="back-button" data-action="back-list">
+        <svg class="icon" aria-hidden="true"><use href="#i-back" /></svg>Minhas contas
+      </button>
+      <p class="eyebrow">Detalhes da conta</p>
+      <h1 id="detail-title" tabindex="-1"></h1>
+      <span id="detail-type" class="type-tag detail-type"></span>
+      <div class="detail-balance">
+        <p class="eyebrow">Saldo atual</p>
+        <strong id="detail-amount" class="amount"></strong>
+        <p class="hint">
+          O saldo atual considera as movimentações com data até hoje.
+        </p><p id="detail-initial" class="hint"></p>
+      </div>
+      <div class="detail-actions">
+        <button id="edit-account" class="button primary">
+          <svg class="icon" aria-hidden="true"><use href="#i-edit" /></svg>Editar conta</button
+        ><button id="delete-account" class="button danger">Excluir conta</button>
+      </div>
+      <p class="description privacy">
+        <svg class="icon" aria-hidden="true"><use href="#i-lock" /></svg>Esta conta pertence somente
+        a você.
+      </p>
+    </section>
+    <section id="form-screen" aria-labelledby="form-title" hidden>
+      <button id="back-form" class="back-button">
+        <svg class="icon" aria-hidden="true"><use href="#i-back" /></svg>Voltar
+      </button>
+      <p class="eyebrow" id="form-kicker">Mais organização, menos esforço</p>
+      <h1 id="form-title" tabindex="-1">Nova conta.</h1>
+      <p class="description" id="form-description">
+        Comece pelo nome e escolha como usar esta conta.
+      </p>
+      <form id="account-form" novalidate>
+        <div class="field">
+          <label for="account-name">Nome da conta</label>
+          <input
+            id="account-name"
+            name="name"
+            type="text"
+            maxlength="80"
+            autocomplete="off"
+            placeholder="Ex.: Minha conta do dia a dia"
+            aria-describedby="name-hint name-error"
+            required
+          />
+          <p id="name-hint" class="hint">Um nome que faça sentido para você.</p>
+          <p id="name-error" class="field-error" role="alert" hidden></p>
+        </div>
+        <fieldset>
+          <legend>Tipo de conta</legend>
+          <div class="type-options">
+            <label class="type-choice"
+              ><input type="radio" name="account-type" value="consumption" checked /><span
+                ><strong>Consumo</strong><small>Dinheiro para o dia a dia.</small></span
+              ></label
+            >
+            <label class="type-choice"
+              ><input type="radio" name="account-type" value="investment" /><span
+                ><strong>Investimento</strong><small>Reservas e patrimônio guardado.</small></span
+              ></label
+            >
+            <label class="type-choice"
+              ><input type="radio" name="account-type" value="credit" /><span
+                ><strong>Cartão de Crédito</strong
+                ><small>Organização dos gastos para conferência.</small></span
+              ></label
+            >
+          </div>
+        </fieldset>
+        <div id="type-warning" class="change-warning" hidden>
+          <p>
+            O novo tipo valerá para a interpretação de todos os períodos, inclusive os anteriores,
+            quando houver movimentações.
+          </p>
+          <label class="check-label"
+            ><input id="confirm-type-change" type="checkbox" aria-describedby="type-error" />Entendi
+            o efeito da alteração.</label
+          >
+          <p id="type-error" class="field-error" role="alert" hidden></p>
+        </div>
+        <div class="field">
+          <label for="initial-amount">Saldo inicial <span class="optional">· opcional</span></label>
+          <div class="amount-wrap">
+            <span aria-hidden="true">R$</span
+            ><input
+              id="initial-amount"
+              name="initialAmount"
+              type="text"
+              inputmode="decimal"
+              maxlength="20"
+              autocomplete="off"
+              placeholder="0,00"
+              aria-describedby="amount-hint amount-error"
+            />
+          </div>
+          <label class="check-label"
+            ><input id="negative-amount" type="checkbox" />Valor negativo</label
+          >
+          <p id="amount-hint" class="hint">Ex.: 1.250,00. Em branco significa não informado.</p>
+          <p id="amount-error" class="field-error" role="alert" hidden></p>
+          <div class="field" id="opening-date-field" hidden>
+            <label for="opening-date">Data do saldo inicial</label>
+            <input id="opening-date" type="date" aria-describedby="amount-error" />
+          </div>
+        </div>
+        <div class="reference-note">
+          <svg class="icon" aria-hidden="true"><use href="#i-info" /></svg>
+          <p>
+            O saldo inicial gera um lançamento na data informada.
+            <strong>Ele participa dos totais de receitas ou despesas do período.</strong>
+          </p>
+        </div>
+        <div class="form-actions">
+          <button id="save-account" class="button primary" type="submit">
+            Salvar conta<svg class="icon" aria-hidden="true"><use href="#i-arrow" /></svg></button
+          ><button id="cancel-form" class="button text" type="button">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+  <footer class="mobile-footer">
+    <div class="account-navigation">
+      <button id="accounts-transactions" class="button text" type="button">Lançamentos</button><button id="accounts-home" class="button text" type="button">Meu espaço</button
+      ><button id="accounts-tests" class="button text" type="button">Testes de Contas</button>
+    </div>
+  </footer>
+</div>
+<template id="account-row-template"
+  ><button class="account-card" type="button">
+    <span class="card-heading"
+      ><span class="type-icon" data-field="type-icon"
+        ><svg class="icon" aria-hidden="true"><use data-field="icon" /></svg></span
+      ><span class="card-title"
+        ><strong data-field="name"></strong><small data-field="type"></small></span
+      ><svg class="icon card-arrow" aria-hidden="true"><use href="#i-arrow" /></svg></span
+    ><span class="card-value"
+      ><span>Saldo atual</span><strong class="amount" data-field="amount"></strong
+    ></span></button
+></template>
+<dialog
+  id="confirmation-dialog"
+  aria-labelledby="confirmation-title"
+  aria-describedby="confirmation-description"
+>
+  <h2 id="confirmation-title"></h2>
+  <p id="confirmation-description"></p>
+  <div class="dialog-actions">
+    <button id="dialog-cancel" class="button" type="button" autofocus>Cancelar</button
+    ><button id="dialog-confirm" class="button danger-filled" type="button">Confirmar</button>
+  </div>
+</dialog>
+<div id="toast" class="status-toast" role="status" hidden></div>
+<template id="empty-template"
+  ><div class="empty-state">
+    <div class="type-icon">
+      <svg class="icon" aria-hidden="true"><use href="#i-wallet" /></svg>
+    </div>
+    <h2 data-field="title"></h2>
+    <p data-field="description"></p>
+    <button class="button primary" type="button" data-action="empty"></button></div
+></template>
+</div></template></template>
+<template id="desktop-template"><a class="skip-link" href="#access-title">Ir para o acesso</a>
+<!-- Símbolos locais compartilhados pelos componentes visuais. -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  width="0"
+  height="0"
+  style="position: absolute"
+>
+  <defs>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" /></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="14" rx="3" />
+      <path d="m4 7 8 6 8-6" />
+    </symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24">
+      <rect x="5" y="10" width="14" height="11" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3M12 15v2" />
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+    <symbol id="icon-leaf" viewBox="0 0 24 24">
+      <path d="M5 20C3 10 8 4 20 4c0 10-6 16-15 16ZM5 20 15 10" />
+    </symbol>
+  </defs>
+</svg>
+
+<div id="access-layout" class="shell">
+  <aside class="story" aria-label="Conheça o Mukirana">
+    <div class="brand" aria-label="Mukirana">
+      <svg class="brand-symbol" viewBox="0 0 40 40" aria-hidden="true">
+        <rect
+          x="1"
+          y="1"
+          width="38"
+          height="38"
+          rx="12"
+          fill="none"
+          stroke="var(--accent)"
+          stroke-opacity=".65"
+        />
+        <path
+          d="M10 27V16c6 0 10 4 10 11V13c6 0 10 5 10 14"
+          fill="none"
+          stroke="var(--accent)"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span class="brand-name">mukirana<span style="color: var(--accent)">.</span></span>
+    </div>
+
+    <div class="story-main">
+      <p class="eyebrow">Finanças no seu ritmo</p>
+      <h2 class="story-title">
+        Seu dinheiro,<br />
+        com mais<br />
+        <em>clareza.</em>
+      </h2>
+      <p class="story-description">
+        Organize o presente, planeje seus próximos passos e abra espaço para o que importa.
+      </p>
+
+      <div class="illustration" aria-hidden="true">
+        <div class="illustration-card">
+          <div class="illustration-top">
+            <span class="illustration-label">Pequenos passos, novos planos</span
+            ><svg class="icon"><use href="#icon-leaf" /></svg>
+          </div>
+          <p class="illustration-title">Mais tranquilidade.<br />Um dia de cada vez.</p>
+          <svg class="illustration-chart" viewBox="0 0 300 66" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="var(--chart-fill)" stop-opacity=".22" />
+                <stop offset="1" stop-color="var(--chart-fill)" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M0 55C25 55 28 39 52 43S83 57 106 34 141 48 164 28 194 34 215 18 251 32 276 10 292 10 300 5V66H0Z"
+              fill="url(#chart-fill)"
+            />
+            <path
+              d="M0 55C25 55 28 39 52 43S83 57 106 34 141 48 164 28 194 34 215 18 251 32 276 10 292 10 300 5"
+              fill="none"
+              stroke="var(--chart)"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <div class="illustration-bottom">
+            <span>Você no controle</span
+            ><span class="illustration-check"
+              ><svg class="icon"><use href="#icon-check" /></svg>No seu tempo</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="story-footer">
+      <span
+        ><svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg>Suas finanças. Seu
+        espaço.</span
+      ><span>Simples, como deve ser.</span>
+    </div>
+  </aside>
+
+  <section class="access" aria-label="Acesso ao sistema">
+    <header class="access-header">
+      <span class="access-badge">Seu espaço financeiro</span
+      ><label class="theme-control" for="theme-select"
+        ><span>Tema</span
+        ><select id="theme-select" class="theme-select" name="theme">
+          <option value="light">Claro</option>
+          <option value="dark">Escuro</option>
+          <option value="sepia">Sépia</option>
+        </select></label
+      >
+    </header>
+
+    <main class="access-main">
+      <section id="loading-view" aria-labelledby="loading-title">
+  <h1 id="loading-title" class="form-title" tabindex="-1">Abrindo seu espaço.</h1>
+  <p id="loading-message" class="form-description" role="status">Conferindo seu acesso…</p>
+  <button id="retry-session" class="primary-button" type="button" hidden>Tentar novamente</button>
+</section>
+
+      <section id="email-view" hidden aria-labelledby="access-title">
+        <div class="step" aria-label="Etapa 1 de 2">
+          <span class="step-line"></span><span class="step-line inactive"></span
+          ><span>Seu primeiro passo</span>
+        </div>
+        <h1 id="access-title" class="form-title" tabindex="-1">Que bom ter você aqui.</h1>
+        <p class="form-description">
+          Entre ou comece pelo seu e-mail.<br />A gente cuida do acesso, sem senhas para lembrar.
+        </p>
+
+        <form id="email-form" novalidate>
+          <label for="email">Seu e-mail</label>
+          <div class="input-wrap">
+            <svg class="icon" aria-hidden="true"><use href="#icon-mail" /></svg
+            ><input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="voce@exemplo.com"
+              autocomplete="email"
+              inputmode="email"
+              enterkeyhint="go"
+              autocapitalize="none"
+              spellcheck="false"
+              maxlength="254"
+              required
+              aria-describedby="email-hint email-error"
+            />
+          </div>
+          <p id="email-hint" class="field-hint">Use um e-mail ao qual você tenha acesso.</p>
+          <p id="email-error" class="field-error" role="alert" hidden></p>
+          <button id="email-submit" class="primary-button" type="submit">
+            <span>Receber código de acesso</span
+            ><svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg>
+          </button>
+        </form>
+
+        <p class="access-note">
+          <svg class="icon" aria-hidden="true"><use href="#icon-lock" /></svg>O acesso é feito com
+          um código temporário de 6 dígitos.
+        </p>
+        <div class="separator">Sua organização começa aqui</div>
+        <details class="explanation">
+          <summary>
+            Como funciona o acesso?<svg class="icon" aria-hidden="true">
+              <use href="#icon-chevron" />
+            </svg>
+          </summary>
+          <div class="explanation-content">
+            <p>
+              Você receberá um código por e-mail para entrar ou criar sua conta. Depois, seu acesso
+              continuará neste navegador. Prefira um dispositivo de confiança.
+            </p>
+            <p>
+              O código vale por 10 minutos. Seu acesso dura até 30 dias neste navegador. Você pode
+              encerrá-lo a qualquer momento.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section id="code-view" aria-labelledby="code-title" hidden>
+        <div class="step" aria-label="Etapa 2 de 2">
+          <span class="step-line"></span><span class="step-line"></span
+          ><span>Só mais um passo</span>
+        </div>
+        <h1 id="code-title" class="form-title" tabindex="-1">Confira seu e-mail.</h1>
+        <p class="form-description">
+          Enviamos um código para<br /><strong id="destination-email"></strong>
+        </p>
+
+        <form id="code-form" novalidate>
+          <label for="code">Código de acesso</label>
+          <input
+            id="code"
+            class="code-input"
+            name="code"
+            type="text"
+            inputmode="numeric"
+            enterkeyhint="go"
+            autocomplete="one-time-code"
+            placeholder="000000"
+            pattern="[0-9]{6}"
+            maxlength="6"
+            required
+            aria-describedby="code-hint code-error"
+          />
+          <p id="code-hint" class="field-hint">Digite ou cole os 6 dígitos do código.</p>
+          <p id="code-error" class="field-error" role="alert" hidden></p>
+          <button id="code-submit" class="primary-button" type="submit">
+            <span>Entrar no Mukirana</span
+            ><svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg>
+          </button>
+        </form>
+
+        <div class="code-toolbar">
+          <button id="change-email" class="text-button" type="button">Alterar e-mail</button
+          ><button id="resend-code" class="text-button" type="button" disabled>
+            Reenviar código
+          </button>
+        </div>
+        <p id="resend-status" class="status-message" role="status"></p>
+        <p class="demo-note">
+          O código vale por 10 minutos e pode ser usado uma única vez. Nunca compartilhe seu código.
+        </p>
+      </section>
+
+      <section id="home-view" aria-labelledby="home-title" hidden>
+  <div class="step">Seu acesso está pronto</div>
+  <h1 id="home-title" class="form-title" tabindex="-1">Bem-vindo ao seu espaço.</h1>
+  <p class="form-description">Você entrou como <strong id="session-email"></strong>.</p>
+  <p class="demo-note">Registre suas entradas e saídas e organize suas contas e categorias.</p>
+  <button id="open-transactions" class="primary-button" type="button">Meus lançamentos</button>
+  <button id="open-accounts" class="primary-button" type="button">Minhas contas</button>
+  <button id="open-categories" class="primary-button" type="button">Minhas categorias</button>
+  <button id="open-tests" class="primary-button" type="button">Abrir testes de acesso</button>
+  <div class="session-options">
+    <button id="logout-current" class="text-button" type="button">Sair deste navegador</button>
+    <button id="logout-all" class="text-button" type="button">Sair de todos os dispositivos</button>
+  </div>
+  <p id="home-status" class="status-message" role="status"></p>
+</section>
+<section id="tests-view" aria-labelledby="tests-title" hidden>
+  <button id="close-tests" class="text-button" type="button">Voltar ao meu espaço</button>
+  <h1 id="tests-title" class="form-title" tabindex="-1">Testes do seu acesso.</h1>
+  <p class="form-description">
+  Selecione o que deseja conferir. Estes testes consultam os serviços reais e não alteram seus dados
+  nem enviam e-mails.
+</p>
+<div id="tests-catalog"></div>
+<button id="run-tests" class="primary-button" type="button" disabled>Executar selecionados</button>
+<p id="tests-summary" class="status-message" role="status"></p>
+<p id="tests-run" class="field-hint"></p>
+
+</section>
+
+      <p id="flow-status" class="visually-hidden" role="status"></p>
+    </main>
+
+    <footer class="access-footer"><span>Protótipo visual · sem envio de e-mails</span></footer>
+  </section>
+</div>
+<section id="accounts-view" hidden></section>
+      <template id="accounts-template"><style>:host {
+  display: block;
+}
+:host([hidden]) {
+  display: none !important;
+}
+#accounts-content {
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100svh;
+}
+/* Componentes do protótipo de Contas. Cores vêm da identidade homologada. */
+#accounts-content[data-theme="sepia"] {
+  /* As notas usam superfície mais escura; o texto secundário precisa de contraste extra. */
+  --muted: #705b50;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+summary {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+button,
+a,
+summary,
+input,
+select {
+  scroll-margin-block: 24px;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+svg {
+  display: block;
+  flex-shrink: 0;
+}
+.icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  padding: 14px;
+  color: var(--primary);
+  background: var(--surface);
+  transform: translateY(-180%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.brand-mark {
+  width: 34px;
+  height: 34px;
+}
+.brand-word {
+  font-size: 26px;
+  font-weight: 650;
+  letter-spacing: -1.1px;
+}
+.theme-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.theme-select {
+  min-height: 48px;
+  min-width: 103px;
+  padding: 10px;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--input-line);
+  border-radius: 10px;
+}
+.eyebrow {
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 1.5px;
+  font-weight: 650;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 42px;
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+h1:focus,
+h2:focus {
+  outline: none;
+}
+.description {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+  margin-top: 12px;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 12px 20px;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 600;
+  border: 1px solid var(--input-line);
+  border-radius: 10px;
+  color: var(--primary);
+  background: var(--surface);
+  text-decoration: none;
+}
+.button.primary {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.button.primary:hover {
+  background: var(--primary-hover);
+}
+.button.danger {
+  color: var(--error);
+  border-color: var(--error);
+}
+.button.danger-filled {
+  background: var(--error);
+  color: var(--paper);
+  border-color: var(--error);
+}
+.button.text {
+  padding: 10px 0;
+  background: none;
+  border-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 10px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--primary);
+}
+.icon-button:hover {
+  border-color: var(--input-line);
+  background: var(--soft-primary);
+}
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 0;
+  margin-bottom: 18px;
+  border: 0;
+  color: var(--primary);
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+.back-button .icon {
+  width: 18px;
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 550;
+  white-space: nowrap;
+}
+.filter[aria-pressed="true"] {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.filter-count {
+  opacity: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+.search-wrap {
+  position: relative;
+}
+.search-wrap .icon {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 20px;
+  color: var(--muted);
+  pointer-events: none;
+}
+.search-wrap input {
+  padding-left: 44px;
+}
+input[type="text"],
+input[type="search"] {
+  width: 100%;
+  min-height: 52px;
+  padding: 13px 15px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--input-line);
+  border-radius: 9px;
+  font-size: 16px;
+}
+input[type="search"] {
+  padding-left: 44px;
+}
+input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+.type-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: var(--soft-primary);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.type-icon[data-type="investment"] {
+  background: var(--illustration-bg);
+  color: var(--illustration-ink);
+}
+.type-icon[data-type="credit"] {
+  background: var(--explanation-bg);
+  color: var(--note-ink);
+}
+.type-tag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+.amount {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+}
+.unreported {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.list-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.privacy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.privacy .icon {
+  width: 14px;
+  height: 14px;
+}
+.reference-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 15px 17px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  background: var(--explanation-bg);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.reference-note .icon {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+.reference-note strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.empty-state {
+  padding: 48px 22px;
+  text-align: center;
+  border: 1px dashed var(--input-line);
+  border-radius: 16px;
+}
+.empty-state .type-icon {
+  margin: 0 auto 22px;
+  width: 60px;
+  height: 60px;
+}
+.empty-state h2 {
+  font-family: Georgia, serif;
+  font-size: 29px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.7px;
+}
+.empty-state p {
+  max-width: 350px;
+  margin: 12px auto 22px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.empty-state .button {
+  margin: auto;
+}
+.loading-bar {
+  height: 13px;
+  max-width: 75%;
+  margin-top: 12px;
+  border-radius: 5px;
+  background: var(--line);
+}
+.skeleton {
+  padding: 22px;
+  min-height: 116px;
+  margin: 12px 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.field {
+  margin-top: 25px;
+}
+.field label,
+legend {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.optional {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 12px;
+}
+.hint {
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.field-error {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--error);
+}
+[aria-invalid="true"] {
+  border-color: var(--error) !important;
+}
+fieldset {
+  margin: 25px 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+legend {
+  padding: 0;
+}
+.type-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 14px;
+  border: 1px solid var(--input-line);
+  border-radius: 11px;
+  color: var(--ink);
+  background: var(--surface);
+  cursor: pointer;
+}
+.type-choice:has(input:checked) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+  background: var(--soft-primary);
+}
+.type-choice input {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+.type-choice strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.type-choice small {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.amount-wrap {
+  position: relative;
+}
+.amount-wrap > span {
+  position: absolute;
+  left: 15px;
+  top: 16px;
+  color: var(--muted);
+  font-size: 16px;
+}
+.amount-wrap input {
+  padding-left: 47px;
+}
+.check-label {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin: 0 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  cursor: pointer;
+}
+.check-label input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+}
+.change-warning {
+  padding: 14px 16px;
+  margin-top: 16px;
+  border-left: 3px solid var(--note-line);
+  border-radius: 6px;
+  color: var(--note-ink);
+  background: var(--note-bg);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+.detail-balance {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+  background: var(--surface);
+}
+.detail-balance .amount {
+  display: block;
+  margin-top: 14px;
+  font-size: 34px;
+}
+.detail-balance .hint {
+  margin-top: 18px;
+}
+.detail-actions {
+  display: flex;
+  gap: 12px;
+}
+.status-toast {
+  position: fixed;
+  z-index: 8;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 14px 20px;
+  border: 1px solid var(--input-line);
+  border-radius: 12px;
+  color: var(--on-primary);
+  background: var(--primary);
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 6px 25px #00000018;
+}
+.prototype-tools {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.prototype-tools summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.prototype-tools .tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.prototype-tools button {
+  min-height: 48px;
+  padding: 9px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--primary);
+  background: var(--surface);
+  font-size: 12px;
+}
+.prototype-tools a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  color: var(--primary);
+}
+dialog {
+  width: min(430px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 26px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 24px 80px #00000030;
+}
+dialog::backdrop {
+  background: #17132173;
+}
+dialog h2 {
+  font-family: Georgia, serif;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.7px;
+  overflow-wrap: anywhere;
+}
+dialog p {
+  margin-top: 15px;
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 14px;
+}
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+  }
+}
+
+.account-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+/* View de computador/tablet: navegação lateral, tabela e formulário em painel. */
+.desktop-shell {
+  display: grid;
+  grid-template-columns: 224px minmax(0, 1fr);
+  min-height: 100svh;
+}
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: 35px 22px 28px;
+  color: var(--on-brand);
+  background: var(--brand-bg);
+}
+.sidebar .brand {
+  padding-left: 6px;
+}
+.sidebar .brand-word {
+  color: var(--on-brand);
+}
+.sidebar .brand-mark {
+  color: var(--accent);
+}
+.sidebar .nav-label {
+  margin: 52px 14px 16px;
+  color: var(--brand-muted);
+  font-size: 10px;
+  letter-spacing: 1.7px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.nav-current {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 52px;
+  margin: 0;
+  padding: 13px 16px;
+  border: 1px solid #ffffff26;
+  border-radius: 11px;
+  color: var(--on-brand);
+  background: #ffffff10;
+  text-decoration: none;
+  font-size: 14px;
+}
+.nav-current .icon {
+  color: var(--accent);
+}
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 48px 14px 0;
+}
+.sidebar-bottom > p {
+  margin-top: 14px;
+  color: var(--brand-muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.sidebar-decoration {
+  width: 70px;
+  height: 70px;
+  color: var(--accent);
+  opacity: 0.8;
+}
+.sidebar-bottom .privacy {
+  font-size: 11px;
+  color: var(--brand-muted);
+  margin-top: 35px;
+}
+.workspace {
+  min-width: 0;
+}
+.desktop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 105px;
+  padding: 20px clamp(24px, 4.3vw, 68px);
+  border-bottom: 1px solid var(--line);
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.breadcrumb strong {
+  color: var(--ink);
+  font-weight: 550;
+}
+.desktop-main {
+  width: 100%;
+  max-width: 1330px;
+  padding: 48px clamp(24px, 4.3vw, 68px) 36px;
+  margin: 0 auto;
+}
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+.desktop-main h1 {
+  margin-top: 10px;
+  font-size: 44px;
+}
+.page-heading .new-account {
+  flex-shrink: 0;
+  margin-top: 20px;
+}
+.accounts-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 35px 0 24px;
+}
+.accounts-toolbar .search-wrap {
+  flex: 1;
+  min-width: 200px;
+  max-width: 260px;
+}
+.accounts-toolbar .filters {
+  flex-shrink: 0;
+}
+.desktop-main .list-meta {
+  margin-bottom: 15px;
+}
+.table-wrap {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.accounts-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.accounts-table th {
+  padding: 18px 14px;
+  color: var(--muted);
+  background: var(--explanation-bg);
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.accounts-table th:first-child {
+  padding-left: 22px;
+  width: 39%;
+}
+.accounts-table th:nth-child(2) {
+  width: 24%;
+}
+.accounts-table th:nth-child(3) {
+  width: 27%;
+  text-align: right;
+}
+.accounts-table th:last-child {
+  width: 10%;
+}
+.accounts-table td {
+  padding: 18px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.accounts-table td:first-child {
+  padding-left: 22px;
+}
+.accounts-table td:nth-child(3) {
+  text-align: right;
+}
+.accounts-table td:last-child {
+  padding-left: 0;
+  padding-right: 12px;
+  text-align: right;
+}
+.account-name {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  color: var(--ink);
+  background: none;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 550;
+}
+.account-name > span:last-child {
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+.account-name .type-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+}
+.accounts-table .amount {
+  font-size: 17px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.accounts-table .unreported {
+  font-size: 13px;
+  white-space: normal;
+}
+.desktop-main .reference-note {
+  margin-top: 23px;
+}
+.form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 28px;
+  align-items: start;
+  margin-top: 28px;
+}
+.form-panel {
+  padding: 8px 28px 28px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface);
+}
+.form-aside {
+  padding: 25px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--explanation-bg);
+}
+.form-aside > .type-icon {
+  margin-bottom: 22px;
+  background: var(--illustration-bg);
+}
+.form-aside h2 {
+  font-family: Georgia, serif;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+.form-aside p {
+  margin-top: 13px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.form-aside .privacy {
+  margin-top: 25px;
+}
+.desktop-main .type-options {
+  display: grid;
+  gap: 10px;
+}
+.desktop-main .type-choice {
+  margin: 0;
+}
+.desktop-main .form-actions {
+  justify-content: flex-end;
+  align-items: center;
+}
+.desktop-main .form-actions .primary {
+  order: 2;
+}
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 28px;
+  margin-top: 30px;
+  align-items: start;
+}
+.detail-information {
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.detail-information h2 {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.detail-information .hint {
+  margin: 15px 0 24px;
+}
+.desktop-main .detail-actions {
+  flex-direction: column;
+}
+.detail-type {
+  margin-top: 17px;
+}
+.desktop-footer {
+  max-width: 1330px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 4.3vw, 68px) 28px;
+}
+.desktop-footer > p {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+@media (max-width: 1150px) {
+  .desktop-shell {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+  .sidebar {
+    padding-inline: 16px;
+  }
+  .sidebar .brand-word {
+    font-size: 25px;
+  }
+  .desktop-main {
+    padding-top: 35px;
+  }
+  .form-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .form-aside {
+    display: none;
+  }
+  .accounts-toolbar .search-wrap {
+    max-width: none;
+  }
+}
+@media (max-width: 850px) {
+  .desktop-shell {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+  .sidebar {
+    align-items: center;
+    padding: 28px 10px;
+  }
+  .sidebar .brand {
+    padding: 0;
+  }
+  .sidebar .brand-word,
+  .sidebar .nav-label,
+  .sidebar .nav-current span,
+  .sidebar-bottom {
+    display: none;
+  }
+  .nav-current {
+    width: 50px;
+    min-height: 50px;
+    justify-content: center;
+    padding: 10px;
+    margin-top: 40px;
+  }
+  .desktop-header {
+    min-height: 90px;
+  }
+  .page-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .page-heading .new-account {
+    margin-top: 0;
+  }
+  .desktop-main h1 {
+    font-size: 38px;
+  }
+  .accounts-toolbar {
+    margin-top: 28px;
+  }
+  .accounts-table th,
+  .accounts-table td {
+    padding: 14px 8px;
+  }
+  .accounts-table th:first-child,
+  .accounts-table td:first-child {
+    padding-left: 14px;
+  }
+  .accounts-table th:first-child {
+    width: 35%;
+  }
+  .accounts-table th:nth-child(2) {
+    width: 24%;
+  }
+  .accounts-table th:nth-child(3) {
+    width: 27%;
+  }
+  .accounts-table th:last-child {
+    width: 14%;
+  }
+  .account-name {
+    gap: 8px;
+    font-size: 13px;
+  }
+  .account-name .type-icon {
+    display: none;
+  }
+  .accounts-table .amount {
+    font-size: 14px;
+  }
+  .accounts-table .type-tag {
+    font-size: 10px;
+    padding: 5px 6px;
+  }
+  .form-panel {
+    padding-inline: 20px;
+  }
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+</style>
+      <div id="accounts-content"><a href="#page-title" class="skip-link">Ir para minhas contas</a>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  width="0"
+  height="0"
+  style="position: absolute"
+>
+  <defs>
+    <symbol id="i-wallet" viewBox="0 0 24 24">
+      <path d="M20 8V5a2 2 0 0 0-2-2H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14V8H6a2 2 0 0 1 0-4" />
+      <path d="M20 12h-5v5h5M16 14.5h.1" />
+    </symbol>
+    <symbol id="i-investment" viewBox="0 0 24 24">
+      <path d="M4 20h16M7 16v-3m5 3V9m5 7V5M5 9l6-5 4 2 5-4" />
+    </symbol>
+    <symbol id="i-card" viewBox="0 0 24 24">
+      <rect x="2" y="4" width="20" height="16" rx="3" />
+      <path d="M2 10h20M6 15h4" />
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H4m7-7-7 7 7 7" /></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24">
+      <path d="m15 4 5 5M4 15 15 4a3.5 3.5 0 0 1 5 5L9 20l-6 1 1-6Z" />
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24">
+      <rect x="5" y="10" width="14" height="11" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3M12 15v2" />
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v6M12 7h.01" />
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m16 16 5 5" />
+    </symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24">
+      <path d="M5 20C3 10 8 4 20 4c0 10-6 16-15 16ZM5 20 15 10" />
+    </symbol>
+    <symbol id="i-brand" viewBox="0 0 40 40">
+      <rect x="1" y="1" width="38" height="38" rx="12" fill="currentColor" />
+      <path
+        d="M10 27V16c6 0 10 4 10 11V13c6 0 10 5 10 14"
+        fill="none"
+        stroke="var(--paper)"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </symbol>
+  </defs>
+</svg>
+
+<div class="desktop-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <svg class="brand-mark" aria-hidden="true"><use href="#i-brand" /></svg
+      ><span class="brand-word">mukirana.</span>
+    </div>
+    <p class="nav-label">Meu espaço</p>
+    <nav aria-label="Navegação principal">
+      <a href="#page-title" class="nav-current" aria-current="page" aria-label="Contas"
+        ><svg class="icon" aria-hidden="true"><use href="#i-wallet" /></svg><span>Contas</span></a
+      >
+    </nav>
+    <div class="sidebar-bottom">
+      <svg class="sidebar-decoration" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+        <path d="M12 64V34h28v30M40 64V16h28v48M5 64h70" stroke="currentColor" stroke-width="1.5" />
+        <circle cx="24" cy="19" r="10" stroke="currentColor" stroke-width="1.5" />
+        <path d="M46 7h20" stroke="currentColor" />
+      </svg>
+      <p>Pequenos passos.<br />Mais espaço para seus planos.</p>
+      <span class="privacy"
+        ><svg class="icon" aria-hidden="true"><use href="#i-lock" /></svg>Seu dinheiro. Seu
+        espaço.</span
+      >
+    </div>
+  </aside>
+  <div class="workspace">
+    <header class="desktop-header">
+      <div class="breadcrumb">
+        <span>Meu espaço</span><span aria-hidden="true">/</span><strong>Contas</strong>
+      </div>
+      <label class="theme-control"
+        ><span>Tema</span
+        ><select id="theme-select" class="theme-select" aria-label="Tema">
+          <option value="light">Claro</option>
+          <option value="dark">Escuro</option>
+          <option value="sepia">Sépia</option>
+        </select></label
+      >
+    </header>
+    <main class="desktop-main">
+      <div
+        id="account-operation-error"
+        class="change-warning"
+        role="alert"
+        tabindex="-1"
+        hidden
+      ></div>
+      <button id="reload-accounts" class="button" type="button" hidden>Recarregar contas</button>
+      <section id="list-screen" aria-labelledby="page-title">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Organização que acompanha você</p>
+            <h1 id="page-title" tabindex="-1">Minhas contas.</h1>
+            <p class="description">Cada conta com seu lugar. Seus planos com mais clareza.</p>
+          </div>
+          <button class="button primary new-account" data-action="new">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus" /></svg>Nova conta
+          </button>
+        </div>
+        <div class="accounts-toolbar">
+          <div class="filters" role="group" aria-label="Filtrar por tipo">
+            <button class="filter" data-filter="all" aria-pressed="true">
+              Todas <span class="filter-count"></span></button
+            ><button class="filter" data-filter="consumption" aria-pressed="false">
+              Consumo <span class="filter-count"></span></button
+            ><button class="filter" data-filter="investment" aria-pressed="false">
+              Investimento <span class="filter-count"></span></button
+            ><button class="filter" data-filter="credit" aria-pressed="false">
+              Cartão <span class="filter-count"></span>
+            </button>
+          </div>
+          <div class="search-wrap">
+            <label for="search" class="visually-hidden">Buscar conta pelo nome</label
+            ><svg class="icon" aria-hidden="true"><use href="#i-search" /></svg
+            ><input id="search" type="search" placeholder="Buscar pelo nome" autocomplete="off" />
+          </div>
+        </div>
+        <div class="list-meta">
+          <span id="result-count" role="status">Carregando contas…</span
+          ><span class="privacy"
+            ><svg class="icon" aria-hidden="true"><use href="#i-lock" /></svg>Visíveis somente para
+            você</span
+          >
+        </div>
+        <div id="table-wrap" class="table-wrap">
+          <table class="accounts-table">
+            <caption class="visually-hidden">
+              Contas e saldos atuais
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Conta</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Saldo atual</th>
+                <th scope="col"><span class="visually-hidden">Ações</span></th>
+              </tr>
+            </thead>
+            <tbody id="accounts-list"></tbody>
+          </table>
+        </div>
+        <div id="list-state"></div>
+        <div class="reference-note" id="list-reference">
+          <svg class="icon" aria-hidden="true"><use href="#i-info" /></svg>
+          <p>
+            <strong>Seu saldo, atualizado.</strong> Calculado pelos lançamentos com data até hoje.
+          </p>
+        </div>
+      </section>
+      <section id="form-screen" aria-labelledby="form-title" hidden>
+        <button id="back-form" class="back-button">
+          <svg class="icon" aria-hidden="true"><use href="#i-back" /></svg>Voltar
+        </button>
+        <p id="form-kicker" class="eyebrow">Organize do seu jeito</p>
+        <h1 id="form-title" tabindex="-1">Nova conta.</h1>
+        <p id="form-description" class="description">
+          Dê um nome à conta e escolha o tipo que combina com seu uso.
+        </p>
+        <div class="form-layout">
+          <form id="account-form" class="form-panel" novalidate>
+            <div class="field">
+              <label for="account-name">Nome da conta</label>
+              <input
+                id="account-name"
+                name="name"
+                type="text"
+                maxlength="80"
+                autocomplete="off"
+                placeholder="Ex.: Minha conta do dia a dia"
+                aria-describedby="name-hint name-error"
+                required
+              />
+              <p id="name-hint" class="hint">Um nome que faça sentido para você.</p>
+              <p id="name-error" class="field-error" role="alert" hidden></p>
+            </div>
+            <fieldset>
+              <legend>Tipo de conta</legend>
+              <div class="type-options">
+                <label class="type-choice"
+                  ><input type="radio" name="account-type" value="consumption" checked /><span
+                    ><strong>Consumo</strong><small>Dinheiro para o dia a dia.</small></span
+                  ></label
+                >
+                <label class="type-choice"
+                  ><input type="radio" name="account-type" value="investment" /><span
+                    ><strong>Investimento</strong
+                    ><small>Reservas e patrimônio guardado.</small></span
+                  ></label
+                >
+                <label class="type-choice"
+                  ><input type="radio" name="account-type" value="credit" /><span
+                    ><strong>Cartão de Crédito</strong
+                    ><small>Organização dos gastos para conferência.</small></span
+                  ></label
+                >
+              </div>
+            </fieldset>
+            <div id="type-warning" class="change-warning" hidden>
+              <p>
+                O novo tipo valerá para a interpretação de todos os períodos, inclusive os
+                anteriores, quando houver movimentações.
+              </p>
+              <label class="check-label"
+                ><input
+                  id="confirm-type-change"
+                  type="checkbox"
+                  aria-describedby="type-error"
+                />Entendi o efeito da alteração.</label
+              >
+              <p id="type-error" class="field-error" role="alert" hidden></p>
+            </div>
+            <div class="field">
+              <label for="initial-amount"
+                >Saldo inicial <span class="optional">· opcional</span></label
+              >
+              <div class="amount-wrap">
+                <span aria-hidden="true">R$</span
+                ><input
+                  id="initial-amount"
+                  name="initialAmount"
+                  type="text"
+                  inputmode="decimal"
+                  maxlength="20"
+                  autocomplete="off"
+                  placeholder="0,00"
+                  aria-describedby="amount-hint amount-error"
+                />
+              </div>
+              <label class="check-label"
+                ><input id="negative-amount" type="checkbox" />Valor negativo</label
+              >
+              <p id="amount-hint" class="hint">Ex.: 1.250,00. Em branco significa não informado.</p>
+              <p id="amount-error" class="field-error" role="alert" hidden></p>
+          <div class="field" id="opening-date-field" hidden>
+            <label for="opening-date">Data do saldo inicial</label>
+            <input id="opening-date" type="date" aria-describedby="amount-error" />
+          </div>
+            </div>
+            <div class="reference-note">
+              <svg class="icon" aria-hidden="true"><use href="#i-info" /></svg>
+              <p>
+                O saldo inicial gera um lançamento na data informada.
+            <strong>Ele participa dos totais de receitas ou despesas do período.</strong>
+              </p>
+            </div>
+            <div class="form-actions">
+              <button id="save-account" class="button primary" type="submit">
+                Salvar conta<svg class="icon" aria-hidden="true">
+                  <use href="#i-arrow" />
+                </svg></button
+              ><button id="cancel-form" class="button text" type="button">Cancelar</button>
+            </div>
+          </form>
+          <aside class="form-aside">
+            <div class="type-icon">
+              <svg class="icon" aria-hidden="true"><use href="#i-leaf" /></svg>
+            </div>
+            <h2>Uma conta.<br />Muitos planos.</h2>
+            <p>
+              Você pode organizar dinheiro do dia a dia, investimentos e cartões em contas
+              separadas.
+            </p>
+            <p>Depois, cada movimentação encontrará seu lugar.</p>
+            <p class="privacy">
+              <svg class="icon" aria-hidden="true"><use href="#i-lock" /></svg>Visível somente para
+              você
+            </p>
+          </aside>
+        </div>
+      </section>
+      <section id="detail-screen" aria-labelledby="detail-title" hidden>
+        <button class="back-button" data-action="back-list">
+          <svg class="icon" aria-hidden="true"><use href="#i-back" /></svg>Minhas contas
+        </button>
+        <p class="eyebrow">Detalhes da conta</p>
+        <h1 id="detail-title" tabindex="-1"></h1>
+        <span id="detail-type" class="type-tag detail-type"></span>
+        <div class="detail-layout">
+          <div class="detail-balance">
+            <p class="eyebrow">Saldo atual</p>
+            <strong id="detail-amount" class="amount"></strong>
+            <p class="hint">
+              O saldo atual considera as movimentações com data até hoje.
+        </p><p id="detail-initial" class="hint"></p>
+          </div>
+          <aside class="detail-information">
+            <h2>Gerenciar conta</h2>
+            <p class="hint">Ajuste o cadastro quando seus planos mudarem.</p>
+            <div class="detail-actions">
+              <button id="edit-account" class="button primary">
+                <svg class="icon" aria-hidden="true"><use href="#i-edit" /></svg>Editar conta</button
+              ><button id="delete-account" class="button danger">Excluir conta</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <footer class="desktop-footer">
+      <div class="account-navigation">
+        <button id="accounts-transactions" class="button text" type="button">Lançamentos</button><button id="accounts-home" class="button text" type="button">Meu espaço</button
+        ><button id="accounts-tests" class="button text" type="button">Testes de Contas</button>
+      </div>
+    </footer>
+  </div>
+</div>
+<template id="account-row-template"
+  ><tr>
+    <td>
+      <button class="account-name" data-action="details">
+        <span class="type-icon" data-field="type-icon"
+          ><svg class="icon" aria-hidden="true"><use data-field="icon" /></svg></span
+        ><span data-field="name"></span>
+      </button>
+    </td>
+    <td><span class="type-tag" data-field="type"></span></td>
+    <td><strong class="amount" data-field="amount"></strong></td>
+    <td>
+      <button class="icon-button" data-action="edit">
+        <svg class="icon" aria-hidden="true"><use href="#i-edit" /></svg>
+      </button>
+    </td></tr
+></template>
+<dialog
+  id="confirmation-dialog"
+  aria-labelledby="confirmation-title"
+  aria-describedby="confirmation-description"
+>
+  <h2 id="confirmation-title"></h2>
+  <p id="confirmation-description"></p>
+  <div class="dialog-actions">
+    <button id="dialog-cancel" class="button" type="button" autofocus>Cancelar</button
+    ><button id="dialog-confirm" class="button danger-filled" type="button">Confirmar</button>
+  </div>
+</dialog>
+<div id="toast" class="status-toast" role="status" hidden></div>
+<template id="empty-template"
+  ><div class="empty-state">
+    <div class="type-icon">
+      <svg class="icon" aria-hidden="true"><use href="#i-wallet" /></svg>
+    </div>
+    <h2 data-field="title"></h2>
+    <p data-field="description"></p>
+    <button class="button primary" type="button" data-action="empty"></button></div
+></template>
+</div></template></template>
+<?!= includeCategoriesView_(); ?>
+<?!= includeTransactionsView_(); ?>
+<noscript>Ative o JavaScript para acessar o Mukirana.</noscript><script>/** Monta somente uma View; redimensionar ou girar não substitui o formulário em andamento. */
+(() => {
+  const smallScreen = Math.min(window.screen.width, window.screen.height) < 600;
+  const mobile =
+    window.matchMedia("(max-width: 599px)").matches ||
+    (window.matchMedia("(pointer: coarse)").matches && smallScreen);
+  const view = mobile ? "mobile" : "desktop";
+  document.body.dataset.view = view;
+  document
+    .getElementById("app")
+    .append(document.getElementById(view + "-template").content.cloneNode(true));
+  // Templates de componentes internos precisam continuar disponíveis após montar a View.
+  for (const name of ["mobile", "desktop"]) document.getElementById(name + "-template").remove();
+})();
+
+/** Ponte única para o controller Apps Script; falhas de transporte não são aprovação. */
+const MukiranaApi = Object.freeze({
+  call(request) {
+    return new Promise((resolve, reject) => {
+      if (!window.google?.script?.run) {
+        reject(new Error("Abra o aplicativo pelo endereço publicado no Google."));
+        return;
+      }
+      window.google.script.run
+        .withSuccessHandler((result) => {
+          if (!result || typeof result.status !== "string")
+            reject(new Error("Resposta incompleta. Tente novamente."));
+          else resolve(result);
+        })
+        .withFailureHandler(() => reject(new Error("A conexão falhou. Tente novamente.")))
+        .api(request);
+    });
+  },
+});
+
+/** Apenas o token persiste; indisponibilidade do armazenamento mantém a sessão em memória. */
+const MukiranaSession = (() => {
+  const key = "mukirana.session";
+  let token = "";
+  return Object.freeze({
+    read() {
+      try {
+        token = localStorage.getItem(key) || "";
+      } catch {
+        /* Navegação privada restrita. */
+      }
+      if (!/^[0-9a-f]{64}$/.test(token)) token = "";
+      return token;
+    },
+    current: () => token,
+    save(value) {
+      token = value;
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    clear() {
+      token = "";
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        /* A sessão já foi revogada no servidor. */
+      }
+    },
+  });
+})();
+
+</script>
+<?!= includeFinanceClient_(); ?>
+<script>
+/** Runner reutilizável: catálogo e asserções pertencem ao backend de cada módulo. */
+const MukiranaDiagnostics = (() => {
+  const labels = {
+    passed: "Aprovado",
+    failed: "Reprovado",
+    blocked: "Bloqueado",
+    skipped: "Ignorado",
+    not_run: "Não executado",
+  };
+  let running = false;
+  let catalog = [];
+  let version = "";
+  const nodes = new Map();
+  const element = (id) => document.getElementById(id);
+  async function load(onExpired) {
+    if (running) return;
+    element("run-tests").disabled = true;
+    element("tests-summary").textContent = "Carregando cenários…";
+    element("tests-run").textContent = "";
+    element("tests-catalog").replaceChildren();
+    nodes.clear();
+    try {
+      const result = await MukiranaApi.call({
+        action: "tests.catalog",
+        token: MukiranaSession.current(),
+      });
+      if (result.status === "invalid_session") {
+        onExpired();
+        return;
+      }
+      if (result.status !== "ready" || !Array.isArray(result.scenarios) || !result.scenarios.length)
+        throw new Error();
+      catalog = result.scenarios;
+      version = result.version;
+      catalog.forEach((scenario) => {
+        const card = document.createElement("article");
+        card.className = "test-card";
+        const label = document.createElement("label");
+        label.className = "test-choice";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = true;
+        const title = document.createElement("span");
+        title.textContent = scenario.title;
+        label.append(checkbox, title);
+        card.append(label);
+        for (const content of [
+          scenario.objective,
+          "Esperado: " + scenario.expected,
+          "Critério: " + scenario.criterion,
+        ]) {
+          const paragraph = document.createElement("p");
+          paragraph.className = "field-hint";
+          paragraph.textContent = content;
+          card.append(paragraph);
+        }
+        const output = document.createElement("p");
+        output.className = "test-result";
+        output.textContent = labels.not_run;
+        card.append(output);
+        element("tests-catalog").append(card);
+        nodes.set(scenario.id, { checkbox, output });
+      });
+      element("tests-summary").textContent = "Escolha um ou mais cenários para executar.";
+      element("run-tests").disabled = false;
+    } catch {
+      element("tests-summary").textContent =
+        "Não foi possível carregar os testes. Volte ao seu espaço e tente novamente.";
+    }
+  }
+  async function run(onExpired) {
+    if (running) return;
+    const selected = catalog.filter((scenario) => nodes.get(scenario.id).checkbox.checked);
+    if (!selected.length) {
+      element("tests-summary").textContent = "Selecione ao menos um teste.";
+      return;
+    }
+    running = true;
+    element("run-tests").disabled = true;
+    element("close-tests").disabled = true;
+    nodes.forEach(({ checkbox, output }) => {
+      checkbox.disabled = true;
+      output.textContent = labels.not_run;
+    });
+    const runId = window.crypto.randomUUID();
+    element("tests-run").textContent = "Versão " + version + " · Execução " + runId;
+    const counts = { passed: 0, failed: 0, blocked: 0, not_run: selected.length };
+    try {
+      for (const [index, scenario] of selected.entries()) {
+        element("tests-summary").textContent =
+          "Executando " + (index + 1) + " de " + selected.length + "…";
+        let result;
+        try {
+          result = await MukiranaApi.call({
+            action: "tests.run",
+            id: scenario.id,
+            token: MukiranaSession.current(),
+          });
+        } catch {
+          result = { status: "blocked", evidence: "A conexão falhou. Tente novamente." };
+        }
+        if (result.status === "invalid_session") {
+          onExpired();
+          break;
+        }
+        const status = ["passed", "failed", "blocked"].includes(result.status)
+          ? result.status
+          : "blocked";
+        counts[status] += 1;
+        counts.not_run -= 1;
+        nodes.get(scenario.id).output.textContent =
+          labels[status] + ". " + (result.evidence || "O serviço não concluiu a verificação.");
+      }
+      element("tests-summary").textContent =
+        `${counts.passed} aprovados · ${counts.failed} reprovados · ${counts.blocked} bloqueados · ${counts.not_run} não executados.`;
+    } finally {
+      running = false;
+      element("run-tests").disabled = false;
+      element("close-tests").disabled = false;
+      nodes.forEach(({ checkbox }) => {
+        checkbox.disabled = false;
+      });
+    }
+  }
+  return Object.freeze({ load, run });
+})();
+
+/**
+ * Controller de Contas compartilhado pelas Views homologadas.
+ * O servidor valida sessão/propriedade; este módulo não persiste dados financeiros no navegador.
+ */
+const MukiranaAccounts = (() => {
+  "use strict";
+  const host = document.getElementById("accounts-view");
+  const root = host.attachShadow({ mode: "open" });
+  root.append(document.getElementById("accounts-template").content.cloneNode(true));
+  document.getElementById("accounts-template").remove();
+  let callbacks = {};
+  const element = (id) => root.getElementById(id);
+  const all = (selector) => [...root.querySelectorAll(selector)];
+  const types = Object.freeze({
+    consumption: { label: "Consumo", icon: "i-wallet" },
+    investment: { label: "Investimento", icon: "i-investment" },
+    credit: { label: "Cartão de Crédito", icon: "i-card" },
+  });
+  const state = {
+    accounts: [],
+    filter: "all",
+    screen: "list",
+    selectedId: null,
+    editId: null,
+    originalType: null,
+    formSnapshot: "",
+    busy: false,
+    scenario: "loading",
+    operation: 0,
+    createId: null,
+  };
+  let toastTimer;
+  let confirmResult = null;
+  const dialog = element("confirmation-dialog");
+
+  function money(cents) {
+    return MukiranaFinance.money(cents);
+  }
+  function show(screen, focusId) {
+    state.screen = screen;
+    for (const name of ["list", "detail", "form"])
+      element(name + "-screen").hidden = name !== screen;
+    root.querySelector(".skip-link").href = "#" + focusId;
+    element(focusId).focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  }
+  function toast(message) {
+    window.clearTimeout(toastTimer);
+    element("toast").textContent = message;
+    element("toast").hidden = false;
+    toastTimer = window.setTimeout(() => {
+      element("toast").hidden = true;
+    }, 4500);
+  }
+  function confirm(title, description, label) {
+    element("confirmation-title").textContent = title;
+    element("confirmation-description").textContent = description;
+    element("dialog-confirm").textContent = label;
+    dialog.showModal();
+    element("dialog-cancel").focus();
+    return new Promise((resolve) => {
+      confirmResult = resolve;
+    });
+  }
+  function closeDialog(confirmed) {
+    dialog.close();
+    const resolve = confirmResult;
+    confirmResult = null;
+    if (resolve) resolve(confirmed);
+  }
+  element("dialog-cancel").addEventListener("click", () => closeDialog(false));
+  element("dialog-confirm").addEventListener("click", () => closeDialog(true));
+  dialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeDialog(false);
+  });
+
+  function empty(title, description, label, action) {
+    const node = element("empty-template").content.cloneNode(true);
+    node.querySelector('[data-field="title"]').textContent = title;
+    node.querySelector('[data-field="description"]').textContent = description;
+    const button = node.querySelector("button");
+    button.textContent = label;
+    button.addEventListener("click", action);
+    element("list-state").append(node);
+  }
+  function render() {
+    element("accounts-list").replaceChildren();
+    element("list-state").replaceChildren();
+    const query = element("search").value.trim().toLocaleLowerCase("pt-BR");
+    const matches = state.accounts.filter(
+      (account) =>
+        (state.filter === "all" || account.type === state.filter) &&
+        account.name.toLocaleLowerCase("pt-BR").includes(query),
+    );
+    all("[data-filter]").forEach((button) => {
+      const type = button.dataset.filter;
+      const count = state.accounts.filter((item) => type === "all" || item.type === type).length;
+      button.querySelector(".filter-count").textContent = count;
+      button.setAttribute("aria-pressed", String(state.filter === type));
+      button.disabled = state.scenario === "loading";
+    });
+    const ready = !["loading", "error"].includes(state.scenario);
+    all('[data-action="new"]').forEach((button) => {
+      button.disabled = !ready;
+    });
+    element("search").disabled = !ready;
+    if (element("table-wrap")) element("table-wrap").hidden = !ready || !matches.length;
+    element("list-reference").hidden = !ready || !state.accounts.length;
+    element("result-count").textContent = ready
+      ? `${matches.length} ${matches.length === 1 ? "conta" : "contas"}`
+      : state.scenario === "loading"
+        ? "Carregando contas…"
+        : "Contas indisponíveis";
+    if (!ready) {
+      if (state.scenario === "error")
+        empty(
+          "Não foi possível carregar.",
+          "Tente buscar a lista novamente.",
+          "Tentar novamente",
+          load,
+        );
+      else {
+        for (let index = 0; index < 3; index += 1) {
+          const skeleton = document.createElement("div");
+          skeleton.className = "skeleton";
+          skeleton.setAttribute("aria-hidden", "true");
+          for (let line = 0; line < 2; line += 1) {
+            const bar = document.createElement("div");
+            bar.className = "loading-bar";
+            skeleton.append(bar);
+          }
+          element("list-state").append(skeleton);
+        }
+      }
+      return;
+    }
+    if (!state.accounts.length) {
+      empty(
+        "Seus planos começam aqui.",
+        "Adicione sua primeira conta para organizar o dinheiro do dia a dia, suas reservas ou seus cartões.",
+        "Criar minha primeira conta",
+        () => openForm(),
+      );
+      return;
+    }
+    if (!matches.length) {
+      empty(
+        "Nenhuma conta por aqui.",
+        "Experimente outro nome ou escolha um tipo diferente.",
+        "Limpar filtros",
+        () => {
+          state.filter = "all";
+          element("search").value = "";
+          render();
+        },
+      );
+      return;
+    }
+    for (const account of matches) {
+      const row = element("account-row-template").content.cloneNode(true);
+      row.querySelector('[data-field="name"]').textContent = account.name;
+      row.querySelector('[data-field="type"]').textContent = types[account.type].label;
+      row.querySelector('[data-field="type-icon"]').dataset.type = account.type;
+      row.querySelector('[data-field="icon"]').setAttribute("href", "#" + types[account.type].icon);
+      const amount = row.querySelector('[data-field="amount"]');
+      amount.textContent = money(account.balanceCents);
+      amount.classList.remove("unreported");
+      const details = row.querySelector('[data-action="details"]') || row.querySelector("button");
+      details.setAttribute("aria-label", "Ver conta " + account.name);
+      details.addEventListener("click", () => showDetails(account.id));
+      const edit = row.querySelector('[data-action="edit"]');
+      if (edit) {
+        edit.setAttribute("aria-label", "Editar " + account.name);
+        edit.addEventListener("click", () => openForm(account.id));
+      }
+      element("accounts-list").append(row);
+    }
+  }
+  function showDetails(id) {
+    const account = state.accounts.find((item) => item.id === id);
+    if (!account) return;
+    state.selectedId = id;
+    element("detail-title").textContent = account.name;
+    element("detail-type").textContent = types[account.type].label;
+    element("detail-amount").textContent = money(account.balanceCents);
+    element("detail-initial").textContent = account.initialCents === null ? "Saldo inicial não informado." : `Saldo inicial: ${money(account.initialCents)} em ${MukiranaFinance.dateLabel(account.openingDate)}.`;
+    element("detail-amount").classList.remove("unreported");
+    show("detail", "detail-title");
+  }
+  function formSnapshot() {
+    return JSON.stringify([
+      element("account-name").value,
+      root.querySelector('[name="account-type"]:checked').value,
+      element("initial-amount").value,
+      element("negative-amount").checked,
+      element("opening-date").value,
+    ]);
+  }
+  function fieldError(id, message) {
+    element(id + "-error").textContent = message;
+    element(id + "-error").hidden = !message;
+    const field = element(
+      id === "name" ? "account-name" : id === "amount" ? "initial-amount" : "confirm-type-change",
+    );
+    field.setAttribute("aria-invalid", String(Boolean(message)));
+  }
+  function openForm(id = null) {
+    if (state.busy || state.scenario !== "ready") return;
+    operationError("");
+    const account = id ? state.accounts.find((item) => item.id === id) : null;
+    state.editId = id;
+    state.createId = id ? null : window.crypto.randomUUID();
+    state.originalType = account?.type || null;
+    element("account-form").reset();
+    element("account-name").value = account?.name || "";
+    root.querySelector(`[name="account-type"][value="${account?.type || "consumption"}"]`).checked =
+      true;
+    element("initial-amount").value =
+      account?.initialCents !== null && account?.initialCents !== undefined
+        ? (Math.abs(account.initialCents) / 100).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        : "";
+    element("negative-amount").checked = (account?.initialCents || 0) < 0;
+    element("opening-date").value = account?.openingDate || MukiranaFinance.today();
+    element("opening-date-field").hidden = account?.initialCents == null;
+    element("type-warning").hidden = true;
+    for (const name of ["name", "amount", "type"]) fieldError(name, "");
+    element("form-title").textContent = account ? "Editar conta." : "Nova conta.";
+    element("form-description").textContent = account
+      ? "Ajuste o nome, o tipo ou o saldo inicial informado."
+      : "Dê um nome à conta e escolha o tipo que combina com seu uso.";
+    element("save-account").firstChild.textContent = account ? "Salvar alterações" : "Salvar conta";
+    state.formSnapshot = formSnapshot();
+    show("form", "form-title");
+  }
+  async function leaveForm() {
+    if (state.busy) return;
+    if (
+      formSnapshot() !== state.formSnapshot &&
+      !(await confirm(
+        "Descartar alterações?",
+        "O que você mudou neste formulário ainda não foi salvo.",
+        "Descartar",
+      ))
+    )
+      return;
+    await load();
+  }
+  /** Conversão decimal em centavos por texto; não multiplica um decimal de ponto flutuante. */
+  function parseAmount() {
+    const raw = element("initial-amount").value.trim();
+    if (!raw) return null;
+    if (!/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(raw)) return undefined;
+    const [whole, decimal = ""] = raw.replace(/\./g, "").split(",");
+    const cents = Number(whole + decimal.padEnd(2, "0"));
+    if (!Number.isSafeInteger(cents) || cents > 99999999999999) return undefined;
+    return element("negative-amount").checked && cents ? -cents : cents;
+  }
+  function busy(value) {
+    state.busy = value;
+    all(
+      '#account-form input, #account-form button, #back-form, #edit-account, #delete-account, [data-action="new"], #accounts-home, #accounts-transactions, #accounts-tests, #reload-accounts',
+    ).forEach((control) => {
+      control.disabled = value;
+    });
+    element("account-form").setAttribute("aria-busy", String(value));
+    element("save-account").firstChild.textContent = value
+      ? "Salvando…"
+      : state.editId
+        ? "Salvar alterações"
+        : "Salvar conta";
+  }
+  element("account-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (state.busy) return;
+    const name = element("account-name").value.trim();
+    const type = root.querySelector('[name="account-type"]:checked').value;
+    const amount = parseAmount();
+    fieldError(
+      "name",
+      name && !/[\u0000-\u001f\u007f]/.test(name) ? "" : "Dê um nome válido para esta conta.",
+    );
+    fieldError(
+      "amount",
+      amount === undefined ? "Use um valor como 1.250,00, com no máximo duas casas decimais." : "",
+    );
+    const missingConfirmation =
+      state.editId && type !== state.originalType && !element("confirm-type-change").checked;
+    fieldError(
+      "type",
+      missingConfirmation ? "Confirme que entendeu o efeito da alteração de tipo." : "",
+    );
+    if (!name || /[\u0000-\u001f\u007f]/.test(name)) {
+      element("account-name").focus();
+      return;
+    }
+    if (amount === undefined) {
+      element("initial-amount").focus();
+      return;
+    }
+    if (amount !== null && !MukiranaFinance.date(element("opening-date").value)) {
+      fieldError("amount", "Informe uma data válida para o saldo inicial."); element("opening-date").focus(); return;
+    }
+    if (missingConfirmation) {
+      element("confirm-type-change").focus();
+      return;
+    }
+    const original = state.accounts.find((item) => item.id === state.editId);
+    const account = {
+      id: state.editId || state.createId,
+      version: original?.version || 0,
+      name,
+      type,
+      initialCents: amount,
+      openingDate: amount === null ? null : element("opening-date").value,
+      confirmTypeChange: element("confirm-type-change").checked,
+    };
+    const generation = state.operation;
+    operationError("");
+    busy(true);
+    try {
+      const result = await MukiranaApi.call({
+        action: "accounts.save",
+        token: MukiranaSession.current(),
+        account,
+      });
+      if (generation !== state.operation || sessionExpired(result)) return;
+      if (result.status !== "saved" || !validAccount(result.account)) {
+        handleFailure(result.status);
+        return;
+      }
+      state.accounts = state.editId
+        ? state.accounts.map((item) => (item.id === result.account.id ? result.account : item))
+        : [result.account, ...state.accounts.filter((item) => item.id !== result.account.id)];
+      state.scenario = "ready";
+      state.filter = "all";
+      element("search").value = "";
+      render();
+      show("list", "page-title");
+      toast(state.editId ? "Conta atualizada." : "Conta criada.");
+    } catch {
+      if (generation === state.operation)
+        operationError(
+          "Não foi possível confirmar o salvamento. Confira a conexão e tente novamente; seu formulário foi preservado.",
+        );
+    } finally {
+      if (generation === state.operation) busy(false);
+    }
+  });
+  all('[name="account-type"]').forEach((radio) =>
+    radio.addEventListener("change", () => {
+      element("type-warning").hidden = !state.editId || radio.value === state.originalType;
+      element("confirm-type-change").checked = false;
+      fieldError("type", "");
+    }),
+  );
+  element("account-name").addEventListener("input", () => fieldError("name", ""));
+  element("initial-amount").addEventListener("input", () => {
+    element("opening-date-field").hidden = !element("initial-amount").value.trim();
+    if (/^-/.test(element("initial-amount").value)) {
+      element("negative-amount").checked = true;
+      element("initial-amount").value = element("initial-amount").value.replace(/^-/, "");
+    }
+    fieldError("amount", "");
+  });
+  element("cancel-form").addEventListener("click", leaveForm);
+  element("back-form").addEventListener("click", leaveForm);
+  element("edit-account").addEventListener("click", () => openForm(state.selectedId));
+  element("delete-account").addEventListener("click", async () => {
+    if (state.busy) return;
+    const account = state.accounts.find((item) => item.id === state.selectedId);
+    if (
+      !account ||
+      !(await confirm(
+        `Excluir “${account.name}”?`,
+        "A conta será removida da sua lista. Se preferir mantê-la, você pode apenas editar o nome.",
+        "Excluir conta",
+      ))
+    )
+      return;
+    const generation = state.operation;
+    operationError("");
+    busy(true);
+    try {
+      const result = await MukiranaApi.call({
+        action: "accounts.delete",
+        token: MukiranaSession.current(),
+        id: account.id,
+        version: account.version,
+      });
+      if (generation !== state.operation || sessionExpired(result)) return;
+      if (result.status === "linked") {
+        busy(false);
+        if (await confirm("Esta conta possui movimentações.", "Você pode renomear a conta para manter o histórico organizado.", "Renomear conta")) openForm(account.id);
+        return;
+      }
+      if (result.status !== "deleted") {
+        handleFailure(result.status);
+        return;
+      }
+      state.accounts = state.accounts.filter((item) => item.id !== account.id);
+      state.selectedId = null;
+      render();
+      show("list", "page-title");
+      toast("Conta excluída.");
+    } catch {
+      if (generation === state.operation)
+        operationError(
+          "Não foi possível confirmar a exclusão. Tente novamente ou recarregue suas contas.",
+        );
+    } finally {
+      if (generation === state.operation) busy(false);
+    }
+  });
+  all('[data-action="new"]').forEach((button) =>
+    button.addEventListener("click", () => openForm()),
+  );
+  all('[data-action="back-list"]').forEach((button) =>
+    button.addEventListener("click", () => show("list", "page-title")),
+  );
+  all("[data-filter]").forEach((button) =>
+    button.addEventListener("click", () => {
+      state.filter = button.dataset.filter;
+      render();
+    }),
+  );
+  element("search").addEventListener("input", render);
+  const nav = root.querySelector(".nav-current");
+  if (nav)
+    nav.addEventListener("click", async (event) => {
+      event.preventDefault();
+      if (state.busy) return;
+      if (state.screen === "form") {
+        await leaveForm();
+        return;
+      }
+      show("list", "page-title");
+    });
+  window.addEventListener("beforeunload", (event) => {
+    if (!host.hidden && state.screen === "form" && formSnapshot() !== state.formSnapshot) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  });
+  function validAccount(account) {
+    return (
+      account &&
+      typeof account.id === "string" &&
+      typeof account.name === "string" &&
+      Object.hasOwn(types, account.type) &&
+      Number.isInteger(account.version) &&
+      account.version > 0 &&
+      (account.initialCents === null || Number.isSafeInteger(account.initialCents))
+    );
+  }
+  function operationError(message, canReload = false) {
+    element("account-operation-error").textContent = message;
+    element("account-operation-error").hidden = !message;
+    element("reload-accounts").hidden = !canReload;
+    if (message) element("account-operation-error").focus();
+  }
+  function handleFailure(status) {
+    const messages = {
+      conflict:
+        "Esta conta foi alterada em outro acesso. Recarregue a lista para revisar a versão atual antes de continuar.",
+      not_found: "A conta não está mais disponível. Recarregue sua lista.",
+      type_confirmation_required: "Confirme o efeito da alteração de tipo para continuar.",
+      invalid_request: "Confira os dados informados antes de salvar.",
+    };
+    operationError(
+      messages[status] || "Não foi possível concluir a operação. Tente novamente.",
+      ["conflict", "not_found"].includes(status),
+    );
+  }
+  function sessionExpired(result) {
+    if (result.status !== "invalid_session") return false;
+    reset();
+    callbacks.onExpired?.();
+    return true;
+  }
+  async function load() {
+    if (state.busy) return;
+    const generation = ++state.operation;
+    state.scenario = "loading";
+    operationError("");
+    show("list", "page-title");
+    busy(true);
+    render();
+    try {
+      const result = await MukiranaApi.call({
+        action: "accounts.list",
+        token: MukiranaSession.current(),
+      });
+      if (generation !== state.operation || sessionExpired(result)) return;
+      if (
+        result.status !== "ok" ||
+        !Array.isArray(result.accounts) ||
+        !result.accounts.every(validAccount)
+      )
+        throw new Error();
+      state.accounts = result.accounts;
+      state.scenario = "ready";
+    } catch {
+      if (generation === state.operation) {
+        state.accounts = [];
+        state.scenario = "error";
+      }
+    } finally {
+      if (generation === state.operation) {
+        busy(false);
+        render();
+      }
+    }
+  }
+  async function leave(callback) {
+    if (state.busy) return;
+    if (
+      state.screen === "form" &&
+      formSnapshot() !== state.formSnapshot &&
+      !(await confirm("Descartar alterações?", "O formulário ainda não foi salvo.", "Descartar"))
+    )
+      return;
+    if (callback) callback();
+  }
+  function reset() {
+    state.operation += 1;
+    state.accounts = [];
+    state.selectedId = null;
+    state.editId = null;
+    state.createId = null;
+    state.originalType = null;
+    state.formSnapshot = "";
+    state.filter = "all";
+    state.scenario = "loading";
+    state.screen = "list";
+    element("account-form").reset();
+    if (dialog.open) closeDialog(false);
+    for (const id of [
+      "detail-title",
+      "detail-type",
+      "detail-amount",
+      "detail-initial",
+      "confirmation-title",
+      "confirmation-description",
+      "toast",
+    ])
+      element(id).textContent = "";
+    operationError("");
+    element("search").value = "";
+    busy(false);
+    window.clearTimeout(toastTimer);
+    element("toast").hidden = true;
+    render();
+  }
+  function syncTheme() {
+    const theme = document.documentElement.dataset.theme;
+    element("accounts-content").dataset.theme = theme;
+    element("theme-select").value = theme;
+  }
+  element("theme-select").addEventListener("change", () => {
+    const sharedSelect = document.getElementById("theme-select");
+    sharedSelect.value = element("theme-select").value;
+    sharedSelect.dispatchEvent(new window.Event("change"));
+  });
+  document.addEventListener("mukirana:theme", syncTheme);
+  syncTheme();
+  root.querySelector(".skip-link").addEventListener("click", (event) => {
+    event.preventDefault();
+    element(
+      state.screen === "list"
+        ? "page-title"
+        : state.screen === "form"
+          ? "form-title"
+          : "detail-title",
+    ).focus();
+  });
+  element("accounts-transactions").addEventListener("click", () => leave(callbacks.onTransactions));
+  element("accounts-home").addEventListener("click", () => leave(callbacks.onHome));
+  element("accounts-tests").addEventListener("click", () => leave(callbacks.onTests));
+  element("reload-accounts").addEventListener("click", () => leave(load));
+  return Object.freeze({
+    open: async (options) => {
+      callbacks = options;
+      state.filter = "all";
+      element("search").value = "";
+      await load();
+      if (options.editId && state.scenario === "ready") openForm(options.editId);
+    },
+    reset,
+  });
+})();
+
+</script>
+<?!= includeCategoryClient_(); ?>
+<?!= includeTransactionClient_(); ?>
+<script>
+
+/** Controller compartilhado pelas duas Views. Nenhuma regra de autorização depende dele. */
+document.addEventListener("DOMContentLoaded", () => {
+  const element = (id) => document.getElementById(id);
+  const emailInput = element("email");
+  const codeInput = element("code");
+  let challenge = null;
+  let destination = "";
+  let busy = false;
+  let retryAt = 0;
+  let stage = "loading";
+  const messages = {
+    invalid_request: "Confira o e-mail informado.",
+    rate_limited: "Aguarde antes de solicitar outro código.",
+    busy: "O envio está ocupado. Tente novamente em instantes.",
+    delivery_unavailable: "Não foi possível enviar o código agora. Tente novamente mais tarde.",
+    delivery_unconfirmed:
+      "O envio não pôde ser confirmado. Aguarde um minuto e solicite outro código.",
+    unavailable: "O serviço está indisponível. Tente novamente.",
+    invalid_code:
+      "Código inválido, expirado ou sem tentativas disponíveis. Confira ou solicite outro.",
+  };
+  function show(view, focusId) {
+    stage = view;
+    for (const name of ["loading", "email", "code", "home", "tests", "accounts", "categories", "transactions"])
+      element(name + "-view").hidden = name !== view;
+    element("access-layout").hidden = ["accounts", "categories", "transactions"].includes(view);
+    if (["accounts", "categories", "transactions"].includes(view)) return;
+    document.querySelector(".skip-link").href = "#" + focusId;
+    element(focusId).focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  }
+  function error(input, message) {
+    const output = element(input.id + "-error");
+    output.textContent = message;
+    output.hidden = !message;
+    input.setAttribute("aria-invalid", String(Boolean(message)));
+  }
+  function refreshResend() {
+    const remaining = Math.max(0, Math.ceil((retryAt - Date.now()) / 1000));
+    element("resend-code").disabled = busy || remaining > 0;
+    element("resend-code").textContent = remaining
+      ? "Reenviar em " + remaining + " s"
+      : "Reenviar código";
+  }
+  function setBusy(value) {
+    busy = value;
+    for (const id of [
+      "email-submit",
+      "code-submit",
+      "change-email",
+      "logout-current",
+      "logout-all",
+      "open-tests",
+      "open-accounts",
+      "open-categories",
+      "open-transactions",
+      "retry-session",
+    ])
+      element(id).disabled = value;
+    emailInput.disabled = value;
+    codeInput.disabled = value;
+    element("email-form").setAttribute("aria-busy", String(value));
+    element("code-form").setAttribute("aria-busy", String(value));
+    refreshResend();
+  }
+  function expired() {
+    MukiranaAccounts.reset();
+    MukiranaCategories.reset();
+    MukiranaTransactions.reset();
+    MukiranaFinance.period.reset();
+    MukiranaSession.clear();
+    challenge = null;
+    codeInput.value = "";
+    show("email", "access-title");
+    error(emailInput, "Seu acesso foi encerrado ou expirou. Solicite um novo código.");
+  }
+  function enter(session, persistent = true) {
+    challenge = null;
+    codeInput.value = "";
+    element("session-email").textContent = session.user.email;
+    element("home-status").textContent = persistent
+      ? ""
+      : "O navegador bloqueou o armazenamento. Seu acesso vale enquanto esta página estiver aberta.";
+    show("home", "home-title");
+  }
+  async function restore() {
+    if (busy) return;
+    const token = MukiranaSession.read();
+    if (!token) {
+      show("email", "access-title");
+      return;
+    }
+    setBusy(true);
+    element("loading-message").textContent = "Conferindo seu acesso…";
+    element("retry-session").hidden = true;
+    try {
+      const result = await MukiranaApi.call({ action: "auth.resolve", token });
+      if (result.status === "authenticated") enter(result);
+      else if (result.status === "invalid_session") expired();
+      else throw new Error();
+    } catch {
+      element("loading-message").textContent =
+        "Não foi possível conferir seu acesso. Sua sessão foi preservada para tentar novamente.";
+      element("retry-session").hidden = false;
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function requestCode(resending = false) {
+    if (busy) return;
+    const email = resending ? destination : emailInput.value.trim();
+    if (!email || !emailInput.checkValidity()) {
+      error(emailInput, "Informe um e-mail válido.");
+      emailInput.focus();
+      return;
+    }
+    error(emailInput, "");
+    element("resend-status").textContent = "";
+    setBusy(true);
+    element("flow-status").textContent = "Solicitando seu código…";
+    try {
+      const result = await MukiranaApi.call({ action: "auth.request", email });
+      if (result.retryAfterSeconds) retryAt = Date.now() + result.retryAfterSeconds * 1000;
+      if (result.status !== "code_sent")
+        throw new Error(messages[result.status] || messages.unavailable);
+      challenge = result.challengeId;
+      destination = email.toLowerCase();
+      codeInput.value = "";
+      error(codeInput, "");
+      element("destination-email").textContent = destination;
+      element("resend-status").textContent = resending
+        ? "Novo código enviado. Use o mais recente."
+        : "Confira também a pasta de spam. O código vale por 10 minutos.";
+      show("code", "code-title");
+    } catch (failure) {
+      if (resending) {
+        // Uma falha pode ter substituído o desafio; não reapresente o antigo como vigente.
+        challenge = null;
+        element("resend-status").textContent = failure.message;
+      } else error(emailInput, failure.message);
+    } finally {
+      element("flow-status").textContent = "";
+      setBusy(false);
+    }
+  }
+  element("email-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    requestCode();
+  });
+  element("code-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (busy) return;
+    if (!challenge) {
+      error(codeInput, "Solicite um novo código para continuar.");
+      return;
+    }
+    if (!/^[0-9]{6}$/.test(codeInput.value)) {
+      error(codeInput, "Digite os 6 dígitos do código.");
+      codeInput.focus();
+      return;
+    }
+    setBusy(true);
+    error(codeInput, "");
+    try {
+      const result = await MukiranaApi.call({
+        action: "auth.verify",
+        challengeId: challenge,
+        code: codeInput.value,
+      });
+      if (result.status !== "authenticated")
+        throw new Error(messages[result.status] || messages.unavailable);
+      enter(result, MukiranaSession.save(result.sessionToken));
+    } catch (failure) {
+      error(codeInput, failure.message);
+    } finally {
+      setBusy(false);
+    }
+  });
+  emailInput.addEventListener("input", () => error(emailInput, ""));
+  codeInput.addEventListener("input", () => {
+    codeInput.value = codeInput.value.replace(/\D/g, "").slice(0, 6);
+    error(codeInput, "");
+  });
+  element("change-email").addEventListener("click", () => {
+    if (busy) return;
+    challenge = null;
+    codeInput.value = "";
+    show("email", "access-title");
+  });
+  element("resend-code").addEventListener("click", () => requestCode(true));
+  element("retry-session").addEventListener("click", restore);
+  for (const [id, allDevices] of [
+    ["logout-current", false],
+    ["logout-all", true],
+  ]) {
+    element(id).addEventListener("click", async () => {
+      if (busy) return;
+      setBusy(true);
+      try {
+        const result = await MukiranaApi.call({
+          action: "auth.logout",
+          token: MukiranaSession.current(),
+          allDevices,
+        });
+        if (!["logged_out", "invalid_session"].includes(result.status)) throw new Error();
+        MukiranaSession.clear();
+        MukiranaAccounts.reset();
+        MukiranaCategories.reset();
+        MukiranaTransactions.reset();
+        MukiranaFinance.period.reset();
+        emailInput.value = "";
+        error(emailInput, "");
+        show("email", "access-title");
+        element("flow-status").textContent = allDevices
+          ? "Acesso encerrado em todos os dispositivos."
+          : "Você saiu deste navegador.";
+      } catch {
+        element("home-status").textContent = "Não foi possível encerrar o acesso. Tente novamente.";
+      } finally {
+        setBusy(false);
+      }
+    });
+  }
+  element("open-tests").addEventListener("click", () => {
+    show("tests", "tests-title");
+    MukiranaDiagnostics.load(expired);
+  });
+  function openAccounts(accountId = null) {
+    show("accounts");
+    MukiranaAccounts.open({
+      editId: typeof accountId === "string" ? accountId : null,
+      onExpired: expired, onHome: () => show("home", "home-title"), onTransactions: openTransactions,
+      onTests: () => { show("tests", "tests-title"); MukiranaDiagnostics.load(expired); },
+    });
+  }
+  function openCategories() {
+    show("categories");
+    MukiranaCategories.open({ onExpired: expired, onHome: () => show("home", "home-title"),
+      onAccounts: () => openAccounts(), onTransactions: openTransactions });
+  }
+  function openTransactions() {
+    show("transactions");
+    MukiranaTransactions.open({ onExpired: expired, onHome: () => show("home", "home-title"),
+      onAccounts: () => openAccounts(), onAccount: id => openAccounts(id), onCategories: openCategories });
+  }
+  element("open-accounts").addEventListener("click", () => openAccounts());
+  element("open-categories").addEventListener("click", openCategories);
+  element("open-transactions").addEventListener("click", openTransactions);
+  element("close-tests").addEventListener("click", () => show("home", "home-title"));
+  element("run-tests").addEventListener("click", () => MukiranaDiagnostics.run(expired));
+  // Tokens revogados em outra aba deixam de apresentar uma área autenticada nesta aba.
+  window.addEventListener("storage", (event) => {
+    if (event.key === "mukirana.session" && stage !== "loading") window.location.reload();
+  });
+  window.setInterval(refreshResend, 1000);
+  restore();
+});
+</script></body></html>

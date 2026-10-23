@@ -1,0 +1,10 @@
+.git/**
+node_modules/**
+tests/**
+docs/**
+supabase/**
+package*.json
+requirements*.txt
+**/*.md
+.gitignore
+.claspignore

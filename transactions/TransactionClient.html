@@ -1,0 +1,317 @@
+<script>
+/** Controller de lançamentos. Persistência e autorização pertencem ao backend. */
+const MukiranaTransactions = (() => {
+  "use strict";
+  const host = document.getElementById("transactions-view");
+  const root = host.attachShadow({ mode: "open" });
+  root.append(document.getElementById("transactions-template").content.cloneNode(true));
+  document.getElementById("transactions-template").remove();
+  const $ = id => root.getElementById(id);
+  const all = selector => [...root.querySelectorAll(selector)];
+  const F = MukiranaFinance;
+  let callbacks = {}, epoch = 0, readId = 0, phase = "loading", busy = false;
+  let entries = [], accounts = [], categories = [], summary = null, hasMore = false, today = F.today();
+  let edit = null, quick = null, confirmation = null, timer = null, searchTimer = null, toastAction = null;
+  const errors = {
+    invalid_request: "Confira os dados informados.", invalid_account: "A conta não está mais disponível. Recarregue a lista.",
+    invalid_category: "A categoria não está mais disponível. Recarregue a lista.",
+    conflict: "O registro mudou em outro acesso. Recarregue a lista para revisar a versão atual.",
+    not_found: "O registro não está mais disponível. Recarregue a lista.",
+    opening_balance_only_in_account: "Edite o saldo inicial pelo cadastro da conta.",
+    duplicate: "Já existe um nome igual neste nível de categorias.",
+    reserved_name: "Esse nome é reservado ao sistema. Escolha outro.",
+    invalid_parent: "Escolha uma categoria principal disponível.",
+    unavailable: "Não foi possível concluir a operação. Tente novamente.",
+  };
+  function node(tag, className, text) {
+    const el = document.createElement(tag); if (className) el.className = className;
+    if (text !== undefined) el.textContent = text; return el;
+  }
+  function notify(text, action = null) {
+    clearTimeout(timer); $("toast-text").textContent = text; $("toast").hidden = false;
+    toastAction = action; $("toast-action").hidden = !action;
+    timer = setTimeout(() => { $("toast").hidden = true; toastAction = null; }, action ? 14000 : 6500);
+  }
+  $("toast-close").addEventListener("click", () => { $("toast").hidden = true; clearTimeout(timer); });
+  $("toast-action").addEventListener("click", () => { const action = toastAction; $("toast").hidden = true; toastAction = null; action?.(); });
+  function fieldError(id, text = "") {
+    $(id + "-error").textContent = text; $(id + "-error").hidden = !text;
+    if ($(id)) $(id).setAttribute("aria-invalid", String(Boolean(text)));
+  }
+  function pageError(text = "") { $("page-error").textContent = text; $("page-error").hidden = !text; }
+  async function call(action, fields = {}) {
+    return MukiranaApi.call({ action, token: MukiranaSession.current(), ...fields });
+  }
+  function expired(result) {
+    if (result.status !== "invalid_session") return false;
+    reset(); callbacks.onExpired?.(); return true;
+  }
+  function setBusy(value) {
+    busy = value;
+    for (const el of all("dialog input, dialog select, dialog button")) el.disabled = value;
+    $("entry-form").setAttribute("aria-busy", String(value));
+    $("quick-form").setAttribute("aria-busy", String(value));
+    $("save-entry").textContent = value ? "Salvando…" : "Salvar lançamento";
+    for (const id of ["new-income", "new-expense"]) $(id).disabled = value || phase !== "ready";
+    $("reload").disabled = value || phase === "loading";
+  }
+  function options(select, rows, placeholder, selected = select.value, label = row => row.name) {
+    select.replaceChildren(); const first = node("option", "", placeholder); first.value = ""; select.append(first);
+    for (const row of rows) { const option = node("option", "", label(row)); option.value = row.id; select.append(option); }
+    select.value = selected || "";
+  }
+  function categoryLabel(row) {
+    const path = [row.name], visited = new Set([row.id]); let parent = row.parentId;
+    while (parent && !visited.has(parent)) {
+      visited.add(parent); const value = categories.find(c => c.id === parent);
+      if (!value) break; path.unshift(value.name); parent = value.parentId;
+    }
+    return path.join(" › ");
+  }
+  function choices() {
+    options($("account-filter"), accounts, "Todas as contas");
+    options($("category-filter"), categories, "Todas as categorias", $("category-filter").value, categoryLabel);
+    options($("account"), accounts, "Selecione uma conta");
+    options($("category"), categories.filter(c => c.systemKey === null), "Selecione uma categoria", $("category").value, categoryLabel);
+  }
+  function filters(cursor = null) {
+    return { ...F.period.get(), nature: $("nature-filter").value || null, accountId: $("account-filter").value || null,
+      categoryId: $("category-filter").value || null, classification: $("class-filter").value || null,
+      query: $("search").value.trim(), cursorDate: cursor?.date || null, cursorId: cursor?.id || null, limit: 50 };
+  }
+  async function load(append = false) {
+    if (busy) return;
+    clearTimeout(searchTimer);
+    const generation = epoch, requestId = ++readId;
+    const cursor = append ? entries.at(-1) : null;
+    phase = "loading"; pageError(); render();
+    try {
+      const result = await call("transactions.list", { filter: filters(cursor) });
+      if (generation !== epoch || requestId !== readId) return;
+      if (expired(result)) return;
+      if (result.status !== "ok") throw new Error();
+      entries = append ? [...entries, ...result.entries.filter(row => !entries.some(old => old.id === row.id))] : result.entries;
+      accounts = result.accounts; categories = result.categories; summary = result.summary;
+      hasMore = result.hasMore; today = result.today; phase = "ready"; choices();
+    } catch {
+      if (generation !== epoch || requestId !== readId) return;
+      phase = "error"; entries = []; summary = null; hasMore = false;
+    }
+    if (generation === epoch && requestId === readId) render();
+  }
+  function render() {
+    for (const [id, key] of [["income-total","incomeCents"],["expense-total","expenseCents"],["result-total","resultCents"]])
+      $(id).textContent = phase === "ready" ? F.money(summary[key]) : "—";
+    $("result-count").textContent = phase === "loading" ? "Carregando…" : phase === "error" ? "Consulta indisponível" : `${summary.count} ${summary.count === 1 ? "lançamento" : "lançamentos"}`;
+    const list = $("entry-list"); list.replaceChildren(); list.setAttribute("aria-busy", String(phase === "loading"));
+    $("more").hidden = phase !== "ready" || !hasMore;
+    $("more").disabled = phase !== "ready" || busy;
+    const selectedAccount = accounts.find(row => row.id === $("account-filter").value);
+    $("account-balance").hidden = !selectedAccount || phase !== "ready";
+    $("account-balance").textContent = selectedAccount ? `Saldo atual de ${selectedAccount.name}: ${F.money(selectedAccount.balanceCents)}. Saldo ${F.period.get().endDate ? "até " + F.dateLabel(F.period.get().endDate) : "com todos os lançamentos"}: ${F.money(selectedAccount.projectedCents)}.` : "";
+    if (phase !== "ready") {
+      const state = node("div", "load-state"); state.append(node("p", "", phase === "loading" ? "Buscando seus lançamentos…" : "Não foi possível carregar seus registros."));
+      if (phase === "error") { const retry = node("button", "button primary", "Tentar novamente"); retry.addEventListener("click", () => load()); state.append(retry); }
+      list.append(state);
+    } else if (!entries.length) {
+      const state = node("div", "load-state"); state.append(node("h3", "", "Um registro de cada vez."), node("p", "", "Nenhum lançamento neste período e nestes filtros. Registre uma entrada ou saída para começar."));
+      const create = node("button", "button primary", "Criar lançamento"); create.addEventListener("click", () => openEditor("expense")); state.append(create); list.append(state);
+    } else for (const row of entries) {
+      const item = node("div", "entry-row"); item.dataset.entryId = row.id;
+      const date = node("div", "entry-date", F.dateLabel(row.date));
+      if (row.date > today) date.append(node("span", "entry-badge", "Previsto"));
+      const description = node("div", "entry-description", row.description);
+      if (row.kind === "opening_balance") description.append(node("small", "", "Saldo inicial da conta"));
+      else description.append(node("small", "", row.classification === "fixed" ? "Fixa" : "Variável"));
+      const account = accounts.find(a => a.id === row.accountId), category = categories.find(c => c.id === row.categoryId);
+      const organization = node("div", "entry-account", account?.name || "Conta");
+      organization.append(node("small", "", category ? categoryLabel(category) : "Categoria"));
+      const amount = node("div", "entry-amount " + row.nature, F.money(row.nature === "expense" ? -row.amountCents : row.amountCents));
+      const actions = node("div", "entry-actions");
+      const editButton = node("button", "", "✎"); editButton.type = "button";
+      editButton.setAttribute("aria-label", row.kind === "opening_balance" ? "Editar saldo inicial de " + account?.name : "Editar " + row.description);
+      editButton.title = row.kind === "opening_balance" ? "Editar pela conta" : "Editar";
+      editButton.addEventListener("click", () => row.kind === "opening_balance" ? callbacks.onAccount?.(row.accountId) : openEditor(row.nature, row.id));
+      const removeButton = node("button", "danger-text", "×"); removeButton.type = "button";
+      removeButton.setAttribute("aria-label", "Excluir " + row.description); removeButton.title = "Excluir";
+      removeButton.addEventListener("click", () => remove(row)); actions.append(editButton, removeButton);
+      item.append(date, description, organization, amount, actions); list.append(item);
+    }
+    for (const id of ["new-income", "new-expense"]) $(id).disabled = busy || phase !== "ready";
+    $("reload").disabled = busy || phase === "loading";
+  }
+  function confirm(title, description, label) {
+    $("confirm-title").textContent = title; $("confirm-description").textContent = description; $("confirm-accept").textContent = label;
+    $("confirm").showModal(); $("confirm-cancel").focus();
+    return new Promise(resolve => { confirmation = resolve; });
+  }
+  function closeConfirm(value) { $("confirm").close(); const resolve = confirmation; confirmation = null; resolve?.(value); }
+  $("confirm-accept").addEventListener("click", () => { if (!busy) closeConfirm(true); });
+  $("confirm-cancel").addEventListener("click", () => { if (!busy) closeConfirm(false); });
+  $("confirm").addEventListener("cancel", event => { event.preventDefault(); if (!busy) closeConfirm(false); });
+  function snapshot() {
+    return JSON.stringify([$("description").value,$("amount").value,$("date").value,$("account").value,$("category").value,
+      root.querySelector('[name="nature"]:checked').value,root.querySelector('[name="classification"]:checked').value]);
+  }
+  function futureNote() { $("future-note").hidden = !F.date($("date").value) || $("date").value <= today; }
+  function openEditor(nature, id = null) {
+    if (busy || phase !== "ready") return;
+    const row = id ? entries.find(value => value.id === id) : null;
+    if (id && (!row || row.kind !== "standard")) return;
+    $("entry-form").reset(); choices(); $("editor-note").textContent = "";
+    edit = { id: row?.id || crypto.randomUUID(), version: row?.version || 0, snapshot: "" };
+    root.querySelector(`[name="nature"][value="${nature}"]`).checked = true;
+    root.querySelector(`[name="classification"][value="${row?.classification || "variable"}"]`).checked = true;
+    $("description").value = row?.description || ""; $("amount").value = row ? F.amountInput(row.amountCents) : "";
+    $("date").value = row?.date || today; $("account").value = row?.accountId || $("account-filter").value || (accounts.length === 1 ? accounts[0].id : "");
+    const filterCategory = categories.find(c => c.id === $("category-filter").value && !c.systemKey);
+    $("category").value = row?.categoryId || filterCategory?.id || "";
+    $("editor-title").textContent = row ? "Editar lançamento." : nature === "income" ? "Nova receita." : "Nova despesa.";
+    for (const field of ["description","amount","date","account","category","form"]) fieldError(field);
+    $("review").hidden = true; futureNote(); edit.snapshot = snapshot();
+    $("editor").showModal(); $("description").focus();
+  }
+  async function closeEditor() {
+    if (busy) return;
+    if (edit && snapshot() !== edit.snapshot && !(await confirm("Descartar alterações?", "Este lançamento ainda não foi salvo.", "Descartar"))) return;
+    $("editor").close(); edit = null;
+  }
+  $("entry-form").addEventListener("submit", async event => {
+    event.preventDefault(); if (!edit || busy) return;
+    for (const field of ["description","amount","date","account","category","form"]) fieldError(field);
+    const description = $("description").value.normalize("NFC").trim().replace(/\s+/g," ");
+    const amountCents = F.parseAmount($("amount").value), date = $("date").value;
+    const failures = [];
+    if (!description || Array.from(description).length > 160 || /[\u0000-\u001f\u007f]/.test(description)) failures.push(["description","Informe uma descrição entre 1 e 160 caracteres."]);
+    if (amountCents === null) failures.push(["amount","Informe um valor positivo, como 125,90."]);
+    if (!F.date(date)) failures.push(["date","Informe uma data válida."]);
+    if (!$("account").value) failures.push(["account","Escolha ou crie uma conta."]);
+    if (!$("category").value) failures.push(["category","Escolha ou crie uma categoria."]);
+    if (failures.length) { for (const [id, message] of failures) fieldError(id,message); $(failures[0][0]).focus(); return; }
+    const generation = epoch;
+    const entry = { id:edit.id, version:edit.version, description, amountCents, date,
+      accountId:$("account").value, categoryId:$("category").value,
+      nature:root.querySelector('[name="nature"]:checked').value,
+      classification:root.querySelector('[name="classification"]:checked').value, modality:"single" };
+    setBusy(true); $("review").hidden = true;
+    let saved = false;
+    try {
+      const result = await call("transactions.save", { entry });
+      if (generation !== epoch || expired(result)) return;
+      if (result.status !== "saved") {
+        fieldError("form",errors[result.status] || errors.unavailable); $("form-error").focus();
+        $("review").hidden = !["conflict","not_found","invalid_account","invalid_category"].includes(result.status); return;
+      }
+      $("editor").close(); edit = null; saved = true;
+    } catch {
+      if (generation === epoch) fieldError("form","A resposta não pôde ser confirmada. Tente salvar novamente ou recarregue a lista para conferir.");
+    } finally { if (generation === epoch) setBusy(false); }
+    if (saved && generation === epoch) {
+      await load();
+      const period = F.period.get(), outside = (period.startDate && date < period.startDate) || (period.endDate && date > period.endDate);
+      notify(outside ? "Lançamento salvo fora do período selecionado." : "Lançamento salvo.", outside ? () => {
+        const month = F.month(date); F.period.set(month.startDate,month.endDate); periodControls(); load();
+      } : null);
+    }
+  });
+  $("review").addEventListener("click", () => { if (!busy) { $("editor").close(); edit = null; load(); } });
+  for (const id of ["description","amount","account","category"]) $(id).addEventListener("input", () => fieldError(id));
+  $("date").addEventListener("input", () => { fieldError("date"); futureNote(); });
+  for (const id of ["cancel-editor","close-editor"]) $(id).addEventListener("click",closeEditor);
+  $("editor").addEventListener("cancel",event => { event.preventDefault(); closeEditor(); });
+  async function remove(row) {
+    if (busy) return;
+    const generation = epoch;
+    const description = row.kind === "opening_balance" ? "O saldo inicial será retirado também do cadastro da conta. A conta será preservada." : "O lançamento será removido e os saldos e totais serão recalculados.";
+    if (!(await confirm(`Excluir “${row.description}”?`,description,"Excluir lançamento")) || generation !== epoch) return;
+    setBusy(true); let deleted = false;
+    try {
+      const result = await call("transactions.delete",{ id:row.id,version:row.version });
+      if (generation !== epoch || expired(result)) return;
+      if (result.status !== "deleted") { pageError(errors[result.status] || errors.unavailable); return; }
+      deleted = true;
+    } catch { if (generation === epoch) pageError("A exclusão não pôde ser confirmada. Atualize a lista para conferir."); }
+    finally { if (generation === epoch) setBusy(false); }
+    if (deleted && generation === epoch) { await load(); notify("Lançamento excluído."); }
+  }
+  function openQuick(kind) {
+    if (busy) return;
+    quick = { kind, id:crypto.randomUUID() }; $("quick-form").reset();
+    $("quick-title").textContent = kind === "account" ? "Nova conta." : "Nova categoria.";
+    $("quick-type-field").hidden = kind !== "account"; $("quick-parent-field").hidden = kind !== "category";
+    options($("quick-parent"),categories.filter(c => !c.systemKey && !c.parentId),"Categoria principal (sem superior)","");
+    $("quick-error").textContent = ""; $("quick-error").hidden = true;
+    $("quick").showModal(); $("quick-name").focus();
+  }
+  $("quick-account").addEventListener("click",() => openQuick("account"));
+  $("quick-category").addEventListener("click",() => openQuick("category"));
+  $("quick-cancel").addEventListener("click",() => { if (!busy) { $("quick").close(); quick = null; } });
+  $("quick").addEventListener("cancel",event => { if (busy) event.preventDefault(); else quick = null; });
+  $("quick-form").addEventListener("submit",async event => {
+    event.preventDefault(); if (!quick || busy) return;
+    const name = $("quick-name").value.normalize("NFC").trim().replace(/\s+/g," ");
+    if (!name || Array.from(name).length > 80 || /[\u0000-\u001f\u007f]/.test(name)) { $("quick-error").textContent = "Informe um nome entre 1 e 80 caracteres."; $("quick-error").hidden = false; return; }
+    const generation = epoch, kind = quick.kind;
+    const fields = kind === "account" ? { account:{ id:quick.id,version:0,name,type:$("quick-type").value,initialCents:null,openingDate:null,confirmTypeChange:false } }
+      : { category:{ id:quick.id,version:0,name,parentId:$("quick-parent").value || null } };
+    setBusy(true);
+    try {
+      const result = await call(kind === "account" ? "accounts.save" : "categories.save",fields);
+      if (generation !== epoch || expired(result)) return;
+      if (result.status !== "saved") { $("quick-error").textContent = errors[result.status] || errors.unavailable; $("quick-error").hidden = false; return; }
+      const created = kind === "account" ? result.account : result.category;
+      if (kind === "account") accounts = accounts.filter(row => row.id !== created.id).concat(created);
+      else categories = categories.filter(row => row.id !== created.id).concat(created);
+      choices(); $(kind).value = created.id; $("quick").close(); quick = null;
+      $("editor-note").textContent = kind === "account" ? "Conta criada e selecionada." : "Categoria criada e selecionada.";
+    } catch { if (generation === epoch) { $("quick-error").textContent = "A resposta não pôde ser confirmada. Tente novamente."; $("quick-error").hidden = false; } }
+    finally { if (generation === epoch) { setBusy(false); if (!quick) $(kind).focus(); } }
+  });
+  function periodControls() {
+    const period = F.period.get(); $("start-date").value = period.startDate || ""; $("end-date").value = period.endDate || "";
+    let preset = period.startDate === null && period.endDate === null ? "all" : "custom";
+    for (const [key,delta] of [["current",0],["previous",-1],["next",1]]) { const month=F.month(today,delta); if (period.startDate === month.startDate && period.endDate === month.endDate) preset=key; }
+    $("period-preset").value = preset;
+  }
+  $("period-preset").addEventListener("change",() => {
+    const selected = $("period-preset").value;
+    if (selected === "custom") return;
+    const month = F.month(today,selected === "previous" ? -1 : selected === "next" ? 1 : 0);
+    F.period.set(selected === "all" ? null : month.startDate, selected === "all" ? null : month.endDate);
+    $("period-error").hidden = true; periodControls(); load();
+  });
+  for (const id of ["start-date","end-date"]) $(id).addEventListener("input",() => { $("period-preset").value = "custom"; });
+  $("apply-period").addEventListener("click",() => {
+    const valid = F.period.set($("start-date").value || null,$("end-date").value || null);
+    $("period-error").hidden = valid; $("period-error").textContent = valid ? "" : "Informe um período válido, com início anterior ou igual ao fim.";
+    if (valid) { periodControls(); load(); }
+  });
+  for (const id of ["nature-filter","account-filter","category-filter","class-filter"]) $(id).addEventListener("change",() => load());
+  $("search").addEventListener("input",() => { clearTimeout(searchTimer); $("more").disabled = true; searchTimer = setTimeout(() => load(),400); });
+  $("new-income").addEventListener("click",() => openEditor("income"));
+  $("new-expense").addEventListener("click",() => openEditor("expense"));
+  $("reload").addEventListener("click",() => load()); $("more").addEventListener("click",() => load(true));
+  for (const [id, callback] of [["tx-home","onHome"],["tx-brand","onHome"],["tx-accounts","onAccounts"],["tx-categories","onCategories"]])
+    $(id).addEventListener("click",event => { event.preventDefault(); if (!busy) callbacks[callback]?.(); });
+  root.querySelector(".nav-item.current").addEventListener("click",event => { event.preventDefault(); $("page-title").focus(); });
+  root.querySelector(".skip-link").addEventListener("click",event => { event.preventDefault(); $("page-title").focus(); });
+  function syncTheme() { const theme=document.documentElement.dataset.theme || "light"; $("transactions-content").dataset.theme=theme; $("theme").value=theme; }
+  document.addEventListener("mukirana:theme",syncTheme); syncTheme();
+  $("theme").addEventListener("change",() => { const shared=document.getElementById("theme-select"); shared.value=$("theme").value; shared.dispatchEvent(new Event("change")); });
+  window.addEventListener("beforeunload",event => { if (busy || (edit && snapshot() !== edit.snapshot)) { event.preventDefault(); event.returnValue=""; } });
+  function reset() {
+    ++epoch; ++readId; clearTimeout(timer); clearTimeout(searchTimer);
+    if (confirmation) closeConfirm(false);
+    for (const dialog of all("dialog[open]")) dialog.close();
+    entries=[]; accounts=[]; categories=[]; summary=null; edit=null; quick=null; hasMore=false; phase="loading";
+    $("entry-form").reset(); $("quick-form").reset(); $("search").value="";
+    for (const id of ["nature-filter","class-filter"]) $(id).value="";
+    for (const id of ["account-filter","category-filter","account","category","quick-parent"]) $(id).replaceChildren();
+    for (const id of ["toast-text","confirm-title","confirm-description","quick-error","editor-note","account-balance"]) $(id).textContent="";
+    for (const field of ["description","amount","date","account","category","form"]) fieldError(field);
+    $("toast").hidden=true; toastAction=null; pageError(); setBusy(false); render();
+  }
+  render(); periodControls();
+  return Object.freeze({ open(options) { callbacks=options; periodControls(); $("page-title").focus({preventScroll:true}); window.scrollTo(0,0); load(); }, reset });
+})();
+</script>

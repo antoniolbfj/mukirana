@@ -1,0 +1,497 @@
+<script>
+/** Interface de Categorias: dados somente em memória e persistência pelo backend. */
+const MukiranaCategories = (() => {
+  "use strict";
+  const host = document.getElementById("categories-view");
+  const root = host.attachShadow({ mode: "open" });
+  root.append(document.getElementById("categories-template").content.cloneNode(true));
+  document.getElementById("categories-template").remove();
+  const $ = (id) => root.getElementById(id);
+  const all = (selector) => [...root.querySelectorAll(selector)];
+  const sort = (rows) => [...rows].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+  const node = (tag, className, text) => {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+  };
+  function icon(name) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("icon"); svg.setAttribute("aria-hidden", "true");
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    use.setAttribute("href", "#i-" + name); svg.append(use); return svg;
+  }
+  const M = Object.freeze({
+    find: (data, id) => data.categories.find((row) => row.id === id),
+    children: (data, id) => data.categories.filter((row) => row.parent_id === id),
+    links: (data, id) => data.categories.find((row) => row.id === id)?.linkedCount || 0,
+    manual: (data) => data.categories.filter((row) => !row.system_key),
+    automatic: (data) => data.categories.filter((row) => row.system_key && row.linkedCount > 0),
+    comparable: (name) => name.normalize("NFC").trim().replace(/\s+/g, " ").toLocaleLowerCase("pt-BR"),
+    deletion(data, id) {
+      const count = this.links(data, id);
+      if (count) return { ok: false, code: "linked", count };
+      const children = this.children(data, id);
+      return children.length ? { ok: false, code: "has_children", count: children.length } : { ok: true };
+    },
+  });
+  let store = { categories: [] };
+  let filter = "all", expanded = new Set(), edit = null, deleteAction = null, toastTimer;
+  let phase = "loading", busy = false, operation = 0, callbacks = {};
+  let deletionAvailable = false;
+  const messages = {
+    duplicate: "Já existe um nome igual neste nível, mesmo que esteja em outra categoria principal.",
+    invalid_request: "Confira o nome e a organização informados.",
+    invalid_name: "Use um nome entre 1 e 80 caracteres, sem caracteres de controle.",
+    invalid_parent: "A categoria principal não está mais disponível. Recarregue a lista.",
+    has_children: "Esta categoria possui subcategorias. Reorganize-as antes de continuar.",
+    reserved: "Esta classificação é gerenciada pelo sistema.",
+    reserved_name: "Este nome é reservado a uma classificação automática. Escolha outro.",
+    conflict: "Esta categoria mudou em outro acesso. Feche e recarregue a lista para revisar a versão atual.",
+    not_found: "Esta categoria não está mais disponível. Recarregue a lista.",
+    linked: "Existem lançamentos vinculados. Você pode renomear esta categoria, preservando seu histórico.",
+    unavailable: "Não foi possível concluir a operação. Tente novamente.",
+  };
+  function rowFromApi(row) {
+    return { id: row.id, parent_id: row.parentId, name: row.name,
+      version: row.version, system_key: row.systemKey, linkedCount: row.linkedCount };
+  }
+  function setBusy(value) {
+    busy = value;
+    $("category-form").setAttribute("aria-busy", String(value));
+    // As escolhas que já estavam indisponíveis permanecem assim após a requisição.
+    for (const control of all("#category-form input, #category-form select, #category-form button, #delete-dialog button")) {
+      if (value) { control.dataset.wasDisabled = String(control.disabled); control.disabled = true; }
+      else { control.disabled = control.dataset.wasDisabled === "true"; delete control.dataset.wasDisabled; }
+    }
+    $("new-category").disabled = value || phase !== "ready";
+    $("reload-categories").disabled = value || phase === "loading";
+  }
+  async function request(action, fields = {}) {
+    const result = await MukiranaApi.call({ action, token: MukiranaSession.current(), ...fields });
+    return result;
+  }
+  function expire() { reset(); callbacks.onExpired?.(); }
+  async function load() {
+    const generation = ++operation;
+    phase = "loading"; store = { categories: [] }; render();
+    try {
+      const result = await request("categories.list");
+      if (generation !== operation) return;
+      if (result.status === "invalid_session") { expire(); return; }
+      if (result.status !== "ok" || !Array.isArray(result.categories)) throw new Error();
+      store.categories = result.categories.map(rowFromApi);
+      deletionAvailable = result.deletionAvailable === true;
+      phase = "ready";
+    } catch {
+      if (generation !== operation) return;
+      phase = "error";
+    }
+    if (generation === operation) render();
+  }
+  function toast(message) {
+    clearTimeout(toastTimer);
+    $("toast-text").textContent = message;
+    $("toast").hidden = false;
+    toastTimer = setTimeout(() => { $("toast").hidden = true; }, 5500);
+  }
+  $("close-toast").addEventListener("click", () => { $("toast").hidden = true; clearTimeout(toastTimer); });
+  function setFilter(value) { filter = value; render(); }
+  function closeMenus(except) { all("details.row-menu[open]").forEach((menu) => { if (menu !== except) menu.open = false; }); }
+  root.addEventListener("click", (event) => {
+    closeMenus(event.target.closest("details.row-menu"));
+  });
+  root.addEventListener("keydown", (event) => { if (event.key === "Escape") closeMenus(); });
+  function actionButton(label, symbol, action, className = "") {
+    const button = node("button", "icon-button " + className);
+    button.type = "button";
+    button.setAttribute("aria-label", label);
+    button.title = label;
+    button.append(icon(symbol));
+    button.addEventListener("click", action);
+    return button;
+  }
+  function menuItem(label, symbol, action, isDanger = false) {
+    const button = node("button", isDanger ? "danger-text" : "");
+    button.type = "button";
+    button.append(icon(symbol), document.createTextNode(label));
+    button.addEventListener("click", (event) => { event.currentTarget.closest("details").open = false; action(); });
+    return button;
+  }
+  function countLabel(id) {
+    const count = M.links(store, id);
+    const container = node("div", "linked-count" + (count ? "" : " zero"));
+    container.title = "Lançamentos vinculados diretamente a esta classificação";
+    if (count) container.append(node("span"));
+    container.append(document.createTextNode(count ? `${count} ${count === 1 ? "lançamento" : "lançamentos"}` : "Nenhum lançamento"));
+    return container;
+  }
+  function rowElement(row, sub, flat = false) {
+    const item = node("div", "category-row" + (sub ? " sub-row" : "") + (flat ? " flat-sub" : ""));
+    item.dataset.categoryId = row.id;
+    const identity = node("div", "category-identity");
+    const dependents = sort(M.children(store, row.id));
+    if (!sub) {
+      if (dependents.length) {
+        const toggle = node("button", "chevron");
+        toggle.type = "button";
+        toggle.setAttribute("aria-label", (expanded.has(row.id) ? "Recolher " : "Expandir ") + row.name);
+        toggle.setAttribute("aria-expanded", String(expanded.has(row.id)));
+        toggle.append(icon("down"));
+        toggle.addEventListener("click", () => { expanded.has(row.id) ? expanded.delete(row.id) : expanded.add(row.id); render(); });
+        identity.append(toggle);
+      } else identity.append(node("span", "chevron-placeholder"));
+      const badge = node("span", "stat-icon"); badge.append(icon("folder")); identity.append(badge);
+    } else {
+      const symbol = icon("tag"); symbol.classList.add("sub-icon"); identity.append(symbol);
+    }
+    const text = node("div", "category-text");
+    const title = node("button", "category-name", row.name);
+    title.type = "button";
+    title.setAttribute("aria-label", "Editar " + row.name);
+    title.addEventListener("click", () => openEditor({ id: row.id }));
+    text.append(title);
+    if (!sub) text.append(node("small", "", dependents.length
+      ? `${dependents.length} ${dependents.length === 1 ? "subcategoria" : "subcategorias"}` : "Categoria principal"));
+    else if (flat) text.append(node("small", "", "Em " + M.find(store, row.parent_id).name));
+    identity.append(text);
+    const actions = node("div", "row-actions");
+    if (!sub) actions.append(actionButton("Adicionar subcategoria em " + row.name, "plus", () => openEditor({ parentId: row.id }), "add-sub"));
+    actions.append(actionButton("Editar " + row.name, "edit", () => openEditor({ id: row.id })));
+    const menu = node("details", "row-menu");
+    const summary = node("summary", "icon-button");
+    summary.setAttribute("aria-label", "Mais opções de " + row.name);
+    summary.title = "Mais opções";
+    summary.append(icon("more"));
+    const items = node("div", "menu-items");
+    if (!sub) items.append(menuItem("Adicionar subcategoria", "plus", () => openEditor({ parentId: row.id })));
+    items.append(menuItem(sub ? "Alterar organização" : "Editar categoria", "edit", () => openEditor({ id: row.id })));
+    if (deletionAvailable) {
+      items.append(node("div", "menu-divider"));
+      items.append(menuItem("Excluir", "trash", () => openDelete(row.id), true));
+    }
+    menu.append(summary, items); actions.append(menu);
+    item.append(identity, countLabel(row.id), actions);
+    return item;
+  }
+  function emptyState(hasData) {
+    const empty = node("div", "empty-state");
+    const art = node("div", "empty-art"); art.append(icon(hasData ? "search" : "folder"));
+    empty.append(art, node("h3", "", hasData ? "Nenhuma categoria por aqui." : "Seu jeito de organizar começa aqui."),
+      node("p", "", hasData ? "Experimente outro nome ou escolha um filtro diferente." : "Crie uma categoria para reunir o que faz sentido para você. Os detalhes podem virar subcategorias."));
+    const button = node("button", "button primary", hasData ? "Limpar filtros" : "Criar minha primeira categoria");
+    button.addEventListener("click", () => {
+      if (hasData) { filter = "all"; $("search").value = ""; render(); }
+      else openEditor();
+    });
+    empty.append(button);
+    return empty;
+  }
+  function render() {
+    $("new-category").disabled = busy || phase !== "ready";
+    $("reload-categories").disabled = busy || phase === "loading";
+    $("category-list").setAttribute("aria-busy", String(phase === "loading"));
+    const manual = M.manual(store);
+    const roots = sort(manual.filter((row) => !row.parent_id));
+    const subcategories = manual.filter((row) => row.parent_id);
+    const automatic = M.automatic(store);
+    $("main-count").textContent = roots.length;
+    $("sub-count").textContent = subcategories.length;
+    $("automatic-count").textContent = automatic.length;
+    $("automatic-stat").hidden = !automatic.length;
+    root.querySelector(".stats").classList.toggle("two", !automatic.length);
+    all("[data-filter]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.filter === filter);
+      button.setAttribute("aria-pressed", String(button.dataset.filter === filter));
+    });
+    const query = M.comparable($("search").value);
+    const matches = (row) => M.comparable(row.name).includes(query);
+    $("clear-search").hidden = !query;
+    const list = $("category-list"); list.replaceChildren();
+    let displayed = 0;
+    for (const root of roots) {
+      const dependents = sort(M.children(store, root.id).filter((row) => !row.system_key));
+      if (filter === "sub") {
+        for (const row of dependents.filter((row) => !query || matches(row) || matches(root))) {
+          list.append(rowElement(row, true, true)); displayed++;
+        }
+        continue;
+      }
+      const selected = dependents.filter((row) => !query || matches(row) || matches(root));
+      if (query && !matches(root) && (!selected.length || filter === "main")) continue;
+      list.append(rowElement(root, false)); displayed++;
+      if (filter === "all" && (expanded.has(root.id) || query)) {
+        for (const row of selected) { list.append(rowElement(row, true)); displayed++; }
+      }
+    }
+    if (phase !== "ready") {
+      list.replaceChildren();
+      const state = node("div", "load-state");
+      state.setAttribute("role", "status");
+      state.append(node("p", "", phase === "loading" ? "Carregando suas categorias…" : "Não foi possível carregar suas categorias. Tente novamente."));
+      if (phase === "error") {
+        const retry = node("button", "button primary", "Tentar novamente");
+        retry.addEventListener("click", load); state.append(retry);
+      }
+      list.append(state);
+    } else if (!displayed) list.append(emptyState(Boolean(manual.length)));
+    root.querySelector(".table-heading").hidden = !displayed;
+    $("result-count").textContent = phase !== "ready" ? "" : query
+      ? `${displayed} ${displayed === 1 ? "item encontrado" : "itens encontrados"}`
+      : `${roots.length} principais · ${subcategories.length} subcategorias`;
+    const expandable = roots.filter((row) => M.children(store, row.id).length);
+    $("expand-all").hidden = filter !== "all" || !expandable.length || Boolean(query);
+    $("expand-all").textContent = expandable.every((row) => expanded.has(row.id)) ? "Recolher todas" : "Expandir todas";
+    const visibleAuto = automatic.filter((row) => !query || matches(row));
+    $("automatic-panel").hidden = !visibleAuto.length;
+    $("automatic-list").replaceChildren();
+    for (const row of visibleAuto) {
+      const item = node("div", "automatic-row");
+      const label = node("div", "automatic-name", row.name);
+      label.append(node("span", "automatic-tag", "Automática"));
+      item.append(label, countLabel(row.id));
+      $("automatic-list").append(item);
+    }
+  }
+  function snapshot() {
+    return JSON.stringify([$("category-name").value, root.querySelector('[name="level"]:checked').value, $("category-parent").value]);
+  }
+  function fieldError(field, message = "") {
+    const output = $(field + "-error"); output.textContent = message; output.hidden = !message;
+    if (field === "name") $("category-name").setAttribute("aria-invalid", String(Boolean(message)));
+    if (field === "parent") $("category-parent").setAttribute("aria-invalid", String(Boolean(message)));
+  }
+  function updatePreview() {
+    const isSub = root.querySelector('[name="level"]:checked').value === "sub";
+    $("parent-field").hidden = !isSub;
+    const preview = $("hierarchy-preview"); preview.replaceChildren();
+    const name = $("category-name").value.trim() || "Nome da categoria";
+    const main = node("div", "preview-root"); main.append(icon("folder"));
+    if (isSub) {
+      main.append(document.createTextNode(M.find(store, $("category-parent").value)?.name || "Escolha uma categoria principal"));
+      const child = node("div", "preview-child"); child.append(icon("tag"), document.createTextNode(name));
+      preview.append(main, child);
+    } else { main.append(document.createTextNode(name)); preview.append(main); }
+    const row = edit?.id ? M.find(store, edit.id) : null;
+    const newParent = isSub ? $("category-parent").value : null;
+    const moving = row && (newParent || null) !== row.parent_id;
+    const count = row ? M.links(store, row.id) : 0;
+    $("preserve-note").hidden = !moving && !count;
+    $("preserve-text").textContent = (count
+      ? `${count === 1 ? "O lançamento continua vinculado" : `Os ${count} lançamentos continuam vinculados`} a esta categoria.`
+      : "Esta mudança preserva a identidade da categoria e seus vínculos.") +
+      (moving ? " Os agrupamentos dos relatórios acompanharão a nova hierarquia." : " Você pode renomeá-la sem perder o histórico.");
+  }
+  function openEditor(options = {}) {
+    if (busy || phase !== "ready") return;
+    closeMenus();
+    const row = options.id ? M.find(store, options.id) : null;
+    if ((options.id && !row) || row?.system_key) return;
+    const roots = sort(M.manual(store).filter((item) => !item.parent_id && item.id !== row?.id));
+    edit = { requestId: row?.id || crypto.randomUUID(), id: row?.id || null, version: row?.version || 0, originalParent: row?.parent_id || null };
+    $("category-form").reset();
+    $("category-name").value = row?.name || "";
+    $("editor-title").textContent = row ? "Editar categoria." : options.parentId ? "Nova subcategoria." : "Nova categoria.";
+    $("editor-description").textContent = row ? "Ajuste o nome ou reorganize, mantendo seus lançamentos." : "Um nome que faça sentido para você.";
+    $("save-category").replaceChildren(document.createTextNode(row ? "Salvar alterações" : "Criar categoria"), icon("arrow"));
+    const parentId = row?.parent_id || options.parentId || null;
+    root.querySelector(`[name="level"][value="${parentId ? "sub" : "main"}"]`).checked = true;
+    const subRadio = root.querySelector('[name="level"][value="sub"]');
+    const hasChildren = row && M.children(store, row.id).length > 0;
+    subRadio.disabled = hasChildren || !roots.length;
+    $("level-hint").hidden = !hasChildren && Boolean(roots.length);
+    $("level-hint").textContent = hasChildren
+      ? "Esta categoria possui subcategorias. Reorganize-as antes de transformá-la em subcategoria."
+      : "Crie uma categoria principal antes de adicionar uma subcategoria.";
+    $("category-parent").replaceChildren();
+    const placeholder = node("option", "", "Selecione uma categoria"); placeholder.value = ""; $("category-parent").append(placeholder);
+    roots.forEach((item) => { const option = node("option", "", item.name); option.value = item.id; $("category-parent").append(option); });
+    $("category-parent").value = parentId || "";
+    for (const field of ["name", "parent", "form"]) fieldError(field);
+    $("review-current").hidden = true;
+    updatePreview();
+    edit.snapshot = snapshot();
+    $("editor").showModal();
+    $("category-name").focus();
+  }
+  function closeEditor() {
+    if (busy) return;
+    if (edit && snapshot() !== edit.snapshot) { $("discard-dialog").showModal(); $("keep-editing").focus(); }
+    else { $("editor").close(); edit = null; }
+  }
+  $("category-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!edit || busy) return;
+    for (const field of ["name", "parent", "form"]) fieldError(field);
+    $("review-current").hidden = true;
+    const level = root.querySelector('[name="level"]:checked').value;
+    const parentId = level === "sub" ? $("category-parent").value : null;
+    if (level === "sub" && !parentId) { fieldError("parent", "Escolha a categoria principal."); $("category-parent").focus(); return; }
+    const name = $("category-name").value.normalize("NFC").trim().replace(/\s+/g, " ");
+    if (!name || Array.from(name).length > 80 || /[\u0000-\u001f\u007f]/.test(name)) {
+      fieldError("name", messages.invalid_name); $("category-name").focus(); return;
+    }
+    const generation = operation;
+    const original = { ...edit };
+    setBusy(true);
+    let saved = null;
+    try {
+      const result = await request("categories.save", { category: {
+        id: edit.requestId, version: edit.version, name, parentId,
+      } });
+      if (generation !== operation) return;
+      if (result.status === "invalid_session") { expire(); return; }
+      if (result.status !== "saved") {
+        const field = ["duplicate", "invalid_name", "reserved_name"].includes(result.status) ? "name"
+          : ["invalid_parent", "has_children"].includes(result.status) ? "parent" : "form";
+        fieldError(field, messages[result.status] || messages.unavailable);
+        $("review-current").hidden = !["conflict", "not_found", "invalid_parent", "has_children"].includes(result.status);
+        (field === "name" ? $("category-name") : field === "parent" ? $("category-parent") : $("form-error")).focus();
+        return;
+      }
+      saved = rowFromApi(result.category);
+      store.categories = store.categories.filter((row) => row.id !== saved.id).concat(saved);
+      if (saved.parent_id) expanded.add(saved.parent_id);
+      filter = "all"; $("search").value = "";
+      $("editor").close(); edit = null; render();
+      toast(!original.id ? (parentId ? "Subcategoria criada." : "Categoria criada.")
+        : original.originalParent !== saved.parent_id ? "Organização atualizada. Os vínculos foram preservados." : "Categoria atualizada.");
+    } catch {
+      if (generation === operation) fieldError("form", "A resposta não pôde ser confirmada. Tente salvar novamente ou recarregue a lista para conferir.");
+    } finally {
+      if (generation === operation) {
+        setBusy(false);
+        if (saved) root.querySelector(`[data-category-id="${saved.id}"] .category-name`)?.focus();
+      }
+    }
+  });
+  $("review-current").addEventListener("click", () => {
+    if (busy) return;
+    $("editor").close(); edit = null; load();
+  });
+  $("category-name").addEventListener("input", () => { fieldError("name"); updatePreview(); });
+  $("category-parent").addEventListener("change", () => { fieldError("parent"); updatePreview(); });
+  all('[name="level"]').forEach((radio) => radio.addEventListener("change", () => { fieldError("parent"); updatePreview(); }));
+  for (const id of ["close-editor", "cancel-editor"]) $(id).addEventListener("click", closeEditor);
+  $("editor").addEventListener("cancel", (event) => { event.preventDefault(); closeEditor(); });
+  $("keep-editing").addEventListener("click", () => $("discard-dialog").close());
+  $("discard-changes").addEventListener("click", () => { $("discard-dialog").close(); $("editor").close(); edit = null; });
+  window.addEventListener("beforeunload", (event) => { if (busy || (edit && snapshot() !== edit.snapshot)) { event.preventDefault(); event.returnValue = ""; } });
+  function openDelete(id) {
+    if (busy || phase !== "ready") return;
+    closeMenus();
+    const row = M.find(store, id); if (!row || row.system_key) return;
+    const allowed = M.deletion(store, id);
+    $("delete-extra").hidden = true;
+    $("confirm-delete").classList.toggle("danger", allowed.ok);
+    $("delete-icon").replaceChildren(icon(allowed.ok ? "trash" : "lock"));
+    if (allowed.ok) {
+      $("delete-title").textContent = `Excluir “${row.name}”?`;
+      $("delete-description").textContent = "Esta categoria não possui lançamentos nem subcategorias. Ela será removida da sua organização.";
+      $("confirm-delete").textContent = "Excluir categoria";
+      deleteAction = () => remove(row);
+    } else if (allowed.code === "linked") {
+      $("delete-title").textContent = "O histórico fica com você.";
+      $("delete-description").textContent = `“${row.name}” tem ${allowed.count} ${allowed.count === 1 ? "lançamento vinculado" : "lançamentos vinculados"} e não pode ser excluída.`;
+      $("delete-extra").hidden = false;
+      $("delete-extra").textContent = "Você pode mudar o nome sem perder os lançamentos ou o histórico financeiro.";
+      $("confirm-delete").textContent = "Renomear categoria";
+      deleteAction = () => { $("delete-dialog").close(); openEditor({ id }); };
+    } else {
+      $("delete-title").textContent = "Primeiro, reorganize os detalhes.";
+      $("delete-description").textContent = `“${row.name}” possui ${allowed.count} ${allowed.count === 1 ? "subcategoria vinculada" : "subcategorias vinculadas"}. Reorganize-as antes de excluir a categoria principal.`;
+      $("delete-extra").hidden = false;
+      $("delete-extra").textContent = "Você pode transformar as subcategorias em principais ou vinculá-las a outra categoria. Nada será excluído automaticamente.";
+      $("confirm-delete").textContent = "Ver subcategorias";
+      deleteAction = () => {
+        $("delete-dialog").close(); expanded.add(id); filter = "all"; $("search").value = ""; render();
+        const item = root.querySelector(`[data-category-id="${id}"]`); item?.scrollIntoView({ behavior: "smooth", block: "center" }); item?.querySelector(".category-name").focus({ preventScroll: true });
+      };
+    }
+    $("confirm-delete").hidden = false;
+    $("delete-dialog").showModal(); $("cancel-delete").focus();
+  }
+  async function remove(row) {
+    if (busy) return;
+    const generation = operation;
+    setBusy(true);
+    try {
+      const result = await request("categories.delete", { id: row.id, version: row.version });
+      if (generation !== operation) return;
+      if (result.status === "invalid_session") { expire(); return; }
+      if (result.status !== "deleted") {
+        $("delete-description").textContent = messages[result.status] || messages.unavailable;
+        if (result.status !== "unavailable") {
+          $("confirm-delete").textContent = "Recarregar lista";
+          $("confirm-delete").classList.remove("danger");
+          deleteAction = () => { $("delete-dialog").close(); load(); };
+        }
+        return;
+      }
+      store.categories = store.categories.filter((item) => item.id !== row.id);
+      $("delete-dialog").close(); deleteAction = null; render(); toast("Categoria excluída.");
+      $("new-category").focus();
+    } catch {
+      $("delete-description").textContent = "A exclusão não pôde ser confirmada. Recarregue a lista para conferir.";
+      $("confirm-delete").textContent = "Recarregar lista";
+      deleteAction = () => { $("delete-dialog").close(); load(); };
+    } finally {
+      if (generation === operation) setBusy(false);
+    }
+  }
+  $("confirm-delete").addEventListener("click", () => deleteAction?.());
+  for (const id of ["close-delete", "cancel-delete"]) $(id).addEventListener("click", () => { if (!busy) $("delete-dialog").close(); });
+  $("new-category").addEventListener("click", () => openEditor());
+  all("[data-filter]").forEach((button) => button.addEventListener("click", () => setFilter(button.dataset.filter)));
+  all("[data-stat-filter]").forEach((button) => button.addEventListener("click", () => setFilter(button.dataset.statFilter)));
+  $("search").addEventListener("input", render);
+  $("clear-search").addEventListener("click", () => { $("search").value = ""; render(); $("search").focus(); });
+  $("expand-all").addEventListener("click", () => {
+    const roots = M.manual(store).filter((row) => !row.parent_id && M.children(store, row.id).length);
+    const collapse = roots.every((row) => expanded.has(row.id));
+    roots.forEach((row) => collapse ? expanded.delete(row.id) : expanded.add(row.id)); render();
+  });
+  $("delete-dialog").addEventListener("cancel", (event) => { if (busy) event.preventDefault(); });
+  $("reload-categories").addEventListener("click", () => { if (!busy && phase !== "loading") load(); });
+  function syncTheme() {
+    const theme = document.documentElement.dataset.theme || "light";
+    $("categories-content").dataset.theme = theme; $("theme").value = theme;
+  }
+  $("theme").addEventListener("change", () => {
+    const shared = document.getElementById("theme-select");
+    shared.value = $("theme").value; shared.dispatchEvent(new Event("change"));
+  });
+  document.addEventListener("mukirana:theme", syncTheme); syncTheme();
+  root.querySelector(".skip-link").addEventListener("click", (event) => {
+    event.preventDefault(); $("page-title").focus();
+  });
+  function leave(callback, event) { event.preventDefault(); if (!busy) callback?.(); }
+  $("categories-home").addEventListener("click", (event) => leave(callbacks.onHome, event));
+  $("categories-brand").addEventListener("click", (event) => leave(callbacks.onHome, event));
+  $("categories-transactions").addEventListener("click", (event) => leave(callbacks.onTransactions, event));
+  $("categories-accounts").addEventListener("click", (event) => leave(callbacks.onAccounts, event));
+  root.querySelector(".nav-item.current").addEventListener("click", (event) => { event.preventDefault(); $("page-title").focus(); });
+  function reset() {
+    ++operation;
+    for (const dialog of all("dialog[open]")) dialog.close();
+    store = { categories: [] }; edit = null; deleteAction = null; deletionAvailable = false;
+    filter = "all"; expanded.clear(); phase = "loading";
+    $("category-form").reset(); $("category-parent").replaceChildren();
+    $("search").value = ""; $("hierarchy-preview").replaceChildren();
+    for (const id of ["editor-title", "editor-description", "delete-title", "delete-description", "delete-extra", "toast-text", "preserve-text"])
+      $(id).textContent = "";
+    for (const field of ["name", "parent", "form"]) fieldError(field);
+    clearTimeout(toastTimer); $("toast").hidden = true;
+    setBusy(false); render();
+  }
+  render();
+  return Object.freeze({
+    open(options) {
+      callbacks = options; filter = "all"; $("search").value = "";
+      $("page-title").focus({ preventScroll: true }); window.scrollTo(0, 0); load();
+    },
+    reset,
+  });
+})();
+
+</script>
