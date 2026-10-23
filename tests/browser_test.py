@@ -138,4 +138,4 @@ async def main():
   assert not errors,errors
   print(json.dumps({'passed':len(checks),'checks':checks,'pageErrors':errors,'apiCalls':len(calls)},ensure_ascii=False,indent=2));await browser.close()
  server.shutdown()
-asyncio.run(main())
+if __name__=='__main__':asyncio.run(main())

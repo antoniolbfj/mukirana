@@ -20,14 +20,24 @@ function includeCategoriesView_() {
 function includeCategoryClient_() {
   return HtmlService.createHtmlOutputFromFile("categories/CategoryClient").getContent();
 }
+function includeFinanceStyles_() {
+  return HtmlService.createHtmlOutputFromFile("web/FinanceStyles").getContent();
+}
 function includeFinanceClient_() {
   return HtmlService.createHtmlOutputFromFile("web/FinanceClient").getContent();
 }
 function includeTransactionsView_() {
-  return HtmlService.createHtmlOutputFromFile("transactions/TransactionsView").getContent();
+  return HtmlService.createTemplateFromFile("transactions/TransactionsView").evaluate().getContent();
 }
 function includeTransactionClient_() {
   return HtmlService.createHtmlOutputFromFile("transactions/TransactionClient").getContent();
+}
+
+function includeTransfersView_() {
+  return HtmlService.createTemplateFromFile("transfers/TransfersView").evaluate().getContent();
+}
+function includeTransferClient_() {
+  return HtmlService.createHtmlOutputFromFile("transfers/TransferClient").getContent();
 }
 
 /** Executar no editor para conceder o novo escopo de e-mail; não envia mensagens. */

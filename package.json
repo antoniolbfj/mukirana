@@ -1,11 +1,11 @@
 {
   "name": "mukirana",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Finanças individuais com Google Apps Script e Supabase",
   "scripts": {
     "test": "node tests/backend.test.cjs",
     "check": "python3 tests/render_preview.py",
-    "test:ui": "python3 tests/browser_test.py"
+    "test:ui": "python3 tests/browser_test.py && python3 tests/transfers_browser_test.py"
   }
 }

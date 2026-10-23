@@ -468,6 +468,7 @@ const MukiranaCategories = (() => {
   function leave(callback, event) { event.preventDefault(); if (!busy) callback?.(); }
   $("categories-home").addEventListener("click", (event) => leave(callbacks.onHome, event));
   $("categories-brand").addEventListener("click", (event) => leave(callbacks.onHome, event));
+  $("categories-transfers").addEventListener("click", (event) => leave(callbacks.onTransfers, event));
   $("categories-transactions").addEventListener("click", (event) => leave(callbacks.onTransactions, event));
   $("categories-accounts").addEventListener("click", (event) => leave(callbacks.onAccounts, event));
   root.querySelector(".nav-item.current").addEventListener("click", (event) => { event.preventDefault(); $("page-title").focus(); });

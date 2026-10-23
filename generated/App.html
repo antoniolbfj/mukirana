@@ -1200,6 +1200,7 @@ input {
   <p class="form-description">Você entrou como <strong id="session-email"></strong>.</p>
   <p class="demo-note">Registre suas entradas e saídas e organize suas contas e categorias.</p>
   <button id="open-transactions" class="primary-button" type="button">Meus lançamentos</button>
+  <button id="open-transfers" class="primary-button" type="button">Minhas transferências</button>
   <button id="open-accounts" class="primary-button" type="button">Minhas contas</button>
   <button id="open-categories" class="primary-button" type="button">Minhas categorias</button>
   <button id="open-tests" class="primary-button" type="button">Testar meu acesso</button>
@@ -2333,7 +2334,7 @@ dialog p {
   </main>
   <footer class="mobile-footer">
     <div class="account-navigation">
-      <button id="accounts-transactions" class="button text" type="button">Lançamentos</button><button id="accounts-home" class="button text" type="button">Meu espaço</button
+      <button id="accounts-transfers" class="button text" type="button">Transferências</button><button id="accounts-transactions" class="button text" type="button">Lançamentos</button><button id="accounts-home" class="button text" type="button">Meu espaço</button
       ><button id="accounts-tests" class="button text" type="button">Testes de Contas</button>
     </div>
   </footer>
@@ -2614,6 +2615,7 @@ dialog p {
   <p class="form-description">Você entrou como <strong id="session-email"></strong>.</p>
   <p class="demo-note">Registre suas entradas e saídas e organize suas contas e categorias.</p>
   <button id="open-transactions" class="primary-button" type="button">Meus lançamentos</button>
+  <button id="open-transfers" class="primary-button" type="button">Minhas transferências</button>
   <button id="open-accounts" class="primary-button" type="button">Minhas contas</button>
   <button id="open-categories" class="primary-button" type="button">Minhas categorias</button>
   <button id="open-tests" class="primary-button" type="button">Abrir testes de acesso</button>
@@ -4024,7 +4026,7 @@ dialog p {
     </main>
     <footer class="desktop-footer">
       <div class="account-navigation">
-        <button id="accounts-transactions" class="button text" type="button">Lançamentos</button><button id="accounts-home" class="button text" type="button">Meu espaço</button
+        <button id="accounts-transfers" class="button text" type="button">Transferências</button><button id="accounts-transactions" class="button text" type="button">Lançamentos</button><button id="accounts-home" class="button text" type="button">Meu espaço</button
         ><button id="accounts-tests" class="button text" type="button">Testes de Contas</button>
       </div>
     </footer>
@@ -4072,6 +4074,7 @@ dialog p {
 </div></template></template>
 <?!= includeCategoriesView_(); ?>
 <?!= includeTransactionsView_(); ?>
+<?!= includeTransfersView_(); ?>
 <noscript>Ative o JavaScript para acessar o Mukirana.</noscript><script>/** Monta somente uma View; redimensionar ou girar não substitui o formulário em andamento. */
 (() => {
   const smallScreen = Math.min(window.screen.width, window.screen.height) < 600;
@@ -4536,7 +4539,7 @@ const MukiranaAccounts = (() => {
   function busy(value) {
     state.busy = value;
     all(
-      '#account-form input, #account-form button, #back-form, #edit-account, #delete-account, [data-action="new"], #accounts-home, #accounts-transactions, #accounts-tests, #reload-accounts',
+      '#account-form input, #account-form button, #back-form, #edit-account, #delete-account, [data-action="new"], #accounts-home, #accounts-transfers, #accounts-transactions, #accounts-tests, #reload-accounts',
     ).forEach((control) => {
       control.disabled = value;
     });
@@ -4851,6 +4854,7 @@ const MukiranaAccounts = (() => {
           : "detail-title",
     ).focus();
   });
+  element("accounts-transfers").addEventListener("click", () => leave(callbacks.onTransfers));
   element("accounts-transactions").addEventListener("click", () => leave(callbacks.onTransactions));
   element("accounts-home").addEventListener("click", () => leave(callbacks.onHome));
   element("accounts-tests").addEventListener("click", () => leave(callbacks.onTests));
@@ -4870,6 +4874,7 @@ const MukiranaAccounts = (() => {
 </script>
 <?!= includeCategoryClient_(); ?>
 <?!= includeTransactionClient_(); ?>
+<?!= includeTransferClient_(); ?>
 <script>
 
 /** Controller compartilhado pelas duas Views. Nenhuma regra de autorização depende dele. */
@@ -4895,10 +4900,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   function show(view, focusId) {
     stage = view;
-    for (const name of ["loading", "email", "code", "home", "tests", "accounts", "categories", "transactions"])
+    for (const name of ["loading", "email", "code", "home", "tests", "accounts", "categories", "transactions", "transfers"])
       element(name + "-view").hidden = name !== view;
-    element("access-layout").hidden = ["accounts", "categories", "transactions"].includes(view);
-    if (["accounts", "categories", "transactions"].includes(view)) return;
+    element("access-layout").hidden = ["accounts", "categories", "transactions", "transfers"].includes(view);
+    if (["accounts", "categories", "transactions", "transfers"].includes(view)) return;
     document.querySelector(".skip-link").href = "#" + focusId;
     element(focusId).focus({ preventScroll: true });
     window.scrollTo(0, 0);
@@ -4928,6 +4933,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "open-accounts",
       "open-categories",
       "open-transactions",
+      "open-transfers",
       "retry-session",
     ])
       element(id).disabled = value;
@@ -4941,6 +4947,7 @@ document.addEventListener("DOMContentLoaded", () => {
     MukiranaAccounts.reset();
     MukiranaCategories.reset();
     MukiranaTransactions.reset();
+    MukiranaTransfers.reset();
     MukiranaFinance.period.reset();
     MukiranaSession.clear();
     challenge = null;
@@ -5081,6 +5088,7 @@ document.addEventListener("DOMContentLoaded", () => {
         MukiranaAccounts.reset();
         MukiranaCategories.reset();
         MukiranaTransactions.reset();
+        MukiranaTransfers.reset();
         MukiranaFinance.period.reset();
         emailInput.value = "";
         error(emailInput, "");
@@ -5103,20 +5111,26 @@ document.addEventListener("DOMContentLoaded", () => {
     show("accounts");
     MukiranaAccounts.open({
       editId: typeof accountId === "string" ? accountId : null,
-      onExpired: expired, onHome: () => show("home", "home-title"), onTransactions: openTransactions,
+      onExpired: expired, onHome: () => show("home", "home-title"), onTransactions: openTransactions, onTransfers: openTransfers,
       onTests: () => { show("tests", "tests-title"); MukiranaDiagnostics.load(expired); },
     });
   }
   function openCategories() {
     show("categories");
     MukiranaCategories.open({ onExpired: expired, onHome: () => show("home", "home-title"),
-      onAccounts: () => openAccounts(), onTransactions: openTransactions });
+      onAccounts: () => openAccounts(), onTransactions: openTransactions, onTransfers: openTransfers });
   }
   function openTransactions() {
     show("transactions");
     MukiranaTransactions.open({ onExpired: expired, onHome: () => show("home", "home-title"),
-      onAccounts: () => openAccounts(), onAccount: id => openAccounts(id), onCategories: openCategories });
+      onAccounts: () => openAccounts(), onAccount: id => openAccounts(id), onCategories: openCategories, onTransfers: openTransfers });
   }
+  function openTransfers() {
+    show("transfers");
+    MukiranaTransfers.open({ onExpired: expired, onHome: () => show("home", "home-title"),
+      onAccounts: () => openAccounts(), onCategories: openCategories, onTransactions: openTransactions });
+  }
+  element("open-transfers").addEventListener("click", openTransfers);
   element("open-accounts").addEventListener("click", () => openAccounts());
   element("open-categories").addEventListener("click", openCategories);
   element("open-transactions").addEventListener("click", openTransactions);

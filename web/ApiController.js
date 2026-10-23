@@ -31,6 +31,12 @@ function api(request) {
         return TransactionService_.save(request.token, request.entry);
       case "transactions.delete":
         return TransactionService_.remove(request.token, request.id, request.version);
+      case "transfers.list":
+        return TransferService_.list(request.token, request.filter);
+      case "transfers.save":
+        return TransferService_.save(request.token, request.entry);
+      case "transfers.delete":
+        return TransferService_.remove(request.token, request.id, request.version);
       case "tests.catalog":
         AuthService_.requireSession(request.token);
         return { status: "ready", version: "0.4.0", scenarios: DiagnosticsService_.catalog() };

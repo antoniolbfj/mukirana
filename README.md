@@ -9,6 +9,8 @@ e-mail e sessões próprias por navegador.
 - Contas de Consumo, Investimento e Cartão de Crédito, com saldo atual calculado.
 - Categorias e subcategorias individuais em uma única tabela hierárquica.
 - Receitas e despesas únicas: cadastro, consulta, edição e exclusão.
+- Transferências entre contas próprias: operação completa, edição/exclusão das
+  duas pontas e integração com os saldos (instalação SQL remota pendente).
 - Valores em centavos, classificação fixa/variável e datas passadas ou futuras.
 - Filtros de período, natureza, conta, categoria, classificação e descrição.
 - Resultado do período, saldo atual e posição acumulada até o fim do período.
@@ -20,20 +22,21 @@ e-mail e sessões próprias por navegador.
 - Interface responsiva com temas claro, escuro e sépia; diagnósticos reais de
   leitura disponíveis dentro do aplicativo.
 
-As modalidades parcelada e recorrente, transferências e compartilhamentos serão
+As modalidades parcelada e recorrente e os compartilhamentos serão
 entregues em módulos próprios. O período selecionado é mantido em memória durante
 a navegação; preferência de período salva por usuário será uma entrega posterior.
 
 ## Organização
 
-`authentication`, `accounts`, `categories` e `transactions` contêm os contratos,
+`authentication`, `accounts`, `categories`, `transactions` e `transfers` contêm os contratos,
 serviços e DAOs de cada módulo. `web/ApiController.js` é a fronteira da interface;
 as funções e objetos internos terminam em `_`. `infrastructure/SupabaseDao.js`
 centraliza o acesso às RPCs. A interface existente fica em `generated/App.html`,
 com os módulos adicionais incluídos por `web/WebController.js`.
 
 As regras de dados e as migrações estão descritas em [supabase/README.md](supabase/README.md).
-As decisões desta entrega estão em [docs/lancamentos-unicos.md](docs/lancamentos-unicos.md).
+As decisões das entregas estão em [docs/lancamentos-unicos.md](docs/lancamentos-unicos.md)
+e [docs/transferencias.md](docs/transferencias.md).
 
 ## Configuração e publicação
 
@@ -49,8 +52,8 @@ Com o clasp autenticado na conta proprietária:
 
 ```sh
 clasp push
-clasp create-version "Mukirana: lançamentos únicos"
-clasp create-deployment -V NUMERO_DA_VERSAO -d "Mukirana: lançamentos únicos"
+clasp create-version "Mukirana: transferências"
+clasp create-deployment -V NUMERO_DA_VERSAO -d "Mukirana: transferências"
 ```
 
 O manifesto configura execução pela conta responsável pela implantação e acesso
@@ -72,8 +75,11 @@ npm run test:ui
 
 Os testes de navegador usam uma ponte Apps Script simulada, sem enviar e-mails.
 Os testes SQL em `supabase/checks` exercitam o banco real com dados isolados em
-subtransações revertidas. A instalação desta entrega passou por 48 asserções de
-lançamentos no banco, 16 grupos de contratos/utilitários e 20 fluxos de interface.
+subtransações revertidas. A entrega de transferências passou em PostgreSQL 17.11 isolado por 60 verificações
+SQL, quatro cenários de concorrência e as 68 verificações SQL anteriores. Também
+passaram 24 grupos de contratos/utilitários e 37 fluxos de interface. A aplicação
+remota do SQL de transferências está pendente devido a uma falha do conector;
+o procedimento está em `docs/transferencias.md`.
 
 As migrações registradas aqui foram recuperadas do histórico efetivamente aplicado
 no Supabase. As estruturas de autenticação e contas anteriores à primeira migração

@@ -291,7 +291,7 @@ const MukiranaTransactions = (() => {
   $("new-income").addEventListener("click",() => openEditor("income"));
   $("new-expense").addEventListener("click",() => openEditor("expense"));
   $("reload").addEventListener("click",() => load()); $("more").addEventListener("click",() => load(true));
-  for (const [id, callback] of [["tx-home","onHome"],["tx-brand","onHome"],["tx-accounts","onAccounts"],["tx-categories","onCategories"]])
+  for (const [id, callback] of [["tx-home","onHome"],["tx-brand","onHome"],["tx-accounts","onAccounts"],["tx-categories","onCategories"],["tx-transfers","onTransfers"]])
     $(id).addEventListener("click",event => { event.preventDefault(); if (!busy) callbacks[callback]?.(); });
   root.querySelector(".nav-item.current").addEventListener("click",event => { event.preventDefault(); $("page-title").focus(); });
   root.querySelector(".skip-link").addEventListener("click",event => { event.preventDefault(); $("page-title").focus(); });

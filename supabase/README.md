@@ -81,3 +81,16 @@ desktop/mobile com ponte assíncrona simulada (incluindo o fluxo de exclusão).
 O bloqueio de exclusão por dependência foi conferido no catálogo da FK. A auditoria
 de segurança não apontou WARN/ERROR; o aviso informativo de RLS acima é esperado.
 As verificações adicionais de exclusão estão documentadas na seção acima.
+
+## Transferências entre contas próprias
+
+A estrutura está preparada em `pending/enable_own_account_transfers.sql`, com
+instalação transacional e 60 verificações. A aplicação remota foi recusada pelo
+conector com `Invalid or expired requestState`; nenhuma migração foi registrada.
+A validação passou em PostgreSQL 17.11 isolado com a estrutura atual do projeto.
+
+`transfers` representa uma operação única com origem/destino. A view privada
+`account_movements` deriva duas pontas opostas e reúne os lançamentos anteriores
+para calcular saldos atuais/projetados. Transferências não entram em receitas,
+despesas ou categorias. Contas vinculadas não podem ser excluídas. Consulte
+`../docs/transferencias.md` para regras, validação e instalação pendente.

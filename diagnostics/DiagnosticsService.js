@@ -23,7 +23,7 @@ const DiagnosticsService_ = Object.freeze({
         expected: "Acesso protegido recusado.",
         criterion: "RQ-AUT: acesso protegido",
       },
-    ].concat(AccountDiagnostics_.catalog(), CategoryDiagnostics_.catalog(), TransactionDiagnostics_.catalog());
+    ].concat(AccountDiagnostics_.catalog(), CategoryDiagnostics_.catalog(), TransactionDiagnostics_.catalog(), TransferDiagnostics_.catalog());
   },
   /** Cada cenário revalida a sessão; não recebe identidade ou SQL do navegador. */
   run: function (token, id) {
@@ -40,6 +40,7 @@ const DiagnosticsService_ = Object.freeze({
       if (id.indexOf("accounts.") === 0) return AccountDiagnostics_.run(token, id);
       if (id.indexOf("categories.") === 0) return CategoryDiagnostics_.run(token, id);
       if (id.indexOf("transactions.") === 0) return TransactionDiagnostics_.run(token, id);
+      if (id.indexOf("transfers.") === 0) return TransferDiagnostics_.run(token, id);
       if (id === "auth.schema") {
         const health = AuthDao_.health();
         passed = health.tables === 3 && health.revision === 1;
