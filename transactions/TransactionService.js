@@ -5,6 +5,9 @@ const TransactionService_ = Object.freeze({
     const input = TransactionDomain_.filters(request);
     if (!input) return { status: "invalid_request" };
     const r = TransactionDao_.list(token, input);
+    return this.page(r);
+  },
+  page: function (r) {
     if (r.status !== "ok") return this.failure(r.status);
     if (!Array.isArray(r.entries) || !Array.isArray(r.accounts) || !Array.isArray(r.categories) ||
       typeof r.hasMore !== "boolean" || !TransactionDomain_.date(r.today) || !r.summary ||

@@ -63,8 +63,9 @@ async def api(req):
   result.sort(key=lambda e:(e['date'],e['id']),reverse=True)
   income=sum(e['amountCents'] for e in result if e['nature']=='income');expense=sum(e['amountCents'] for e in result if e['nature']=='expense')
   summary={'count':len(result),'incomeCents':str(income),'expenseCents':str(expense),'resultCents':str(income-expense)}
-  if f['cursorDate']:result=[e for e in result if (e['date'],e['id'])<(f['cursorDate'],f['cursorId'])]
-  return {'status':'ok','entries':result[:f['limit']],'summary':summary,'hasMore':len(result)>f['limit'],'accounts':[account_dto(a,f['endDate']) for a in accounts],'categories':options()[1],'today':TODAY}
+  cursor=(f.get('cursor') or {}).get('standard')
+  if cursor:result=[e for e in result if (e['date'],e['id'])<(cursor['date'],cursor['id'])]
+  return {'status':'ok','entries':result[:f['limit']],'summary':summary,'hasMore':len(result)>f['limit'],'nextCursor':{'standard':{'date':result[min(len(result),f['limit'])-1]['date'],'id':result[min(len(result),f['limit'])-1]['id']} if result else cursor,'transfer':(f.get('cursor') or {}).get('transfer')},'accounts':[account_dto(a,f['endDate']) for a in accounts],'categories':options()[1],'today':TODAY}
  if action=='transactions.save':
   if conflict_save:conflict_save=False;return {'status':'conflict'}
   e=dict(req['entry']);old=next((x for x in entries if x['id']==e['id']),None)

@@ -33,13 +33,6 @@ function includeTransactionClient_() {
   return HtmlService.createHtmlOutputFromFile("transactions/TransactionClient").getContent();
 }
 
-function includeTransfersView_() {
-  return HtmlService.createTemplateFromFile("transfers/TransfersView").evaluate().getContent();
-}
-function includeTransferClient_() {
-  return HtmlService.createHtmlOutputFromFile("transfers/TransferClient").getContent();
-}
-
 /** Executar no editor para conceder o novo escopo de e-mail; não envia mensagens. */
 function authorizeMukirana() {
   const activeEmail = Session.getActiveUser().getEmail();

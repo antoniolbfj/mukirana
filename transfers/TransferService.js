@@ -5,6 +5,9 @@ const TransferService_ = Object.freeze({
     const input = TransferDomain_.filters(request);
     if (!input) return { status: "invalid_request" };
     const r = TransferDao_.list(token, input);
+    return this.page(r);
+  },
+  page: function (r) {
     if (r.status !== "ok") return this.failure(r.status);
     if (!Array.isArray(r.entries) || !Array.isArray(r.accounts) || typeof r.hasMore !== "boolean" ||
       !TransactionDomain_.date(r.today) || !r.summary || !Number.isSafeInteger(r.summary.count) || r.summary.count < 0 ||

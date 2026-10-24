@@ -65,3 +65,11 @@ das RPCs. `tests/browser_test.py` cobre 20 fluxos com ponte simulada em desktop 
 celular. Os advisors não apontaram WARN/ERROR; os avisos informativos de RLS sem
 políticas correspondem à negação de acesso direto nas tabelas privadas, e o índice
 de paginação ainda tem pouca utilização por se tratar de uma tabela nova.
+
+## Integração de transferências — v0.4.1
+
+Meus lançamentos também apresenta Transferência como tipo, no mesmo formulário e
+na mesma lista de receitas/despesas. Categoria e classificação são solicitadas
+apenas para receitas/despesas. A contagem inclui cada transferência uma vez; os
+totais de receitas/despesas continuam considerando somente esses dois tipos.
+A composição e a paginação estão em `docs/transferencias.md`.

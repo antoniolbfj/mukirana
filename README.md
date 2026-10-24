@@ -9,10 +9,11 @@ e-mail e sessões próprias por navegador.
 - Contas de Consumo, Investimento e Cartão de Crédito, com saldo atual calculado.
 - Categorias e subcategorias individuais em uma única tabela hierárquica.
 - Receitas e despesas únicas: cadastro, consulta, edição e exclusão.
-- Transferências entre contas próprias: operação completa, edição/exclusão das
-  duas pontas e integração com os saldos.
+- Transferência como tipo de lançamento, junto de receitas e despesas em uma
+  lista e um formulário; edição/exclusão das duas pontas e integração com saldos.
 - Valores em centavos, classificação fixa/variável e datas passadas ou futuras.
-- Filtros de período, natureza, conta, categoria, classificação e descrição.
+- Filtros de período, natureza, conta, categoria, classificação e descrição. Transferências podem ser filtradas pelo tipo e por
+  qualquer uma das contas envolvidas.
 - Resultado do período, saldo atual e posição acumulada até o fim do período.
 - Criação rápida de conta, categoria ou subcategoria dentro do lançamento.
 - Saldo inicial como movimentação especial, com data e edição pelo cadastro da
@@ -86,3 +87,9 @@ As migrações registradas aqui foram recuperadas do histórico efetivamente apl
 no Supabase. As estruturas de autenticação e contas anteriores à primeira migração
 do repositório já existiam no ambiente; este diretório não representa uma instalação
 completa dessas fundações em um banco vazio.
+
+A correção v0.4.1 integra transferências a **Meus lançamentos**, incluindo o
+formulário, a lista, os filtros e as ações. A tela independente foi removida.
+Não há nova instalação SQL: as operações existentes são preservadas. Passaram
+36 grupos de backend (incluindo 30 combinações de paginação mista) e 38 fluxos
+de navegador. Detalhes em `docs/transferencias.md`.

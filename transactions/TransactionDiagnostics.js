@@ -14,12 +14,12 @@ const TransactionDiagnostics_ = Object.freeze({
     let passed = false; let evidence = "";
     if (id === "transactions.schema") { TransactionDao_.health(); passed = true; evidence = "Serviços de lançamentos únicos e centavos confirmados."; }
     else if (id === "transactions.read") {
-      const r = TransactionService_.list(token, {});
+      const r = EntryService_.list(token, {});
       if (r.status === "invalid_session") return { status: "invalid_session" };
       passed = r.status === "ok";
       evidence = passed ? "Consulta autorizada; " + r.summary.count + " lançamento(s) disponível(is)." : "Consulta inconclusiva.";
     } else if (id === "transactions.rejection") {
-      try { TransactionService_.list("", {}); } catch (e) { passed = e.message === "AUTH_REQUIRED"; }
+      try { EntryService_.list("", {}); } catch (e) { passed = e.message === "AUTH_REQUIRED"; }
       evidence = passed ? "Consulta sem sessão recusada." : "Acesso sem sessão aceito indevidamente.";
     } else return { status: "invalid_request" };
     return { status: passed ? "passed" : "failed", id: id, evidence: evidence };

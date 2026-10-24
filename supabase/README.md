@@ -99,3 +99,7 @@ Passaram 60 verificações de transferências e 48 de lançamentos no Supabase, 
 com rollback das fixtures e zero usuários de teste restantes. As quatro RPCs foram
 conferidas também pela API REST. Os advisors não apontaram WARN/ERROR. Regras e
 resultados completos estão em `../docs/transferencias.md`.
+
+A correção v0.4.1 trata Transferência como tipo em Meus lançamentos. A composição
+da consulta é feita no backend com as RPCs existentes e cursores por origem.
+Não modifica schema, funções SQL ou dados registrados e não exige outro script.

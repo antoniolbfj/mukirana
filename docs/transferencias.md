@@ -16,11 +16,29 @@ e positivo no destino. Uma única linha contém valor e data de ambas as pontas;
 não existem cópias independentes editáveis. Alterar ou excluir a operação atualiza
 os dois efeitos atomicamente. A view não permite editar uma ponta isolada.
 
-Transferências ficam na própria listagem, acessível pelo início e pelos módulos
-Contas, Categorias e Lançamentos. Receitas e despesas continuam em sua listagem e
-não recebem registros ou categorias artificiais de transferência. Pagamento de
-cartão é uma transferência para a conta de Cartão; aporte/resgate usa a conta de
-Investimento. Nenhuma dessas operações cria receita ou despesa adicional.
+Transferência é um tipo de lançamento, junto de Receita e Despesa. Os três tipos
+usam **Meus lançamentos**, a mesma lista, o mesmo formulário, os mesmos filtros
+e as mesmas ações de edição/exclusão. A opção Transferência mostra conta de origem
+e destino; categoria e classificação fixa/variável se aplicam a receitas/despesas.
+A tela independente e seus links foram removidos na correção v0.4.1.
+
+O backend comum `EntryService_` usa as operações já instaladas. `transactions.save`
+e `transactions.delete` encaminham cada tipo ao serviço financeiro apropriado.
+A consulta combina as páginas autorizadas das RPCs existentes, ordenando por data,
+ID e tipo. Cada origem mantém seu próprio cursor e só avança até o último item
+que foi entregue ao navegador. Isso preserva paginação completa mesmo com IDs
+iguais nas duas tabelas. A chave visual inclui tipo e ID.
+
+O filtro de tipo admite Todos, Receita, Despesa e Transferência; uma conta inclui
+transferências em que aparece como origem ou destino. Filtros de categoria ou
+classificação se aplicam apenas aos lançamentos que possuem esses atributos. Ao
+selecionar somente Transferências, os dois filtros são limpos e desabilitados.
+Transferências entram na contagem de lançamentos uma vez e têm efeito zero nos
+cards de receitas, despesas e resultado.
+
+A correção preserva as tabelas, RPCs e dados financeiros já instalados; não requer
+outro SQL. Pagamento de cartão continua sendo transferência para a conta de Cartão;
+aporte/resgate usa a conta de Investimento, com ambas as pontas alteradas juntas.
 
 ## Saldos, consulta e concorrência
 
@@ -31,9 +49,9 @@ histórico completo até a data final do período, sem cortar movimentos anterio
 entre todas as contas é sempre zero.
 
 O período é o mesmo objeto em memória usado por Lançamentos. Há busca literal por
-descrição, filtro por conta (origem ou destino), paginação por data/ID e totais de
-valor transferido que contam a operação uma vez, independentemente da paginação.
-O volume transferido não é indicador de receitas/despesas ou de patrimônio.
+descrição, filtro por conta (origem ou destino), paginação por data/ID e contagem
+de lançamentos que inclui cada transferência uma vez, independentemente da paginação.
+Os totais de receitas/despesas não incorporam valores de transferências.
 
 Todas as RPCs revalidam a sessão e a propriedade. FKs compostas incluem o usuário.
 A trava do proprietário precede as travas de registros, conforme os módulos
@@ -87,7 +105,22 @@ esperado nas tabelas privadas com negação de acesso direto, e
 [índice ainda sem uso](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index)
 para `transactions_owner_date_idx`, mantido para a paginação por proprietário/data.
 
-A versão 5 já publicada contém o código necessário; nenhuma mudança de código ou
-nova versão é necessária para ativar o banco instalado. A página publicada foi
-conferida novamente, com HTTP 200, módulo de transferências presente e includes
-resolvidos. O status da implantação foi atualizado para indicar banco validado.
+A versão 5 corresponde à entrega anterior, com tela independente. A correção
+v0.4.1 publica uma nova versão do Apps Script com a experiência unificada, usando
+o mesmo banco instalado. A documentação da validação financeira acima permanece
+válida: esta correção não modifica SQL nem o cálculo dos saldos.
+
+## Verificação da correção v0.4.1
+
+Passaram 24 grupos anteriores de backend, 12 novos grupos de integração e 38
+fluxos de navegador (20 regressões e 18 da tela unificada), sem erros de página.
+Os novos grupos incluem 30 combinações de paginação, variando quantidades de cada
+tipo, tamanhos de página e IDs/datas iguais entre as origens. Também conferem
+totais acima do limite seguro de inteiro JavaScript, filtros, falha de sessão,
+whitelist dos DTOs e encaminhamento das gravações/exclusões às RPCs corretas.
+
+Os testes de navegador usam ponte simulada; verificam a convivência dos três tipos
+na mesma lista, troca de tipo no formulário novo sem perder o rascunho, criação
+rápida de ambas as contas, transferência futura, conflitos, exclusão completa,
+expiração, paginação mista e tela de celular. As RPCs existentes e suas permissões
+foram conferidas no Supabase. Nenhum dado financeiro real foi modificado.

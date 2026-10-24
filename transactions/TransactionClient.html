@@ -10,10 +10,11 @@ const MukiranaTransactions = (() => {
   const all = selector => [...root.querySelectorAll(selector)];
   const F = MukiranaFinance;
   let callbacks = {}, epoch = 0, readId = 0, phase = "loading", busy = false;
-  let entries = [], accounts = [], categories = [], summary = null, hasMore = false, today = F.today();
+  let entries = [], accounts = [], categories = [], summary = null, hasMore = false, nextCursor = null, today = F.today();
   let edit = null, quick = null, confirmation = null, timer = null, searchTimer = null, toastAction = null;
   const errors = {
     invalid_request: "Confira os dados informados.", invalid_account: "A conta não está mais disponível. Recarregue a lista.",
+    same_account: "Escolha contas diferentes para origem e destino.",
     invalid_category: "A categoria não está mais disponível. Recarregue a lista.",
     conflict: "O registro mudou em outro acesso. Recarregue a lista para revisar a versão atual.",
     not_found: "O registro não está mais disponível. Recarregue a lista.",
@@ -52,8 +53,9 @@ const MukiranaTransactions = (() => {
     $("entry-form").setAttribute("aria-busy", String(value));
     $("quick-form").setAttribute("aria-busy", String(value));
     $("save-entry").textContent = value ? "Salvando…" : "Salvar lançamento";
-    for (const id of ["new-income", "new-expense"]) $(id).disabled = value || phase !== "ready";
+    for (const id of ["new-income", "new-expense", "new-transfer"]) $(id).disabled = value || phase !== "ready";
     $("reload").disabled = value || phase === "loading";
+    editorType();
   }
   function options(select, rows, placeholder, selected = select.value, label = row => row.name) {
     select.replaceChildren(); const first = node("option", "", placeholder); first.value = ""; select.append(first);
@@ -72,30 +74,31 @@ const MukiranaTransactions = (() => {
     options($("account-filter"), accounts, "Todas as contas");
     options($("category-filter"), categories, "Todas as categorias", $("category-filter").value, categoryLabel);
     options($("account"), accounts, "Selecione uma conta");
+    options($("destination"), accounts, "Selecione a conta de destino");
     options($("category"), categories.filter(c => c.systemKey === null), "Selecione uma categoria", $("category").value, categoryLabel);
   }
   function filters(cursor = null) {
     return { ...F.period.get(), nature: $("nature-filter").value || null, accountId: $("account-filter").value || null,
       categoryId: $("category-filter").value || null, classification: $("class-filter").value || null,
-      query: $("search").value.trim(), cursorDate: cursor?.date || null, cursorId: cursor?.id || null, limit: 50 };
+      query: $("search").value.trim(), cursor, limit: 50 };
   }
   async function load(append = false) {
     if (busy) return;
     clearTimeout(searchTimer);
     const generation = epoch, requestId = ++readId;
-    const cursor = append ? entries.at(-1) : null;
+    const cursor = append ? nextCursor : null;
     phase = "loading"; pageError(); render();
     try {
       const result = await call("transactions.list", { filter: filters(cursor) });
       if (generation !== epoch || requestId !== readId) return;
       if (expired(result)) return;
       if (result.status !== "ok") throw new Error();
-      entries = append ? [...entries, ...result.entries.filter(row => !entries.some(old => old.id === row.id))] : result.entries;
+      entries = append ? [...entries, ...result.entries.filter(row => !entries.some(old => old.id === row.id && old.kind === row.kind))] : result.entries;
       accounts = result.accounts; categories = result.categories; summary = result.summary;
-      hasMore = result.hasMore; today = result.today; phase = "ready"; choices();
+      hasMore = result.hasMore; nextCursor = result.nextCursor; today = result.today; phase = "ready"; choices();
     } catch {
       if (generation !== epoch || requestId !== readId) return;
-      phase = "error"; entries = []; summary = null; hasMore = false;
+      phase = "error"; entries = []; summary = null; hasMore = false; nextCursor = null;
     }
     if (generation === epoch && requestId === readId) render();
   }
@@ -114,30 +117,32 @@ const MukiranaTransactions = (() => {
       if (phase === "error") { const retry = node("button", "button primary", "Tentar novamente"); retry.addEventListener("click", () => load()); state.append(retry); }
       list.append(state);
     } else if (!entries.length) {
-      const state = node("div", "load-state"); state.append(node("h3", "", "Um registro de cada vez."), node("p", "", "Nenhum lançamento neste período e nestes filtros. Registre uma entrada ou saída para começar."));
+      const state = node("div", "load-state"); state.append(node("h3", "", "Um registro de cada vez."), node("p", "", "Nenhum lançamento neste período e nestes filtros. Registre uma receita, despesa ou transferência para começar."));
       const create = node("button", "button primary", "Criar lançamento"); create.addEventListener("click", () => openEditor("expense")); state.append(create); list.append(state);
     } else for (const row of entries) {
-      const item = node("div", "entry-row"); item.dataset.entryId = row.id;
+      const item = node("div", "entry-row"); item.dataset.entryId = row.id; item.dataset.entryKind = row.kind; item.dataset.entryKey = row.kind + ":" + row.id;
       const date = node("div", "entry-date", F.dateLabel(row.date));
       if (row.date > today) date.append(node("span", "entry-badge", "Previsto"));
       const description = node("div", "entry-description", row.description);
       if (row.kind === "opening_balance") description.append(node("small", "", "Saldo inicial da conta"));
+      else if (row.kind === "transfer") description.append(node("small", "", "Transferência"));
       else description.append(node("small", "", row.classification === "fixed" ? "Fixa" : "Variável"));
       const account = accounts.find(a => a.id === row.accountId), category = categories.find(c => c.id === row.categoryId);
-      const organization = node("div", "entry-account", account?.name || "Conta");
-      organization.append(node("small", "", category ? categoryLabel(category) : "Categoria"));
+      const source = accounts.find(a => a.id === row.sourceAccountId), destination = accounts.find(a => a.id === row.destinationAccountId);
+      const organization = node("div", "entry-account", row.kind === "transfer" ? "De: " + (source?.name || "Conta") : account?.name || "Conta");
+      organization.append(node("small", "", row.kind === "transfer" ? "Para: " + (destination?.name || "Conta") : category ? categoryLabel(category) : "Categoria"));
       const amount = node("div", "entry-amount " + row.nature, F.money(row.nature === "expense" ? -row.amountCents : row.amountCents));
       const actions = node("div", "entry-actions");
       const editButton = node("button", "", "✎"); editButton.type = "button";
       editButton.setAttribute("aria-label", row.kind === "opening_balance" ? "Editar saldo inicial de " + account?.name : "Editar " + row.description);
       editButton.title = row.kind === "opening_balance" ? "Editar pela conta" : "Editar";
-      editButton.addEventListener("click", () => row.kind === "opening_balance" ? callbacks.onAccount?.(row.accountId) : openEditor(row.nature, row.id));
+      editButton.addEventListener("click", () => row.kind === "opening_balance" ? callbacks.onAccount?.(row.accountId) : openEditor(row.nature, row.id, row.kind));
       const removeButton = node("button", "danger-text", "×"); removeButton.type = "button";
       removeButton.setAttribute("aria-label", "Excluir " + row.description); removeButton.title = "Excluir";
       removeButton.addEventListener("click", () => remove(row)); actions.append(editButton, removeButton);
       item.append(date, description, organization, amount, actions); list.append(item);
     }
-    for (const id of ["new-income", "new-expense"]) $(id).disabled = busy || phase !== "ready";
+    for (const id of ["new-income", "new-expense", "new-transfer"]) $(id).disabled = busy || phase !== "ready";
     $("reload").disabled = busy || phase === "loading";
   }
   function confirm(title, description, label) {
@@ -150,27 +155,43 @@ const MukiranaTransactions = (() => {
   $("confirm-cancel").addEventListener("click", () => { if (!busy) closeConfirm(false); });
   $("confirm").addEventListener("cancel", event => { event.preventDefault(); if (!busy) closeConfirm(false); });
   function snapshot() {
-    return JSON.stringify([$("description").value,$("amount").value,$("date").value,$("account").value,$("category").value,
+    return JSON.stringify([$("description").value,$("amount").value,$("date").value,$("account").value,$("category").value,$("destination").value,
       root.querySelector('[name="nature"]:checked').value,root.querySelector('[name="classification"]:checked').value]);
   }
   function futureNote() { $("future-note").hidden = !F.date($("date").value) || $("date").value <= today; }
-  function openEditor(nature, id = null) {
+  function editorType() {
+    const nature = root.querySelector('[name="nature"]:checked').value;
+    const transfer = nature === "transfer";
+    $("destination-field").hidden = !transfer; $("category-field").hidden = transfer;
+    $("classification-field").hidden = transfer; $("transfer-note").hidden = !transfer;
+    $("account-label").textContent = transfer ? "Conta de origem" : "Conta";
+    $("category").disabled = busy || transfer; $("destination").disabled = busy || !transfer;
+    for (const radio of all('[name="nature"]')) radio.disabled = busy || Boolean(edit?.version && ((edit.kind === "transfer") !== (radio.value === "transfer")));
+    for (const radio of all('[name="classification"]')) radio.disabled = busy || transfer;
+    $("editor-title").textContent = edit?.version ? "Editar lançamento." : transfer ? "Nova transferência." : nature === "income" ? "Nova receita." : "Nova despesa.";
+  }
+  function openEditor(nature, id = null, kind = "standard") {
     if (busy || phase !== "ready") return;
-    const row = id ? entries.find(value => value.id === id) : null;
-    if (id && (!row || row.kind !== "standard")) return;
+    const row = id ? entries.find(value => value.id === id && value.kind === kind) : null;
+    if (id && (!row || row.kind === "opening_balance")) return;
     $("entry-form").reset(); choices(); $("editor-note").textContent = "";
-    edit = { id: row?.id || crypto.randomUUID(), version: row?.version || 0, snapshot: "" };
+    edit = { id: row?.id || crypto.randomUUID(), version: row?.version || 0, kind: row?.kind || "standard", snapshot: "" };
     root.querySelector(`[name="nature"][value="${nature}"]`).checked = true;
     root.querySelector(`[name="classification"][value="${row?.classification || "variable"}"]`).checked = true;
     $("description").value = row?.description || ""; $("amount").value = row ? F.amountInput(row.amountCents) : "";
-    $("date").value = row?.date || today; $("account").value = row?.accountId || $("account-filter").value || (accounts.length === 1 ? accounts[0].id : "");
+    $("date").value = row?.date || today;
+    $("account").value = row?.sourceAccountId || row?.accountId || $("account-filter").value || (accounts.length === 1 ? accounts[0].id : "");
+    $("destination").value = row?.destinationAccountId || "";
     const filterCategory = categories.find(c => c.id === $("category-filter").value && !c.systemKey);
     $("category").value = row?.categoryId || filterCategory?.id || "";
-    $("editor-title").textContent = row ? "Editar lançamento." : nature === "income" ? "Nova receita." : "Nova despesa.";
-    for (const field of ["description","amount","date","account","category","form"]) fieldError(field);
-    $("review").hidden = true; futureNote(); edit.snapshot = snapshot();
+    for (const field of ["description","amount","date","account","category","destination","form"]) fieldError(field);
+    $("review").hidden = true; editorType(); futureNote(); edit.snapshot = snapshot();
     $("editor").showModal(); $("description").focus();
   }
+  for (const radio of all('[name="nature"]')) radio.addEventListener("change", () => {
+    for (const field of ["account","category","destination","form"]) fieldError(field);
+    editorType();
+  });
   async function closeEditor() {
     if (busy) return;
     if (edit && snapshot() !== edit.snapshot && !(await confirm("Descartar alterações?", "Este lançamento ainda não foi salvo.", "Descartar"))) return;
@@ -178,21 +199,25 @@ const MukiranaTransactions = (() => {
   }
   $("entry-form").addEventListener("submit", async event => {
     event.preventDefault(); if (!edit || busy) return;
-    for (const field of ["description","amount","date","account","category","form"]) fieldError(field);
+    for (const field of ["description","amount","date","account","category","destination","form"]) fieldError(field);
     const description = $("description").value.normalize("NFC").trim().replace(/\s+/g," ");
     const amountCents = F.parseAmount($("amount").value), date = $("date").value;
+    const nature = root.querySelector('[name="nature"]:checked').value, transfer = nature === "transfer";
     const failures = [];
     if (!description || Array.from(description).length > 160 || /[\u0000-\u001f\u007f]/.test(description)) failures.push(["description","Informe uma descrição entre 1 e 160 caracteres."]);
     if (amountCents === null) failures.push(["amount","Informe um valor positivo, como 125,90."]);
     if (!F.date(date)) failures.push(["date","Informe uma data válida."]);
     if (!$("account").value) failures.push(["account","Escolha ou crie uma conta."]);
-    if (!$("category").value) failures.push(["category","Escolha ou crie uma categoria."]);
+    if (!transfer && !$("category").value) failures.push(["category","Escolha ou crie uma categoria."]);
+    if (transfer && !$("destination").value) failures.push(["destination","Escolha ou crie uma conta de destino."]);
+    else if (transfer && $("destination").value === $("account").value) failures.push(["destination","Escolha contas diferentes para origem e destino."]);
     if (failures.length) { for (const [id, message] of failures) fieldError(id,message); $(failures[0][0]).focus(); return; }
     const generation = epoch;
-    const entry = { id:edit.id, version:edit.version, description, amountCents, date,
-      accountId:$("account").value, categoryId:$("category").value,
-      nature:root.querySelector('[name="nature"]:checked').value,
-      classification:root.querySelector('[name="classification"]:checked').value, modality:"single" };
+    const entry = transfer ? { id:edit.id, version:edit.version, description, amountCents, date, nature,
+      sourceAccountId:$("account").value, destinationAccountId:$("destination").value }
+      : { id:edit.id, version:edit.version, description, amountCents, date, nature,
+        accountId:$("account").value, categoryId:$("category").value,
+        classification:root.querySelector('[name="classification"]:checked').value, modality:"single" };
     setBusy(true); $("review").hidden = true;
     let saved = false;
     try {
@@ -215,18 +240,18 @@ const MukiranaTransactions = (() => {
     }
   });
   $("review").addEventListener("click", () => { if (!busy) { $("editor").close(); edit = null; load(); } });
-  for (const id of ["description","amount","account","category"]) $(id).addEventListener("input", () => fieldError(id));
+  for (const id of ["description","amount","account","category","destination"]) $(id).addEventListener("input", () => fieldError(id));
   $("date").addEventListener("input", () => { fieldError("date"); futureNote(); });
   for (const id of ["cancel-editor","close-editor"]) $(id).addEventListener("click",closeEditor);
   $("editor").addEventListener("cancel",event => { event.preventDefault(); closeEditor(); });
   async function remove(row) {
     if (busy) return;
     const generation = epoch;
-    const description = row.kind === "opening_balance" ? "O saldo inicial será retirado também do cadastro da conta. A conta será preservada." : "O lançamento será removido e os saldos e totais serão recalculados.";
+    const description = row.kind === "opening_balance" ? "O saldo inicial será retirado também do cadastro da conta. A conta será preservada." : row.kind === "transfer" ? "A saída da origem e a entrada no destino serão removidas juntas. Os saldos das duas contas serão recalculados." : "O lançamento será removido e os saldos e totais serão recalculados.";
     if (!(await confirm(`Excluir “${row.description}”?`,description,"Excluir lançamento")) || generation !== epoch) return;
     setBusy(true); let deleted = false;
     try {
-      const result = await call("transactions.delete",{ id:row.id,version:row.version });
+      const result = await call("transactions.delete",{ id:row.id,version:row.version,kind:row.kind });
       if (generation !== epoch || expired(result)) return;
       if (result.status !== "deleted") { pageError(errors[result.status] || errors.unavailable); return; }
       deleted = true;
@@ -234,9 +259,9 @@ const MukiranaTransactions = (() => {
     finally { if (generation === epoch) setBusy(false); }
     if (deleted && generation === epoch) { await load(); notify("Lançamento excluído."); }
   }
-  function openQuick(kind) {
+  function openQuick(kind, target = kind) {
     if (busy) return;
-    quick = { kind, id:crypto.randomUUID() }; $("quick-form").reset();
+    quick = { kind, target, id:crypto.randomUUID() }; $("quick-form").reset();
     $("quick-title").textContent = kind === "account" ? "Nova conta." : "Nova categoria.";
     $("quick-type-field").hidden = kind !== "account"; $("quick-parent-field").hidden = kind !== "category";
     options($("quick-parent"),categories.filter(c => !c.systemKey && !c.parentId),"Categoria principal (sem superior)","");
@@ -244,6 +269,7 @@ const MukiranaTransactions = (() => {
     $("quick").showModal(); $("quick-name").focus();
   }
   $("quick-account").addEventListener("click",() => openQuick("account"));
+  $("quick-destination").addEventListener("click",() => openQuick("account", "destination"));
   $("quick-category").addEventListener("click",() => openQuick("category"));
   $("quick-cancel").addEventListener("click",() => { if (!busy) { $("quick").close(); quick = null; } });
   $("quick").addEventListener("cancel",event => { if (busy) event.preventDefault(); else quick = null; });
@@ -251,7 +277,7 @@ const MukiranaTransactions = (() => {
     event.preventDefault(); if (!quick || busy) return;
     const name = $("quick-name").value.normalize("NFC").trim().replace(/\s+/g," ");
     if (!name || Array.from(name).length > 80 || /[\u0000-\u001f\u007f]/.test(name)) { $("quick-error").textContent = "Informe um nome entre 1 e 80 caracteres."; $("quick-error").hidden = false; return; }
-    const generation = epoch, kind = quick.kind;
+    const generation = epoch, kind = quick.kind, target = quick.target;
     const fields = kind === "account" ? { account:{ id:quick.id,version:0,name,type:$("quick-type").value,initialCents:null,openingDate:null,confirmTypeChange:false } }
       : { category:{ id:quick.id,version:0,name,parentId:$("quick-parent").value || null } };
     setBusy(true);
@@ -262,10 +288,10 @@ const MukiranaTransactions = (() => {
       const created = kind === "account" ? result.account : result.category;
       if (kind === "account") accounts = accounts.filter(row => row.id !== created.id).concat(created);
       else categories = categories.filter(row => row.id !== created.id).concat(created);
-      choices(); $(kind).value = created.id; $("quick").close(); quick = null;
+      choices(); $(target).value = created.id; fieldError(target); $("quick").close(); quick = null;
       $("editor-note").textContent = kind === "account" ? "Conta criada e selecionada." : "Categoria criada e selecionada.";
     } catch { if (generation === epoch) { $("quick-error").textContent = "A resposta não pôde ser confirmada. Tente novamente."; $("quick-error").hidden = false; } }
-    finally { if (generation === epoch) { setBusy(false); if (!quick) $(kind).focus(); } }
+    finally { if (generation === epoch) { setBusy(false); if (!quick) $(target).focus(); } }
   });
   function periodControls() {
     const period = F.period.get(); $("start-date").value = period.startDate || ""; $("end-date").value = period.endDate || "";
@@ -286,12 +312,18 @@ const MukiranaTransactions = (() => {
     $("period-error").hidden = valid; $("period-error").textContent = valid ? "" : "Informe um período válido, com início anterior ou igual ao fim.";
     if (valid) { periodControls(); load(); }
   });
-  for (const id of ["nature-filter","account-filter","category-filter","class-filter"]) $(id).addEventListener("change",() => load());
+  $("nature-filter").addEventListener("change", () => {
+    const transfer = $("nature-filter").value === "transfer";
+    if (transfer) { $("category-filter").value = ""; $("class-filter").value = ""; }
+    $("category-filter").disabled = transfer; $("class-filter").disabled = transfer; load();
+  });
+  for (const id of ["account-filter","category-filter","class-filter"]) $(id).addEventListener("change",() => load());
   $("search").addEventListener("input",() => { clearTimeout(searchTimer); $("more").disabled = true; searchTimer = setTimeout(() => load(),400); });
   $("new-income").addEventListener("click",() => openEditor("income"));
   $("new-expense").addEventListener("click",() => openEditor("expense"));
+  $("new-transfer").addEventListener("click",() => openEditor("transfer"));
   $("reload").addEventListener("click",() => load()); $("more").addEventListener("click",() => load(true));
-  for (const [id, callback] of [["tx-home","onHome"],["tx-brand","onHome"],["tx-accounts","onAccounts"],["tx-categories","onCategories"],["tx-transfers","onTransfers"]])
+  for (const [id, callback] of [["tx-home","onHome"],["tx-brand","onHome"],["tx-accounts","onAccounts"],["tx-categories","onCategories"]])
     $(id).addEventListener("click",event => { event.preventDefault(); if (!busy) callbacks[callback]?.(); });
   root.querySelector(".nav-item.current").addEventListener("click",event => { event.preventDefault(); $("page-title").focus(); });
   root.querySelector(".skip-link").addEventListener("click",event => { event.preventDefault(); $("page-title").focus(); });
@@ -303,12 +335,13 @@ const MukiranaTransactions = (() => {
     ++epoch; ++readId; clearTimeout(timer); clearTimeout(searchTimer);
     if (confirmation) closeConfirm(false);
     for (const dialog of all("dialog[open]")) dialog.close();
-    entries=[]; accounts=[]; categories=[]; summary=null; edit=null; quick=null; hasMore=false; phase="loading";
+    entries=[]; accounts=[]; categories=[]; summary=null; edit=null; quick=null; hasMore=false; nextCursor=null; phase="loading";
     $("entry-form").reset(); $("quick-form").reset(); $("search").value="";
     for (const id of ["nature-filter","class-filter"]) $(id).value="";
-    for (const id of ["account-filter","category-filter","account","category","quick-parent"]) $(id).replaceChildren();
+    for (const id of ["account-filter","category-filter","account","category","destination","quick-parent"]) $(id).replaceChildren();
     for (const id of ["toast-text","confirm-title","confirm-description","quick-error","editor-note","account-balance"]) $(id).textContent="";
-    for (const field of ["description","amount","date","account","category","form"]) fieldError(field);
+    for (const field of ["description","amount","date","account","category","destination","form"]) fieldError(field);
+    $("category-filter").disabled=false; $("class-filter").disabled=false;
     $("toast").hidden=true; toastAction=null; pageError(); setBusy(false); render();
   }
   render(); periodControls();
