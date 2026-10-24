@@ -94,7 +94,8 @@ function obterPacoteTelaLancamentos(tokenSessao, filtros) {
 
   lancamentosDoUsuario = lancamentosDoUsuario
     .concat(lancamentosProgramadosFiltrados)
-    .concat(pagamentosFaturaFiltrados);
+    .concat(pagamentosFaturaFiltrados)
+    .concat(aplicarFiltrosPacoteLancamentos_(montarSaldosIniciaisParaTela_(contexto), filtrosNormalizados, contexto));
 
   medirEtapaPerformance_(medidor, "ordenar_lancamentos", function() {
     lancamentosDoUsuario.sort(function(a, b) {
@@ -642,7 +643,7 @@ function processarSalvarLancamentoUnico_(dadosFormulario, contexto, lancamentoOr
     validarSemRateioAcertadoParaRedefinir_(lancamento.ID_Lancamento, contexto);
   }
 
-  salvarLancamentoModel(lancamento);
+  salvarLancamentoModel_(lancamento);
 
   aplicarRateiosAposSalvarLancamento_(lancamento, flagRateio, novosRateios, contexto);
 
@@ -740,11 +741,11 @@ function processarCriacaoParceladaLancamento_(dadosFormulario, contexto, tokenSe
     ? calcularRateiosParceladosParaCriacao_(lancamentos, dadosFormulario, contexto)
     : {};
 
-  salvarLancamentosEmLoteModel(lancamentos);
+  salvarLancamentosEmLoteModel_(lancamentos);
 
   if (flagRateio === true) {
     lancamentos.forEach(function(lancamento) {
-      substituirRateiosPendentesDoLancamentoModel(
+      substituirRateiosPendentesDoLancamentoModel_(
         lancamento.ID_Lancamento,
         rateiosPorLancamento[lancamento.ID_Lancamento] || [],
         contexto.idLogado
@@ -867,7 +868,7 @@ function processarEdicaoEstaEProximasParcelasLancamento_(dadosFormulario, lancam
     });
   }
 
-  salvarLancamentosEmLoteModel(lancamentosAtualizados);
+  salvarLancamentosEmLoteModel_(lancamentosAtualizados);
 
   lancamentosAtualizados.forEach(function(lancamento) {
     aplicarRateiosAposSalvarLancamento_(
@@ -958,15 +959,15 @@ function adicionarAlertaOrcamentoMensagemLancamento_(mensagemBase, lancamento, t
  * @param {string} idUsuarioAlteracao ID do usuário responsável pela alteração.
  */
 function substituirRateiosDoLancamentoComExclusaoFisica_(idLancamento, novosRateios, idUsuarioAlteracao) {
-  if (typeof substituirRateiosDoLancamentoModel === "function") {
-    substituirRateiosDoLancamentoModel(idLancamento, novosRateios, idUsuarioAlteracao);
+  if (typeof substituirRateiosDoLancamentoModel_ === "function") {
+    substituirRateiosDoLancamentoModel_(idLancamento, novosRateios, idUsuarioAlteracao);
     return;
   }
 
   excluirRateiosDoLancamentoComValidacao_(idLancamento);
 
   if (novosRateios && novosRateios.length > 0) {
-    substituirRateiosPendentesDoLancamentoModel(
+    substituirRateiosPendentesDoLancamentoModel_(
       idLancamento,
       novosRateios,
       idUsuarioAlteracao
@@ -981,17 +982,17 @@ function substituirRateiosDoLancamentoComExclusaoFisica_(idLancamento, novosRate
  * @param {string} idLancamento ID do lançamento.
  */
 function excluirRateiosDoLancamentoComValidacao_(idLancamento) {
-  if (typeof excluirRateiosDoLancamentoModel === "function") {
-    excluirRateiosDoLancamentoModel(idLancamento);
+  if (typeof excluirRateiosDoLancamentoModel_ === "function") {
+    excluirRateiosDoLancamentoModel_(idLancamento);
     return;
   }
 
-  if (typeof excluirRateiosPorLancamentosModel === "function") {
-    excluirRateiosPorLancamentosModel([idLancamento]);
+  if (typeof excluirRateiosPorLancamentosModel_ === "function") {
+    excluirRateiosPorLancamentosModel_([idLancamento]);
     return;
   }
 
-  if (typeof cancelarRateiosPendentesDoLancamentoModel === "function") {
+  if (typeof cancelarRateiosPendentesDoLancamentoModel_ === "function") {
     throw new Error("O Model de Rateios ainda não possui exclusão física. Atualize Rateios_Model antes de salvar sem rateio.");
   }
 
@@ -1414,19 +1415,19 @@ function excluirLancamentoCompleto(idLancamento, tokenSessao, escopoExclusaoParc
     const identificadoresParaExcluir = obterIdentificadoresExclusaoLancamentos_(lancamentosParaExcluir);
 
     medirEtapaPerformance_(medidor, "excluir_rateios", function() {
-      if (typeof excluirRateiosPorLancamentosModel === "function") {
-        excluirRateiosPorLancamentosModel(idsParaExcluir);
+      if (typeof excluirRateiosPorLancamentosModel_ === "function") {
+        excluirRateiosPorLancamentosModel_(idsParaExcluir);
       }
     });
 
     medirEtapaPerformance_(medidor, "excluir_lancamentos", function() {
-      if (typeof excluirLancamentosPorLinhasModel === "function") {
-        excluirLancamentosPorLinhasModel(identificadoresParaExcluir);
+      if (typeof excluirLancamentosPorLinhasModel_ === "function") {
+        excluirLancamentosPorLinhasModel_(identificadoresParaExcluir);
       } else {
         identificadoresParaExcluir
           .sort(function(a, b) { return b - a; })
           .forEach(function(linhaPlanilha) {
-            excluirLancamentoModel(linhaPlanilha);
+            excluirLancamentoModel_(linhaPlanilha);
           });
       }
     });
@@ -1538,7 +1539,7 @@ function alterarStatusLancamentosEmLote_(lancamentosSelecionados, statusInformad
     return clone;
   });
 
-  salvarLancamentosEmLoteModel(atualizados);
+  salvarLancamentosEmLoteModel_(atualizados);
 
   return atualizados.length === 1
     ? "Status de 1 lançamento atualizado com sucesso."
@@ -1558,17 +1559,17 @@ function excluirLancamentosSelecionadosEmLote_(lancamentosSelecionados, contexto
   });
   const identificadoresParaExcluir = obterIdentificadoresExclusaoLancamentos_(lancamentosSelecionados);
 
-  if (typeof excluirRateiosPorLancamentosModel === "function") {
-    excluirRateiosPorLancamentosModel(idsParaExcluir);
+  if (typeof excluirRateiosPorLancamentosModel_ === "function") {
+    excluirRateiosPorLancamentosModel_(idsParaExcluir);
   }
 
-  if (typeof excluirLancamentosPorLinhasModel === "function") {
-    excluirLancamentosPorLinhasModel(identificadoresParaExcluir);
+  if (typeof excluirLancamentosPorLinhasModel_ === "function") {
+    excluirLancamentosPorLinhasModel_(identificadoresParaExcluir);
   } else {
     identificadoresParaExcluir
       .sort(function(a, b) { return b - a; })
       .forEach(function(linhaPlanilha) {
-        excluirLancamentoModel(linhaPlanilha);
+        excluirLancamentoModel_(linhaPlanilha);
       });
   }
 
@@ -1579,7 +1580,7 @@ function excluirLancamentosSelecionadosEmLote_(lancamentosSelecionados, contexto
 
 
 function obterIdentificadoresExclusaoLancamentos_(lancamentos) {
-  const usaSupabase = typeof bancoUsaSupabase === "function" && bancoUsaSupabase();
+  const usaSupabase = typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_();
 
   return (lancamentos || []).map(function(lancamento) {
     return usaSupabase
@@ -1693,45 +1694,45 @@ function montarContextoLancamentosAPartirBase_(sessao, contextoBase, medidorPerf
   const papelLogado = normalizarTextoLancamento_(sessao.papel) || "Usuário";
 
   const usuariosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_usuarios", function() {
-    return contextoBase ? contextoBase.usuariosTodos : listarUsuariosModel();
+    return contextoBase ? contextoBase.usuariosTodos : listarUsuariosModel_();
   });
   const contasTodas = medirEtapaPerformance_(medidorPerformance, "consulta_contas", function() {
-    return contextoBase ? contextoBase.contasTodas : typeof listarContasModel === "function" ? listarContasModel() : [];
+    return contextoBase ? contextoBase.contasTodas : typeof listarContasModel_ === "function" ? listarContasModel_() : [];
   });
   const cartoesTodos = medirEtapaPerformance_(medidorPerformance, "consulta_cartoes", function() {
-    return contextoBase ? contextoBase.cartoesTodos : typeof listarCartoesModel === "function" ? listarCartoesModel() : [];
+    return contextoBase ? contextoBase.cartoesTodos : typeof listarCartoesModel_ === "function" ? listarCartoesModel_() : [];
   });
   const categoriasTodas = medirEtapaPerformance_(medidorPerformance, "consulta_categorias", function() {
-    return contextoBase ? contextoBase.categoriasTodas : typeof listarCategoriasModel === "function" ? listarCategoriasModel() : [];
+    return contextoBase ? contextoBase.categoriasTodas : typeof listarCategoriasModel_ === "function" ? listarCategoriasModel_() : [];
   });
   const projetosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_projetos", function() {
-    return contextoBase ? contextoBase.projetosTodos : typeof listarProjetosModel === "function" ? listarProjetosModel() : [];
+    return contextoBase ? contextoBase.projetosTodos : typeof listarProjetosModel_ === "function" ? listarProjetosModel_() : [];
   });
   const lancamentosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_lancamentos", function() {
-    return contextoBase ? contextoBase.lancamentosTodos : listarLancamentosModel();
+    return contextoBase ? contextoBase.lancamentosTodos : listarLancamentosModel_();
   });
   const rateiosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_rateios", function() {
-    return contextoBase ? contextoBase.rateiosTodos : typeof listarRateiosModel === "function" ? listarRateiosModel() : [];
+    return contextoBase ? contextoBase.rateiosTodos : typeof listarRateiosModel_ === "function" ? listarRateiosModel_() : [];
   });
   const recorrenciasTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias", function() {
     return contextoBase && contextoBase.recorrenciasTodos
       ? contextoBase.recorrenciasTodos
-      : typeof listarRecorrenciasModel === "function" ? listarRecorrenciasModel() : [];
+      : typeof listarRecorrenciasModel_ === "function" ? listarRecorrenciasModel_() : [];
   });
   const recorrenciasRateiosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias_rateios", function() {
     return contextoBase && contextoBase.recorrenciasRateiosTodos
       ? contextoBase.recorrenciasRateiosTodos
-      : typeof listarRecorrenciasRateiosModel === "function" ? listarRecorrenciasRateiosModel() : [];
+      : typeof listarRecorrenciasRateiosModel_ === "function" ? listarRecorrenciasRateiosModel_() : [];
   });
   const recorrenciasOcorrenciasTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias_ocorrencias", function() {
     return contextoBase && contextoBase.recorrenciasOcorrenciasTodos
       ? contextoBase.recorrenciasOcorrenciasTodos
-      : typeof listarRecorrenciasOcorrenciasModel === "function" ? listarRecorrenciasOcorrenciasModel() : [];
+      : typeof listarRecorrenciasOcorrenciasModel_ === "function" ? listarRecorrenciasOcorrenciasModel_() : [];
   });
   const pagamentosFaturasTodos = medirEtapaPerformance_(medidorPerformance, "consulta_pagamentos_faturas", function() {
     return contextoBase && contextoBase.pagamentosFaturasTodos
       ? contextoBase.pagamentosFaturasTodos
-      : typeof listarPagamentosFaturasModel === "function" ? listarPagamentosFaturasModel() : [];
+      : typeof listarPagamentosFaturasModel_ === "function" ? listarPagamentosFaturasModel_() : [];
   });
   const usuariosAtivosSanitizados = medirEtapaPerformance_(medidorPerformance, "filtrar_usuarios_ativos", function() {
     return filtrarUsuariosAtivosParaLancamentos_(usuariosTodos);
@@ -2782,6 +2783,16 @@ function normalizarMesPagamentoFaturaLancamento_(valor) {
  * @returns {Object} Lançamento seguro para a tela.
  */
 function enriquecerLancamentoParaTela_(lancamento, contexto, idsLancamentosComRateioDoUsuario, rateiosVisiveis) {
+  if (lancamento && lancamento._Saldo_Inicial === true) {
+    return Object.assign({}, lancamento, {
+      Pode_Editar: false, Pode_Excluir: false, Somente_Leitura: false,
+      Pode_Editar_Saldo_Inicial: lancamento.Criado_Por_ID === contexto.idLogado,
+      Nome_Autor: 'Sistema', Nome_Categoria_Visualizacao: 'Saldo inicial',
+      Nome_Projeto_Visualizacao: '', Nome_Origem_Visualizacao: lancamento.Nome_Conta,
+      Possui_Rateio: false, Valor_Total_Original: lancamento.Valor_Total,
+      Valor_Exibicao: lancamento.Valor_Total, Rotulo_Valor_Exibicao: 'Saldo inicial'
+    });
+  }
   if (lancamento && lancamento._Pagamento_Fatura === true) {
     return enriquecerPagamentoFaturaLancamentoParaTela_(lancamento, contexto);
   }

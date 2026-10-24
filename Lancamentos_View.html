@@ -2210,6 +2210,17 @@
 
     td.appendChild(descricao);
 
+    if (lancamento._Saldo_Inicial === true) {
+      var badgeSaldo = document.createElement('span');
+      badgeSaldo.className = 'badge-global';
+      badgeSaldo.textContent = 'Saldo inicial';
+      td.appendChild(badgeSaldo);
+      var dicaSaldo = document.createElement('span');
+      dicaSaldo.className = 'lancamento-descricao-projeto';
+      dicaSaldo.textContent = 'Compõe o saldo da conta; fora das receitas e despesas.';
+      td.appendChild(dicaSaldo);
+    }
+
     if (lancamentoEhParceladoFront(lancamento)) {
       var badgeParcela = document.createElement('span');
       badgeParcela.className = 'badge-parcela';
@@ -2379,6 +2390,22 @@
     td.style.textAlign = 'right';
 
     container.className = 'lancamento-acoes';
+
+    if (lancamento._Saldo_Inicial === true) {
+      if (lancamento.Pode_Editar_Saldo_Inicial === true) {
+        var btnSaldo = document.createElement('button');
+        btnSaldo.type = 'button';
+        btnSaldo.className = 'btn-acao';
+        btnSaldo.textContent = 'Editar saldo inicial';
+        btnSaldo.addEventListener('click', function() {
+          sessionStorage.setItem('mukirana_contas_nova_editar', lancamento.ID_Origem);
+          navegarPara('ContasNova');
+        });
+        container.appendChild(btnSaldo);
+      } else container.textContent = 'Saldo inicial';
+      td.appendChild(container);
+      return td;
+    }
 
     if (lancamento.Origem_Registro === 'Pagamento_Fatura') {
       var btnDetalhesFatura = document.createElement('button');

@@ -115,7 +115,7 @@ function salvarRecorrencia(dados, tokenSessao) {
       throw new Error(diagnostico.mensagemGeral);
     }
 
-    salvarRecorrenciaModel(recorrencia);
+    salvarRecorrenciaModel_(recorrencia);
     salvarRateioRecorrenciaController_(recorrencia, dados, contexto);
 
     if (normalizarTextoRecorrenciaController_(recorrencia.Modo_Geracao) === "Automática") {
@@ -155,7 +155,7 @@ function inativarRecorrencia(idRecorrencia, tokenSessao) {
   recorrencia.Alterado_Por_ID = contexto.idLogado;
   recorrencia.Data_Alteracao = new Date().toLocaleString("pt-BR");
 
-  salvarRecorrenciaModel(recorrencia);
+  salvarRecorrenciaModel_(recorrencia);
   return "Recorrencia inativada com sucesso.";
 }
 
@@ -191,7 +191,7 @@ function reativarRecorrencia(idRecorrencia, novaDataInicio, tokenSessao) {
     recorrencia.Alterado_Por_ID = contexto.idLogado;
     recorrencia.Data_Alteracao = new Date().toLocaleString("pt-BR");
 
-    salvarRecorrenciaModel(recorrencia);
+    salvarRecorrenciaModel_(recorrencia);
 
     if (normalizarTextoRecorrenciaController_(recorrencia.Modo_Geracao) === "Automática") {
       garantirTriggerRecorrenciasAutomaticas_();
@@ -247,7 +247,7 @@ function alterarRecorrenciasEmLote(tokenSessao, dados) {
       aplicarConfiguracaoLoteRecorrenciaController_(recorrencia, configuracao);
       recorrencia.Alterado_Por_ID = contexto.idLogado;
       recorrencia.Data_Alteracao = agora;
-      salvarRecorrenciaModel(recorrencia);
+      salvarRecorrenciaModel_(recorrencia);
       resumo.alteradas += 1;
     });
 
@@ -557,7 +557,7 @@ function executarRotinaRecorrenciasAutomaticas() {
   lock.waitLock(30000);
 
   try {
-    const usuarios = listarUsuariosModel().filter(function(usuario) {
+    const usuarios = listarUsuariosModel_().filter(function(usuario) {
       return normalizarBooleanoRecorrenciaController_(usuario.Ativo);
     });
     let totalGerado = 0;
@@ -680,40 +680,40 @@ function montarContextoRecorrenciasPorUsuarioController_(usuarioBase, medidorPer
       : null;
   });
   const usuariosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_usuarios", function() {
-    return contextoRpc ? contextoRpc.usuariosTodos : listarUsuariosModel();
+    return contextoRpc ? contextoRpc.usuariosTodos : listarUsuariosModel_();
   });
   const contasTodas = medirEtapaPerformance_(medidorPerformance, "consulta_contas", function() {
-    return contextoRpc ? contextoRpc.contasTodas : typeof listarContasModel === "function" ? listarContasModel() : [];
+    return contextoRpc ? contextoRpc.contasTodas : typeof listarContasModel_ === "function" ? listarContasModel_() : [];
   });
   const cartoesTodos = medirEtapaPerformance_(medidorPerformance, "consulta_cartoes", function() {
-    return contextoRpc ? contextoRpc.cartoesTodos : typeof listarCartoesModel === "function" ? listarCartoesModel() : [];
+    return contextoRpc ? contextoRpc.cartoesTodos : typeof listarCartoesModel_ === "function" ? listarCartoesModel_() : [];
   });
   const categoriasTodas = medirEtapaPerformance_(medidorPerformance, "consulta_categorias", function() {
-    return typeof listarCategoriasModel === "function"
-      ? listarCategoriasModel()
+    return typeof listarCategoriasModel_ === "function"
+      ? listarCategoriasModel_()
       : contextoRpc
         ? contextoRpc.categoriasTodas
         : [];
   });
   const projetosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_projetos", function() {
-    return contextoRpc ? contextoRpc.projetosTodos : typeof listarProjetosModel === "function" ? listarProjetosModel() : [];
+    return contextoRpc ? contextoRpc.projetosTodos : typeof listarProjetosModel_ === "function" ? listarProjetosModel_() : [];
   });
   const lancamentosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_lancamentos", function() {
-    return contextoRpc ? contextoRpc.lancamentosTodos : typeof listarLancamentosModel === "function" ? listarLancamentosModel() : [];
+    return contextoRpc ? contextoRpc.lancamentosTodos : typeof listarLancamentosModel_ === "function" ? listarLancamentosModel_() : [];
   });
   const rateiosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_rateios", function() {
-    return contextoRpc ? contextoRpc.rateiosTodos : typeof listarRateiosModel === "function" ? listarRateiosModel() : [];
+    return contextoRpc ? contextoRpc.rateiosTodos : typeof listarRateiosModel_ === "function" ? listarRateiosModel_() : [];
   });
   const recorrenciasTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias", function() {
-    return contextoRpc ? contextoRpc.recorrenciasTodos : listarRecorrenciasModel();
+    return contextoRpc ? contextoRpc.recorrenciasTodos : listarRecorrenciasModel_();
   });
   const recorrenciasRateiosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias_rateios", function() {
-    return contextoRpc ? contextoRpc.recorrenciasRateiosTodos : listarRecorrenciasRateiosModel();
+    return contextoRpc ? contextoRpc.recorrenciasRateiosTodos : listarRecorrenciasRateiosModel_();
   });
   const recorrenciasOcorrenciasTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias_ocorrencias", function() {
     return contextoRpc && contextoRpc.recorrenciasOcorrenciasTodos
       ? contextoRpc.recorrenciasOcorrenciasTodos
-      : typeof listarRecorrenciasOcorrenciasModel === "function" ? listarRecorrenciasOcorrenciasModel() : [];
+      : typeof listarRecorrenciasOcorrenciasModel_ === "function" ? listarRecorrenciasOcorrenciasModel_() : [];
   });
 
   return {
@@ -1085,7 +1085,7 @@ function salvarRateioRecorrenciaController_(recorrencia, dados, contexto) {
   const agora = new Date().toLocaleString("pt-BR");
 
   if (!flagRateio || recorrencia.Tipo === "Transferência") {
-    substituirRecorrenciasRateiosModel(recorrencia.ID_Recorrencia, []);
+    substituirRecorrenciasRateiosModel_(recorrencia.ID_Recorrencia, []);
     return;
   }
 
@@ -1119,7 +1119,7 @@ function salvarRateioRecorrenciaController_(recorrencia, dados, contexto) {
     };
   });
 
-  substituirRecorrenciasRateiosModel(recorrencia.ID_Recorrencia, itens);
+  substituirRecorrenciasRateiosModel_(recorrencia.ID_Recorrencia, itens);
 }
 
 
@@ -1262,7 +1262,7 @@ function marcarRecorrenciaComoRevisaoController_(recorrencia, motivo, idUsuarioA
   recorrencia.Alterado_Por_ID = normalizarTextoRecorrenciaController_(idUsuarioAlteracao);
   recorrencia.Data_Alteracao = new Date().toLocaleString("pt-BR");
 
-  salvarRecorrenciaModel(recorrencia);
+  salvarRecorrenciaModel_(recorrencia);
 }
 
 
@@ -1615,7 +1615,7 @@ function gerarOcorrenciaRecorrenciaController_(recorrencia, dataOcorrencia, cont
     Data_Criacao: agora
   };
 
-  gerarOcorrenciaRecorrenciaModel(lancamento, ocorrencia, novosRateios, contexto.idLogado);
+  gerarOcorrenciaRecorrenciaModel_(lancamento, ocorrencia, novosRateios, contexto.idLogado);
   return lancamento;
 }
 

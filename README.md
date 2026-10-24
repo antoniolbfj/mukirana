@@ -51,3 +51,11 @@ ativa. Nenhuma alteração foi publicada no Apps Script nesta importação.
 Detalhes da preparação e limites da validação estão em
 [docs/reinicio.md](docs/reinicio.md). O escopo vigente está em
 [docs/pendencias-requisitos.md](docs/pendencias-requisitos.md).
+
+## Nova tela de Contas
+
+Implementadas interfaces próprias para computadores/tablets e smartphones no
+menu provisório **Contas (nova)**. A migração dos saldos iniciais foi aplicada no
+Supabase, preservando os registros existentes e a compatibilidade da tela atual.
+Detalhes, testes e publicação: [entrega de Contas](docs/contas-entrega.md).
+A substituição do acesso principal depende da homologação das duas interfaces.

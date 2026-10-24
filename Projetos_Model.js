@@ -4,12 +4,12 @@
  * Padronização: Colunas de usuário (Criado_Por e Usuarios_Compartilhados) baseadas em ID_Usuario (UUID).
  */
 
-function listarProjetosModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarProjetosModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarProjetosSupabaseModel_();
   }
 
-  let banco = conectarBanco();
+  let banco = conectarBanco_();
   let aba = banco.getSheetByName('PROJETOS');
   if (!aba) throw new Error("Aba PROJETOS não encontrada na planilha.");
 
@@ -22,24 +22,24 @@ function listarProjetosModel() {
 
     registros.push({
       _linhaPlanilha: i + 1,
-      ID_Projeto: linha[0],                                                     
-      Nome: linha[1],                                                           
-      Orcamento_Teto: linha[2],                                                 
-      Compartilhado: (linha[3] === true || linha[3] === "true" || linha[3] === 1),  
-      Usuarios_Compartilhados: linha[4] ? linha[4].toString() : "", // Agora retorna string de UUIDs         
-      Status: (linha[5] === true || linha[5] === "true" || linha[5] === 1),         
-      Criado_Por: linha[6] || "" // Retorna UUID do criador                                                  
+      ID_Projeto: linha[0],
+      Nome: linha[1],
+      Orcamento_Teto: linha[2],
+      Compartilhado: (linha[3] === true || linha[3] === "true" || linha[3] === 1),
+      Usuarios_Compartilhados: linha[4] ? linha[4].toString() : "", // Agora retorna string de UUIDs
+      Status: (linha[5] === true || linha[5] === "true" || linha[5] === 1),
+      Criado_Por: linha[6] || "" // Retorna UUID do criador
     });
   }
   return registros;
 }
 
-function salvarProjetoModel(projeto) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarProjetoModel_(projeto) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarProjetoSupabaseModel_(projeto);
   }
 
-  let banco = conectarBanco();
+  let banco = conectarBanco_();
   let aba = banco.getSheetByName('PROJETOS');
 
   let dadosVetor = [
@@ -60,23 +60,23 @@ function salvarProjetoModel(projeto) {
   return projeto.ID_Projeto;
 }
 
-function alterarStatusProjetoModel(linhaPlanilha, novoStatus) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function alterarStatusProjetoModel_(linhaPlanilha, novoStatus) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return alterarStatusProjetoSupabaseModel_(linhaPlanilha, novoStatus);
   }
 
-  let banco = conectarBanco();
+  let banco = conectarBanco_();
   let aba = banco.getSheetByName('PROJETOS');
   aba.getRange(linhaPlanilha, 6).setValue(novoStatus);
 }
 
 
 function listarProjetosSupabaseModel_() {
-  const projetos = supabaseSelecionar(
+  const projetos = supabaseSelecionar_(
     "projetos",
     "select=id_projeto,nome,orcamento_teto,compartilhado,ativo,criado_por&order=nome.asc"
   );
-  const compartilhamentos = supabaseSelecionar(
+  const compartilhamentos = supabaseSelecionar_(
     "projetos_compartilhamentos",
     "select=id_projeto,id_usuario,ativo,papel_no_projeto&ativo=eq.true"
   );
@@ -112,7 +112,7 @@ function salvarProjetoSupabaseModel_(projeto) {
   const compartilhado = projeto.Compartilhado === true;
   const usuariosCompartilhados = compartilhado ? (projeto.Usuarios_Compartilhados || "") : "";
 
-  supabaseInserir("projetos", {
+  supabaseInserir_("projetos", {
     id_projeto: idProjeto,
     nome: projeto.Nome,
     orcamento_teto: projeto.Orcamento_Teto || 0,
@@ -135,7 +135,7 @@ function alterarStatusProjetoSupabaseModel_(linhaOuIdProjeto, novoStatus) {
     throw new Error("Projeto nao encontrado para alteracao de status no Supabase.");
   }
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "projetos",
     "id_projeto=eq." + encodeURIComponent(idProjeto),
     {
@@ -149,7 +149,7 @@ function alterarStatusProjetoSupabaseModel_(linhaOuIdProjeto, novoStatus) {
 function sincronizarCompartilhamentosProjetoSupabase_(idProjeto, idDono, usuariosCompartilhados) {
   const ids = normalizarListaIdsProjetoSupabase_([idDono, usuariosCompartilhados].join(","));
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "projetos_compartilhamentos",
     "id_projeto=eq." + encodeURIComponent(idProjeto),
     {
@@ -170,7 +170,7 @@ function sincronizarCompartilhamentosProjetoSupabase_(idProjeto, idDono, usuario
   });
 
   if (registros.length > 0) {
-    supabaseInserir("projetos_compartilhamentos", registros, "resolution=merge-duplicates,return=representation");
+    supabaseInserir_("projetos_compartilhamentos", registros, "resolution=merge-duplicates,return=representation");
   }
 }
 

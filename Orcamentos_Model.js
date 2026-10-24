@@ -21,8 +21,8 @@
  *
  * @returns {Array<Object>} Itens de orçamento.
  */
-function listarOrcamentosModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarOrcamentosModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarOrcamentosSupabaseModel_();
   }
 
@@ -65,8 +65,8 @@ function listarOrcamentosModel() {
  * @param {Object} item Item validado pelo Controller.
  * @returns {string} ID salvo.
  */
-function salvarOrcamentoModel(item) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarOrcamentoModel_(item) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarOrcamentoSupabaseModel_(item);
   }
 
@@ -98,8 +98,8 @@ function salvarOrcamentoModel(item) {
  *
  * @param {number} linhaPlanilha Linha real na aba ORCAMENTOS.
  */
-function excluirOrcamentoModel(linhaPlanilha) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function excluirOrcamentoModel_(linhaPlanilha) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return excluirOrcamentoSupabaseModel_(linhaPlanilha);
   }
 
@@ -115,7 +115,7 @@ function excluirOrcamentoModel(linhaPlanilha) {
 
 
 function listarOrcamentosSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "orcamentos",
     "select=id_orcamento,id_usuario,id_categoria,valor_teto,ativo,created_at,updated_at&order=created_at.asc"
   ).map(function(item, indice) {
@@ -139,7 +139,7 @@ function salvarOrcamentoSupabaseModel_(item) {
   const dataCriacao = normalizarDataHoraSupabaseOrcamentoModel_(item.Data_Criacao) || agora;
   const dataAlteracao = normalizarDataHoraSupabaseOrcamentoModel_(item.Data_Alteracao) || agora;
 
-  supabaseInserir("orcamentos", {
+  supabaseInserir_("orcamentos", {
     id_orcamento: idOrcamento,
     id_usuario: item.ID_Usuario,
     id_categoria: item.ID_Categoria,
@@ -186,7 +186,7 @@ function excluirOrcamentoSupabaseModel_(linhaOuIdOrcamento) {
     throw new Error("Item de orcamento nao encontrado para exclusao no Supabase.");
   }
 
-  supabaseExcluir("orcamentos", "id_orcamento=eq." + encodeURIComponent(idOrcamento));
+  supabaseExcluir_("orcamentos", "id_orcamento=eq." + encodeURIComponent(idOrcamento));
 }
 
 
@@ -212,7 +212,7 @@ function obterIdOrcamentoParaAlteracaoSupabase_(linhaOuIdOrcamento) {
 
 
 function obterAbaOrcamentosModel_() {
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   let aba = banco.getSheetByName("ORCAMENTOS");
 
   if (!aba) {

@@ -20,8 +20,8 @@ const SUPABASE_TABELAS_DIAGNOSTICO = [
 ];
 
 
-function sincronizarPlanilhaAtualParaSupabase() {
-  if (typeof supabaseEstaConfigurado !== "function" || !supabaseEstaConfigurado()) {
+function sincronizarPlanilhaAtualParaSupabase_() {
+  if (typeof supabaseEstaConfigurado_ !== "function" || !supabaseEstaConfigurado_()) {
     throw new Error("Supabase nao configurado. Configure URL e service key antes de sincronizar.");
   }
 
@@ -384,7 +384,7 @@ function inserirSupabaseEmBlocos_(nomeTabela, registros) {
   }
 
   for (let i = 0; i < lista.length; i += tamanhoBloco) {
-    supabaseInserir(
+    supabaseInserir_(
       nomeTabela,
       lista.slice(i, i + tamanhoBloco),
       "resolution=merge-duplicates,return=minimal"
@@ -402,7 +402,7 @@ function inserirSupabaseEmBlocosComConflito_(nomeTabela, registros, colunasConfl
   }
 
   for (let i = 0; i < lista.length; i += tamanhoBloco) {
-    supabaseInserirComConflito(
+    supabaseInserirComConflito_(
       nomeTabela,
       lista.slice(i, i + tamanhoBloco),
       colunasConflito,
@@ -413,7 +413,7 @@ function inserirSupabaseEmBlocosComConflito_(nomeTabela, registros, colunasConfl
 
 
 function lerTabelaPlanilhaMigracao_(nomeTabela) {
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName(nomeTabela);
 
   if (!aba || aba.getLastRow() <= 1) {

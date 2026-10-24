@@ -177,59 +177,59 @@ function montarContextoConsolidadosAPartirBase_(sessao, contextoBase, medidorPer
   const idLogado = normalizarTextoConsolidadoController_(sessao.id);
   const papelLogado = normalizarTextoConsolidadoController_(sessao.papel);
   const usuariosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_usuarios", function() {
-    return contextoBase ? contextoBase.usuariosTodos : listarUsuariosModel();
+    return contextoBase ? contextoBase.usuariosTodos : listarUsuariosModel_();
   });
   const contasTodas = medirEtapaPerformance_(medidorPerformance, "consulta_contas", function() {
-    return contextoBase ? contextoBase.contasTodas : typeof listarContasModel === "function" ? listarContasModel() : [];
+    return contextoBase ? contextoBase.contasTodas : typeof listarContasModel_ === "function" ? listarContasModel_() : [];
   });
   const cartoesTodos = medirEtapaPerformance_(medidorPerformance, "consulta_cartoes", function() {
-    return contextoBase ? contextoBase.cartoesTodos : typeof listarCartoesModel === "function" ? listarCartoesModel() : [];
+    return contextoBase ? contextoBase.cartoesTodos : typeof listarCartoesModel_ === "function" ? listarCartoesModel_() : [];
   });
   const categoriasTodas = medirEtapaPerformance_(medidorPerformance, "consulta_categorias", function() {
-    return contextoBase ? contextoBase.categoriasTodas : typeof listarCategoriasModel === "function" ? listarCategoriasModel() : [];
+    return contextoBase ? contextoBase.categoriasTodas : typeof listarCategoriasModel_ === "function" ? listarCategoriasModel_() : [];
   });
   const projetosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_projetos", function() {
-    return contextoBase ? contextoBase.projetosTodos : typeof listarProjetosModel === "function" ? listarProjetosModel() : [];
+    return contextoBase ? contextoBase.projetosTodos : typeof listarProjetosModel_ === "function" ? listarProjetosModel_() : [];
   });
   const lancamentosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_lancamentos", function() {
-    return contextoBase ? contextoBase.lancamentosTodos : typeof listarLancamentosModel === "function" ? listarLancamentosModel() : [];
+    return contextoBase ? contextoBase.lancamentosTodos : typeof listarLancamentosModel_ === "function" ? listarLancamentosModel_() : [];
   });
   const rateiosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_rateios", function() {
-    return contextoBase ? contextoBase.rateiosTodos : typeof listarRateiosModel === "function" ? listarRateiosModel() : [];
+    return contextoBase ? contextoBase.rateiosTodos : typeof listarRateiosModel_ === "function" ? listarRateiosModel_() : [];
   });
   const pagamentosFaturasTodos = medirEtapaPerformance_(medidorPerformance, "consulta_pagamentos_faturas", function() {
     return contextoBase
       ? (contextoBase.pagamentosFaturasTodos || [])
-      : typeof listarPagamentosFaturasModel === "function" ? listarPagamentosFaturasModel() : [];
+      : typeof listarPagamentosFaturasModel_ === "function" ? listarPagamentosFaturasModel_() : [];
   });
   const orcamentosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_orcamentos", function() {
-    return contextoBase ? contextoBase.orcamentosTodos : typeof listarOrcamentosModel === "function" ? listarOrcamentosModel() : [];
+    return contextoBase ? contextoBase.orcamentosTodos : typeof listarOrcamentosModel_ === "function" ? listarOrcamentosModel_() : [];
   });
   const recorrenciasTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias", function() {
     return contextoBase
       ? mesclarRegistrosPorIdConsolidadoController_(
         contextoBase.recorrenciasTodos || [],
-        typeof listarRecorrenciasModel === "function" ? listarRecorrenciasModel() : [],
+        typeof listarRecorrenciasModel_ === "function" ? listarRecorrenciasModel_() : [],
         "ID_Recorrencia"
       )
-      : typeof listarRecorrenciasModel === "function" ? listarRecorrenciasModel() : [];
+      : typeof listarRecorrenciasModel_ === "function" ? listarRecorrenciasModel_() : [];
   });
   const recorrenciasRateiosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias_rateios", function() {
     return contextoBase
       ? mesclarRegistrosPorIdConsolidadoController_(
         contextoBase.recorrenciasRateiosTodos || [],
-        typeof listarRecorrenciasRateiosModel === "function" ? listarRecorrenciasRateiosModel() : [],
+        typeof listarRecorrenciasRateiosModel_ === "function" ? listarRecorrenciasRateiosModel_() : [],
         "ID_Recorrencia_Rateio"
       )
-      : typeof listarRecorrenciasRateiosModel === "function" ? listarRecorrenciasRateiosModel() : [];
+      : typeof listarRecorrenciasRateiosModel_ === "function" ? listarRecorrenciasRateiosModel_() : [];
   });
   const recorrenciasOcorrenciasTodos = medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias_ocorrencias", function() {
     return contextoBase
       ? mesclarOcorrenciasRecorrenciasConsolidadoController_(
         contextoBase.recorrenciasOcorrenciasTodos || [],
-        typeof listarRecorrenciasOcorrenciasModel === "function" ? listarRecorrenciasOcorrenciasModel() : []
+        typeof listarRecorrenciasOcorrenciasModel_ === "function" ? listarRecorrenciasOcorrenciasModel_() : []
       )
-      : typeof listarRecorrenciasOcorrenciasModel === "function" ? listarRecorrenciasOcorrenciasModel() : [];
+      : typeof listarRecorrenciasOcorrenciasModel_ === "function" ? listarRecorrenciasOcorrenciasModel_() : [];
   });
   const contasAcessiveis = medirEtapaPerformance_(medidorPerformance, "filtrar_contas_acessiveis", function() {
     return filtrarContasAcessiveisLancamento_(contasTodas, idLogado);
@@ -528,8 +528,9 @@ function calcularSaldoFinanceiroGlobalConsolidadoController_(
   const limiteAgora = hoje < inicioPeriodo ? inicioPeriodo : hoje > fimPeriodo ? fimPeriodo : hoje;
   const considerarHistoricoAnterior = !filtros || filtros.Considerar_Historico_Anterior !== false;
   const saldoInicialContas = (contexto.contasAcessiveis || []).reduce(function(total, conta) {
-    return total + converterNumeroConsolidadoController_(conta.Saldo_Inicial);
+    return total + (!conta.Data_Saldo_Inicial || conta.Data_Saldo_Inicial < inicioPeriodo ? converterNumeroConsolidadoController_(conta.Saldo_Inicial) : 0);
   }, 0);
+  const saldoInicialNoPeriodo = somarSaldosIniciaisNoPeriodo_(contexto.contasAcessiveis, inicioPeriodo, fimPeriodo);
   const resultadoAnterior = considerarHistoricoAnterior
     ? calcularResultadoGlobalAntesDeDataConsolidadoController_(
       contexto,
@@ -555,8 +556,8 @@ function calcularSaldoFinanceiroGlobalConsolidadoController_(
   );
   const resultadoReal = obterResultadoReceitasDespesasConsolidadoController_(resumoReal.Fluxo_Rateios || resumoReal.Pessoal || resumoReal);
   const resultadoProjetado = obterResultadoReceitasDespesasConsolidadoController_(resumoProjetado.Fluxo_Rateios || resumoProjetado.Pessoal || resumoProjetado);
-  const saldoReal = arredondarConsolidadoController_(saldoAnterior + resultadoReal);
-  const saldoEstimado = arredondarConsolidadoController_(saldoAnterior + resultadoProjetado);
+  const saldoReal = arredondarConsolidadoController_(saldoAnterior + saldoInicialNoPeriodo + resultadoReal);
+  const saldoEstimado = arredondarConsolidadoController_(saldoAnterior + saldoInicialNoPeriodo + resultadoProjetado);
   const cenarioAgora = calcularCenarioSaldoFinanceiroConsolidadoController_(
     contexto,
     lancamentosPeriodoReal || [],
@@ -655,17 +656,23 @@ function calcularSaudeFinanceiraConsolidadoController_(contexto, lancamentosVisi
   const resumoPeriodoProjetado = resumirMovimentosSaudeFinanceiraConsolidadoController_(movimentosPeriodoProjetado);
   const resumoPatrimonioPeriodo = resumirMovimentosSaudeFinanceiraConsolidadoController_(movimentosPatrimonioPeriodo);
   const resumoAcumulado = resumirMovimentosSaudeFinanceiraConsolidadoController_(movimentosPatrimonioProjetado);
-  const saldoInicialContas = calcularSaldoInicialUsuarioSaudeFinanceiraConsolidadoController_(contexto);
+  const saldoInicialContas = calcularSaldoInicialUsuarioSaudeFinanceiraConsolidadoController_(contexto, fimPeriodo);
+  const saldosDatados = (contexto.contasTodas || []).filter(function(c) {
+    return c.ID_Usuario === contexto.idLogado && c.Data_Saldo_Inicial && c.Data_Saldo_Inicial <= fimPeriodo;
+  }).map(function(c) { return { Data: c.Data_Saldo_Inicial, Tipo: 'Saldo Inicial', Impacto: converterNumeroConsolidadoController_(c.Saldo_Inicial), Valor: 0 }; });
+  const baseSemData = (contexto.contasTodas || []).filter(function(c) { return !c.Data_Saldo_Inicial && c.ID_Usuario === contexto.idLogado; })
+    .reduce(function(n,c) { return n + converterNumeroConsolidadoController_(c.Saldo_Inicial); }, 0);
+  const movimentosComSaldos = movimentosPatrimonioProjetado.concat(saldosDatados);
   const patrimonioAcumulado = saldoInicialContas + resumoAcumulado.Resultado;
   const evolucao = montarEvolucaoPatrimonioSaudeFinanceiraConsolidadoController_(
-    movimentosPatrimonioProjetado,
+    movimentosComSaldos,
     inicioPeriodo,
     fimPeriodo,
-    saldoInicialContas
+    baseSemData
   );
   const relatorioMensalPatrimonio = montarRelatorioMensalPatrimonioSaudeFinanceiraConsolidadoController_(
-    movimentosPatrimonioProjetado,
-    saldoInicialContas,
+    movimentosComSaldos,
+    baseSemData,
     inicioPeriodo,
     fimPeriodo
   );
@@ -692,7 +699,7 @@ function calcularSaudeFinanceiraConsolidadoController_(contexto, lancamentosVisi
       Receitas_Acumuladas: arredondarConsolidadoController_(resumoAcumulado.Receitas),
       Despesas_Acumuladas: arredondarConsolidadoController_(resumoAcumulado.Despesas),
       Total: arredondarConsolidadoController_(patrimonioAcumulado),
-      Variacao_Periodo: arredondarConsolidadoController_(resumoPatrimonioPeriodo.Resultado),
+      Variacao_Periodo: arredondarConsolidadoController_(resumoPatrimonioPeriodo.Resultado + saldosDatados.filter(function(m) { return m.Data >= inicioPeriodo; }).reduce(function(n,m) { return n + m.Impacto; }, 0)),
       Total_Pendentes: resumoAcumulado.Total_Pendentes,
       Total_Programados: resumoAcumulado.Total_Programados,
       Evolucao_Periodo: evolucao,
@@ -774,6 +781,7 @@ function resumirMovimentosSaudeFinanceiraConsolidadoController_(movimentos) {
   };
 
   (movimentos || []).forEach(function(movimento) {
+    if (movimento.Tipo === "Saldo Inicial") return;
     if (movimento.Tipo === "Receita") {
       resumo.Receitas += movimento.Valor;
       if (movimento.ID_Lancamento) resumo.IDs_Receitas.push(movimento.ID_Lancamento);
@@ -823,7 +831,7 @@ function montarRelatorioMensalPatrimonioSaudeFinanceiraConsolidadoController_(mo
   while (mesAtual && mesAtual <= mesFinal && indiceSeguranca < 600) {
     const resumo = resumirMovimentosSaudeFinanceiraConsolidadoController_(movimentosPorMes[mesAtual] || []);
     const saldoAnterior = saldoCorrente;
-    saldoCorrente += resumo.Resultado;
+    saldoCorrente += resumo.Resultado + (movimentosPorMes[mesAtual] || []).reduce(function(n,m) { return n + (m.Tipo === "Saldo Inicial" ? m.Impacto : 0); }, 0);
 
     relatorio.push({
       Mes_Referencia: mesAtual,
@@ -847,13 +855,13 @@ function montarRelatorioMensalPatrimonioSaudeFinanceiraConsolidadoController_(mo
 }
 
 
-function calcularSaldoInicialUsuarioSaudeFinanceiraConsolidadoController_(contexto) {
+function calcularSaldoInicialUsuarioSaudeFinanceiraConsolidadoController_(contexto, dataLimite) {
   const contasSomadas = {};
   const idLogado = normalizarTextoConsolidadoController_(contexto.idLogado);
 
   return (contexto.contasTodas || []).reduce(function(total, conta) {
     const idConta = normalizarTextoConsolidadoController_(conta.ID_Conta);
-    if (!idConta || contasSomadas[idConta] || normalizarTextoConsolidadoController_(conta.ID_Usuario) !== idLogado) {
+    if (!idConta || contasSomadas[idConta] || normalizarTextoConsolidadoController_(conta.ID_Usuario) !== idLogado || (dataLimite && conta.Data_Saldo_Inicial && conta.Data_Saldo_Inicial > dataLimite)) {
       return total;
     }
 
@@ -950,7 +958,7 @@ function calcularCenarioSaldoFinanceiroConsolidadoController_(
     Despesas_Programadas: arredondarConsolidadoController_(despesasProgramadas),
     Despesas_Total: arredondarConsolidadoController_(totalDespesas),
     Resultado: arredondarConsolidadoController_(resultado),
-    Saldo: arredondarConsolidadoController_(saldoAnterior + resultado),
+    Saldo: arredondarConsolidadoController_(saldoAnterior + somarSaldosIniciaisNoPeriodo_(contexto.contasAcessiveis, dataInicio, dataLimite) + resultado),
     Total_Lancamentos: reaisAteLimite.length,
     Total_Programados: programadosAteLimite.length
   };
@@ -1943,7 +1951,8 @@ function listarOcorrenciasManuaisPendentesPeriodoConsolidadoController_(contexto
 
 function calcularSaldoContaAteDataConsolidadoController_(conta, lancamentos, dataFim) {
   const idConta = normalizarTextoConsolidadoController_(conta.ID_Conta);
-  let saldo = converterNumeroConsolidadoController_(conta.Saldo_Inicial);
+  let saldo = conta.Data_Saldo_Inicial && conta.Data_Saldo_Inicial > dataFim
+    ? 0 : converterNumeroConsolidadoController_(conta.Saldo_Inicial);
 
   lancamentos.forEach(function(lancamento) {
     const data = normalizarTextoConsolidadoController_(lancamento.Data_Ocorrencia);
@@ -1994,7 +2003,7 @@ function calcularMovimentoContaNoPeriodoConsolidadoController_(conta, lancamento
   const idConta = normalizarTextoConsolidadoController_(conta.ID_Conta);
   const inicio = normalizarTextoConsolidadoController_(dataInicio);
   const fim = normalizarTextoConsolidadoController_(dataFim);
-  let saldo = 0;
+  let saldo = somarSaldosIniciaisNoPeriodo_([conta], inicio, fim);
 
   (lancamentos || []).forEach(function(lancamento) {
     const data = normalizarTextoConsolidadoController_(lancamento.Data_Ocorrencia);
@@ -2744,4 +2753,12 @@ function normalizarBooleanoConsolidadoController_(valor) {
 function normalizarTextoConsolidadoController_(valor) {
   if (valor === null || valor === undefined) return "";
   return valor.toString().trim();
+}
+
+/** Efeito patrimonial datado, sem classificar como receita/despesa. */
+function somarSaldosIniciaisNoPeriodo_(contas, inicio, fim) {
+  return (contas || []).reduce(function(n,c) {
+    return n + (c.Data_Saldo_Inicial && c.Data_Saldo_Inicial >= inicio && c.Data_Saldo_Inicial <= fim
+      ? converterNumeroConsolidadoController_(c.Saldo_Inicial) : 0);
+  }, 0);
 }

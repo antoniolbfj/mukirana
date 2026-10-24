@@ -206,7 +206,7 @@ function registrarPagamentoFaturaCartao(tokenSessao, dados) {
   const sessao = obterSessaoObrigatoria(tokenSessao);
   const pagamento = validarDadosPagamentoFaturaCartaoController_(sessao, dados, "");
 
-  const pagamentoSalvo = inserirPagamentoFaturaModel(pagamento);
+  const pagamentoSalvo = inserirPagamentoFaturaModel_(pagamento);
   const totalEfetivados = efetivarLancamentosFaturaPagaCartaoController_(
     sessao,
     pagamentoSalvo || pagamento
@@ -223,7 +223,7 @@ function atualizarPagamentoFaturaCartao(tokenSessao, dados) {
   const idPagamento = normalizarTextoConsolidadoController_(dados && dados.ID_Pagamento_Fatura);
   const pagamento = validarDadosPagamentoFaturaCartaoController_(sessao, dados, idPagamento);
 
-  const pagamentoSalvo = atualizarPagamentoFaturaModel(pagamento);
+  const pagamentoSalvo = atualizarPagamentoFaturaModel_(pagamento);
   const totalEfetivados = efetivarLancamentosFaturaPagaCartaoController_(
     sessao,
     pagamentoSalvo || pagamento
@@ -289,7 +289,7 @@ function efetivarLancamentosFaturaPagaCartaoController_(sessao, pagamento) {
   });
 
   if (lancamentosParaEfetivar.length > 0) {
-    salvarLancamentosEmLoteModel(lancamentosParaEfetivar);
+    salvarLancamentosEmLoteModel_(lancamentosParaEfetivar);
   }
 
   return lancamentosParaEfetivar.length;
@@ -304,7 +304,7 @@ function excluirPagamentoFaturaCartao(tokenSessao, idPagamentoFatura) {
     throw new Error("Pagamento de fatura nao informado para exclusao.");
   }
 
-  const pagamento = (typeof listarPagamentosFaturasModel === "function" ? listarPagamentosFaturasModel() : []).find(function(item) {
+  const pagamento = (typeof listarPagamentosFaturasModel_ === "function" ? listarPagamentosFaturasModel_() : []).find(function(item) {
     return normalizarTextoConsolidadoController_(item.ID_Pagamento_Fatura) === idPagamento;
   });
 
@@ -326,7 +326,7 @@ function excluirPagamentoFaturaCartao(tokenSessao, idPagamentoFatura) {
     throw new Error("Voce nao tem acesso a conta usada neste pagamento.");
   }
 
-  excluirPagamentoFaturaModel(idPagamento);
+  excluirPagamentoFaturaModel_(idPagamento);
 
   return "Pagamento de fatura excluido com sucesso.";
 }
@@ -521,7 +521,7 @@ function complementarContextoFaturaComRecorrenciasController_(contextoBase) {
     recorrenciasRateiosExistentes[normalizarTextoConsolidadoController_(rateio.ID_Recorrencia_Rateio)] = true;
   });
 
-  (typeof listarRecorrenciasModel === "function" ? listarRecorrenciasModel() : []).forEach(function(recorrencia) {
+  (typeof listarRecorrenciasModel_ === "function" ? listarRecorrenciasModel_() : []).forEach(function(recorrencia) {
     const idRecorrencia = normalizarTextoConsolidadoController_(recorrencia.ID_Recorrencia);
     const idOrigem = normalizarTextoConsolidadoController_(recorrencia.ID_Origem);
     const tipoOrigem = recorrencia.Tipo_Origem;
@@ -547,7 +547,7 @@ function complementarContextoFaturaComRecorrenciasController_(contextoBase) {
     idsRecorrenciasComplementares[normalizarTextoConsolidadoController_(recorrencia.ID_Recorrencia)] = true;
   });
 
-  (typeof listarRecorrenciasRateiosModel === "function" ? listarRecorrenciasRateiosModel() : []).forEach(function(rateio) {
+  (typeof listarRecorrenciasRateiosModel_ === "function" ? listarRecorrenciasRateiosModel_() : []).forEach(function(rateio) {
     const idRecorrenciaRateio = normalizarTextoConsolidadoController_(rateio.ID_Recorrencia_Rateio);
     const idRecorrencia = normalizarTextoConsolidadoController_(rateio.ID_Recorrencia);
 

@@ -106,7 +106,7 @@ function processarSalvarCategoria(dadosFormulario, tokenSessao) {
   };
 
   medirEtapaPerformance_(medidor, "salvar_categoria", function() {
-    salvarCategoriaModel(categoria);
+    salvarCategoriaModel_(categoria);
   });
 
   registrarContagemPerformance_(medidor, "categoriasTodas", todasCategorias.length);
@@ -178,7 +178,7 @@ function montarContextoCategoriasController_(sessao, medidorPerformance) {
     categoriasTodas: medirEtapaPerformance_(medidorPerformance, "consulta_categorias", function() {
       return contextoRpc && contextoRpc.categoriasTodas
         ? contextoRpc.categoriasTodas
-        : listarCategoriasModel();
+        : listarCategoriasModel_();
     })
   };
 }
@@ -232,7 +232,7 @@ function alternarStatusCategoria(idCategoria, tokenSessao) {
   const novoStatus = !normalizarBooleanoCategoria_(categoria.Ativa);
 
   medirEtapaPerformance_(medidor, "alterar_status", function() {
-    alterarStatusCategoriaModel(obterIdentificadorAlteracaoCategoria_(categoria), novoStatus);
+    alterarStatusCategoriaModel_(obterIdentificadorAlteracaoCategoria_(categoria), novoStatus);
   });
 
   registrarContagemPerformance_(medidor, "categoriasTodas", todasCategorias.length);
@@ -243,7 +243,7 @@ function alternarStatusCategoria(idCategoria, tokenSessao) {
 
 
 function obterIdentificadorAlteracaoCategoria_(categoria) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return normalizarTextoCategoria_(categoria.ID_Categoria);
   }
 

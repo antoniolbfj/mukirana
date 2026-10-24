@@ -60,7 +60,7 @@ function finalizarPerformance_(medidor) {
   const fim = Date.now();
   const resumo = {
     nomeFluxo: medidor.nomeFluxo,
-    fonteDados: typeof obterFonteDadosMukirana === "function" ? obterFonteDadosMukirana() : "DESCONHECIDA",
+    fonteDados: typeof obterFonteDadosMukirana_ === "function" ? obterFonteDadosMukirana_() : "DESCONHECIDA",
     totalMs: fim - medidor.inicioMs,
     etapas: medidor.etapas,
     contagens: medidor.contagens

@@ -7,7 +7,7 @@
  */
 
 
-function diagnosticarRateiosUsuarioMes(emailUsuario, mesReferencia, opcoes) {
+function diagnosticarRateiosUsuarioMes_(emailUsuario, mesReferencia, opcoes) {
   opcoes = opcoes || {};
   const usuario = obterUsuarioDiagnosticoPerformance_(emailUsuario);
   const mesNormalizado = normalizarMesDiagnosticoRateios_(mesReferencia);
@@ -88,18 +88,18 @@ function diagnosticarRateiosUsuarioMes(emailUsuario, mesReferencia, opcoes) {
 }
 
 
-function diagnosticarRateiosAntonioJulho2026() {
-  return diagnosticarRateiosUsuarioMes("lbfjantonio@gmail.com", "2026-07");
+function diagnosticarRateiosAntonioJulho2026_() {
+  return diagnosticarRateiosUsuarioMes_("lbfjantonio@gmail.com", "2026-07");
 }
 
 
-function resumirRateiosAntonioJulho2026() {
-  return resumirRateiosUsuarioMes("lbfjantonio@gmail.com", "2026-07");
+function resumirRateiosAntonioJulho2026_() {
+  return resumirRateiosUsuarioMes_("lbfjantonio@gmail.com", "2026-07");
 }
 
 
-function resumirRateiosUsuarioMes(emailUsuario, mesReferencia) {
-  const diagnostico = diagnosticarRateiosUsuarioMes(emailUsuario, mesReferencia, {
+function resumirRateiosUsuarioMes_(emailUsuario, mesReferencia) {
+  const diagnostico = diagnosticarRateiosUsuarioMes_(emailUsuario, mesReferencia, {
     registrarLogCompleto: false
   });
   const itens = diagnostico.itensConsiderados || [];
@@ -344,7 +344,7 @@ function normalizarMesDiagnosticoRateios_(mesReferencia) {
 }
 
 
-function diagnosticarPerformanceMukirana(emailUsuario) {
+function diagnosticarPerformanceMukirana_(emailUsuario) {
   const usuario = obterUsuarioDiagnosticoPerformance_(emailUsuario);
   const token = criarSessaoUsuario_(usuario);
   const mesReferencia = obterMesAtualPerformance_();
@@ -413,7 +413,7 @@ function medirFaturaCartaoPerformance_(token, mesReferencia) {
   if (!cartao) {
     return {
       nomeFluxo: "FaturasCartao.obterPacote",
-      fonteDados: typeof obterFonteDadosMukirana === "function" ? obterFonteDadosMukirana() : "DESCONHECIDA",
+      fonteDados: typeof obterFonteDadosMukirana_ === "function" ? obterFonteDadosMukirana_() : "DESCONHECIDA",
       ignorado: true,
       motivo: "Nenhuma fatura acessivel encontrada no mes de referencia."
     };
@@ -432,7 +432,7 @@ function medirFluxoPerformance_(nomeFluxo, callback) {
 
   return {
     nomeFluxo: nomeFluxo,
-    fonteDados: typeof obterFonteDadosMukirana === "function" ? obterFonteDadosMukirana() : "DESCONHECIDA",
+    fonteDados: typeof obterFonteDadosMukirana_ === "function" ? obterFonteDadosMukirana_() : "DESCONHECIDA",
     totalMs: Date.now() - inicio,
     quantidadeRetornada: Array.isArray(retorno) ? retorno.length : null
   };
@@ -441,10 +441,10 @@ function medirFluxoPerformance_(nomeFluxo, callback) {
 
 function obterUsuarioDiagnosticoPerformance_(emailUsuario) {
   const email = emailUsuario ? emailUsuario.toString().trim().toLowerCase() : "";
-  const usuarioPorEmail = email && typeof buscarUsuarioPorEmailModel === "function"
-    ? buscarUsuarioPorEmailModel(email)
+  const usuarioPorEmail = email && typeof buscarUsuarioPorEmailModel_ === "function"
+    ? buscarUsuarioPorEmailModel_(email)
     : null;
-  const usuarios = usuarioPorEmail ? [] : (typeof listarUsuariosModel === "function" ? listarUsuariosModel() : []);
+  const usuarios = usuarioPorEmail ? [] : (typeof listarUsuariosModel_ === "function" ? listarUsuariosModel_() : []);
   const usuario = usuarioPorEmail && usuarioPorEmail.Ativo === true
     ? usuarioPorEmail
     : usuarios.find(function(item) {
@@ -485,7 +485,7 @@ function obterDataHojePerformance_() {
 }
 
 
-function diagnosticarRelatorioSemanal() {
+function diagnosticarRelatorioSemanal_() {
   const triggers = ScriptApp.getProjectTriggers().map(function(trigger) {
     return {
       handler: trigger.getHandlerFunction(),
@@ -519,7 +519,7 @@ function diagnosticarRelatorioSemanal() {
 }
 
 
-function enviarRelatorioSemanalFicticioTeste() {
+function enviarRelatorioSemanalFicticioTeste_() {
   const destinatario = "lbfjantonio@gmail.com";
   const pacote = montarPacoteRelatorioSemanalFicticioTeste_();
   const htmlBody = montarHtmlRelatorioSemanalFicticioTeste_(pacote);
@@ -771,8 +771,8 @@ function montarPacoteRelatorioSemanalFicticioTeste_() {
 }
 
 
-function diagnosticarSupabaseMukirana() {
-  const status = obterStatusBancoMukirana();
+function diagnosticarSupabaseMukirana_() {
+  const status = obterStatusBancoMukirana_();
   const resultado = {
     fonteAtual: status.fonte,
     supabaseConfigurado: status.supabaseConfigurado,
@@ -788,7 +788,7 @@ function diagnosticarSupabaseMukirana() {
     return resultado;
   }
 
-  resultado.conexao = testarConexaoSupabase();
+  resultado.conexao = testarConexaoSupabase_();
   resultado.contagens = compararContagensPlanilhaSupabase_();
 
   Logger.log(JSON.stringify(resultado, null, 2));
@@ -797,8 +797,8 @@ function diagnosticarSupabaseMukirana() {
 }
 
 
-function diagnosticarEstruturaPlanilhaMukirana() {
-  const banco = conectarBanco();
+function diagnosticarEstruturaPlanilhaMukirana_() {
+  const banco = conectarBanco_();
   const resultado = SUPABASE_TABELAS_DIAGNOSTICO.map(function(item) {
     const aba = banco.getSheetByName(item.planilha);
 
@@ -851,7 +851,7 @@ function compararContagensPlanilhaSupabase_() {
 
 
 function contarLinhasTabelaPlanilha_(nomeTabela) {
-  const aba = conectarBanco().getSheetByName(nomeTabela);
+  const aba = conectarBanco_().getSheetByName(nomeTabela);
 
   if (!aba) {
     return 0;
@@ -862,7 +862,7 @@ function contarLinhasTabelaPlanilha_(nomeTabela) {
 
 
 function contarLinhasTabelaSupabase_(nomeTabela) {
-  const resposta = supabaseSelecionar(nomeTabela, "select=*&limit=1");
+  const resposta = supabaseSelecionar_(nomeTabela, "select=*&limit=1");
 
   if (Array.isArray(resposta) && resposta.length === 0) {
     return 0;
@@ -877,8 +877,8 @@ function contarLinhasTabelaSupabase_(nomeTabela) {
 }
 
 
-function testarConexaoSupabase() {
-  const usuarios = supabaseSelecionar("usuarios", "select=id_usuario&limit=1");
+function testarConexaoSupabase_() {
+  const usuarios = supabaseSelecionar_("usuarios", "select=id_usuario&limit=1");
   return {
     ok: true,
     mensagem: "Conexao com Supabase realizada com sucesso.",
@@ -887,12 +887,12 @@ function testarConexaoSupabase() {
 }
 
 
-function diagnosticarCategoriasGlobaisIntermediariasMukirana() {
+function diagnosticarCategoriasGlobaisIntermediariasMukirana_() {
   return executarCargaCategoriasGlobaisIntermediariasMukirana_(true);
 }
 
 
-function diagnosticarCategoriasRecorrenciasMukirana(tokenSessao) {
+function diagnosticarCategoriasRecorrenciasMukirana_(tokenSessao) {
   const sessao = obterSessaoObrigatoria(tokenSessao);
   const contexto = montarContextoRecorrenciasController_(sessao);
   const resumo = montarDiagnosticoCategoriasRecorrenciasController_(contexto);

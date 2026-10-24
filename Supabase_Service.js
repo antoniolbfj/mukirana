@@ -19,7 +19,7 @@ const SUPABASE_CONFIG_KEYS = {
 };
 
 
-function supabaseEstaConfigurado() {
+function supabaseEstaConfigurado_() {
   const props = PropertiesService.getScriptProperties();
   return Boolean(
     supabaseNormalizarTexto_(props.getProperty(SUPABASE_CONFIG_KEYS.URL)) &&
@@ -28,7 +28,7 @@ function supabaseEstaConfigurado() {
 }
 
 
-function configurarSupabaseMukirana(urlProjeto, serviceKey) {
+function configurarSupabaseMukirana_(urlProjeto, serviceKey) {
   const url = normalizarUrlProjetoSupabase_(urlProjeto);
   const chave = supabaseNormalizarTexto_(serviceKey);
 
@@ -112,13 +112,13 @@ function supabaseRestRequest_(metodo, caminho, opcoes) {
 }
 
 
-function supabaseSelecionar(nomeTabela, parametrosConsulta) {
+function supabaseSelecionar_(nomeTabela, parametrosConsulta) {
   const query = parametrosConsulta || "select=*";
   return supabaseRestRequest_("get", nomeTabela, { query: query, prefer: "return=representation" }) || [];
 }
 
 
-function supabaseRpc(nomeFuncao, payload, prefer) {
+function supabaseRpc_(nomeFuncao, payload, prefer) {
   const nome = supabaseNormalizarTexto_(nomeFuncao);
 
   if (!nome) {
@@ -132,7 +132,7 @@ function supabaseRpc(nomeFuncao, payload, prefer) {
 }
 
 
-function supabaseInserir(nomeTabela, registros, prefer) {
+function supabaseInserir_(nomeTabela, registros, prefer) {
   const payload = Array.isArray(registros) ? registros : [registros];
   if (payload.length === 0) {
     return [];
@@ -145,7 +145,7 @@ function supabaseInserir(nomeTabela, registros, prefer) {
 }
 
 
-function supabaseInserirComConflito(nomeTabela, registros, colunasConflito, prefer) {
+function supabaseInserirComConflito_(nomeTabela, registros, colunasConflito, prefer) {
   const payload = Array.isArray(registros) ? registros : [registros];
   const conflito = supabaseNormalizarTexto_(colunasConflito);
 
@@ -165,7 +165,7 @@ function supabaseInserirComConflito(nomeTabela, registros, colunasConflito, pref
 }
 
 
-function supabaseAtualizar(nomeTabela, filtroQuery, dados) {
+function supabaseAtualizar_(nomeTabela, filtroQuery, dados) {
   if (!filtroQuery) {
     throw new Error("Filtro obrigatorio para atualizar registros no Supabase.");
   }
@@ -178,7 +178,7 @@ function supabaseAtualizar(nomeTabela, filtroQuery, dados) {
 }
 
 
-function supabaseExcluir(nomeTabela, filtroQuery) {
+function supabaseExcluir_(nomeTabela, filtroQuery) {
   if (!filtroQuery) {
     throw new Error("Filtro obrigatorio para excluir registros no Supabase.");
   }

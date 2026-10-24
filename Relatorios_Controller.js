@@ -1918,7 +1918,7 @@ function contarUsuariosIgnoradosRelatorioSemanal_() {
 
 
 function classificarUsuariosRelatorioSemanal_() {
-  const usuarios = typeof listarUsuariosModel === "function" ? (listarUsuariosModel() || []) : [];
+  const usuarios = typeof listarUsuariosModel_ === "function" ? (listarUsuariosModel_() || []) : [];
   const classificacao = {
     destinatarios: [],
     ignorados: 0

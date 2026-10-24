@@ -11,17 +11,17 @@
  *   Apps Script quando for desejado revisar ou popular a base inicial.
  */
 
-function popularCategoriasGlobaisIntermediariasMukirana() {
+function popularCategoriasGlobaisIntermediariasMukirana_() {
   return executarCargaCategoriasGlobaisIntermediariasMukirana_(false);
 }
 
 
 function executarCargaCategoriasGlobaisIntermediariasMukirana_(somenteDiagnostico) {
-  const categoriasExistentes = typeof listarCategoriasModel === "function"
-    ? listarCategoriasModel()
+  const categoriasExistentes = typeof listarCategoriasModel_ === "function"
+    ? listarCategoriasModel_()
     : [];
-  const usuarios = typeof listarUsuariosModel === "function"
-    ? listarUsuariosModel()
+  const usuarios = typeof listarUsuariosModel_ === "function"
+    ? listarUsuariosModel_()
     : [];
   const catalogo = obterCatalogoCategoriasGlobaisIntermediariasMukirana_();
   const criadoPorPadrao = obterCriadorPadraoCategoriasGlobaisMukirana_(categoriasExistentes, usuarios);
@@ -140,7 +140,7 @@ function resolverOuCriarCategoriaGlobalMukirana_(opcoes) {
   };
 
   if (opcoes.somenteDiagnostico !== true) {
-    salvarCategoriaModel(novaCategoria);
+    salvarCategoriaModel_(novaCategoria);
   }
 
   opcoes.indicePorNomeTipo[chave] = opcoes.indicePorNomeTipo[chave] || [];

@@ -29,8 +29,8 @@ function autenticarUsuario(emailDigitado, senhaDigitada) {
 
   const emailLower = emailDigitado.toString().trim().toLowerCase();
   const senhaLimpa = senhaDigitada.toString().trim();
-  const usuarioEncontrado = typeof buscarUsuarioPorEmailModel === "function"
-    ? buscarUsuarioPorEmailModel(emailLower)
+  const usuarioEncontrado = typeof buscarUsuarioPorEmailModel_ === "function"
+    ? buscarUsuarioPorEmailModel_(emailLower)
     : buscarUsuarioPorEmailLoginController_(emailLower);
 
   // Erro genérico para evitar enumeração de usuários.
@@ -74,8 +74,8 @@ function autenticarUsuario(emailDigitado, senhaDigitada) {
 
 
 function buscarUsuarioPorEmailLoginController_(emailLower) {
-  const todosUsuarios = typeof listarUsuariosModel === "function"
-    ? listarUsuariosModel()
+  const todosUsuarios = typeof listarUsuariosModel_ === "function"
+    ? listarUsuariosModel_()
     : [];
 
   return todosUsuarios.find(function(usuario) {

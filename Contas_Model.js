@@ -21,12 +21,12 @@
  *
  * @returns {Array<Object>} Contas da planilha.
  */
-function listarContasModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarContasModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarContasSupabaseModel_();
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName("CONTAS");
 
   if (!aba) {
@@ -69,12 +69,12 @@ function listarContasModel() {
  * @param {Object} conta Conta validada pelo Controller.
  * @returns {string} ID_Conta salvo.
  */
-function salvarContaModel(conta) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarContaModel_(conta) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarContaSupabaseModel_(conta);
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName("CONTAS");
 
   if (!aba) {
@@ -112,12 +112,12 @@ function salvarContaModel(conta) {
  * @param {number} linhaPlanilha Linha real da conta.
  * @param {boolean} novoStatus Novo status.
  */
-function alterarStatusContaModel(linhaPlanilha, novoStatus) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function alterarStatusContaModel_(linhaPlanilha, novoStatus) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return alterarStatusContaSupabaseModel_(linhaPlanilha, novoStatus);
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName("CONTAS");
 
   if (!aba) {
@@ -135,11 +135,11 @@ function alterarStatusContaModel(linhaPlanilha, novoStatus) {
 
 
 function listarContasSupabaseModel_() {
-  const contas = supabaseSelecionar(
+  const contas = supabaseSelecionar_(
     "contas",
-    "select=id_conta,id_usuario,nome_conta,saldo_inicial,ativa,compartilhada&order=nome_conta.asc"
+    "select=id_conta,id_usuario,nome_conta,saldo_inicial,saldo_inicial_data,versao,ativa,compartilhada&order=nome_conta.asc"
   );
-  const compartilhamentos = supabaseSelecionar(
+  const compartilhamentos = supabaseSelecionar_(
     "contas_compartilhamentos",
     "select=id_conta,id_usuario,ativo,papel_na_conta&ativo=eq.true"
   );
@@ -162,6 +162,8 @@ function listarContasSupabaseModel_() {
       ID_Usuario: item.id_usuario || "",
       Nome_Conta: item.nome_conta || "",
       Saldo_Inicial: normalizarNumeroContaModel_(item.saldo_inicial),
+      Data_Saldo_Inicial: item.saldo_inicial_data || '',
+      Versao: item.versao,
       Ativa: item.ativa === true,
       Compartilhada: item.compartilhada === true,
       Usuarios_Compartilhados: normalizarListaIdsContaModel_((mapaCompartilhamentos[item.id_conta] || []).join(","))
@@ -177,7 +179,7 @@ function salvarContaSupabaseModel_(conta) {
     ? normalizarListaIdsContaModel_(conta.Usuarios_Compartilhados)
     : "";
 
-  supabaseInserir("contas", {
+  supabaseInserir_("contas", {
     id_conta: idConta,
     id_usuario: conta.ID_Usuario,
     nome_conta: conta.Nome_Conta,
@@ -200,7 +202,7 @@ function alterarStatusContaSupabaseModel_(linhaOuIdConta, novoStatus) {
     throw new Error("Conta nao encontrada para alteracao de status no Supabase.");
   }
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "contas",
     "id_conta=eq." + encodeURIComponent(idConta),
     {
@@ -218,7 +220,7 @@ function sincronizarCompartilhamentosContaSupabase_(idConta, idDono, usuariosCom
       return Boolean(id);
     });
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "contas_compartilhamentos",
     "id_conta=eq." + encodeURIComponent(idConta),
     {
@@ -239,7 +241,7 @@ function sincronizarCompartilhamentosContaSupabase_(idConta, idDono, usuariosCom
   });
 
   if (registros.length > 0) {
-    supabaseInserir("contas_compartilhamentos", registros, "resolution=merge-duplicates,return=representation");
+    supabaseInserir_("contas_compartilhamentos", registros, "resolution=merge-duplicates,return=representation");
   }
 }
 

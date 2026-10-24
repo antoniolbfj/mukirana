@@ -79,7 +79,7 @@ function montarContextoUsuariosController_(sessao, medidorPerformance) {
     usuariosTodos: medirEtapaPerformance_(medidorPerformance, "consulta_usuarios", function() {
       return contextoRpc && contextoRpc.usuariosTodos
         ? contextoRpc.usuariosTodos
-        : listarUsuariosModel();
+        : listarUsuariosModel_();
     })
   };
 }
@@ -248,7 +248,7 @@ function processarSalvarUsuario(dadosFormulario, tokenSessao) {
   };
 
   medirEtapaPerformance_(medidor, "salvar_usuario", function() {
-    salvarUsuarioModel(usuario);
+    salvarUsuarioModel_(usuario);
   });
   registrarContagemPerformance_(medidor, "usuariosTodos", usuarios.length);
   finalizarPerformance_(medidor);
@@ -304,8 +304,8 @@ function alternarStatusUsuario(idUsuarioAlvo, tokenSessao) {
   const novoStatus = !normalizarBooleanoUsuario_(usuarioAlvo.Ativo);
 
   medirEtapaPerformance_(medidor, "alterar_status", function() {
-    alterarStatusUsuarioModel(
-      typeof bancoUsaSupabase === "function" && bancoUsaSupabase()
+    alterarStatusUsuarioModel_(
+      typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()
         ? idAlvo
         : usuarioAlvo._linhaPlanilha,
       novoStatus
@@ -355,7 +355,7 @@ function atualizarTemaRapido(novoTema, tokenSessao) {
   };
 
   medirEtapaPerformance_(medidor, "salvar_usuario", function() {
-    salvarUsuarioModel(usuarioAtualizado);
+    salvarUsuarioModel_(usuarioAtualizado);
   });
   finalizarPerformance_(medidor);
 
@@ -370,11 +370,11 @@ function buscarUsuarioPorIdController_(idUsuario) {
     return null;
   }
 
-  if (typeof buscarUsuarioPorIdModel === "function") {
-    return buscarUsuarioPorIdModel(id);
+  if (typeof buscarUsuarioPorIdModel_ === "function") {
+    return buscarUsuarioPorIdModel_(id);
   }
 
-  return listarUsuariosModel().find(function(u) {
+  return listarUsuariosModel_().find(function(u) {
     return lancNormalizarIdUsuario_(u.ID_Usuario) === id;
   }) || null;
 }

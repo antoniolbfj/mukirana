@@ -269,13 +269,13 @@ function montarContextoListaContasController_(sessao, medidorPerformance) {
 
   return {
     contas: medirEtapaPerformance_(medidorPerformance, "consulta_contas", function() {
-      return contextoRpc ? contextoRpc.contasTodas : listarContasModel();
+      return contextoRpc ? contextoRpc.contasTodas : listarContasModel_();
     }),
     usuarios: medirEtapaPerformance_(medidorPerformance, "consulta_usuarios", function() {
-      return contextoRpc ? contextoRpc.usuariosTodos : typeof listarUsuariosModel === "function" ? listarUsuariosModel() : [];
+      return contextoRpc ? contextoRpc.usuariosTodos : typeof listarUsuariosModel_ === "function" ? listarUsuariosModel_() : [];
     }),
     lancamentos: medirEtapaPerformance_(medidorPerformance, "consulta_lancamentos", function() {
-      return contextoRpc ? contextoRpc.lancamentosVinculos : typeof listarLancamentosModel === "function" ? listarLancamentosModel() : [];
+      return contextoRpc ? contextoRpc.lancamentosVinculos : typeof listarLancamentosModel_ === "function" ? listarLancamentosModel_() : [];
     })
   };
 }
@@ -398,7 +398,7 @@ function processarSalvarConta(dadosForm, tokenSessao) {
       _linhaPlanilha: linhaConfiavel
     };
 
-    salvarContaModel(conta);
+    salvarContaModel_(conta);
 
     return isEdicao ? "Conta atualizada com sucesso!" : "Conta criada com sucesso!";
 
@@ -440,8 +440,8 @@ function alternarStatusConta(idConta, tokenSessao) {
 
   const novoStatus = !normalizarBooleanoContaController_(conta.Ativa);
   medirEtapaPerformance_(medidor, "alterar_status", function() {
-    alterarStatusContaModel(
-      typeof bancoUsaSupabase === "function" && bancoUsaSupabase() ? id : conta._linhaPlanilha,
+    alterarStatusContaModel_(
+      typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_() ? id : conta._linhaPlanilha,
       novoStatus
     );
   });
@@ -473,18 +473,18 @@ function montarContextoCadastroContaController_(sessao, medidorPerformance, incl
 
   return {
     contas: medirEtapaPerformance_(medidorPerformance, "consulta_contas", function() {
-      return contextoRpc ? contextoRpc.contasTodas : listarContasModel();
+      return contextoRpc ? contextoRpc.contasTodas : listarContasModel_();
     }),
     usuarios: medirEtapaPerformance_(medidorPerformance, "consulta_usuarios", function() {
-      return contextoRpc ? contextoRpc.usuariosTodos : typeof listarUsuariosModel === "function" ? listarUsuariosModel() : [];
+      return contextoRpc ? contextoRpc.usuariosTodos : typeof listarUsuariosModel_ === "function" ? listarUsuariosModel_() : [];
     }),
     lancamentos: medirEtapaPerformance_(medidorPerformance, "consulta_lancamentos", function() {
       if (contextoRpc) {
         return contextoRpc.lancamentosVinculos || [];
       }
 
-      return incluirVinculos === true && typeof listarLancamentosModel === "function"
-        ? listarLancamentosModel()
+      return incluirVinculos === true && typeof listarLancamentosModel_ === "function"
+        ? listarLancamentosModel_()
         : [];
     })
   };
@@ -661,13 +661,13 @@ function buscarContaPorIdController_(idConta, contas) {
  * @returns {boolean} True quando ha vinculo.
  */
 function contaPossuiLancamentosController_(idConta, lancamentosPreCarregados) {
-  if (!Array.isArray(lancamentosPreCarregados) && typeof listarLancamentosModel !== "function") {
+  if (!Array.isArray(lancamentosPreCarregados) && typeof listarLancamentosModel_ !== "function") {
     return false;
   }
 
   const lancamentos = Array.isArray(lancamentosPreCarregados)
     ? lancamentosPreCarregados
-    : listarLancamentosModel();
+    : listarLancamentosModel_();
   const mapa = mapearContasComLancamentosController_(lancamentos);
   return mapa[normalizarTextoContaController_(idConta)] === true;
 }

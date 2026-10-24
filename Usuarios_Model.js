@@ -24,24 +24,24 @@
  *
  * @returns {Array<Object>} Lista completa de usuários.
  */
-function listarUsuariosModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarUsuariosModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarUsuariosSupabaseModel_();
   }
 
-  return consultarTabela('USUARIOS');
+  return consultarTabela_('USUARIOS');
 }
 
 
-function buscarUsuarioPorIdModel(idUsuario) {
+function buscarUsuarioPorIdModel_(idUsuario) {
   const id = idUsuario === null || idUsuario === undefined ? "" : idUsuario.toString().trim();
 
   if (!id) {
     return null;
   }
 
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
-    const registros = supabaseSelecionar(
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
+    const registros = supabaseSelecionar_(
       "usuarios",
       "select=id_usuario,nome,email,papel,preferencia_tema,ativo,senha_pin&id_usuario=eq." + encodeURIComponent(id) + "&limit=1"
     );
@@ -49,22 +49,22 @@ function buscarUsuarioPorIdModel(idUsuario) {
     return registros.length > 0 ? montarUsuarioPlanilhaAPartirSupabase_(registros[0], 0) : null;
   }
 
-  const usuarios = listarUsuariosModel();
+  const usuarios = listarUsuariosModel_();
   return usuarios.find(function(usuario) {
     return usuario.ID_Usuario && usuario.ID_Usuario.toString().trim() === id;
   }) || null;
 }
 
 
-function buscarUsuarioPorEmailModel(emailUsuario) {
+function buscarUsuarioPorEmailModel_(emailUsuario) {
   const email = emailUsuario === null || emailUsuario === undefined ? "" : emailUsuario.toString().trim().toLowerCase();
 
   if (!email) {
     return null;
   }
 
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
-    const registros = supabaseSelecionar(
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
+    const registros = supabaseSelecionar_(
       "usuarios",
       "select=id_usuario,nome,email,papel,preferencia_tema,ativo,senha_pin&email=eq." + encodeURIComponent(email) + "&limit=1"
     );
@@ -72,7 +72,7 @@ function buscarUsuarioPorEmailModel(emailUsuario) {
     return registros.length > 0 ? montarUsuarioPlanilhaAPartirSupabase_(registros[0], 0) : null;
   }
 
-  const usuarios = listarUsuariosModel();
+  const usuarios = listarUsuariosModel_();
   return usuarios.find(function(usuario) {
     return usuario.Email && usuario.Email.toString().trim().toLowerCase() === email;
   }) || null;
@@ -84,14 +84,14 @@ function buscarUsuarioPorEmailModel(emailUsuario) {
  * @param {Object} usuario Objeto de usuário já validado pelo Controller.
  * @returns {string} ID_Usuario salvo.
  */
-function salvarUsuarioModel(usuario) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarUsuarioModel_(usuario) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     const idSupabase = salvarUsuarioSupabaseModel_(usuario);
     invalidarCacheUsuarioModel_(idSupabase);
     return idSupabase;
   }
 
-  let banco = conectarBanco();
+  let banco = conectarBanco_();
   let aba = banco.getSheetByName('USUARIOS');
 
   if (!aba) {
@@ -124,14 +124,14 @@ function salvarUsuarioModel(usuario) {
  * @param {number} linhaPlanilha Linha real do usuário na planilha.
  * @param {boolean} statusAtivo Novo status.
  */
-function alterarStatusUsuarioModel(linhaPlanilha, statusAtivo) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function alterarStatusUsuarioModel_(linhaPlanilha, statusAtivo) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     const idSupabase = alterarStatusUsuarioSupabaseModel_(linhaPlanilha, statusAtivo);
     invalidarCacheUsuarioModel_(idSupabase);
     return idSupabase;
   }
 
-  let banco = conectarBanco();
+  let banco = conectarBanco_();
   let aba = banco.getSheetByName('USUARIOS');
 
   if (!aba) {
@@ -152,7 +152,7 @@ function alterarStatusUsuarioModel(linhaPlanilha, statusAtivo) {
 
 
 function listarUsuariosSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "usuarios",
     "select=id_usuario,nome,email,papel,preferencia_tema,ativo,senha_pin&order=nome.asc"
   ).map(function(item, indice) {
@@ -174,7 +174,7 @@ function salvarUsuarioSupabaseModel_(usuario) {
     updated_at: new Date().toISOString()
   };
 
-  supabaseInserir("usuarios", registro, "resolution=merge-duplicates,return=representation");
+  supabaseInserir_("usuarios", registro, "resolution=merge-duplicates,return=representation");
 
   return idUsuario;
 }
@@ -187,7 +187,7 @@ function alterarStatusUsuarioSupabaseModel_(linhaOuIdUsuario, statusAtivo) {
     throw new Error("Usuario nao encontrado para alteracao de status no Supabase.");
   }
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "usuarios",
     "id_usuario=eq." + encodeURIComponent(idUsuario),
     {

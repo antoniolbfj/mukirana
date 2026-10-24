@@ -1,0 +1,88 @@
+# Entrega da nova tela de Contas
+
+24/10/2026. Implementação autorizada pelo usuário, com menu provisório e duas
+interfaces próprias. Aguarda homologação antes da troca do acesso principal.
+
+## Funcionamento
+
+- Computadores/tablets: linhas comparativas, formulário e histórico em painel lateral.
+- Smartphones: cartões, ações na base, formulário e histórico em tela inteira.
+- Lista rápida independente da consulta de participantes e do cálculo de recorrências.
+- Busca imediata, filtros de status, compartilhamento por nome/e-mail, mensagens de erro com rascunho preservado, inativação/restauração e Desfazer.
+- Somente o proprietário altera cadastro, saldo inicial e participantes. Demais acessos mantêm as regras de consulta da base.
+- Saldo atual soma os movimentos registrados até hoje (ou até o fim do período histórico). Mantém a regra existente para registros pendentes datados. Previsão inclui os registros futuros e recorrências ainda não geradas até a data mostrada.
+
+## Banco e compatibilidade
+
+Projeto confirmado: `wcczkultokrypdfimbsh`. Migração registrada no servidor:
+`20261024163611_accounts_v2_opening_balance_ledger`.
+O arquivo foi iniciado pela CLI e recebeu o identificador efetivo registrado
+pelo MCP ao aplicar a mesma migração.
+
+Um lançamento `Saldo Inicial` para cada conta com valor diferente de zero:
+`Saldo Inicial da Conta [nome da conta]`, positivo ou negativo. Vínculo único
+pela conta; edição e renomeação mantêm o ID do lançamento. Zerar o saldo inicial
+remove somente esse lançamento. A criação manual no formulário comum é bloqueada.
+
+A data foi definida pelo usuário: a mais antiga em `lancamentos`, tanto na origem
+quanto no destino da conta. Sem movimentos, usa `created_at` em America/Sao_Paulo.
+Saldos futuros entram no saldo na data informada e antes disso na previsão.
+A lista global de Lançamentos identifica o registro especial e encaminha sua
+edição ao cadastro de Contas. Receitas, despesas, orçamento e rateios não recebem
+esse valor. Consolidados e evolução patrimonial respeitam sua data.
+
+`contas.saldo_inicial` fica como espelho de compatibilidade com a tela e a versão
+anteriores. Contextos financeiros legados excluem os lançamentos especiais,
+evitando somar o espelho e o lançamento. Triggers sincronizam também as gravações
+legadas. Novas gravações reúnem conta, saldo inicial e participantes na mesma
+transação, com versão esperada e recibo da última operação para repetição segura.
+
+A migração verifica hashes dos registros preexistentes dentro da transação e
+aborta se contas, lançamentos comuns, faturas ou participantes forem alterados.
+A conferência posterior confirmou **17 contas, 14 saldos iniciais, 1.078
+lançamentos anteriores e 22 pagamentos de fatura**, sem divergências.
+Não é necessário executar SQL manualmente.
+
+## Autorização e validação
+
+As APIs novas exigem sessão; o usuário vem da sessão, nunca do formulário.
+DTOs retornam somente os campos necessários. Funções de modelo, acesso genérico
+ao banco e diagnósticos foram tornadas internas no Apps Script. Nenhuma chave
+foi incluída no HTML ou no Git. As RPCs são exclusivas do backend `service_role`;
+foram retiradas as permissões públicas das RPCs antigas.
+
+O advisor de segurança deixou de apresentar os avisos de execução pública das
+funções privilegiadas. Restam quatro informações de
+[RLS sem política](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy):
+`contas`, `contas_compartilhamentos`, `lancamentos` e a preexistente `acertos_rateios`.
+É intencional para a sessão própria do Apps Script: acesso direto dos papéis
+`anon`/`authenticated` negado e acesso autorizado pelo backend. Não usar `auth.uid()`
+como se esta aplicação usasse Supabase Auth.
+
+Validações concluídas:
+
+- Sintaxe de todos os JS e scripts HTML; contratos, sessão, isolamento do ator,
+  dinheiro em centavos, datas, listas seguras e proteção do lançamento especial.
+- 31 verificações SQL, localmente e no Supabase como `service_role`, em transação
+  desfeita: compartilhamento, permissões, saldos, transferência nas duas pontas,
+  pagamentos de fatura, paginação, edição, zero, renomeação, conflitos, repetição,
+  sincronização legada e ACLs.
+- Migração local em PostgreSQL 17 com saldo positivo, negativo, zero, transferência
+  recebida e fallback de data; preservação dos registros anteriores.
+- Concorrência real: repetição de criação, duas edições, edição/status e nomes
+  concorrentes. Somente operações compatíveis são aceitas.
+- Navegador Chromium com ponte Apps Script simulada: desktop, tablet e smartphone;
+  busca, cadastro, saldo negativo, erro/repetição sem novo ID, participantes,
+  histórico, inativação/Desfazer, rotação e descarte da tela na navegação.
+- Integração visual com os estilos e estrutura existentes e cálculos de patrimônio
+  antes/depois da data do saldo, sem gerar receitas/despesas.
+
+A validação de navegador usa dados fictícios. A navegação remota autenticada
+na conta Google e a homologação com dados reais devem ser feitas pelo usuário.
+Não foram enviados e-mails nem executadas rotinas de relatórios.
+
+## Publicação
+
+A publicação é registrada após o push pelo clasp. A versão 32 e seu endereço de
+produção são mantidos; a nova tela é oferecida em uma implantação para avaliação,
+com o menu principal antigo disponível. Após homologação, promover a nova tela.

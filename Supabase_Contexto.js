@@ -11,12 +11,12 @@ function obterContextoFinanceiroSupabaseRpc_(idUsuario, mesReferencia, incluirHi
   const id = supabaseNormalizarTexto_(idUsuario);
   const mes = supabaseNormalizarTexto_(mesReferencia);
 
-  if (!id || typeof bancoUsaSupabase !== "function" || !bancoUsaSupabase()) {
+  if (!id || typeof bancoUsaSupabase_ !== "function" || !bancoUsaSupabase_()) {
     return null;
   }
 
   try {
-    const resposta = supabaseRpc("rpc_contexto_financeiro_mukirana", {
+    const resposta = supabaseRpc_("rpc_contexto_financeiro_mukirana", {
       p_id_usuario: id,
       p_mes_referencia: mes ? converterDataSupabase_(mes) : null,
       p_incluir_historico: incluirHistorico !== false
@@ -37,12 +37,12 @@ function obterContextoFinanceiroSupabaseRpc_(idUsuario, mesReferencia, incluirHi
 function obterContextoCadastrosSupabaseRpc_(idUsuario, incluirVinculos) {
   const id = supabaseNormalizarTexto_(idUsuario);
 
-  if (!id || typeof bancoUsaSupabase !== "function" || !bancoUsaSupabase()) {
+  if (!id || typeof bancoUsaSupabase_ !== "function" || !bancoUsaSupabase_()) {
     return null;
   }
 
   try {
-    const resposta = supabaseRpc("rpc_cadastros_mukirana", {
+    const resposta = supabaseRpc_("rpc_cadastros_mukirana", {
       p_id_usuario: id,
       p_incluir_vinculos: incluirVinculos === true
     });
@@ -64,12 +64,12 @@ function obterContextoFaturaCartaoSupabaseRpc_(idUsuario, mesReferencia, idGrupo
   const mes = supabaseNormalizarTexto_(mesReferencia);
   const idGrupo = supabaseNormalizarTexto_(idGrupoCartao);
 
-  if (!id || !idGrupo || typeof bancoUsaSupabase !== "function" || !bancoUsaSupabase()) {
+  if (!id || !idGrupo || typeof bancoUsaSupabase_ !== "function" || !bancoUsaSupabase_()) {
     return null;
   }
 
   try {
-    const resposta = supabaseRpc("rpc_fatura_cartao_mukirana", {
+    const resposta = supabaseRpc_("rpc_fatura_cartao_mukirana", {
       p_id_usuario: id,
       p_mes_referencia: mes ? converterDataSupabase_(mes) : null,
       p_id_grupo_cartao: idGrupo
@@ -90,12 +90,12 @@ function obterContextoFaturaCartaoSupabaseRpc_(idUsuario, mesReferencia, idGrupo
 function obterContextoRecorrenciasSupabaseRpc_(idUsuario) {
   const id = supabaseNormalizarTexto_(idUsuario);
 
-  if (!id || typeof bancoUsaSupabase !== "function" || !bancoUsaSupabase()) {
+  if (!id || typeof bancoUsaSupabase_ !== "function" || !bancoUsaSupabase_()) {
     return null;
   }
 
   try {
-    const resposta = supabaseRpc("rpc_recorrencias_mukirana", {
+    const resposta = supabaseRpc_("rpc_recorrencias_mukirana", {
       p_id_usuario: id
     });
 
@@ -220,6 +220,8 @@ function montarContasRpc_(contas, compartilhamentos) {
       ID_Usuario: item.id_usuario || "",
       Nome_Conta: item.nome_conta || "",
       Saldo_Inicial: numeroRpc_(item.saldo_inicial),
+      Data_Saldo_Inicial: item.saldo_inicial_data || '',
+      Versao: item.versao,
       Ativa: item.ativa === true,
       Compartilhada: item.compartilhada === true,
       Usuarios_Compartilhados: (mapaCompartilhamentos[item.id_conta] || []).join(",")

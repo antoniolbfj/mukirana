@@ -30,12 +30,12 @@
  *
  * @returns {Array<Object>} Grupos de cartões.
  */
-function listarGruposCartoesModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarGruposCartoesModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarGruposCartoesSupabaseModel_();
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName('GRUPOS_CARTOES');
 
   if (!aba) {
@@ -80,19 +80,19 @@ function listarGruposCartoesModel() {
  *
  * @returns {Array<Object>} Cartões físicos enriquecidos.
  */
-function listarCartoesModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarCartoesModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarCartoesSupabaseModel_();
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName('CARTOES');
 
   if (!aba) {
     throw new Error("Aba CARTOES não encontrada na planilha.");
   }
 
-  const grupos = listarGruposCartoesModel();
+  const grupos = listarGruposCartoesModel_();
   const mapaGrupos = {};
 
   grupos.forEach(function(g) {
@@ -149,12 +149,12 @@ function listarCartoesModel() {
  * @param {Object} grupo Grupo validado pelo Controller.
  * @returns {string} ID do grupo salvo.
  */
-function salvarGrupoCartaoModel(grupo) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarGrupoCartaoModel_(grupo) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarGrupoCartaoSupabaseModel_(grupo);
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName('GRUPOS_CARTOES');
 
   if (!aba) {
@@ -187,12 +187,12 @@ function salvarGrupoCartaoModel(grupo) {
  * @param {Object} cartao Cartão físico validado pelo Controller.
  * @returns {string} ID do cartão salvo.
  */
-function salvarCartaoFisicoModel(cartao) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarCartaoFisicoModel_(cartao) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarCartaoFisicoSupabaseModel_(cartao);
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName('CARTOES');
 
   if (!aba) {
@@ -224,12 +224,12 @@ function salvarCartaoFisicoModel(cartao) {
  * @param {number} linhaPlanilha Linha real na aba GRUPOS_CARTOES.
  * @param {boolean} novoStatus Novo status.
  */
-function alterarStatusGrupoCartaoModel(linhaPlanilha, novoStatus) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function alterarStatusGrupoCartaoModel_(linhaPlanilha, novoStatus) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return alterarStatusGrupoCartaoSupabaseModel_(linhaPlanilha, novoStatus);
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName('GRUPOS_CARTOES');
 
   if (!aba) {
@@ -246,12 +246,12 @@ function alterarStatusGrupoCartaoModel(linhaPlanilha, novoStatus) {
  * @param {number} linhaPlanilha Linha real na aba CARTOES.
  * @param {boolean} novoStatus Novo status.
  */
-function alterarStatusCartaoFisicoModel(linhaPlanilha, novoStatus) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function alterarStatusCartaoFisicoModel_(linhaPlanilha, novoStatus) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return alterarStatusCartaoFisicoSupabaseModel_(linhaPlanilha, novoStatus);
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName('CARTOES');
 
   if (!aba) {
@@ -263,7 +263,7 @@ function alterarStatusCartaoFisicoModel(linhaPlanilha, novoStatus) {
 
 
 function listarGruposCartoesSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "grupos_cartoes",
     "select=id_grupo_cartao,id_titular,nome_grupo,limite,dia_fechamento,dia_vencimento,ativo&order=nome_grupo.asc"
   ).map(function(item, indice) {
@@ -289,7 +289,7 @@ function listarCartoesSupabaseModel_() {
     mapaGrupos[grupo.ID_Grupo_Cartao] = grupo;
   });
 
-  const cartoes = supabaseSelecionar(
+  const cartoes = supabaseSelecionar_(
     "cartoes",
     "select=id_cartao,id_grupo_cartao,id_usuario,nome_cartao,tipo_cartao,ativo&order=nome_cartao.asc"
   ).map(function(item, indice) {
@@ -321,7 +321,7 @@ function listarCartoesSupabaseModel_() {
 function salvarGrupoCartaoSupabaseModel_(grupo) {
   const idGrupo = grupo.ID_Grupo_Cartao || Utilities.getUuid();
 
-  supabaseInserir("grupos_cartoes", {
+  supabaseInserir_("grupos_cartoes", {
     id_grupo_cartao: idGrupo,
     id_titular: grupo.ID_Titular,
     nome_grupo: grupo.Nome_Grupo,
@@ -339,7 +339,7 @@ function salvarGrupoCartaoSupabaseModel_(grupo) {
 function salvarCartaoFisicoSupabaseModel_(cartao) {
   const idCartao = cartao.ID_Cartao || Utilities.getUuid();
 
-  supabaseInserir("cartoes", {
+  supabaseInserir_("cartoes", {
     id_cartao: idCartao,
     id_grupo_cartao: cartao.ID_Grupo_Cartao,
     id_usuario: cartao.ID_Usuario,
@@ -360,7 +360,7 @@ function alterarStatusGrupoCartaoSupabaseModel_(linhaOuIdGrupo, novoStatus) {
     throw new Error("Grupo de cartao nao encontrado para alteracao de status no Supabase.");
   }
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "grupos_cartoes",
     "id_grupo_cartao=eq." + encodeURIComponent(idGrupo),
     {
@@ -378,7 +378,7 @@ function alterarStatusCartaoFisicoSupabaseModel_(linhaOuIdCartao, novoStatus) {
     throw new Error("Cartao nao encontrado para alteracao de status no Supabase.");
   }
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "cartoes",
     "id_cartao=eq." + encodeURIComponent(idCartao),
     {

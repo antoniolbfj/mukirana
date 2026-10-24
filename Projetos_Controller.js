@@ -14,7 +14,7 @@
  * - Apenas o criador ou um Administrador pode editar dados gerais.
  * - Apenas o criador pode alterar o compartilhamento.
  * - O criador original, status e linha real sao preservados em edicao.
- * - Usuarios compartilhados precisam existir, estar ativos e nao podem incluir o criador.
+ * - Usuarios compartilhados precisam existir, estar ativos e nao podem incluir_ o criador.
  *
  * @param {Object} dadosFormulario Dados enviados pela View.
  * @param {string} tokenSessao Token de sessao.
@@ -103,7 +103,7 @@ function processarSalvarProjeto(dadosFormulario, tokenSessao) {
       _linhaPlanilha: linhaConfiavel
     };
 
-    salvarProjetoModel(projeto);
+    salvarProjetoModel_(projeto);
 
     return isEdicao ? "Projeto atualizado com sucesso!" : "Projeto criado com sucesso!";
 
@@ -800,8 +800,8 @@ function alternarStatusProjeto(idProjeto, tokenSessao) {
   }
 
   medirEtapaPerformance_(medidor, "alterar_status", function() {
-    alterarStatusProjetoModel(
-      typeof bancoUsaSupabase === "function" && bancoUsaSupabase() ? id : projeto._linhaPlanilha,
+    alterarStatusProjetoModel_(
+      typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_() ? id : projeto._linhaPlanilha,
       novoStatus
     );
   });
@@ -844,7 +844,7 @@ function obterBloqueiosConclusaoProjetoController_(idProjeto) {
 
 function obterResumoLancamentosFuturosProjetoController_(idProjeto) {
   const id = normalizarTextoProjetoController_(idProjeto);
-  const lancamentos = typeof listarLancamentosModel === "function" ? listarLancamentosModel() : [];
+  const lancamentos = typeof listarLancamentosModel_ === "function" ? listarLancamentosModel_() : [];
   let quantidade = 0;
   let proximaData = "";
 
@@ -875,7 +875,7 @@ function obterResumoLancamentosFuturosProjetoController_(idProjeto) {
 
 function obterResumoRecorrenciasProjetoController_(idProjeto) {
   const id = normalizarTextoProjetoController_(idProjeto);
-  const recorrencias = typeof listarRecorrenciasModel === "function" ? listarRecorrenciasModel() : [];
+  const recorrencias = typeof listarRecorrenciasModel_ === "function" ? listarRecorrenciasModel_() : [];
   let quantidade = 0;
 
   (recorrencias || []).forEach(function(recorrencia) {
@@ -904,7 +904,7 @@ function montarContextoProjetosController_(sessao, medidorPerformance) {
       : null;
   });
   const projetosTodos = medirEtapaPerformance_(medidorPerformance, "consulta_projetos", function() {
-    return contextoRpc ? contextoRpc.projetosTodos : listarProjetosModel();
+    return contextoRpc ? contextoRpc.projetosTodos : listarProjetosModel_();
   });
   const usuariosAtivos = medirEtapaPerformance_(medidorPerformance, "consulta_usuarios", function() {
     return contextoRpc
@@ -1084,11 +1084,11 @@ function buscarProjetoPorIdController_(idProjeto, projetos) {
 
 
 function listarUsuariosAtivosProjetoController_() {
-  if (typeof listarUsuariosModel !== "function") {
+  if (typeof listarUsuariosModel_ !== "function") {
     return [];
   }
 
-  return listarUsuariosModel()
+  return listarUsuariosModel_()
     .filter(function(usuario) {
       return normalizarBooleanoProjetoController_(usuario.Ativo);
     })

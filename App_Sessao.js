@@ -162,11 +162,11 @@ function buscarUsuarioPorId_(idUsuario) {
   const idStr = idUsuario ? idUsuario.toString().trim() : "";
   if (!idStr) return null;
 
-  if (typeof buscarUsuarioPorIdModel === "function") {
-    return buscarUsuarioPorIdModel(idStr);
+  if (typeof buscarUsuarioPorIdModel_ === "function") {
+    return buscarUsuarioPorIdModel_(idStr);
   }
 
-  const usuarios = typeof listarUsuariosModel === "function" ? listarUsuariosModel() : [];
+  const usuarios = typeof listarUsuariosModel_ === "function" ? listarUsuariosModel_() : [];
 
   return usuarios.find(function(usuario) {
     const idAtual = usuario.ID_Usuario ? usuario.ID_Usuario.toString().trim() : "";

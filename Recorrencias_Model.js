@@ -12,8 +12,8 @@
  *
  * @returns {Array<Object>} Recorrências da planilha.
  */
-function listarRecorrenciasModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarRecorrenciasModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarRecorrenciasSupabaseModel_();
   }
 
@@ -69,8 +69,8 @@ function listarRecorrenciasModel() {
  * @param {Object} recorrencia Recorrência validada pelo Controller.
  * @returns {string} ID salvo.
  */
-function salvarRecorrenciaModel(recorrencia) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarRecorrenciaModel_(recorrencia) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarRecorrenciaSupabaseModel_(recorrencia);
   }
 
@@ -92,8 +92,8 @@ function salvarRecorrenciaModel(recorrencia) {
  *
  * @returns {Array<Object>} Itens de rateio das recorrências.
  */
-function listarRecorrenciasRateiosModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarRecorrenciasRateiosModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarRecorrenciasRateiosSupabaseModel_();
   }
 
@@ -137,8 +137,8 @@ function listarRecorrenciasRateiosModel() {
  * @param {string} idRecorrencia ID da recorrência.
  * @param {Array<Object>} itens Itens já validados pelo Controller.
  */
-function substituirRecorrenciasRateiosModel(idRecorrencia, itens) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function substituirRecorrenciasRateiosModel_(idRecorrencia, itens) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return substituirRecorrenciasRateiosSupabaseModel_(idRecorrencia, itens);
   }
 
@@ -149,7 +149,7 @@ function substituirRecorrenciasRateiosModel(idRecorrencia, itens) {
     throw new Error("ID da recorrência não informado para salvar o rateio.");
   }
 
-  const existentes = listarRecorrenciasRateiosModel()
+  const existentes = listarRecorrenciasRateiosModel_()
     .filter(function(item) {
       return item.ID_Recorrencia === id;
     })
@@ -188,8 +188,8 @@ function substituirRecorrenciasRateiosModel(idRecorrencia, itens) {
 }
 
 
-function listarRecorrenciasOcorrenciasModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarRecorrenciasOcorrenciasModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarRecorrenciasOcorrenciasSupabaseModel_();
   }
 
@@ -197,8 +197,8 @@ function listarRecorrenciasOcorrenciasModel() {
 }
 
 
-function marcarOcorrenciaRecorrenciaComoGeradaModel(ocorrencia) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function marcarOcorrenciaRecorrenciaComoGeradaModel_(ocorrencia) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return marcarOcorrenciaRecorrenciaComoGeradaSupabaseModel_(ocorrencia);
   }
 
@@ -213,16 +213,16 @@ function marcarOcorrenciaRecorrenciaComoGeradaModel(ocorrencia) {
  * LockService do Controller serializa a operacao e os metadados gravados no
  * lancamento preservam a idempotencia pelo mecanismo legado.
  */
-function gerarOcorrenciaRecorrenciaModel(lancamento, ocorrencia, rateios, idUsuarioExecucao) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function gerarOcorrenciaRecorrenciaModel_(lancamento, ocorrencia, rateios, idUsuarioExecucao) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return gerarOcorrenciaRecorrenciaSupabaseModel_(lancamento, ocorrencia, rateios, idUsuarioExecucao);
   }
 
-  salvarLancamentoModel(lancamento);
-  marcarOcorrenciaRecorrenciaComoGeradaModel(ocorrencia);
+  salvarLancamentoModel_(lancamento);
+  marcarOcorrenciaRecorrenciaComoGeradaModel_(ocorrencia);
 
   if (rateios && rateios.length > 0) {
-    substituirRateiosPendentesDoLancamentoModel(lancamento.ID_Lancamento, rateios, idUsuarioExecucao);
+    substituirRateiosPendentesDoLancamentoModel_(lancamento.ID_Lancamento, rateios, idUsuarioExecucao);
   }
 
   return {
@@ -251,7 +251,7 @@ function gerarOcorrenciaRecorrenciaSupabaseModel_(lancamento, ocorrencia, rateio
     };
   });
 
-  return supabaseRpc("gerar_ocorrencia_recorrencia", {
+  return supabaseRpc_("gerar_ocorrencia_recorrencia", {
     p_id_recorrencia: ocorrencia.ID_Recorrencia,
     p_data_prevista: converterDataSupabase_(ocorrencia.Data_Ocorrencia),
     p_data_lancamento: converterDataSupabase_(lancamento.Data_Ocorrencia),
@@ -266,7 +266,7 @@ function gerarOcorrenciaRecorrenciaSupabaseModel_(lancamento, ocorrencia, rateio
 
 
 function listarRecorrenciasSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "recorrencias",
     "select=id_recorrencia,id_usuario,descricao,tipo,valor_base,data_inicio,periodicidade_tipo,intervalo_dias,modo_geracao,status_recorrencia,tipo_origem,id_origem,id_destino,id_categoria,id_projeto,status_lancamento,observacao,info_bloqueio,created_at,updated_at,criado_por_id,alterado_por_id&order=data_inicio.asc"
   ).map(function(item, indice) {
@@ -301,7 +301,7 @@ function listarRecorrenciasSupabaseModel_() {
 
 function listarRecorrenciasOcorrenciasSupabaseModel_() {
   try {
-    return supabaseSelecionar(
+    return supabaseSelecionar_(
       "recorrencias_ocorrencias",
       "select=id_recorrencia_ocorrencia,id_recorrencia,data_ocorrencia,id_lancamento_gerado,status,observacao,criado_por_id,alterado_por_id,created_at,updated_at&order=data_ocorrencia.asc"
     ).map(function(item, indice) {
@@ -331,7 +331,7 @@ function marcarOcorrenciaRecorrenciaComoGeradaSupabaseModel_(ocorrencia) {
     updated_at: converterDataHoraSupabase_(ocorrencia.Data_Alteracao)
   };
 
-  const inseridos = supabaseInserirComConflito(
+  const inseridos = supabaseInserirComConflito_(
     "recorrencias_ocorrencias",
     registro,
     "id_recorrencia,data_ocorrencia",
@@ -363,7 +363,7 @@ function salvarRecorrenciaSupabaseModel_(recorrencia) {
   const idRecorrencia = recorrencia.ID_Recorrencia || Utilities.getUuid();
   const agora = new Date().toISOString();
 
-  supabaseInserir("recorrencias", {
+  supabaseInserir_("recorrencias", {
     id_recorrencia: idRecorrencia,
     id_usuario: recorrencia.ID_Usuario,
     descricao: recorrencia.Descricao,
@@ -393,7 +393,7 @@ function salvarRecorrenciaSupabaseModel_(recorrencia) {
 
 
 function listarRecorrenciasRateiosSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "recorrencias_rateios",
     "select=id_recorrencia_rateio,id_recorrencia,id_usuario_responsavel,valor_rateado,percentual,observacao,modo_rateio,created_at,updated_at,criado_por_id&order=created_at.asc"
   ).map(function(item, indice) {
@@ -421,7 +421,7 @@ function substituirRecorrenciasRateiosSupabaseModel_(idRecorrencia, itens) {
     throw new Error("ID da recorrencia nao informado para salvar o rateio no Supabase.");
   }
 
-  supabaseExcluir("recorrencias_rateios", "id_recorrencia=eq." + encodeURIComponent(id));
+  supabaseExcluir_("recorrencias_rateios", "id_recorrencia=eq." + encodeURIComponent(id));
 
   if (!itens || itens.length === 0) {
     return;
@@ -442,12 +442,12 @@ function substituirRecorrenciasRateiosSupabaseModel_(idRecorrencia, itens) {
     };
   });
 
-  supabaseInserir("recorrencias_rateios", registros, "resolution=merge-duplicates,return=representation");
+  supabaseInserir_("recorrencias_rateios", registros, "resolution=merge-duplicates,return=representation");
 }
 
 
 function obterAbaRecorrenciasModel_() {
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   let aba = banco.getSheetByName("RECORRENCIAS");
 
   if (!aba) {
@@ -460,7 +460,7 @@ function obterAbaRecorrenciasModel_() {
 
 
 function obterAbaRecorrenciasRateiosModel_() {
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   let aba = banco.getSheetByName("RECORRENCIAS_RATEIOS");
 
   if (!aba) {

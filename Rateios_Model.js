@@ -26,8 +26,8 @@
  *
  * @returns {Array<Object>} Lista de rateios.
  */
-function listarRateiosModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarRateiosModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarRateiosSupabaseModel_();
   }
 
@@ -74,14 +74,14 @@ function listarRateiosModel() {
  * @param {string} idLancamento ID do lançamento.
  * @returns {Array<Object>} Rateios do lançamento.
  */
-function listarRateiosPorLancamentoModel(idLancamento) {
+function listarRateiosPorLancamentoModel_(idLancamento) {
   const id = normalizarTextoRateioModel_(idLancamento);
 
   if (!id) {
     return [];
   }
 
-  return listarRateiosModel().filter(function(rateio) {
+  return listarRateiosModel_().filter(function(rateio) {
     return rateio.ID_Lancamento === id;
   });
 }
@@ -99,8 +99,8 @@ function listarRateiosPorLancamentoModel(idLancamento) {
  * @param {Array<Object>} novosRateios Novos rateios já validados.
  * @param {string} idUsuarioAlteracao ID do usuário responsável pela alteração.
  */
-function substituirRateiosPendentesDoLancamentoModel(idLancamento, novosRateios, idUsuarioAlteracao) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function substituirRateiosPendentesDoLancamentoModel_(idLancamento, novosRateios, idUsuarioAlteracao) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return substituirRateiosPendentesDoLancamentoSupabaseModel_(idLancamento, novosRateios, idUsuarioAlteracao);
   }
 
@@ -166,8 +166,8 @@ function substituirRateiosPendentesDoLancamentoModel(idLancamento, novosRateios,
  * @param {string} idLancamento ID do lançamento.
  * @param {string} idUsuarioAlteracao ID do usuário responsável pela alteração.
  */
-function cancelarRateiosPendentesDoLancamentoModel(idLancamento, idUsuarioAlteracao) {
-  substituirRateiosPendentesDoLancamentoModel(idLancamento, [], idUsuarioAlteracao);
+function cancelarRateiosPendentesDoLancamentoModel_(idLancamento, idUsuarioAlteracao) {
+  substituirRateiosPendentesDoLancamentoModel_(idLancamento, [], idUsuarioAlteracao);
 }
 
 
@@ -183,12 +183,12 @@ function cancelarRateiosPendentesDoLancamentoModel(idLancamento, idUsuarioAltera
  * @param {Array<Object>} novosRateios Novos rateios já validados.
  * @param {string} idUsuarioAlteracao ID do usuário responsável pela alteração. Mantido por compatibilidade/auditoria futura.
  */
-function substituirRateiosDoLancamentoModel(idLancamento, novosRateios, idUsuarioAlteracao) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function substituirRateiosDoLancamentoModel_(idLancamento, novosRateios, idUsuarioAlteracao) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return substituirRateiosDoLancamentoSupabaseModel_(idLancamento, novosRateios, idUsuarioAlteracao);
   }
 
-  excluirRateiosDoLancamentoModel(idLancamento);
+  excluirRateiosDoLancamentoModel_(idLancamento);
   inserirRateiosEmLoteModel_(novosRateios || []);
 }
 
@@ -199,7 +199,7 @@ function substituirRateiosDoLancamentoModel(idLancamento, novosRateios, idUsuari
  * @param {Array<Object>} rateios Rateios prontos para gravação.
  */
 function inserirRateiosEmLoteModel_(rateios) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return inserirRateiosEmLoteSupabaseModel_(rateios);
   }
 
@@ -239,8 +239,8 @@ function inserirRateiosEmLoteModel_(rateios) {
  * @param {string} novoStatus Novo status.
  * @param {string} idUsuarioAlteracao ID do usuário que alterou.
  */
-function alterarStatusRateioModel(linhaPlanilha, novoStatus, idUsuarioAlteracao) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function alterarStatusRateioModel_(linhaPlanilha, novoStatus, idUsuarioAlteracao) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return alterarStatusRateioSupabaseModel_(linhaPlanilha, novoStatus, idUsuarioAlteracao);
   }
 
@@ -265,8 +265,8 @@ function alterarStatusRateioModel(linhaPlanilha, novoStatus, idUsuarioAlteracao)
  *
  * @param {string} idLancamento ID do lançamento.
  */
-function excluirRateiosDoLancamentoModel(idLancamento) {
-  excluirRateiosPorLancamentosModel([idLancamento]);
+function excluirRateiosDoLancamentoModel_(idLancamento) {
+  excluirRateiosPorLancamentosModel_([idLancamento]);
 }
 
 
@@ -279,8 +279,8 @@ function excluirRateiosDoLancamentoModel(idLancamento) {
  *
  * @param {Array<string>} idsLancamentos IDs dos lançamentos.
  */
-function excluirRateiosPorLancamentosModel(idsLancamentos) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function excluirRateiosPorLancamentosModel_(idsLancamentos) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return excluirRateiosPorLancamentosSupabaseModel_(idsLancamentos);
   }
 
@@ -322,7 +322,7 @@ function excluirRateiosPorLancamentosModel(idsLancamentos) {
 
 
 function listarRateiosSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "rateios",
     "select=id_rateio,id_lancamento,id_usuario_responsavel,id_usuario_credor,valor_rateado,percentual,status,criado_por_id,alterado_por_id,observacao,modo_rateio,created_at,updated_at&order=created_at.asc"
   ).map(function(item, indice) {
@@ -340,7 +340,7 @@ function substituirRateiosPendentesDoLancamentoSupabaseModel_(idLancamento, novo
     throw new Error("ID do lancamento nao informado para salvar rateios no Supabase.");
   }
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "rateios",
     "id_lancamento=eq." + encodeURIComponent(id) + "&status=eq.Pendente",
     {
@@ -387,7 +387,7 @@ function inserirRateiosEmLoteSupabaseModel_(rateios) {
     };
   });
 
-  supabaseInserir("rateios", registros, "resolution=merge-duplicates,return=representation");
+  supabaseInserir_("rateios", registros, "resolution=merge-duplicates,return=representation");
 }
 
 
@@ -398,7 +398,7 @@ function alterarStatusRateioSupabaseModel_(linhaOuIdRateio, novoStatus, idUsuari
     throw new Error("Rateio nao encontrado para alteracao de status no Supabase.");
   }
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "rateios",
     "id_rateio=eq." + encodeURIComponent(idRateio),
     {
@@ -424,7 +424,7 @@ function excluirRateiosPorLancamentosSupabaseModel_(idsLancamentos) {
       return Boolean(idLancamento);
     })
     .forEach(function(idLancamento) {
-      supabaseExcluir("rateios", "id_lancamento=eq." + encodeURIComponent(idLancamento));
+      supabaseExcluir_("rateios", "id_lancamento=eq." + encodeURIComponent(idLancamento));
     });
 }
 
@@ -476,7 +476,7 @@ function montarRateioPlanilhaAPartirSupabase_(item, indice) {
  * @returns {GoogleAppsScript.Spreadsheet.Sheet} Aba RATEIOS.
  */
 function obterAbaRateiosModel_() {
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName("RATEIOS");
 
   if (!aba) {

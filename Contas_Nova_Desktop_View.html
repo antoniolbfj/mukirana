@@ -1,0 +1,53 @@
+<div class="app" id="cn-app">
+    
+    <main class="main">
+      <div class="context"><span>Contas (nova) · Em avaliação</span></div>
+      <header class="page-head"><div><h1>Contas</h1><p class="subtitle">Acompanhe os saldos e gerencie suas contas.</p></div><button class="btn primary" id="cn-new-account"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova conta</button></header>
+      <section class="balance-band" aria-label="Resumo das contas da lista">
+        <div class="metric"><div class="metric-label"><span id="cn-current-label">Saldo atual</span> <svg viewBox="0 0 24 24"><path d="M8 3v4m8-4v4M4 10h16M5 5h14v15H5z"/></svg></div><p class="balance" id="cn-total-current"></p><p class="metric-caption" id="cn-asof-date"></p></div>
+        <div class="metric"><div class="metric-label"><span id="cn-forecast-label">Previsto</span></div><p class="balance secondary" id="cn-total-forecast"></p><p class="metric-caption" id="cn-total-change"></p></div>
+      </section>
+      <section class="table-card" aria-label="Lista de contas">
+        <div class="toolbar"><label class="search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="cn-search" type="search" placeholder="Buscar conta" aria-label="Buscar conta pelo nome ou proprietário"></label><select class="select" id="cn-status" aria-label="Filtrar contas por status"><option value="active">Ativas</option><option value="all">Todas</option><option value="inactive">Inativas</option></select></div>
+        <div class="list-head" aria-hidden="true"><span>Conta</span><span>Saldo e previsão</span><span>Ações</span></div>
+        <div id="cn-account-list" aria-live="polite"></div>
+        <div class="list-foot"><span id="cn-list-count"></span><span class="hint"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4 8 9 8 9s8-5 8-9V6z"/><path d="m8 12 3 3 5-6"/></svg>Somente o dono altera o cadastro</span></div>
+      </section>
+      <p class="bottom-note">O previsto inclui movimentações programadas. O saldo inicial aparece nos lançamentos da conta e fica fora das receitas e despesas.</p>
+    </main>
+  </div>
+
+  <div class="overlay" id="cn-editor-overlay" hidden>
+    <section class="drawer" role="dialog" aria-modal="true" aria-labelledby="cn-editor-title">
+      <header class="drawer-head"><div><h2 id="cn-editor-title">Nova conta</h2><p id="cn-editor-subtitle">Comece pelo nome. O restante é opcional.</p></div><button type="button" class="icon-button" data-close="editor" aria-label="Fechar formulário"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
+      <form id="cn-account-form" style="display:flex;flex-direction:column;min-height:0;flex:1">
+        <div class="drawer-content">
+          <div class="field"><label for="cn-account-name">Nome da conta</label><input class="input" id="cn-account-name" required autocomplete="off" placeholder="Ex.: Carteira ou Principal"></div>
+          <section class="option-box">
+            <label class="option-heading"><input id="cn-has-opening" type="checkbox"><span><strong>Informar saldo inicial</strong><small>O valor que já existia nessa conta.</small></span></label>
+            <div class="option-body" id="cn-opening-fields" hidden>
+              <div class="split"><div class="field" style="margin-bottom:0"><label for="cn-opening-amount">Valor</label><div class="money-input"><span>R$</span><input id="cn-opening-amount" inputmode="decimal" autocomplete="off" placeholder="0,00"></div></div><div class="field" style="margin-bottom:0"><label for="cn-opening-date">Data do saldo</label><div class="date-control"><input class="input" id="cn-opening-date" type="date"><span id="cn-opening-date-display" class="date-display" aria-hidden="true"></span></div></div></div>
+              <div class="signs" role="group" aria-label="Sinal do saldo inicial"><button type="button" data-sign="1" aria-pressed="true">+ Positivo</button><button type="button" data-sign="-1" aria-pressed="false">− Negativo</button></div>
+              <div class="preview" id="cn-opening-preview" aria-live="polite"><div class="eyebrow">Lançamento que será criado</div><strong id="cn-opening-description"></strong><p id="cn-opening-preview-value"></p><p>Compõe o saldo da conta, sem entrar nas receitas ou despesas.</p></div>
+            </div>
+          </section>
+          <section class="option-box">
+            <label class="option-heading"><input id="cn-shared" type="checkbox"><span><strong>Compartilhar conta</strong><small>Você continua responsável pelo cadastro.</small></span></label>
+            <div class="option-body" id="cn-sharing-fields" hidden><p class="help" style="margin:0 0 12px">Escolha quem poderá usar a conta. Somente você altera o cadastro e o saldo inicial.</p><label for="cn-user-search" class="help">Buscar participante por nome ou e-mail</label><input id="cn-user-search" class="input user-search" type="search" placeholder="Digite pelo menos 2 caracteres" autocomplete="off"><p id="cn-users-status" class="help"></p><div id="cn-users-list"></div></div>
+          </section>
+          <p class="help" id="cn-edit-note" hidden>Ao salvar, o lançamento de saldo inicial será atualizado. Os demais lançamentos serão preservados.</p>
+          <p class="form-error" id="cn-form-error" role="alert"></p>
+        </div>
+        <footer class="drawer-footer"><button type="button" class="btn" data-close="editor">Cancelar</button><button type="submit" class="btn primary" id="cn-save-account">Criar conta</button></footer>
+      </form>
+    </section>
+  </div>
+
+  <div class="overlay" id="cn-ledger-overlay" hidden>
+    <section class="drawer" role="dialog" aria-modal="true" aria-labelledby="cn-ledger-title">
+      <header class="drawer-head"><div><h2 id="cn-ledger-title">Lançamentos</h2><p id="cn-ledger-subtitle"></p></div><button type="button" class="icon-button" data-close="ledger" aria-label="Fechar lançamentos"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
+      <div class="drawer-content"><div class="ledger-total"><div class="metric-label" id="cn-ledger-date-label"></div><p class="balance" id="cn-ledger-balance"></p><p class="help">O saldo inicial estabelece o ponto de partida desta conta.</p></div><div id="cn-ledger-events"></div><p id="cn-ledger-error" class="help"></p><button class="btn quiet" id="cn-load-more" type="button" hidden>Carregar mais</button><p class="help" style="margin-top:20px" id="cn-ledger-notice"></p></div>
+      <footer class="drawer-footer"><button type="button" class="btn" data-close="ledger">Fechar</button><button type="button" class="btn primary" id="cn-edit-from-ledger">Editar conta</button></footer>
+    </section>
+  </div>
+  <div class="toast" id="cn-toast" role="status" hidden></div>

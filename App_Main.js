@@ -18,13 +18,13 @@ function doGet(e) {
   try {
     // Tenta montar a interface normalmente
     let html = HtmlService.createTemplateFromFile('Index');
-    
+
     html.urlIconeDinamico = "https://drive.google.com/uc?export=view&id=" + CONFIG_SISTEMA.ID_ICONE_DRIVE;
-    
+
     return html.evaluate()
       .setTitle(CONFIG_SISTEMA.NOME_APP)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-      
+
   } catch (erro) {
     // SE O SERVIDOR QUEBRAR, ELE DESENHA O ERRO NA TELA EM VEZ DE FICAR EM BRANCO!
     let telaDeErro = `
@@ -46,7 +46,7 @@ function doGet(e) {
  * @param {string} nomeArquivo - O nome do arquivo .html a ser incluído.
  * @returns {string} - O conteúdo bruto do arquivo lido.
  */
-function incluir(nomeArquivo) {
+function incluir_(nomeArquivo) {
   return HtmlService.createHtmlOutputFromFile(nomeArquivo).getContent();
 }
 
@@ -61,18 +61,19 @@ function obterHtmlDaTela(nomeTela, tokenSessao) {
       obterSessaoObrigatoria(tokenSessao);
     }
 
-    if (nomeTela === 'Usuarios') return incluir('Usuarios_View');
-    if (nomeTela === 'Contas') return incluir('Contas_View');
-    if (nomeTela === 'Cartoes') return incluir('Cartoes_View');
-    if (nomeTela === 'Categorias') return incluir('Categorias_View');
-    if (nomeTela === 'Dashboard') return incluir('Dashboard_View');
-    if (nomeTela === 'FaturasCartao') return incluir('Faturas_Cartao_View');
-    if (nomeTela === 'Orcamentos') return incluir('Orcamentos_View');
-    if (nomeTela === 'Recorrencias') return incluir('Recorrencias_View');
-    if (nomeTela === 'Login') return incluir('Login_View');
-    if (nomeTela === 'Projetos') return incluir('Projetos_View');
-    if (nomeTela === 'Lancamentos') return incluir('Lancamentos_View');
-    
+    if (nomeTela === 'Usuarios') return incluir_('Usuarios_View');
+    if (nomeTela === 'Contas') return incluir_('Contas_View');
+    if (nomeTela === 'ContasNova') return HtmlService.createTemplateFromFile('Contas_Nova_View').evaluate().getContent();
+    if (nomeTela === 'Cartoes') return incluir_('Cartoes_View');
+    if (nomeTela === 'Categorias') return incluir_('Categorias_View');
+    if (nomeTela === 'Dashboard') return incluir_('Dashboard_View');
+    if (nomeTela === 'FaturasCartao') return incluir_('Faturas_Cartao_View');
+    if (nomeTela === 'Orcamentos') return incluir_('Orcamentos_View');
+    if (nomeTela === 'Recorrencias') return incluir_('Recorrencias_View');
+    if (nomeTela === 'Login') return incluir_('Login_View');
+    if (nomeTela === 'Projetos') return incluir_('Projetos_View');
+    if (nomeTela === 'Lancamentos') return incluir_('Lancamentos_View');
+
     return "<div style='padding: 30px;'><h2>Em construção: " + nomeTela + "</h2></div>";
 
   } catch (erro) {

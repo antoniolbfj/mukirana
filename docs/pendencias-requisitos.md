@@ -1,20 +1,31 @@
 # Pendências da base atual — Mukirana
 
-Atualizado em 24/10/2026. Base: Mukirana 1.9, versão 32 do novo projeto Apps Script,
+Atualizado em 24/10/2026. Base: Mukirana 1.9, importada da versão 32,
 com Supabase `wcczkultokrypdfimbsh`.
 
-## Rodada de preparação
+## Rodada de Contas
 
-Estado anterior arquivado; código de produção importado; Git/clasp vinculados à
-nova base e acesso de leitura ao banco confirmado. Nenhuma mudança funcional foi
-implantada nesta rodada.
+Implementadas duas interfaces dedicadas, computadores/tablets e smartphones,
+conectadas ao banco no menu provisório **Contas (nova)**. A tela atual continua
+no menu **Contas**. Implementados cadastro, edição, compartilhamento, busca,
+filtros, histórico paginado, inativação/restauração e Desfazer.
+
+Saldo inicial convertido em lançamento especial com vínculo estável, valor com
+sinal, data e descrição automática. Data dos saldos existentes: lançamento mais
+antigo de cada conta, incluindo transferências recebidas; sem movimentos, data
+de criação do cadastro em São Paulo. Operações da nova tela são atômicas,
+verificam versão concorrente e permitem repetir a última operação sem duplicar.
+Cálculos adaptados para data e exclusão dos totais operacionais.
+
+Migração aplicada no Supabase e reconciliada; testes de banco, autorização,
+concorrência e navegador concluídos. Detalhes em [contas-entrega.md](contas-entrega.md).
+Implementação e publicação não substituem a homologação do usuário.
 
 ## Pendências vigentes
 
-1. Definir e priorizar os ajustes de experiência a partir dos fluxos da versão em produção e das solicitações atuais do usuário.
-2. Implementar os ajustes aprovados em rodadas, preservando as regras e os dados existentes.
-3. Validar os fluxos alterados, publicar para avaliação e registrar a homologação de cada rodada.
+1. Homologar a nova tela de Contas nas duas interfaces, com os dados reais e a sessão Google do usuário; avaliar também as previsões e os saldos nos períodos utilizados.
+2. Depois da homologação explícita, substituir o acesso principal de Contas pela nova tela e retirar o menu provisório.
+3. Definir e priorizar a próxima tela da versão em produção a recriar.
 
-O backlog da implementação anterior está arquivado com aquela versão. Não foi
-transportado como lista de funcionalidades faltantes deste sistema. A relação
-detalhada de pendências será construída com a revisão dos fluxos atuais.
+O backlog da implementação anterior permanece arquivado com aquela versão.
+Não representa funcionalidades ausentes da base atual.

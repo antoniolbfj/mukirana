@@ -19,7 +19,7 @@ const DATABASE_SOURCES = {
 };
 
 
-function obterFonteDadosMukirana() {
+function obterFonteDadosMukirana_() {
   const props = PropertiesService.getScriptProperties();
   const valor = normalizarTextoDatabaseService_(props.getProperty(DATABASE_SERVICE_KEYS.DATA_SOURCE)).toUpperCase();
 
@@ -31,7 +31,7 @@ function obterFonteDadosMukirana() {
 }
 
 
-function definirFonteDadosMukirana(fonte) {
+function definirFonteDadosMukirana_(fonte) {
   const fonteNormalizada = normalizarTextoDatabaseService_(fonte).toUpperCase();
 
   if (fonteNormalizada !== DATABASE_SOURCES.PLANILHA && fonteNormalizada !== DATABASE_SOURCES.SUPABASE) {
@@ -48,23 +48,23 @@ function definirFonteDadosMukirana(fonte) {
 }
 
 
-function bancoUsaSupabase() {
-  return obterFonteDadosMukirana() === DATABASE_SOURCES.SUPABASE;
+function bancoUsaSupabase_() {
+  return obterFonteDadosMukirana_() === DATABASE_SOURCES.SUPABASE;
 }
 
 
-function bancoUsaPlanilha() {
-  return obterFonteDadosMukirana() === DATABASE_SOURCES.PLANILHA;
+function bancoUsaPlanilha_() {
+  return obterFonteDadosMukirana_() === DATABASE_SOURCES.PLANILHA;
 }
 
 
-function consultarTabelaDatabaseService(nomeTabela, consultaSupabase) {
-  if (bancoUsaSupabase()) {
+function consultarTabelaDatabaseService_(nomeTabela, consultaSupabase) {
+  if (bancoUsaSupabase_()) {
     const tabelaSupabase = obterNomeTabelaSupabase_(nomeTabela);
-    return supabaseSelecionar(tabelaSupabase, consultaSupabase || "select=*");
+    return supabaseSelecionar_(tabelaSupabase, consultaSupabase || "select=*");
   }
 
-  return consultarTabela(nomeTabela);
+  return consultarTabela_(nomeTabela);
 }
 
 
@@ -96,9 +96,9 @@ function obterNomeTabelaSupabase_(nomeTabelaPlanilha) {
 }
 
 
-function obterStatusBancoMukirana() {
-  const fonte = obterFonteDadosMukirana();
-  const supabaseConfigurado = typeof supabaseEstaConfigurado === "function" && supabaseEstaConfigurado();
+function obterStatusBancoMukirana_() {
+  const fonte = obterFonteDadosMukirana_();
+  const supabaseConfigurado = typeof supabaseEstaConfigurado_ === "function" && supabaseEstaConfigurado_();
 
   const status = {
     fonte: fonte,
@@ -114,23 +114,23 @@ function obterStatusBancoMukirana() {
 }
 
 
-function ativarSupabaseMukiranaSePronto() {
-  if (typeof supabaseEstaConfigurado !== "function" || !supabaseEstaConfigurado()) {
+function ativarSupabaseMukiranaSePronto_() {
+  if (typeof supabaseEstaConfigurado_ !== "function" || !supabaseEstaConfigurado_()) {
     throw new Error("Supabase nao configurado. Configure URL e service key antes de ativar.");
   }
 
-  const teste = testarConexaoSupabase();
+  const teste = testarConexaoSupabase_();
 
   if (!teste || teste.ok !== true) {
     throw new Error("Nao foi possivel validar a conexao com Supabase antes da ativacao.");
   }
 
-  return definirFonteDadosMukirana(DATABASE_SOURCES.SUPABASE);
+  return definirFonteDadosMukirana_(DATABASE_SOURCES.SUPABASE);
 }
 
 
-function voltarMukiranaParaPlanilha() {
-  return definirFonteDadosMukirana(DATABASE_SOURCES.PLANILHA);
+function voltarMukiranaParaPlanilha_() {
+  return definirFonteDadosMukirana_(DATABASE_SOURCES.PLANILHA);
 }
 
 

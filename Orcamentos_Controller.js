@@ -160,7 +160,7 @@ function salvarCategoriaOrcamento(dados, tokenSessao) {
     };
 
     medirEtapaPerformance_(medidor, "salvar_orcamento", function() {
-      salvarOrcamentoModel(item);
+      salvarOrcamentoModel_(item);
     });
     registrarContagemPerformance_(medidor, "orcamentosTodos", contexto.orcamentosTodos.length);
     finalizarPerformance_(medidor);
@@ -212,7 +212,7 @@ function removerCategoriaOrcamento(idOrcamento, tokenSessao) {
   }
 
   medirEtapaPerformance_(medidor, "excluir_orcamento", function() {
-    excluirOrcamentoModel(obterIdentificadorAlteracaoOrcamentoController_(item));
+    excluirOrcamentoModel_(obterIdentificadorAlteracaoOrcamentoController_(item));
   });
   registrarContagemPerformance_(medidor, "orcamentosTodos", contexto.orcamentosTodos.length);
   finalizarPerformance_(medidor);
@@ -222,7 +222,7 @@ function removerCategoriaOrcamento(idOrcamento, tokenSessao) {
 
 
 function obterIdentificadorAlteracaoOrcamentoController_(item) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return normalizarTextoOrcamentoController_(item.ID_Orcamento);
   }
 
@@ -328,29 +328,29 @@ function montarContextoOrcamentosAPartirBase_(sessao, contextoBase, medidorPerfo
     nomeLogado: normalizarTextoOrcamentoController_(sessao.nome),
     papelLogado: normalizarTextoOrcamentoController_(sessao.papel),
     categoriasTodas: medirEtapaPerformance_(medidorPerformance, "consulta_categorias", function() {
-      return contextoBase ? contextoBase.categoriasTodas : listarCategoriasModel();
+      return contextoBase ? contextoBase.categoriasTodas : listarCategoriasModel_();
     }),
     lancamentosTodos: medirEtapaPerformance_(medidorPerformance, "consulta_lancamentos", function() {
-      return contextoBase ? contextoBase.lancamentosTodos : typeof listarLancamentosModel === "function" ? listarLancamentosModel() : [];
+      return contextoBase ? contextoBase.lancamentosTodos : typeof listarLancamentosModel_ === "function" ? listarLancamentosModel_() : [];
     }),
     rateiosTodos: medirEtapaPerformance_(medidorPerformance, "consulta_rateios", function() {
-      return contextoBase ? contextoBase.rateiosTodos : typeof listarRateiosModel === "function" ? listarRateiosModel() : [];
+      return contextoBase ? contextoBase.rateiosTodos : typeof listarRateiosModel_ === "function" ? listarRateiosModel_() : [];
     }),
     orcamentosTodos: medirEtapaPerformance_(medidorPerformance, "consulta_orcamentos", function() {
-      return listarOrcamentosModel();
+      return listarOrcamentosModel_();
     }),
     recorrenciasTodos: medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias", function() {
-      return contextoBase ? contextoBase.recorrenciasTodos : typeof listarRecorrenciasModel === "function" ? listarRecorrenciasModel() : [];
+      return contextoBase ? contextoBase.recorrenciasTodos : typeof listarRecorrenciasModel_ === "function" ? listarRecorrenciasModel_() : [];
     }),
     recorrenciasRateiosTodos: medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias_rateios", function() {
       return contextoBase
         ? (contextoBase.recorrenciasRateiosTodos || [])
-        : typeof listarRecorrenciasRateiosModel === "function" ? listarRecorrenciasRateiosModel() : [];
+        : typeof listarRecorrenciasRateiosModel_ === "function" ? listarRecorrenciasRateiosModel_() : [];
     }),
     recorrenciasOcorrenciasTodos: medirEtapaPerformance_(medidorPerformance, "consulta_recorrencias_ocorrencias", function() {
       return contextoBase
         ? (contextoBase.recorrenciasOcorrenciasTodos || [])
-        : typeof listarRecorrenciasOcorrenciasModel === "function" ? listarRecorrenciasOcorrenciasModel() : [];
+        : typeof listarRecorrenciasOcorrenciasModel_ === "function" ? listarRecorrenciasOcorrenciasModel_() : [];
     })
   };
 }

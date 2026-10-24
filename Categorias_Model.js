@@ -4,22 +4,22 @@
  * Padronização: A coluna Criado_Por agora armazena o ID_Usuario (UUID).
  */
 
-function listarCategoriasModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarCategoriasModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarCategoriasSupabaseModel_();
   }
 
-  let banco = conectarBanco();
+  let banco = conectarBanco_();
   let aba = banco.getSheetByName('CATEGORIAS');
   if (!aba) throw new Error("Aba CATEGORIAS não encontrada na planilha.");
-  
+
   let dados = aba.getDataRange().getValues();
   let registros = [];
-  
+
   for (let i = 1; i < dados.length; i++) {
     let linha = dados[i];
     if (linha[0] === "") continue;
-    
+
     registros.push({
       _linhaPlanilha: i + 1,
       ID_Categoria: linha[0],
@@ -34,20 +34,20 @@ function listarCategoriasModel() {
   return registros;
 }
 
-function salvarCategoriaModel(categoria) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarCategoriaModel_(categoria) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarCategoriaSupabaseModel_(categoria);
   }
 
-  let banco = conectarBanco();
+  let banco = conectarBanco_();
   let aba = banco.getSheetByName('CATEGORIAS');
-  
+
   let dadosVetor = [
-    categoria.ID_Categoria, 
-    categoria.Nome, 
-    categoria.Tipo, 
-    categoria.ID_Categoria_Pai, 
-    categoria.Global, 
+    categoria.ID_Categoria,
+    categoria.Nome,
+    categoria.Tipo,
+    categoria.ID_Categoria_Pai,
+    categoria.Global,
     categoria.Ativa,
     categoria.Criado_Por // Grava o UUID do criador
   ];
@@ -60,19 +60,19 @@ function salvarCategoriaModel(categoria) {
   return categoria.ID_Categoria;
 }
 
-function alterarStatusCategoriaModel(linhaPlanilha, novoStatus) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function alterarStatusCategoriaModel_(linhaPlanilha, novoStatus) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return alterarStatusCategoriaSupabaseModel_(linhaPlanilha, novoStatus);
   }
 
-  let banco = conectarBanco();
+  let banco = conectarBanco_();
   let aba = banco.getSheetByName('CATEGORIAS');
   aba.getRange(linhaPlanilha, 6).setValue(novoStatus);
 }
 
 
 function listarCategoriasSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "categorias",
     "select=id_categoria,nome,tipo,id_categoria_pai,global,ativa,criado_por&order=nome.asc"
   ).map(function(item, indice) {
@@ -103,7 +103,7 @@ function salvarCategoriaSupabaseModel_(categoria) {
     updated_at: new Date().toISOString()
   };
 
-  supabaseInserir("categorias", registro, "resolution=merge-duplicates,return=representation");
+  supabaseInserir_("categorias", registro, "resolution=merge-duplicates,return=representation");
 
   return idCategoria;
 }
@@ -116,7 +116,7 @@ function alterarStatusCategoriaSupabaseModel_(linhaOuIdCategoria, novoStatus) {
     throw new Error("Categoria nao encontrada para alteracao de status no Supabase.");
   }
 
-  supabaseAtualizar(
+  supabaseAtualizar_(
     "categorias",
     "id_categoria=eq." + encodeURIComponent(idCategoria),
     {

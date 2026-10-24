@@ -6,8 +6,8 @@
  */
 
 
-function listarPagamentosFaturasModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarPagamentosFaturasModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarPagamentosFaturasSupabaseModel_();
   }
 
@@ -15,8 +15,8 @@ function listarPagamentosFaturasModel() {
 }
 
 
-function inserirPagamentoFaturaModel(pagamento) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function inserirPagamentoFaturaModel_(pagamento) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return inserirPagamentoFaturaSupabaseModel_(pagamento);
   }
 
@@ -24,8 +24,8 @@ function inserirPagamentoFaturaModel(pagamento) {
 }
 
 
-function atualizarPagamentoFaturaModel(pagamento) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function atualizarPagamentoFaturaModel_(pagamento) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return atualizarPagamentoFaturaSupabaseModel_(pagamento);
   }
 
@@ -33,8 +33,8 @@ function atualizarPagamentoFaturaModel(pagamento) {
 }
 
 
-function excluirPagamentoFaturaModel(idPagamentoFatura) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function excluirPagamentoFaturaModel_(idPagamentoFatura) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return excluirPagamentoFaturaSupabaseModel_(idPagamentoFatura);
   }
 
@@ -43,7 +43,7 @@ function excluirPagamentoFaturaModel(idPagamentoFatura) {
 
 
 function listarPagamentosFaturasSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "pagamentos_faturas",
     "select=id_pagamento_fatura,id_grupo_cartao,id_conta,valor,data_pagamento,mes_referencia,status,observacao,criado_por_id,alterado_por_id,created_at,updated_at&order=data_pagamento.asc"
   ).map(function(item, indice) {
@@ -68,7 +68,7 @@ function inserirPagamentoFaturaSupabaseModel_(pagamento) {
     updated_at: pagamento.Data_Alteracao || null
   };
 
-  const inseridos = supabaseInserir("pagamentos_faturas", registro, "return=representation");
+  const inseridos = supabaseInserir_("pagamentos_faturas", registro, "return=representation");
   return montarPagamentoFaturaPlanilhaAPartirSupabase_(inseridos[0] || registro, 0);
 }
 
@@ -92,7 +92,7 @@ function atualizarPagamentoFaturaSupabaseModel_(pagamento) {
     updated_at: pagamento.Data_Alteracao || new Date().toISOString()
   };
 
-  supabaseAtualizar("pagamentos_faturas", "id_pagamento_fatura=eq." + encodeURIComponent(id), registro);
+  supabaseAtualizar_("pagamentos_faturas", "id_pagamento_fatura=eq." + encodeURIComponent(id), registro);
 
   return montarPagamentoFaturaPlanilhaAPartirSupabase_({
     id_pagamento_fatura: id,
@@ -116,7 +116,7 @@ function excluirPagamentoFaturaSupabaseModel_(idPagamentoFatura) {
     throw new Error("Pagamento de fatura nao informado para exclusao.");
   }
 
-  supabaseExcluir("pagamentos_faturas", "id_pagamento_fatura=eq." + encodeURIComponent(id));
+  supabaseExcluir_("pagamentos_faturas", "id_pagamento_fatura=eq." + encodeURIComponent(id));
 }
 
 

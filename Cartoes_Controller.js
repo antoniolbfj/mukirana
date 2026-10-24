@@ -121,7 +121,7 @@ function processarSalvarCartao(dadosFormulario, tokenSessao) {
       _linhaPlanilha: linhaGrupoConfiavel
     };
 
-    salvarGrupoCartaoModel(grupo);
+    salvarGrupoCartaoModel_(grupo);
     sincronizarCartoesFisicosDoGrupoCartaoController_(
       grupo,
       idsAdicionais,
@@ -151,12 +151,12 @@ function montarContextoCadastroCartaoController_(sessao, medidorPerformance) {
     grupos: medirEtapaPerformance_(medidorPerformance, "consulta_grupos_cartoes", function() {
       return contextoRpc && contextoRpc.gruposCartoesTodos
         ? contextoRpc.gruposCartoesTodos
-        : listarGruposCartoesModel();
+        : listarGruposCartoesModel_();
     }),
     cartoes: medirEtapaPerformance_(medidorPerformance, "consulta_cartoes", function() {
       return contextoRpc && contextoRpc.cartoesTodos
         ? contextoRpc.cartoesTodos
-        : listarCartoesModel();
+        : listarCartoesModel_();
     }),
     usuariosAtivos: medirEtapaPerformance_(medidorPerformance, "consulta_usuarios", function() {
       return contextoRpc && contextoRpc.usuariosTodos
@@ -304,7 +304,7 @@ function montarMapaGruposComVinculoFinanceiroCartaoController_(idLogado, cartoes
     }
   });
 
-  (typeof listarLancamentosModel === "function" ? listarLancamentosModel() : []).forEach(function(lancamento) {
+  (typeof listarLancamentosModel_ === "function" ? listarLancamentosModel_() : []).forEach(function(lancamento) {
     const idAutor = normalizarTextoCartaoController_(lancamento.Criado_Por_ID);
     const tipoOrigem = normalizarTextoCartaoController_(lancamento.Tipo_Origem);
     const idOrigem = normalizarTextoCartaoController_(lancamento.ID_Origem);
@@ -315,7 +315,7 @@ function montarMapaGruposComVinculoFinanceiroCartaoController_(idLogado, cartoes
     }
   });
 
-  (typeof listarRecorrenciasModel === "function" ? listarRecorrenciasModel() : []).forEach(function(recorrencia) {
+  (typeof listarRecorrenciasModel_ === "function" ? listarRecorrenciasModel_() : []).forEach(function(recorrencia) {
     const idUsuario = normalizarTextoCartaoController_(recorrencia.ID_Usuario);
     const idCriador = normalizarTextoCartaoController_(recorrencia.Criado_Por_ID);
     const tipoOrigem = normalizarTextoCartaoController_(recorrencia.Tipo_Origem);
@@ -458,7 +458,7 @@ function complementarContextoCartoesComRecorrenciasController_(contexto, gruposB
     }
   });
 
-  (typeof listarRecorrenciasModel === "function" ? listarRecorrenciasModel() : []).forEach(function(recorrencia) {
+  (typeof listarRecorrenciasModel_ === "function" ? listarRecorrenciasModel_() : []).forEach(function(recorrencia) {
     const idRecorrencia = normalizarTextoCartaoController_(recorrencia.ID_Recorrencia);
     const idOrigem = normalizarTextoCartaoController_(recorrencia.ID_Origem);
     const tipoOrigem = normalizarTextoCartaoController_(recorrencia.Tipo_Origem);
@@ -576,10 +576,10 @@ function listarRecorrenciasPrevistasGruposCartaoController_(contexto, gruposBase
 function montarContextoListaCartoesController_(sessao, medidorPerformance) {
   return {
     grupos: medirEtapaPerformance_(medidorPerformance, "consulta_grupos_cartoes", function() {
-      return listarGruposCartoesModel();
+      return listarGruposCartoesModel_();
     }),
     cartoes: medirEtapaPerformance_(medidorPerformance, "consulta_cartoes", function() {
-      return listarCartoesModel();
+      return listarCartoesModel_();
     })
   };
 }
@@ -617,8 +617,8 @@ function alternarStatusCartao(idGrupoCartao, tokenSessao) {
 
   const novoStatus = !normalizarBooleanoCartaoController_(grupo.Ativo);
   medirEtapaPerformance_(medidor, "alterar_status", function() {
-    alterarStatusGrupoCartaoModel(
-      typeof bancoUsaSupabase === "function" && bancoUsaSupabase() ? idGrupo : grupo._linhaPlanilha,
+    alterarStatusGrupoCartaoModel_(
+      typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_() ? idGrupo : grupo._linhaPlanilha,
       novoStatus
     );
   });
@@ -714,7 +714,7 @@ function sincronizarCartoesFisicosDoGrupoCartaoController_(grupo, idsAdicionais,
            normalizarTextoCartaoController_(cartao.Tipo_Cartao) === "Titular";
   });
 
-  salvarCartaoFisicoModel({
+  salvarCartaoFisicoModel_({
     ID_Cartao: cartaoTitular ? cartaoTitular.ID_Cartao : Utilities.getUuid(),
     ID_Grupo_Cartao: idGrupo,
     ID_Usuario: idTitular,
@@ -731,7 +731,7 @@ function sincronizarCartoesFisicosDoGrupoCartaoController_(grupo, idsAdicionais,
              normalizarTextoCartaoController_(cartao.Tipo_Cartao) === "Adicional";
     });
 
-    salvarCartaoFisicoModel({
+    salvarCartaoFisicoModel_({
       ID_Cartao: cartaoExistente ? cartaoExistente.ID_Cartao : Utilities.getUuid(),
       ID_Grupo_Cartao: idGrupo,
       ID_Usuario: idUsuario,
@@ -748,7 +748,7 @@ function sincronizarCartoesFisicosDoGrupoCartaoController_(grupo, idsAdicionais,
     const deveInativar = tipo === "Adicional" && !idsAdicionaisMapa[idUsuario];
 
     if (deveInativar && normalizarBooleanoCartaoController_(cartao.Ativo)) {
-      alterarStatusCartaoFisicoModel(cartao._linhaPlanilha, false);
+      alterarStatusCartaoFisicoModel_(cartao._linhaPlanilha, false);
     }
   });
 }
@@ -842,11 +842,11 @@ function listarUsuariosAtivosCartaoController_(sessao, medidorPerformance) {
     }
   }
 
-  if (typeof listarUsuariosModel === "function") {
-    return listarUsuariosAtivosCartaoAPartirBaseController_(listarUsuariosModel());
+  if (typeof listarUsuariosModel_ === "function") {
+    return listarUsuariosAtivosCartaoAPartirBaseController_(listarUsuariosModel_());
   }
 
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName("USUARIOS");
   const dados = aba.getDataRange().getValues();
   const usuarios = [];

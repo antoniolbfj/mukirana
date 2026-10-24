@@ -38,8 +38,8 @@
  *
  * @returns {Array<Object>} Lançamentos da planilha.
  */
-function listarLancamentosModel() {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function listarLancamentosModel_() {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return listarLancamentosSupabaseModel_();
   }
 
@@ -96,8 +96,8 @@ function listarLancamentosModel() {
  * @param {Object} lanc Lançamento validado pelo Controller.
  * @returns {string} ID do lançamento salvo.
  */
-function salvarLancamentoModel(lanc) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarLancamentoModel_(lanc) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarLancamentoSupabaseModel_(lanc);
   }
 
@@ -124,8 +124,8 @@ function salvarLancamentoModel(lanc) {
  * @param {Array<Object>} lancamentos Lançamentos validados pelo Controller.
  * @returns {Array<string>} IDs dos lançamentos salvos.
  */
-function salvarLancamentosEmLoteModel(lancamentos) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function salvarLancamentosEmLoteModel_(lancamentos) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return salvarLancamentosEmLoteSupabaseModel_(lancamentos);
   }
 
@@ -193,8 +193,8 @@ function montarVetorLancamentoModel_(lanc) {
  *
  * @param {number} linhaPlanilha Linha real do lançamento na planilha.
  */
-function excluirLancamentoModel(linhaPlanilha) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function excluirLancamentoModel_(linhaPlanilha) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return excluirLancamentoSupabaseModel_(linhaPlanilha);
   }
 
@@ -219,8 +219,8 @@ function excluirLancamentoModel(linhaPlanilha) {
  *
  * @param {Array<number>} linhasPlanilha Linhas reais na aba LANCAMENTOS.
  */
-function excluirLancamentosPorLinhasModel(linhasPlanilha) {
-  if (typeof bancoUsaSupabase === "function" && bancoUsaSupabase()) {
+function excluirLancamentosPorLinhasModel_(linhasPlanilha) {
+  if (typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_()) {
     return excluirLancamentosPorLinhasSupabaseModel_(linhasPlanilha);
   }
 
@@ -246,9 +246,9 @@ function excluirLancamentosPorLinhasModel(linhasPlanilha) {
 
 
 function listarLancamentosSupabaseModel_() {
-  return supabaseSelecionar(
+  return supabaseSelecionar_(
     "lancamentos",
-    "select=id_lancamento,tipo,descricao,valor_total,data_ocorrencia,mes_referencia,id_categoria,tipo_origem,id_origem,id_destino,id_projeto,email_autor,status,criado_por_id,alterado_por_id,id_grupo_parcela,numero_parcela,total_parcelas,id_recorrencia_origem,modo_recorrencia_origem,data_ocorrencia_recorrencia,created_at,updated_at&order=data_ocorrencia.asc"
+    "select=id_lancamento,tipo,descricao,valor_total,data_ocorrencia,mes_referencia,id_categoria,tipo_origem,id_origem,id_destino,id_projeto,email_autor,status,criado_por_id,alterado_por_id,id_grupo_parcela,numero_parcela,total_parcelas,id_recorrencia_origem,modo_recorrencia_origem,data_ocorrencia_recorrencia,created_at,updated_at&tipo=neq.Saldo%20Inicial&order=data_ocorrencia.asc"
   ).map(function(item, indice) {
     return montarLancamentoPlanilhaAPartirSupabase_(item, indice);
   });
@@ -259,7 +259,7 @@ function salvarLancamentoSupabaseModel_(lanc) {
   const idLancamento = lanc.ID_Lancamento || Utilities.getUuid();
   const registro = montarRegistroLancamentoSupabase_(Object.assign({}, lanc, { ID_Lancamento: idLancamento }));
 
-  supabaseInserir("lancamentos", registro, "resolution=merge-duplicates,return=representation");
+  supabaseInserir_("lancamentos", registro, "resolution=merge-duplicates,return=representation");
 
   return idLancamento;
 }
@@ -277,7 +277,7 @@ function salvarLancamentosEmLoteSupabaseModel_(lancamentos) {
   });
 
   if (registros.length > 0) {
-    supabaseInserir("lancamentos", registros, "resolution=merge-duplicates,return=representation");
+    supabaseInserir_("lancamentos", registros, "resolution=merge-duplicates,return=representation");
   }
 
   return ids;
@@ -291,7 +291,7 @@ function excluirLancamentoSupabaseModel_(linhaOuIdLancamento) {
     throw new Error("Lancamento nao encontrado para exclusao no Supabase.");
   }
 
-  supabaseExcluir("lancamentos", "id_lancamento=eq." + encodeURIComponent(idLancamento));
+  supabaseExcluir_("lancamentos", "id_lancamento=eq." + encodeURIComponent(idLancamento));
 }
 
 
@@ -390,7 +390,7 @@ function obterIdLancamentoParaAlteracaoSupabase_(linhaOuIdLancamento) {
  * @returns {GoogleAppsScript.Spreadsheet.Sheet} Aba LANCAMENTOS.
  */
 function obterAbaLancamentosModel_() {
-  const banco = conectarBanco();
+  const banco = conectarBanco_();
   const aba = banco.getSheetByName("LANCAMENTOS");
 
   if (!aba) {
