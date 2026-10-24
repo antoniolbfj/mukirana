@@ -21,19 +21,21 @@ def search(page, text):
 
 def close_editor(page):
     page.locator('.panel-head [data-close="panel"]').click()
-    page.locator('#dialog-form button[type="submit"]').click()
+    page.locator('[data-action="exit-discard"]').click()
+    page.locator('#dialog-layer').wait_for(state='hidden')
 
 
 def period(page, start, end):
     page.locator('[data-action="period"]').click()
-    page.locator('#period-start').fill(start)
-    page.locator('#period-end').fill(end)
+    page.locator('#period-start').fill(start[:7])
+    page.locator('#period-end').fill(end[:7])
     page.locator('#dialog-form button[type="submit"]').click()
 
 
 def new_entry(page, description, amount='100,00'):
     page.locator('[data-action="new"]').click()
     page.locator('#entry-description').fill(description)
+    if description == 'Super': page.locator('[data-history="market"]').wait_for(state='visible')
     page.locator('#entry-amount').fill(amount)
     page.locator('#entry-category').select_option('shopping')
 
@@ -56,19 +58,16 @@ def run_device(browser, name, size, ui, user_agent=None):
     page.screenshot(path=str(OUT / (name+'.png')), full_page=True)
     assert page.locator('[data-renew]').is_visible()
 
-    # O resultado econômico inclui somente a própria participação, sem duplicar
-    # transferências, fatura, saldo inicial, total pago pelo autor ou aprovações.
-    assert '6.500,00' in page.locator('#sum-income').inner_text()
-    assert '2.296,59' in page.locator('#sum-expense').inner_text()
-    if ui == 'phone':
-        page.locator('[data-action="toggle-view"]').click()
-    else:
-        page.locator('[data-view="cash"]').click()
-    assert '2.190,20' in page.locator('#sum-expense').inner_text()
-    if ui == 'phone':
-        page.locator('[data-action="toggle-view"]').click()
-    else:
-        page.locator('[data-view="economic"]').click()
+    # A projeção global é independente da busca, da visão e dos filtros da lista.
+    baseline=page.locator('#global-available').inner_text()
+    assert '4.892,10' in baseline
+    search(page, 'Supermercado')
+    assert '144,95' in page.locator('[data-entry] .row-value').inner_text()
+    page.locator('[data-view="cash"]').click()
+    assert '289,90' in page.locator('[data-entry] .row-value').inner_text()
+    assert page.locator('#global-available').inner_text() == baseline
+    page.locator('[data-view="economic"]').click()
+    search(page, '')
 
     # Participante não altera a conta privada do autor. Aprova sua categoria,
     # sem aprovar automaticamente a participação de João.

@@ -1,19 +1,68 @@
 <style>
-  body:has(#mk-lancamentos-prototipo) #topbar-filtro-periodo-global,
-  body:has(#mk-lancamentos-prototipo) #fab-container,
-  body:has(#mk-lancamentos-prototipo) #topbar-contexto-app { display: none !important; }
-  #mk-lancamentos-prototipo { margin: -8px; }
-  #mk-lancamentos-prototipo iframe { display: block; width: 100%; height: calc(100dvh - 115px); min-height: 500px; border: 1px solid #e5e8f0; border-radius: 12px; background: #f6f7fb; }
-  #mk-lancamentos-prototipo > p { font-size: 11px; color: var(--cor-texto-secundario, #646d80); margin: 0 4px 12px; line-height: 1.6; }
+  body:has(#mk-lancamentos-prototipo) #menu-lateral,
+  body:has(#mk-lancamentos-prototipo) #menu-overlay,
+  body:has(#mk-lancamentos-prototipo) #topbar-app,
+  body:has(#mk-lancamentos-prototipo) #fab-container { display: none !important; }
+  body:has(#mk-lancamentos-prototipo) #app-container { display: block !important; }
+  body:has(#mk-lancamentos-prototipo) #conteudo-principal { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  body:has(#mk-lancamentos-prototipo) #conteudo-tela { padding: 0 !important; }
+  #mk-lancamentos-prototipo { margin: 0; }
+  #mk-lancamentos-prototipo iframe { display: block; width: 100%; height: 100dvh; border: 0; background: #f6f7fb; }
 </style>
 <section id="mk-lancamentos-prototipo">
-  <p><strong>Protótipo para avaliação.</strong> Dados fictícios e operações simuladas. O período abaixo pertence à demonstração. Para movimentar dados reais, use Lançamentos.</p>
   <iframe id="mk-lancamentos-demo-frame" title="Protótipo interativo de Lançamentos com dados fictícios" sandbox="allow-scripts allow-forms" referrerpolicy="no-referrer"></iframe>
 </section>
 <script>
 (() => {
-  // O frame tem origem isolada: não recebe sessão, bridge Apps Script ou dados reais.
+  if (window.MukiranaLancamentosPrototipo) window.MukiranaLancamentosPrototipo.destroy();
+  const root = document.getElementById('mk-lancamentos-prototipo');
   const frame = document.getElementById('mk-lancamentos-demo-frame');
+  const events = new AbortController();
+  // O frame continua sem origem compartilhada, sessão, bridge ou acesso ao banco.
+  // Esta ponte só guarda estado fictício em três chaves exclusivas do navegador.
+  const keys = {
+    period: 'mk-demo-lanc-v2-period',
+    preference: 'mk-demo-lanc-v2-preference',
+    draft: 'mk-demo-lanc-v2-draft'
+  };
+  function read(storage, key) {
+    const raw = storage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  }
+  function write(storage, key, value) {
+    if (value === null) storage.removeItem(key);
+    else storage.setItem(key, JSON.stringify(value));
+  }
+  window.addEventListener('message', event => {
+    const message = event.data;
+    if (!root.isConnected || event.source !== frame.contentWindow || message?.channel !== 'mk-lancamentos-demo-v2') return;
+    if (!Number.isSafeInteger(message.requestId)) return;
+    const response = {channel: 'mk-lancamentos-demo-v2', requestId: message.requestId, ok: false};
+    try {
+      if (message.type === 'state-load') {
+        response.state = {
+          period: read(sessionStorage, keys.period),
+          preference: read(localStorage, keys.preference),
+          draft: read(localStorage, keys.draft)
+        };
+      } else if (message.type === 'exit') {
+        if (typeof navegarPara === 'function') navegarPara('Lancamentos');
+      } else if (['period-save', 'preference-save', 'draft-save'].includes(message.type)) {
+        const value = message.value;
+        if (JSON.stringify(value).length > 2000000) throw new Error('Estado da demonstração excedeu o limite.');
+        if (value !== null && (!value || typeof value !== 'object' || Array.isArray(value))) throw new Error('Estado inválido.');
+        if (message.type === 'period-save') write(sessionStorage, keys.period, value);
+        if (message.type === 'preference-save') write(localStorage, keys.preference, value);
+        if (message.type === 'draft-save') write(localStorage, keys.draft, value);
+      } else return;
+      response.ok = true;
+    } catch (_) { response.ok = false; }
+    frame.contentWindow?.postMessage(response, '*');
+  }, {signal: events.signal});
+  const observer = new MutationObserver(() => { if (!root.isConnected) api.destroy(); });
+  const api = {destroy() { events.abort(); observer.disconnect(); if (window.MukiranaLancamentosPrototipo === api) delete window.MukiranaLancamentosPrototipo; }};
+  observer.observe(document.documentElement, {childList: true, subtree: true});
+  window.MukiranaLancamentosPrototipo = api;
   frame.srcdoc = <?!= JSON.stringify(incluir_('Lancamentos_Prototipo_Demo')).replace(/</g, '\\u003c') ?>;
   if (typeof registrarTelaAtualMukirana === 'function') registrarTelaAtualMukirana('LancamentosPrototipo', {});
 })();

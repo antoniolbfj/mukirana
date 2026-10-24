@@ -3,6 +3,42 @@
 24/10/2026. Protótipo para avaliação; não é implementação conectada.
 Cartões foi homologado e promovido à produção na versão 36.
 
+## Refinamento da avaliação
+
+Quatro alterações solicitadas pelo usuário foram incorporadas:
+
+1. **Barra global** no topo, na mesma região de navegação/filtros da produção,
+   com **Ainda posso gastar** e acesso à composição. Permanece visível ao rolar e
+   ao navegar entre Lançamentos, Visão geral, Contas, Cartões e Categorias da
+   demonstração. A busca, os chips e os filtros locais não mudam o saldo global.
+2. **Período exclusivamente mensal**, com Inicial/Final na barra global. O padrão
+   é mês atual; a seleção acompanha a sessão. Salvar uma única preferência é
+   explícito. Mês anterior/atual/próximo e últimos 3/6/12 meses permanecem relativos
+   ao calendário em novo acesso. Meses absolutos continuam fixos. Só inicial vai
+   até o mês atual; só final começa no histórico; intervalos incluem meses completos.
+   Esta decisão substitui os filtros por datas livres da proposta/documento anterior.
+3. **Saída com duas opções:** Sair descarta o preenchimento; Sair e salvar rascunho
+   guarda para retomar neste navegador. Não há Cancelar/Continuar nesse diálogo,
+   nem salvamento automático. O rascunho salvo pode ser retomado mesmo após reabrir
+   a prévia, com seus cadastros contextuais fictícios preservados.
+4. **Painel compacto nas telas maiores**, com descrição na largura inteira,
+   valor ao lado de data/situação, conta ao lado de categoria e classificação ao
+   lado de modalidade. Opções adicionais continuam progressivas. O formulário
+   básico cabe sem rolagem interna nos tamanhos conferidos de computador/tablet;
+   smartphone mantém campos sequenciais e formulário inteiro.
+
+A navegação dessas cinco telas é simulada no protótipo para avaliar o componente
+global. Contas/Cartões reais e o filtro da produção não foram remodelados nesta
+rodada. Voltar ao sistema restaura a interface normal e seu estado anterior.
+
+O valor de Ainda posso gastar é uma **projeção fictícia** até o mês final: saldo
+de partida e movimentações de consumo, aportes/pagamentos e reserva para faturas,
+com histórico independente do início do filtro. Não reutiliza resultado do
+período como se fosse saldo. A composição mostra a conta da demonstração.
+O detalhamento final do contrato financeiro — inclusive obrigações de rateios
+e receitas incertas — continua pendente de conciliação, conforme PEN-04 do
+levantamento. Essa fórmula demonstrativa não se torna regra da produção.
+
 ## Fonte e decisões atuais
 
 Releitura integral de **Mukirana — Especificação de Requisitos do Produto — v0.1**,
@@ -40,28 +76,27 @@ Decisões expressas posteriores incorporadas:
 | RQ-RAT-01 a 07, 12, 13 | Igual/valor/percentual; partes positivas com soma exata. Autor recebe residual da divisão igual. Separar total desembolsado e participação econômica; conta do outro não aparece. |
 | RQ-RAT-08 a 11, APR | Aprovação da própria participação/categoria, rejeição justificada e alcance coletivo. Alterar rateio renova aprovações; exclusão fica pendente e preserva o original. Estados simulados, sem tokens reais. |
 | RQ-TRF-01 a 03 | Transferência no mesmo formulário, origem/destino diferentes, sem categoria/modalidade/rateio. Uma operação, sem receita/despesa adicional. |
-| RQ-FIL-01 a 05 | Um período para lista e resumo da prévia, mês atual, atalhos e datas abertas; preferência somente com salvamento explícito. |
+| RQ-FIL-01 a 06, refinamento atual | Um período na barra global de todas as telas da prévia, somente meses, padrão mês atual, atalhos relativos e intervalos abertos; preferência salva explicitamente. Os três cartões de meses da Visão geral só mudam a sessão. |
 | RQ-PRN, NFR | Centavos, informação progressiva, busca imediata, ações em lote, Desfazer, foco/teclado, rascunho e interfaces próprias. |
 
 ## Computadores e tablets
 
-Cabeçalho com Novo lançamento, período global e alternância **Minha participação /
-Fluxo de caixa**. Três números principais: receitas, despesas e resultado do
-recorte. Valores pendentes/futuros são informados separadamente; resultado não é
-saldo acumulado de conta.
+Barra global com período e **Ainda posso gastar**. Cabeçalho local com Novo
+lançamento e alternância **Minha participação / Fluxo de caixa** para a lista,
+sem recalcular o saldo global pela busca ou pelos filtros locais.
 
 Lista comparável com data, descrição, modalidade, categoria, conta/cartão, valor
 e situação. Busca imediata; Todos/Pendentes/Compartilhados; filtros adicionais
 por natureza, origem, categoria com descendentes, modalidade, situação e projeto.
 Seleção múltipla para efetivar/excluir operações autorizadas, com confirmação.
 
-Cadastro e detalhe em painel lateral. O formulário inicia com o essencial;
-geração, rateio e opções aparecem sob demanda. Tablet usa esta interface e
+Cadastro e detalhe em painel lateral. O formulário organiza o essencial em
+colunas compactas; geração, rateio e opções aparecem sob demanda. Tablet usa esta interface e
 mantém os campos essenciais quando reduzido, com detalhe acessível por toque.
 
 ## Smartphones
 
-Estrutura própria: resumo compacto, busca, chips, linha do tempo por dia e
+Estrutura própria: barra global compacta, busca, chips, linha do tempo por dia e
 cartões de lançamentos. Novo lançamento fixo na base, seleção explícita e ações
 secundárias em painel inferior. O formulário e o detalhe ocupam a tela inteira.
 
@@ -106,18 +141,22 @@ já homologados de Contas/Cartões. Esta rodada não consulta nem altera o banco
 
 - HTML/CSS/JavaScript executável e independente de bibliotecas externas.
 - Dois templates distintos e regras locais de datas/centavos/geração/rateio.
-- Cadastro, edição, exclusão e Desfazer alteram **somente a memória da prévia**.
+- Cadastro, edição, exclusão e Desfazer alteram **somente a prévia fictícia**.
+  Ao salvar rascunho explicitamente, seu contexto fictício é guardado no navegador.
 - O menu provisório abre um frame isolado, sem origem compartilhada, token de
   sessão, ponte de Apps Script ou chamadas financeiras reais. Apenas o acesso
   ao menu exige a sessão normal do aplicativo.
-- O formulário de período substitui visualmente o filtro externo enquanto a
-  demonstração está aberta; ao sair, o filtro real reaparece, preservado.
-- No HTML independente, preferência de período usa armazenamento local com
-  prefixo exclusivo. No frame isolado, o texto informa que é demonstrativa.
-- Busca, filtros e resumos trabalham com o mesmo recorte. Não há consulta de
+- A prévia ocupa o quadro do aplicativo com barra e navegação próprias, para
+  demonstrar o componente global na posição do topo. Ao sair, a interface real
+  reaparece, preservada.
+- Preferência e rascunho usam armazenamento local com prefixo exclusivo;
+  período da sessão usa armazenamento de sessão. O frame mantém origem isolada;
+  uma ponte de mensagens com fonte verificada permite somente essas três chaves
+  da demonstração e o retorno ao sistema. Não lê sessão ou dados financeiros reais.
+- Busca e filtros trabalham sobre o período global; não restringem o saldo. Não há consulta de
   finanças de outros integrantes ou diretório público.
-- Navegação lateral do arquivo independente é ilustrativa; o menu do aplicativo
-  continua sendo a navegação real. Rotas de origem de movimentos especiais são
+- Navegação lateral e menu de celular trocam telas de contexto fictícias, mantendo
+  a barra global. Rotas de origem de movimentos especiais são
   explicadas no detalhe sem misturar registros fictícios com os dados reais.
 
 Não foram implementados backend de Lançamentos novo, migrações, notificações
@@ -141,16 +180,19 @@ proteções da demonstração; não constituem novos requisitos de produto.
    15/04 é o término exclusivo. Experimente as outras periodicidades.
 7. Abra uma ocorrência e teste os alcances de edição/exclusão e Desfazer.
 8. Confira origem/destino na transferência e a identificação dos movimentos
-   especiais. Troque período, busque e use filtros e seleção múltipla.
+   especiais. Troque meses na barra global, busque, filtre e use seleção múltipla.
+   Navegue pelas outras telas fictícias e confira que o saldo continua acessível.
 9. O conjunto fictício Assinatura de música termina hoje e oferece renovação com
    revisão de duração; não altera nem renova automaticamente o histórico.
-10. Repita em celular/tablet, inclusive girando o aparelho com formulário aberto.
+10. Teste Sair e Sair e salvar rascunho. Reabra a avaliação e retome o rascunho.
+11. Repita em celular/tablet, inclusive girando o aparelho com formulário aberto.
 
 Código independente: [lancamentos.html](prototipos/lancamentos.html).
 O mesmo conteúdo é publicado por `Lancamentos_Prototipo_Demo.html` no menu
 **Lançamentos (protótipo)**, mantendo Lançamentos atual até homologação posterior.
 
-Verificação reproduzível: `python tests/lancamentos-prototipo-browser.py`.
+Verificação reproduzível: `python tests/lancamentos-prototipo-browser.py` e
+`python tests/lancamentos-refinamento-browser.py`.
 Passou em Chromium para computador, tablet, smartphone/rotação e frame isolado;
 as interações de demonstração não fizeram requisições externas. Os testes também
 conferem resultado econômico/caixa, sugestões, campos preservados, geração,
