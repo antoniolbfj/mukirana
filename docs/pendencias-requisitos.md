@@ -17,7 +17,8 @@ Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
   concluídos. Detalhes em [cartoes-entrega.md](cartoes-entrega.md).
 - Requisitos de Lançamentos revistos no documento v0.1 e conciliados com as decisões
   posteriores e a base homologada. Protótipo HTML/CSS/JavaScript com dados fictícios
-  e duas interfaces. Ver [proposta-lancamentos.md](proposta-lancamentos.md).
+  e duas interfaces na **avaliação, versão 37**, menu **Lançamentos (protótipo)**.
+  Ver [proposta-lancamentos.md](proposta-lancamentos.md).
 
 ## Pendências vigentes
 

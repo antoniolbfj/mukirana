@@ -151,5 +151,14 @@ O mesmo conteúdo é publicado por `Lancamentos_Prototipo_Demo.html` no menu
 **Lançamentos (protótipo)**, mantendo Lançamentos atual até homologação posterior.
 
 Verificação reproduzível: `python tests/lancamentos-prototipo-browser.py`.
-Publicação e limites da conferência remota serão registrados em
-`docs/lancamentos-prototipo-publicacao.json`.
+Passou em Chromium para computador, tablet, smartphone/rotação e frame isolado;
+as interações de demonstração não fizeram requisições externas. Os testes também
+conferem resultado econômico/caixa, sugestões, campos preservados, geração,
+rateio em centavos, decisão individual, alcances de edição/exclusão e Desfazer.
+
+Publicada na **avaliação, versão 37**. Os 63 arquivos dessa versão foram baixados
+e comparados byte a byte com o commit `635bc2a`. A produção permanece na versão 36
+com Contas/Cartões homologados, sem este menu de protótipo. O acesso remoto
+autenticado com a sessão real do usuário não foi automatizado; a conferência
+remota é do código imutável e da configuração da implantação.
+[Registro da publicação](lancamentos-prototipo-publicacao.json).

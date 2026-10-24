@@ -16,4 +16,4 @@
 - Competência das compras registradas é persistida: alterar fechamento não reclassifica histórico; mudanças explícitas de data/origem recalculam a compra afetada.
 
 - Após homologação explícita de Cartões, a produção foi promovida à versão 36, conferida byte a byte com o commit 4659a9b. A versão 35 era somente de avaliação; seus registros permanecem históricos. Ver docs/cartoes-promocao.json.
-- Lançamentos está em fase de protótipo local com dados fictícios, no menu provisório LancamentosPrototipo, somente na implantação de avaliação. Manter o Lançamentos conectado atual na produção. Ver docs/proposta-lancamentos.md e docs/lancamentos-prototipo-publicacao.json.
+- Lançamentos está em fase de protótipo com dados fictícios, no menu provisório LancamentosPrototipo, somente na implantação de avaliação versão 37. Manter o Lançamentos conectado atual na produção versão 36. Ver docs/proposta-lancamentos.md e docs/lancamentos-prototipo-publicacao.json.
