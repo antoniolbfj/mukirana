@@ -1,7 +1,7 @@
 # Entrega da nova tela de Contas
 
 24/10/2026. Implementação autorizada pelo usuário, com menu provisório e duas
-interfaces próprias. Aguarda homologação antes da troca do acesso principal.
+interfaces próprias. Homologada pelo usuário nesta conversa e promovida ao acesso principal Contas.
 
 ## Funcionamento
 
@@ -99,3 +99,12 @@ envio. O backend passou a usar soma decimal textual exata para agregados e núme
 seguros para valores individuais limitados pelo schema. A implementação foi
 verificada com valores acima do limite seguro de Number e o push final passou.
 O navegador usa inteiros BigInt e os contratos transportam centavos como texto.
+
+## Homologação e promoção
+
+O usuário homologou a nova tela e determinou sua permanência como principal.
+O menu **Contas** passa a renderizar as duas interfaces aprovadas; o item
+**Contas (nova)** foi removido. O atalho do saldo inicial nos Lançamentos abre
+**Contas**. A rota anterior continua como alias de compatibilidade para páginas
+já abertas, sem menu público duplicado. Os identificadores da promoção serão
+registrados após a atualização das implantações.

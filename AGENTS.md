@@ -9,3 +9,5 @@
 - Distinguir implementação, publicação e homologação. Identificar a implantação de teste e a de produção antes de publicar.
 - Recriar cada tela com uma rota e um menu provisórios para avaliação. Manter a tela atual como acesso principal até a homologação explícita do usuário; só então substituí-la pela nova e remover o menu provisório.
 - Credenciais permanecem nas propriedades privadas do Apps Script ou no ambiente configurado. Não copiar chaves para arquivos versionados nem para HTML.
+- Contas remodelada foi homologada pelo usuário e passa a ser a tela principal; Cartões é a próxima tela em análise/proposta.
+- Revisar a paleta global somente depois de remodelar todas as telas, conforme orientação do usuário. Até lá, preservar a identidade visual disponível e concentrar as rodadas em estrutura, componentes e fluxos.

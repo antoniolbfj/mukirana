@@ -229,7 +229,7 @@
     if(window.MukiranaContasNova===api){document.body.classList.remove('contas-nova-smartphone');document.body.style.overflow='';delete window.MukiranaContasNova;}
   }
   const api={destroy,refresh:reload};window.MukiranaContasNova=api;
-  if(typeof registrarTelaAtualMukirana==='function')registrarTelaAtualMukirana('ContasNova',{atualizarPeriodoGlobal:reload,obterContextoNovoLancamento:filters});
+  if(typeof registrarTelaAtualMukirana==='function')registrarTelaAtualMukirana('Contas',{atualizarPeriodoGlobal:reload,obterContextoNovoLancamento:filters});
   reload();
 })();
 </script>

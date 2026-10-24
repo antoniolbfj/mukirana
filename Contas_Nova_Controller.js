@@ -1,4 +1,4 @@
-/** Fronteira autenticada da tela provisória; ambas as interfaces usam os mesmos contratos. */
+/** Fronteira autenticada de Contas; ambas as interfaces usam os mesmos contratos. */
 const ContasNova_ = Object.freeze({
   uuid: function (value) { return typeof value === 'string' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value); },
   date: function (value) {

@@ -52,13 +52,14 @@ Detalhes da preparação e limites da validação estão em
 [docs/reinicio.md](docs/reinicio.md). O escopo vigente está em
 [docs/pendencias-requisitos.md](docs/pendencias-requisitos.md).
 
-## Nova tela de Contas
+## Remodelagem das telas
 
-Implementadas interfaces próprias para computadores/tablets e smartphones no
-menu provisório **Contas (nova)**. A migração dos saldos iniciais foi aplicada no
-Supabase, preservando os registros existentes e a compatibilidade da tela atual.
-Detalhes, testes e publicação: [entrega de Contas](docs/contas-entrega.md).
-A substituição do acesso principal depende da homologação das duas interfaces.
+Contas possui duas interfaces próprias (computadores/tablets e smartphones), foi
+homologada e passou a ser o acesso principal **Contas**, sem menu provisório.
+O saldo inicial é um lançamento especial; a migração foi aplicada no Supabase.
+[Entrega de Contas](docs/contas-entrega.md).
 
-[Abrir versão 33 para avaliar Contas](https://script.google.com/macros/s/AKfycbxg6KevdfXzs3WucB23XtRzIg_px8HyQZxjqze8Iwtsegit6XFsjmpZUSFQv9qR7LRJ/exec)
-— menu lateral **Contas (nova)**. A implantação de produção anterior foi preservada.
+A próxima tela é **Cartões**. Foram concluídos o [estudo técnico](docs/estudo-cartoes.md)
+e a [proposta com prévias](docs/proposta-cartoes.md). Cartões permanece com a tela
+atual enquanto a proposta é avaliada. A paleta global será revista após a
+remodelagem das telas.

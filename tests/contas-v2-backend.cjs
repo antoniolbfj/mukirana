@@ -33,3 +33,13 @@ const add=(a,b)=>vm.runInContext('ContasNova_.addCents('+JSON.stringify(a)+','+J
 for(const [a,b] of [['9999999999999999999999999','1'],['1000','-1'],['-1','1000'],['-300','-700'],['0','-1'],['-900','900'],['199','-299'],['-1000','1'],['99','99'],['900719925474099100','-1']])assert.equal(add(a,b),(BigInt(a)+BigInt(b)).toString());
 for(let i=0;i<1000;i++){const a=String(Math.trunc((Math.random()-.5)*2e14)),b=String(Math.trunc((Math.random()-.5)*2e14));assert.equal(add(a,b),(BigInt(a)+BigInt(b)).toString());}
 console.log('Exact decimal sum for Apps Script, including aggregates beyond safe Number: PASS');
+
+// Homologação: a rota principal e os acessos contextuais abrem a tela aprovada.
+const router = vm.createContext({obterSessaoObrigatoria:()=>({id}),HtmlService:{createTemplateFromFile:n=>({evaluate:()=>({getContent:()=>n})})}});
+vm.runInContext(fs.readFileSync('App_Main.js','utf8'),router);
+assert.equal(router.obterHtmlDaTela('Contas','valid'),'Contas_Nova_View');
+assert.equal(router.obterHtmlDaTela('ContasNova','valid'),'Contas_Nova_View');
+assert.equal((fs.readFileSync('Index.html','utf8').match(/onclick="navegarPara\('Contas'\)"/g)||[]).length,1);
+assert.equal(fs.readFileSync('Index.html','utf8').includes('Contas (nova)'),false);
+assert.equal(fs.readFileSync('Lancamentos_View.html','utf8').includes("navegarPara('ContasNova')"),false);
+console.log('Approved Accounts promoted to main route, single menu and compatible alias: PASS');

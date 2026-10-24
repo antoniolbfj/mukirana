@@ -1,32 +1,31 @@
 # Pendências da base atual — Mukirana
 
-Atualizado em 24/10/2026. Base: Mukirana 1.9, importada da versão 32,
-com Supabase `wcczkultokrypdfimbsh`.
+Atualizado em 24/10/2026. Base em produção: Mukirana 1.9 remodelada por etapas;
+Supabase `wcczkultokrypdfimbsh`.
 
-## Rodada de Contas
+## Concluído nesta rodada
 
-Implementadas duas interfaces dedicadas, computadores/tablets e smartphones,
-conectadas ao banco no menu provisório **Contas (nova)**. A tela atual continua
-no menu **Contas**. Implementados cadastro, edição, compartilhamento, busca,
-filtros, histórico paginado, inativação/restauração e Desfazer.
-
-Saldo inicial convertido em lançamento especial com vínculo estável, valor com
-sinal, data e descrição automática. Data dos saldos existentes: lançamento mais
-antigo de cada conta, incluindo transferências recebidas; sem movimentos, data
-de criação do cadastro em São Paulo. Operações da nova tela são atômicas,
-verificam versão concorrente e permitem repetir a última operação sem duplicar.
-Cálculos adaptados para data e exclusão dos totais operacionais.
-
-Migração aplicada no Supabase e reconciliada; testes de banco, autorização,
-concorrência e navegador concluídos. Detalhes em [contas-entrega.md](contas-entrega.md).
-Publicada a versão 33 para avaliação, com 55 arquivos conferidos byte a byte.
-Implementação e publicação não substituem a homologação do usuário.
+- Contas homologada pelo usuário e promovida à rota principal **Contas**.
+  Menu provisório removido; edição contextual do saldo inicial usa a rota principal.
+  Duas interfaces dedicadas e regras de saldo/compartilhamento preservadas.
+- Cartões estudado no código e no catálogo real do Supabase. Comparadas as relações,
+  permissões, consultas, gravações, faturas, pagamentos, parcelas e recorrências.
+- Elaboradas [proposta de Cartões](proposta-cartoes.md) e prévias dedicadas para
+  computadores/tablets e smartphones, com dados fictícios. Ainda não conectadas.
+- Paleta global adiada por orientação do usuário para depois da remodelagem de todas as telas.
 
 ## Pendências vigentes
 
-1. Homologar a nova tela de Contas nas duas interfaces, com os dados reais e a sessão Google do usuário; avaliar também as previsões e os saldos nos períodos utilizados.
-2. Depois da homologação explícita, substituir o acesso principal de Contas pela nova tela e retirar o menu provisório.
-3. Definir e priorizar a próxima tela da versão em produção a recriar.
+1. Avaliar/aprovar a proposta de Cartões nas duas interfaces e o contrato de valores
+   (registrado, pago, em aberto, previsto e escopo do adicional). Detalhar o tratamento
+   de alterações de fechamento e pagamentos pendentes antes da mudança correspondente.
+2. Implementar Cartões conectado no menu provisório, com consultas sob demanda,
+   gravação atômica, proteção de edição concorrente e preservação dos IDs/histórico.
+3. Validar e homologar Cartões em computadores/tablets e smartphones; então promover
+   a tela e retirar seu menu provisório.
+4. Escolher e remodelar as demais telas da base atual, incluindo a UX detalhada de
+   Faturas/pagamentos em rodada própria.
+5. Depois de remodelar todas as telas, revisar e unificar a paleta de cores do sistema.
 
-O backlog da implementação anterior permanece arquivado com aquela versão.
-Não representa funcionalidades ausentes da base atual.
+Não há pendência de homologação ou promoção da tela de Contas. O backlog da versão
+anterior ao reinício permanece arquivado e não define as pendências da base atual.

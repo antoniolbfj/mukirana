@@ -2399,7 +2399,7 @@
         btnSaldo.textContent = 'Editar saldo inicial';
         btnSaldo.addEventListener('click', function() {
           sessionStorage.setItem('mukirana_contas_nova_editar', lancamento.ID_Origem);
-          navegarPara('ContasNova');
+          navegarPara('Contas');
         });
         container.appendChild(btnSaldo);
       } else container.textContent = 'Saldo inicial';
