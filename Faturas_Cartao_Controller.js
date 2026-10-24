@@ -41,9 +41,11 @@ function obterPacoteFaturaCartao(tokenSessao, filtros) {
   const categoriasFiltro = medirEtapaPerformance_(medidor, "normalizar_filtro_categorias", function() {
     return montarMapaIdsFiltroFaturaCartaoController_(filtros && filtros.ID_Categoria);
   });
+  const detalheNovo = bancoUsaSupabase_() ? CartoesNovo_.detail(sessao.id, idGrupo, CartoesNovo_.period(intervalo)) : null;
   const cartoesDoGrupoAcessiveis = medirEtapaPerformance_(medidor, "filtrar_cartoes_grupo", function() {
-    return contexto.cartoesAcessiveis.filter(function(cartao) {
-      return normalizarTextoConsolidadoController_(cartao.ID_Grupo_Cartao) === idGrupo;
+    return (detalheNovo ? contexto.cartoesTodos : contexto.cartoesAcessiveis).filter(function(cartao) {
+      return normalizarTextoConsolidadoController_(cartao.ID_Grupo_Cartao) === idGrupo &&
+        (!detalheNovo || detalheNovo.cards.some(function(c) { return c.id === cartao.ID_Cartao; }));
     });
   });
 
@@ -97,7 +99,9 @@ function obterPacoteFaturaCartao(tokenSessao, filtros) {
     return montarSubtotaisCartoesFaturaController_(cartoesDoGrupoAcessiveis, lancamentos, recorrenciasPrevistas);
   });
   const pagamentos = medirEtapaPerformance_(medidor, "filtrar_pagamentos_fatura", function() {
-    return filtrarPagamentosFaturaCartaoController_(contexto.pagamentosFaturasTodos || [], idGrupo, intervalo);
+    return filtrarPagamentosFaturaCartaoController_(contexto.pagamentosFaturasTodos || [], idGrupo, intervalo).filter(function(p) {
+      return !detalheNovo || detalheNovo.group.canEdit || p.Criado_Por_ID === sessao.id || contexto.contasAcessiveis.some(function(c) { return c.ID_Conta === p.ID_Conta; });
+    });
   });
   const total = subtotais.reduce(function(soma, item) {
     return soma + converterNumeroConsolidadoController_(item.Valor_Total);
@@ -197,6 +201,7 @@ function obterPacoteFaturaCartao(tokenSessao, filtros) {
   registrarContagemPerformance_(medidor, "lancamentosFatura", lancamentos.length);
   registrarContagemPerformance_(medidor, "pagamentosFatura", pagamentos.length);
 
+  if (detalheNovo) aplicarResumoCartoesNovoNaFatura_(pacote, sessao, intervalo, detalheNovo, contexto);
   pacote._performance = finalizarPerformance_(medidor);
   return pacote;
 }
@@ -397,7 +402,7 @@ function validarDadosPagamentoFaturaCartaoController_(sessao, dados, idPagamento
     const idOrigem = normalizarTextoConsolidadoController_(lancamento.ID_Origem);
 
     if (mesLancamento === mesReferencia && idsCartoesGrupo[idOrigem] === true) {
-      return soma + converterNumeroConsolidadoController_(lancamento.Valor_Total);
+      return soma + calcularImpactoCompromissoCartaoConsolidadoController_(lancamento.Tipo, lancamento.Valor_Total);
     }
 
     return soma;
@@ -406,13 +411,22 @@ function validarDadosPagamentoFaturaCartaoController_(sessao, dados, idPagamento
     Mes_Inicial: mesReferencia,
     Mes_Final: ""
   }).reduce(function(soma, pagamento) {
-    if (idPagamentoAtual && normalizarTextoConsolidadoController_(pagamento.ID_Pagamento_Fatura) === idPagamentoAtual) {
+    if (pagamento.Status !== "Efetivado" || (idPagamentoAtual && normalizarTextoConsolidadoController_(pagamento.ID_Pagamento_Fatura) === idPagamentoAtual)) {
       return soma;
     }
 
     return soma + converterNumeroConsolidadoController_(pagamento.Valor);
   }, 0);
-  const saldoEmAberto = arredondarConsolidadoController_(Math.max(0, totalFatura - totalPago));
+  if (idPagamentoAtual) {
+    const original = listarPagamentosFaturasModel_().find(function(p) { return p.ID_Pagamento_Fatura === idPagamentoAtual; });
+    if (!original || original.ID_Grupo_Cartao !== idGrupo || !contexto.contasAcessiveis.some(function(c) { return c.ID_Conta === original.ID_Conta; })) {
+      throw new Error('Você não tem acesso ao pagamento original.');
+    }
+  }
+  const limiteNovo = bancoUsaSupabase_() ? CartoesNovo_.rpc('rpc_cartoes_pagamento_base_v2', {
+    p_usuario: sessao.id, p_grupo: idGrupo, p_mes: mesReferencia + '-01', p_excluir: idPagamentoAtual || null
+  }) : null;
+  const saldoEmAberto = limiteNovo ? CartoesNovo_.legacyNumber(limiteNovo.maxCents) : arredondarConsolidadoController_(Math.max(0, totalFatura - totalPago));
 
   if (valor > saldoEmAberto) {
     const recorrenciasPrevistas = listarRecorrenciasPrevistasFaturaCartaoController_(
@@ -585,6 +599,8 @@ function montarPagamentoFaturaParaTelaController_(pagamento, contexto) {
 
   return {
     ID_Pagamento_Fatura: pagamento.ID_Pagamento_Fatura,
+    Pode_Editar: (contexto.contasAcessiveis || []).some(function(c) { return c.ID_Conta === pagamento.ID_Conta; }) && (contexto.cartoesAcessiveis || []).some(function(c) { return c.ID_Grupo_Cartao === pagamento.ID_Grupo_Cartao; }),
+    Pode_Excluir: (contexto.contasAcessiveis || []).some(function(c) { return c.ID_Conta === pagamento.ID_Conta; }),
     ID_Conta: pagamento.ID_Conta,
     Nome_Conta: conta ? conta.Nome_Conta : "Conta",
     Valor: converterNumeroConsolidadoController_(pagamento.Valor),
@@ -630,8 +646,7 @@ function montarSubtotaisCartoesFaturaController_(cartoes, lancamentos, recorrenc
       return;
     }
 
-    mapa[idCartao].Valor_Total += converterNumeroConsolidadoController_(item.Valor_Total);
-    mapa[idCartao].Quantidade += converterNumeroConsolidadoController_(item.Quantidade || 0);
+    // Previsões ficam separadas do valor e da quantidade já registrados.
     mapa[idCartao].Valor_Recorrencias_Previstas = arredondarConsolidadoController_(
       converterNumeroConsolidadoController_(mapa[idCartao].Valor_Recorrencias_Previstas || 0) +
       converterNumeroConsolidadoController_(item.Valor_Total)
@@ -751,6 +766,7 @@ function ordenarLancamentosFaturaCartaoController_(lancamentos) {
 
 
 function listarRecorrenciasPrevistasFaturaCartaoController_(contexto, cartoesDoGrupoAcessiveis, intervalo, categoriasFiltro) {
+  if (bancoUsaSupabase_()) return previsoesCartoesNovoParaFatura_(contexto, cartoesDoGrupoAcessiveis, intervalo, categoriasFiltro);
   const mapaCartoes = {};
   const inicioMes = normalizarTextoConsolidadoController_(intervalo && intervalo.Mes_Inicial);
   const fimMes = normalizarTextoConsolidadoController_(intervalo && intervalo.Mes_Final) || inicioMes;

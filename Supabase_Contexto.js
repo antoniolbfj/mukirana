@@ -235,6 +235,7 @@ function montarGrupoCartaoRpc_(item, indice) {
     _linhaPlanilha: indice + 2,
     ID_Grupo_Cartao: item.id_grupo_cartao || "",
     ID_Titular: item.id_titular || "",
+    Versao: item.versao,
     Nome_Grupo: item.nome_grupo || "",
     Limite: numeroRpc_(item.limite),
     Dia_Fechamento: item.dia_fechamento || "",

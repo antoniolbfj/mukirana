@@ -142,3 +142,10 @@ ou separação clara entre tarefa principal, edição e detalhes.
 
 A unidade a manter na lista é a fatura/grupo. Cartões do titular e dos adicionais
 ficam em um detalhe progressivo, sem repetição do limite para cada adicional.
+
+## Evolução após o estudo
+
+Este documento descreve a base analisada na versão 34. A implementação posterior
+em **Cartões (novo)** trata carregamento, gravação e resumo conforme a
+[entrega](cartoes-entrega.md). A preservação de competências foi implementada e a
+permissão de pagamentos para adicionais foi confirmada pelo usuário.

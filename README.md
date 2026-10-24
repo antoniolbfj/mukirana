@@ -59,9 +59,9 @@ homologada e passou a ser o acesso principal **Contas**, sem menu provisório.
 O saldo inicial é um lançamento especial; a migração foi aplicada no Supabase.
 [Entrega de Contas](docs/contas-entrega.md).
 
-A próxima tela é **Cartões**. Foram concluídos o [estudo técnico](docs/estudo-cartoes.md)
-e a [proposta com prévias](docs/proposta-cartoes.md). Cartões permanece com a tela
-atual enquanto a proposta é avaliada. A paleta global será revista após a
+Cartões foi implementado no menu provisório **Cartões (novo)**, com duas interfaces
+dedicadas e dados reais. O acesso **Cartões** atual permanece até a homologação.
+[Entrega e testes de Cartões](docs/cartoes-entrega.md). A paleta global será revista após a
 remodelagem das telas.
 
 [Produção com Contas homologada — versão 34](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec).

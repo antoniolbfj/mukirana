@@ -1,6 +1,7 @@
 # Proposta de remodelagem de Cartões
 
-24/10/2026. Proposta para avaliação; ainda não implementada no sistema.
+24/10/2026. Proposta aprovada para implementação; conectada no menu provisório, aguardando homologação.
+Detalhes em [cartoes-entrega.md](cartoes-entrega.md).
 Base técnica: [estudo de código e banco](estudo-cartoes.md).
 Contas foi homologada e promovida ao acesso principal nesta rodada.
 A paleta global será revista **depois de remodelar todas as telas**, conforme o usuário.

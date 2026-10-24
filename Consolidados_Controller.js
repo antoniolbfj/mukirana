@@ -2594,6 +2594,9 @@ function calcularMesCompetenciaCartaoPorDataConsolidadoController_(dataOcorrenci
 
 
 function obterMesCompetenciaCartaoLancamentoConsolidadoController_(lancamento, contexto) {
+  // Compras registradas mantêm a competência persistida ao mudar o fechamento.
+  const registrada = normalizarTextoConsolidadoController_(lancamento.Mes_Referencia);
+  if (/^\d{4}-(0[1-9]|1[0-2])(?:-01)?$/.test(registrada)) return registrada.slice(0,7);
   if (!ehTipoOrigemCartaoConsolidadoController_(lancamento.Tipo_Origem)) {
     return normalizarTextoConsolidadoController_(lancamento.Mes_Referencia);
   }

@@ -121,13 +121,17 @@ function processarSalvarCartao(dadosFormulario, tokenSessao) {
       _linhaPlanilha: linhaGrupoConfiavel
     };
 
-    salvarGrupoCartaoModel_(grupo);
-    sincronizarCartoesFisicosDoGrupoCartaoController_(
-      grupo,
-      idsAdicionais,
-      cartoes,
-      mapaUsuariosAtivos
-    );
+    if (bancoUsaSupabase_()) {
+      const cents = Math.round(grupo.Limite * 100);
+      if (!Number.isSafeInteger(cents) || cents < 0) throw new Error('Informe um limite válido.');
+      CartoesNovo_.rpc('rpc_cartoes_salvar_v2', { p_usuario: idLogado, p_grupo: idGrupo,
+        p_versao: grupoOriginal ? grupoOriginal.Versao : 0, p_operacao: Utilities.getUuid(),
+        p_nome: grupo.Nome_Grupo, p_limite_cents: String(cents), p_fechamento: grupo.Dia_Fechamento,
+        p_vencimento: grupo.Dia_Vencimento, p_adicionais: idsAdicionais });
+    } else {
+      salvarGrupoCartaoModel_(grupo);
+      sincronizarCartoesFisicosDoGrupoCartaoController_(grupo, idsAdicionais, cartoes, mapaUsuariosAtivos);
+    }
 
     return isEdicao
       ? "Grupo de cartoes atualizado com sucesso!"
@@ -332,6 +336,7 @@ function montarMapaGruposComVinculoFinanceiroCartaoController_(idLogado, cartoes
 
 
 function montarConsolidadoPeriodoCartoesController_(sessao, intervalo, gruposBase, medidorPerformance) {
+  if (bancoUsaSupabase_()) return resumoCartoesNovoLegado_(sessao, intervalo);
   const inicio = intervalo && intervalo.Mes_Inicial ? intervalo.Mes_Inicial : "";
   const fim = intervalo && intervalo.Mes_Final ? intervalo.Mes_Final : "";
   const idLogado = normalizarTextoCartaoController_(sessao.id);
@@ -617,10 +622,10 @@ function alternarStatusCartao(idGrupoCartao, tokenSessao) {
 
   const novoStatus = !normalizarBooleanoCartaoController_(grupo.Ativo);
   medirEtapaPerformance_(medidor, "alterar_status", function() {
-    alterarStatusGrupoCartaoModel_(
-      typeof bancoUsaSupabase_ === "function" && bancoUsaSupabase_() ? idGrupo : grupo._linhaPlanilha,
-      novoStatus
-    );
+    if (bancoUsaSupabase_()) {
+      CartoesNovo_.rpc('rpc_cartoes_status_v2', { p_usuario: idLogado, p_grupo: idGrupo,
+        p_versao: grupo.Versao, p_operacao: Utilities.getUuid(), p_ativo: novoStatus });
+    } else alterarStatusGrupoCartaoModel_(grupo._linhaPlanilha, novoStatus);
   });
   finalizarPerformance_(medidor);
 
@@ -748,7 +753,7 @@ function sincronizarCartoesFisicosDoGrupoCartaoController_(grupo, idsAdicionais,
     const deveInativar = tipo === "Adicional" && !idsAdicionaisMapa[idUsuario];
 
     if (deveInativar && normalizarBooleanoCartaoController_(cartao.Ativo)) {
-      alterarStatusCartaoFisicoModel_(cartao._linhaPlanilha, false);
+      alterarStatusCartaoFisicoModel_(bancoUsaSupabase_() ? cartao.ID_Cartao : cartao._linhaPlanilha, false);
     }
   });
 }

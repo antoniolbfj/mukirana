@@ -1,32 +1,30 @@
 # Pendências da base atual — Mukirana
 
-Atualizado em 24/10/2026. Base em produção: Mukirana 1.9 remodelada por etapas;
-Supabase `wcczkultokrypdfimbsh`.
+Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
 
 ## Concluído nesta rodada
 
-- Contas homologada pelo usuário e promovida à rota principal **Contas**.
-  Menu provisório removido; edição contextual do saldo inicial usa a rota principal.
-  Versão 34 publicada no endereço principal e no endereço de avaliação anterior.
-  Duas interfaces dedicadas e regras de saldo/compartilhamento preservadas.
-- Cartões estudado no código e no catálogo real do Supabase. Comparadas as relações,
-  permissões, consultas, gravações, faturas, pagamentos, parcelas e recorrências.
-- Elaboradas [proposta de Cartões](proposta-cartoes.md) e prévias dedicadas para
-  computadores/tablets e smartphones, com dados fictícios. Ainda não conectadas.
-- Paleta global adiada por orientação do usuário para depois da remodelagem de todas as telas.
+- Contas permanece homologada e principal, sem menu provisório.
+- Cartões implementado no menu provisório **Cartões (novo)**, com interfaces próprias
+  para computadores/tablets e smartphones. **Cartões** atual mantido.
+- Cadastro, adicionais, busca/filtros, consulta por competência, navegação real para
+  Fatura/Lançamentos, inativação/restauração e Desfazer conectados ao Supabase.
+- Gravação atômica, versão concorrente, repetição segura, IDs/histórico preservados e
+  competência histórica persistida. Resumo coerente com Fatura: registrado/pago/
+  programado/previsto separados e visão parcial identificada para o adicional.
+- Usuário confirmou: adicional continua registrando pagamentos com contas acessíveis.
+- Migração aplicada e conferida; testes de banco, concorrência, backend e navegador
+  concluídos. Detalhes em [cartoes-entrega.md](cartoes-entrega.md).
 
 ## Pendências vigentes
 
-1. Avaliar/aprovar a proposta de Cartões nas duas interfaces e o contrato de valores
-   (registrado, pago, em aberto, previsto e escopo do adicional). Detalhar o tratamento
-   de alterações de fechamento e pagamentos pendentes antes da mudança correspondente.
-2. Implementar Cartões conectado no menu provisório, com consultas sob demanda,
-   gravação atômica, proteção de edição concorrente e preservação dos IDs/histórico.
-3. Validar e homologar Cartões em computadores/tablets e smartphones; então promover
-   a tela e retirar seu menu provisório.
-4. Escolher e remodelar as demais telas da base atual, incluindo a UX detalhada de
-   Faturas/pagamentos em rodada própria.
-5. Depois de remodelar todas as telas, revisar e unificar a paleta de cores do sistema.
+1. Homologar Cartões (novo) nas duas interfaces, com dados reais: cadastro/adicionais,
+   fechamento, valores por competência, previsões e pagamentos como titular/adicional.
+2. Depois da homologação explícita, substituir o acesso principal de Cartões pela
+   nova tela e retirar seu menu provisório.
+3. Escolher e remodelar as demais telas da base atual, incluindo a UX detalhada de
+   Faturas/pagamentos em rodada própria. A tela de Fatura recebeu compatibilidade
+   dos cálculos/rótulos, mas ainda não foi remodelada nas duas interfaces dedicadas.
+4. Ao concluir a remodelagem das telas, revisar e unificar a paleta de cores do sistema.
 
-Não há pendência de homologação ou promoção da tela de Contas. O backlog da versão
-anterior ao reinício permanece arquivado e não define as pendências da base atual.
+O backlog anterior ao reinício permanece arquivado e não define o que falta nesta base.

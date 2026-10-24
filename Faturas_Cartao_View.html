@@ -381,6 +381,7 @@
     <strong>Como funciona:</strong><br>
     A tela mostra compras, pagamentos e saldo em aberto da fatura. Para pagar cartao, use o botao Pagar fatura; nao cadastre esse pagamento como despesa.
     <div style="margin-top:10px;">
+      <button type="button" class="btn-secundario" onclick="voltarAosCartoesDaFatura()">Voltar aos cartões</button>
       <button type="button" class="btn-primario" onclick="abrirModalPagamentoFaturaCartao()">Pagar fatura</button>
     </div>
   </div>
@@ -407,7 +408,7 @@
     <strong id="fatura_nome">-</strong>
   </div>
   <div class="fatura-resumo-item">
-    <span>Total do periodo</span>
+    <span id="fatura_rotulo_total">Registrado no período</span>
     <strong id="fatura_total">R$ 0,00</strong>
     <span id="fatura_total_recorrencias" class="fatura-valor-meta"></span>
   </div>
@@ -424,11 +425,13 @@
     <strong id="fatura_qtd">0</strong>
   </div>
   <div class="fatura-resumo-item">
-    <span>Limite disponivel</span>
+    <span>Disponível estimado no recorte</span>
     <strong id="fatura_limite_disponivel">R$ 0,00</strong>
   </div>
 </div>
 
+<p id="fatura_escopo" class="texto-ajuda"></p>
+<p id="fatura_programados" class="texto-ajuda"></p>
 <div class="fatura-limite-bloco">
   <div class="fatura-limite-topo">
     <div>
@@ -548,8 +551,13 @@
   var parametrosFaturaCartao = obterParametrosFaturaCartao();
   var pacoteFaturaCartao = null;
   var selecaoLancamentosFaturaCartao = {};
+  var faturaCartaoRequestId = 0;
 
   inicializarFaturaCartao();
+
+  function voltarAosCartoesDaFatura() {
+    navegarPara(parametrosFaturaCartao.Retorno_Tela === 'CartoesNovo' ? 'CartoesNovo' : 'Cartoes');
+  }
 
   function inicializarFaturaCartao() {
     aplicarPeriodoGlobalFaturaCartao_();
@@ -583,7 +591,7 @@
     if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
       var periodo = obterFiltroPeriodoGlobalMukirana() || {};
       return {
-        Mes_Inicial: periodo.Mes_Inicial || periodo.Mes_Referencia || gerarMesAtualFaturaCartao(),
+        Mes_Inicial: periodo.Mes_Inicial || periodo.Mes_Referencia || '',
         Mes_Final: periodo.Mes_Final || ''
       };
     }
@@ -596,21 +604,25 @@
 
   function aplicarPeriodoGlobalFaturaCartao_() {
     var periodo = obterPeriodoGlobalFaturaCartao_();
-    document.getElementById('fatura_mes').value = periodo.Mes_Inicial || gerarMesAtualFaturaCartao();
+    document.getElementById('fatura_mes').value = periodo.Mes_Inicial || '';
     document.getElementById('fatura_mes_final').value = periodo.Mes_Final || '';
   }
 
   function carregarFaturaCartao() {
+    var requestId = ++faturaCartaoRequestId;
+    var rootRequest = document.getElementById("fatura_nome");
     aplicarPeriodoGlobalFaturaCartao_();
     var periodo = obterPeriodoGlobalFaturaCartao_();
 
     google.script.run
       .withSuccessHandler(function(pacote) {
+        if (!rootRequest.isConnected || rootRequest !== document.getElementById("fatura_nome") || requestId !== faturaCartaoRequestId) return;
         pacoteFaturaCartao = pacote || {};
         renderizarFaturaCartao();
         finalizarCarregamentoTelaMukirana();
       })
       .withFailureHandler(function(erro) {
+        if (!rootRequest.isConnected || rootRequest !== document.getElementById("fatura_nome") || requestId !== faturaCartaoRequestId) return;
         finalizarCarregamentoTelaMukirana();
         mostrarNotificacao("Erro ao carregar fatura: " + erro.message, "erro");
       })
@@ -663,14 +675,14 @@
 
     document.getElementById('fatura_nome').textContent = pacoteFaturaCartao.Nome_Grupo || 'Fatura';
     document.getElementById('fatura_total').textContent = 'R$ ' + formatarNumeroFaturaCartao(total);
-    document.getElementById('fatura_total_recorrencias').textContent = totalRecorrenciasPrevistas > 0
-      ? 'Inclui R$ ' + formatarNumeroFaturaCartao(totalRecorrenciasPrevistas) + ' de recorrencias previstas.'
+    document.getElementById('fatura_total_recorrencias').textContent = totalRecorrenciasPrevistas !== 0
+      ? 'Previsto, separado: R$ ' + formatarNumeroFaturaCartao(totalRecorrenciasPrevistas)
       : '';
     document.getElementById('fatura_pago').textContent = 'R$ ' + formatarNumeroFaturaCartao(pago);
     document.getElementById('fatura_em_aberto').textContent = 'R$ ' + formatarNumeroFaturaCartao(emAberto);
     document.getElementById('fatura_qtd').textContent = lancamentos.length;
     document.getElementById('fatura_limite_disponivel').textContent = 'R$ ' + formatarNumeroFaturaCartao(disponivel);
-    document.getElementById('fatura_limite_topo').textContent = 'R$ ' + formatarNumeroFaturaCartao(total) + ' de R$ ' + formatarNumeroFaturaCartao(limite);
+    document.getElementById('fatura_limite_topo').textContent = 'R$ ' + formatarNumeroFaturaCartao(emAberto) + ' de R$ ' + formatarNumeroFaturaCartao(limite);
     document.getElementById('fatura_percentual').textContent = formatarPercentualFaturaCartao(percentual);
     document.getElementById('fatura_limite_progresso').style.width = progresso + '%';
     document.getElementById('fatura_meta_fechamento').textContent = 'Fechamento: dia ' + (pacoteFaturaCartao.Dia_Fechamento || '-');
@@ -681,6 +693,15 @@
       : 'Uso dentro do limite cadastrado';
     document.getElementById('fatura_meta_excedido').className = excedido > 0 ? 'fatura-limite-alerta' : '';
 
+    var parcial = pacoteFaturaCartao.Escopo_Parcial === true;
+    document.getElementById('fatura_rotulo_total').textContent = parcial ? 'Seus lançamentos no período' : 'Registrado no período';
+    ['fatura_pago', 'fatura_em_aberto'].forEach(function(id) { document.getElementById(id).parentElement.style.display = parcial ? 'none' : ''; });
+    document.getElementById('fatura_limite_disponivel').parentElement.style.display = pacoteFaturaCartao.Limite_Comparavel === false ? 'none' : '';
+    document.querySelector('.fatura-limite-bloco').style.display = pacoteFaturaCartao.Limite_Comparavel === false ? 'none' : '';
+    document.getElementById('fatura_escopo').textContent = (pacoteFaturaCartao.Resumo_Escopo || '') + ' Fecha dia ' + (pacoteFaturaCartao.Dia_Fechamento || '-') + ' · vence dia ' + (pacoteFaturaCartao.Dia_Vencimento || '-') + '.';
+    document.getElementById('fatura_programados').textContent = parcial ? '' : 'Pagamentos programados: R$ ' + formatarNumeroFaturaCartao(pacoteFaturaCartao.Valor_Pagamentos_Programados || 0) + ' · Crédito no recorte: R$ ' + formatarNumeroFaturaCartao(pacoteFaturaCartao.Valor_Credito || 0);
+    document.querySelector('[onclick="abrirModalPagamentoFaturaCartao()"]').disabled = pacoteFaturaCartao.Pode_Registrar_Pagamento === false;
+    document.querySelector('[onclick="abrirModalPagamentoFaturaCartao()"]').title = pacoteFaturaCartao.Pode_Registrar_Pagamento === false ? (pacoteFaturaCartao.Motivo_Bloqueio_Pagamento || '') : '';
     renderizarSubtotaisFaturaCartao();
     renderizarPagamentosFaturaCartao();
     renderizarLancamentosFaturaCartao();
@@ -712,6 +733,8 @@
           '<button type="button" class="btn-acao lancamento-acao-icone" title="Editar pagamento" onclick="abrirModalPagamentoFaturaCartaoPorId(\'' + escaparAtributoFaturaCartao(pagamento.ID_Pagamento_Fatura || '') + '\')"><span class="material-symbols-outlined">edit</span></button>' +
           '<button type="button" class="btn-acao btn-perigo lancamento-acao-icone" title="Excluir pagamento" onclick="excluirPagamentoFaturaCartaoFront(\'' + escaparAtributoFaturaCartao(pagamento.ID_Pagamento_Fatura || '') + '\')"><span class="material-symbols-outlined">delete</span></button>' +
         '</div>';
+      if (pagamento.Pode_Editar === false) item.querySelector('[title="Editar pagamento"]').remove();
+      if (pagamento.Pode_Excluir === false) item.querySelector('[title="Excluir pagamento"]').remove();
       container.appendChild(item);
     });
   }
@@ -731,7 +754,7 @@
     var modal = document.getElementById('modal-pagamento-fatura');
     var valorAberto = pacoteFaturaCartao ? (pacoteFaturaCartao.Valor_Em_Aberto || 0) : 0;
     var emEdicao = pagamento && pagamento.ID_Pagamento_Fatura;
-
+    if (pacoteFaturaCartao.Pode_Registrar_Pagamento === false) { mostrarNotificacao(pacoteFaturaCartao.Motivo_Bloqueio_Pagamento || 'Este cartão está disponível somente para consultar o histórico.', 'alerta'); return; }
     popularContasPagamentoFaturaCartao();
     document.getElementById('pag_fatura_id').value = emEdicao ? pagamento.ID_Pagamento_Fatura : '';
     document.getElementById('pag_fatura_conta').value = emEdicao ? (pagamento.ID_Conta || '') : '';
@@ -806,7 +829,7 @@
       return;
     }
 
-    if (valor > limitePermitido) {
+    if (!pacoteFaturaCartao.Escopo_Parcial && valor > limitePermitido) {
       mostrarNotificacao('O pagamento informado e maior que o saldo em aberto da fatura.', 'alerta');
       return;
     }

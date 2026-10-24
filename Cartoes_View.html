@@ -746,7 +746,7 @@
 
       if (celulaLimite) {
         var recorrenciasTexto = consolidado && consolidado.Valor_Recorrencias_Previstas > 0
-          ? '<div class="texto-ajuda">Inclui R$ ' + escaparHtmlCartao(formatarMoedaGrupoCartao(consolidado.Valor_Recorrencias_Previstas)) + ' de recorrencias previstas.</div>'
+          ? '<div class="texto-ajuda">Previsto, separado: R$ ' + escaparHtmlCartao(formatarMoedaGrupoCartao(consolidado.Valor_Recorrencias_Previstas)) + ' de recorrencias previstas.</div>'
           : '';
         celulaLimite.setAttribute('data-label', 'Limite / Fatura');
         celulaLimite.innerHTML =
@@ -754,6 +754,13 @@
           '<div class="texto-ajuda" style="margin-top:4px;">Fatura: ' + escaparHtmlCartao(faturaFormatada) + ' · Disponivel: ' + escaparHtmlCartao(disponivelFormatado) + '</div>' +
           '<div class="texto-ajuda">Uso do limite: ' + escaparHtmlCartao(formatarPercentualGrupoCartao(percentual)) + '</div>' +
           recorrenciasTexto;
+        if (consolidado.Escopo_Parcial) {
+          celulaLimite.innerHTML = '<strong>Seus lançamentos: R$ ' + escaparHtmlCartao(faturaFormatada) + '</strong>' + recorrenciasTexto;
+        } else if (consolidado.Limite_Comparavel === false) {
+          celulaLimite.innerHTML = '<strong>Registrado: R$ ' + escaparHtmlCartao(faturaFormatada) + '</strong><div class="texto-ajuda">Em aberto no período: R$ ' + escaparHtmlCartao(formatarMoedaGrupoCartao(consolidado.Valor_Em_Aberto || 0)) + '</div>' + recorrenciasTexto;
+        } else {
+          celulaLimite.innerHTML = '<strong>Limite: ' + escaparHtmlCartao(limiteFormatado) + '</strong><div class="texto-ajuda">Registrado: R$ ' + escaparHtmlCartao(faturaFormatada) + ' · Pago: R$ ' + escaparHtmlCartao(formatarMoedaGrupoCartao(consolidado.Valor_Pago || 0)) + '</div><div class="texto-ajuda">Em aberto: R$ ' + escaparHtmlCartao(formatarMoedaGrupoCartao(consolidado.Valor_Em_Aberto || 0)) + ' · Disponível estimado no recorte: ' + escaparHtmlCartao(disponivelFormatado) + '</div>' + recorrenciasTexto;
+        }
       }
 
       if (celulaAcoesHtml) {

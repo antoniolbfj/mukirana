@@ -265,12 +265,13 @@ function alterarStatusCartaoFisicoModel_(linhaPlanilha, novoStatus) {
 function listarGruposCartoesSupabaseModel_() {
   return supabaseSelecionar_(
     "grupos_cartoes",
-    "select=id_grupo_cartao,id_titular,nome_grupo,limite,dia_fechamento,dia_vencimento,ativo&order=nome_grupo.asc"
+    "select=id_grupo_cartao,id_titular,nome_grupo,limite,dia_fechamento,dia_vencimento,ativo,versao&order=nome_grupo.asc"
   ).map(function(item, indice) {
     return {
       _linhaPlanilha: indice + 2,
       ID_Grupo_Cartao: item.id_grupo_cartao || "",
       ID_Titular: item.id_titular || "",
+      Versao: item.versao,
       Nome_Grupo: item.nome_grupo || "",
       Limite: normalizarNumeroCartao_(item.limite),
       Dia_Fechamento: item.dia_fechamento || "",
