@@ -19,6 +19,7 @@ Cálculos adaptados para data e exclusão dos totais operacionais.
 
 Migração aplicada no Supabase e reconciliada; testes de banco, autorização,
 concorrência e navegador concluídos. Detalhes em [contas-entrega.md](contas-entrega.md).
+Publicada a versão 33 para avaliação, com 55 arquivos conferidos byte a byte.
 Implementação e publicação não substituem a homologação do usuário.
 
 ## Pendências vigentes

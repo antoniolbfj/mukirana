@@ -63,7 +63,7 @@ Validações concluídas:
 
 - Sintaxe de todos os JS e scripts HTML; contratos, sessão, isolamento do ator,
   dinheiro em centavos, datas, listas seguras e proteção do lançamento especial.
-- 31 verificações SQL, localmente e no Supabase como `service_role`, em transação
+- 32 verificações SQL, localmente e no Supabase como `service_role`, em transação
   desfeita: compartilhamento, permissões, saldos, transferência nas duas pontas,
   pagamentos de fatura, paginação, edição, zero, renomeação, conflitos, repetição,
   sincronização legada e ACLs.
@@ -83,6 +83,19 @@ Não foram enviados e-mails nem executadas rotinas de relatórios.
 
 ## Publicação
 
-A publicação é registrada após o push pelo clasp. A versão 32 e seu endereço de
-produção são mantidos; a nova tela é oferecida em uma implantação para avaliação,
-com o menu principal antigo disponível. Após homologação, promover a nova tela.
+Publicada a **versão 33** em uma nova [implantação de avaliação](https://script.google.com/macros/s/AKfycbxg6KevdfXzs3WucB23XtRzIg_px8HyQZxjqze8Iwtsegit6XFsjmpZUSFQv9qR7LRJ/exec).
+Acesse com a conta Google e abra **Contas (nova)** no menu lateral.
+
+O código foi enviado ao GitHub (`main`, implementação `0cb85a7`, ajuste final
+`4b32934`) e os 55 arquivos foram enviados pelo clasp. A versão imutável 33 foi
+baixada novamente: todos os arquivos correspondem byte a byte ao código local.
+Hashes e identificadores estão em [contas-publicacao.json](contas-publicacao.json).
+A versão 32 e seu endereço de produção permanecem preservados. A nova implantação
+contém a tela antiga como acesso principal e o menu provisório para avaliação.
+A URL remota exige autenticação Google; a homologação autenticada está pendente.
+
+O compilador do Apps Script rejeitou literais BigInt na primeira tentativa de
+envio. O backend passou a usar soma decimal textual exata para agregados e números
+seguros para valores individuais limitados pelo schema. A implementação foi
+verificada com valores acima do limite seguro de Number e o push final passou.
+O navegador usa inteiros BigInt e os contratos transportam centavos como texto.

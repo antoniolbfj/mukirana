@@ -61,6 +61,6 @@ BEGIN
  ASSERT jsonb_array_length(public.rpc_contas_listar_v2(membro,'2026-10-24','2026-10-31')->'accounts')=0,'share revoked';
  ASSERT NOT has_function_privilege('anon','public.rpc_contas_listar_v2(uuid,date,date)','execute') AND NOT has_function_privilege('authenticated','public.rpc_contexto_financeiro_mukirana(uuid,date,boolean)','execute'),'private RPC ACL';
  ASSERT has_function_privilege('service_role','public.rpc_contas_salvar_v2(uuid,uuid,integer,uuid,text,bigint,date,boolean,uuid[])','execute'),'backend ACL';
- RAISE NOTICE 'contas-v2: 31 invariantes verificadas';
+ RAISE NOTICE 'contas-v2: 32 invariantes verificadas';
 END $$;
 ROLLBACK;

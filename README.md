@@ -59,3 +59,6 @@ menu provisório **Contas (nova)**. A migração dos saldos iniciais foi aplicad
 Supabase, preservando os registros existentes e a compatibilidade da tela atual.
 Detalhes, testes e publicação: [entrega de Contas](docs/contas-entrega.md).
 A substituição do acesso principal depende da homologação das duas interfaces.
+
+[Abrir versão 33 para avaliar Contas](https://script.google.com/macros/s/AKfycbxg6KevdfXzs3WucB23XtRzIg_px8HyQZxjqze8Iwtsegit6XFsjmpZUSFQv9qR7LRJ/exec)
+— menu lateral **Contas (nova)**. A implantação de produção anterior foi preservada.
