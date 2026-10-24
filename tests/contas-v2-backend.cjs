@@ -29,3 +29,7 @@ assert.equal(october.Patrimonio_Acumulado.Total,0);
 const november=ctx.calcularSaudeFinanceiraConsolidadoController_(healthCtx,[],{Mes_Inicial:'2026-11',Mes_Final:'2026-11',Mes_Referencia:'2026-11'},[],[],{},{});
 assert.equal(november.Patrimonio_Acumulado.Total,100);assert.equal(november.Resultado_Periodo.Receitas,0);assert.equal(november.Patrimonio_Acumulado.Relatorio_Mensal[0].Saldo_Final,100);
 console.log('Historical/future financial health and monthly patrimony reconciliation: PASS');
+const add=(a,b)=>vm.runInContext('ContasNova_.addCents('+JSON.stringify(a)+','+JSON.stringify(b)+')',ctx);
+for(const [a,b] of [['9999999999999999999999999','1'],['1000','-1'],['-1','1000'],['-300','-700'],['0','-1'],['-900','900'],['199','-299'],['-1000','1'],['99','99'],['900719925474099100','-1']])assert.equal(add(a,b),(BigInt(a)+BigInt(b)).toString());
+for(let i=0;i<1000;i++){const a=String(Math.trunc((Math.random()-.5)*2e14)),b=String(Math.trunc((Math.random()-.5)*2e14));assert.equal(add(a,b),(BigInt(a)+BigInt(b)).toString());}
+console.log('Exact decimal sum for Apps Script, including aggregates beyond safe Number: PASS');

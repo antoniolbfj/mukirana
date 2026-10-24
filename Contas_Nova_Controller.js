@@ -6,6 +6,23 @@ const ContasNova_ = Object.freeze({
       !isNaN(new Date(value + 'T12:00:00Z').getTime()) && new Date(value + 'T12:00:00Z').toISOString().slice(0,10) === value;
   },
   cents: function (value) { return typeof value === 'string' && value.length <= 32 && /^-?(0|[1-9]\d*)$/.test(value); },
+  // Soma decimal textual: mantém agregados exatos sem depender de BigInt no Apps Script.
+  addCents: function (left, right) {
+    const a = String(left), b = String(right), sa = a.charAt(0) === '-', sb = b.charAt(0) === '-';
+    let x = sa ? a.slice(1) : a, y = sb ? b.slice(1) : b, result = '', carry = 0, negative = sa;
+    if (sa !== sb && (x.length < y.length || (x.length === y.length && x < y))) {
+      const temp = x; x = y; y = temp; negative = sb;
+    }
+    for (let i = x.length - 1, j = y.length - 1; i >= 0 || j >= 0; i--, j--) {
+      let digit = Number(x.charAt(i) || 0) + (sa === sb ? Number(y.charAt(j) || 0) : -Number(y.charAt(j) || 0)) + carry;
+      if (sa === sb) { carry = digit >= 10 ? 1 : 0; digit %= 10; }
+      else { carry = digit < 0 ? -1 : 0; if (digit < 0) digit += 10; }
+      result = digit + result;
+    }
+    if (sa === sb && carry) result = carry + result;
+    result = result.replace(/^0+(?=\d)/, '');
+    return (negative && result !== '0' ? '-' : '') + result;
+  },
   today: function () { return Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd'); },
   period: function (filters) {
     const today = this.today(), month = today.slice(0,7), f = filters || {};
@@ -66,8 +83,8 @@ function contasNovaSalvar(token, request) {
   const user = obterSessaoObrigatoria(token); ContasNova_.requireSupabase(); const r = request || {};
   if (!ContasNova_.uuid(r.id) || !ContasNova_.uuid(r.operationId) || !Number.isInteger(r.version) || r.version < 0 ||
     typeof r.name !== 'string' || !r.name.trim() || r.name.trim().length > 160 ||
-    !ContasNova_.cents(r.openingAmountCents) || BigInt(r.openingAmountCents) > 99999999999999n ||
-    BigInt(r.openingAmountCents) < -99999999999999n || !ContasNova_.date(r.openingDate) ||
+    !ContasNova_.cents(r.openingAmountCents) || Number(r.openingAmountCents) > 99999999999999 ||
+    Number(r.openingAmountCents) < -99999999999999 || !ContasNova_.date(r.openingDate) ||
     typeof r.shared !== 'boolean' || !Array.isArray(r.participants) || r.participants.length > 500 ||
     !r.participants.every(ContasNova_.uuid)) throw new Error('Revise os campos informados.');
   const result = ContasNova_.rpc('rpc_contas_salvar_v2', { p_usuario: user.id, p_conta: r.id,
@@ -119,18 +136,18 @@ function contasNovaPrevisoes(token, filters) {
   const context = montarContextoConsolidadosAPartirBase_(user, base, null, 'RPC');
   const allowed = {};
   (context.contasTodas || []).forEach(function(a) {
-    if (a.Ativa && usuarioPodeVisualizarContaController_(a,user.id)) allowed[a.ID_Conta] = 0n;
+    if (a.Ativa && usuarioPodeVisualizarContaController_(a,user.id)) allowed[a.ID_Conta] = '0';
   });
   const generated = gerarLancamentosProgramadosRecorrenciasConsolidadoController_(context,
     { Mes_Inicial: period.start < period.today.slice(0,7) ? period.start : period.today.slice(0,7), Mes_Final: period.end, Mes_Referencia: period.start });
   (generated.lancamentos || []).forEach(function(e) {
     const amount = Math.round(Number(e.Valor_Total) * 100);
     if (!Number.isSafeInteger(amount)) throw new Error('Valor de previsão inválido.');
-    const value = BigInt(amount), source = e.ID_Origem, target = e.ID_Destino;
+    const source = e.ID_Origem, target = e.ID_Destino;
     if (e.Tipo_Origem === 'Conta' && allowed[source] !== undefined) {
-      allowed[source] += e.Tipo === 'Receita' ? value : -value;
+      allowed[source] = ContasNova_.addCents(allowed[source], String(e.Tipo === 'Receita' ? amount : -amount));
     }
-    if (e.Tipo === 'Transferência' && allowed[target] !== undefined) allowed[target] += value;
+    if (e.Tipo === 'Transferência' && allowed[target] !== undefined) allowed[target] = ContasNova_.addCents(allowed[target], String(amount));
   });
   const deltas = {}; Object.keys(allowed).forEach(function(id) { deltas[id] = allowed[id].toString(); });
   return { deltas: deltas, forecastDate: period.forecastDate };
