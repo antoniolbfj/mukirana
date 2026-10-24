@@ -68,7 +68,7 @@ A paleta global será revista após a remodelagem das telas.
 O endereço antigo de avaliação de Contas permanece na versão 34 e não é a produção.
 
 [Avaliar Lançamentos — menu Lançamentos (protótipo)](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec).
-Implantação separada na versão 37, com dados fictícios e frame isolado. O Lançamentos conectado
+Implantação separada na versão 38, com dados fictícios e frame isolado. O Lançamentos conectado
 atual continua principal. A prévia não faz chamadas ao banco.
 [Requisitos revistos e roteiro](docs/proposta-lancamentos.md),
 [HTML independente](docs/prototipos/lancamentos.html).

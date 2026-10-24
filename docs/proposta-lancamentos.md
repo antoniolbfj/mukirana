@@ -198,8 +198,9 @@ as interações de demonstração não fizeram requisições externas. Os testes
 conferem resultado econômico/caixa, sugestões, campos preservados, geração,
 rateio em centavos, decisão individual, alcances de edição/exclusão e Desfazer.
 
-Publicada na **avaliação, versão 37**. Os 63 arquivos dessa versão foram baixados
-e comparados byte a byte com o commit `635bc2a`. A produção permanece na versão 36
+Primeira prévia publicada na versão 37. O refinamento está publicado na
+**avaliação, versão 38**. Os 63 arquivos dessa versão foram baixados e comparados
+byte a byte com o commit `9ad4ef6`. A produção permanece na versão 36
 com Contas/Cartões homologados, sem este menu de protótipo. O acesso remoto
 autenticado com a sessão real do usuário não foi automatizado; a conferência
 remota é do código imutável e da configuração da implantação.

@@ -1,7 +1,7 @@
 {
   "date": "2026-10-24",
-  "codeCommit": "635bc2a",
-  "evaluationVersion": 37,
+  "codeCommit": "9ad4ef6",
+  "evaluationVersion": 38,
   "evaluationDeploymentId": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
   "evaluationUrl": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
   "prototypeMenu": "Lançamentos (protótipo)",
@@ -11,7 +11,7 @@
   "cardsApproved": true,
   "entriesMainRoute": "Lancamentos",
   "entriesPrototypeApproved": false,
-  "prototypeData": "fictional_only_in_memory",
+  "prototypeData": "fictional_browser_state_with_explicit_saved_draft",
   "iframeSandbox": "allow-scripts allow-forms",
   "iframeSameOrigin": false,
   "prototypeBackendCalls": false,
@@ -41,7 +41,7 @@
     }
   ],
   "requirementsDocumentSha256": "92389294df293864b032096c7d7bcdaad897debe0eade20d19a6a8936640f402",
-  "prototypeSha256": "8a9bffa36485caad4736f574463738659258c248b89a46be73aae5685910cc3e",
+  "prototypeSha256": "29443dfda117dc1f33a3444326c2c08eebed36b5c4c22b92c3cb53dafc7958b6",
   "files": {
     "Cartoes_Novo_Styles.html": "dc4557ef99191542b70b6b0e38aca6c1fbcce185155497b154983c3c36fca4a2",
     "Relatorios_Controller.js": "f58b5784dd615a3e0cace7dcbb728e2c0a44f98e899d5094254abe44cfb29cf0",
@@ -50,14 +50,14 @@
     "Usuarios_View.html": "7e63e32b62d7c6d72fc8e1f540e964563757bbd69b2819271c7abedf1d01617f",
     "Recorrencias_Controller.js": "9df26ea0433745841951989abe864be9db9398115f4b8356c12619d60622f095",
     "Projetos_View.html": "f70d988250e9c2d9ed3d3c8217c8781d69e4cc64b0e2dd6f9f8d03f7d6bf8dd0",
-    "Lancamentos_Prototipo_View.html": "0339c494f21ed22d8bd4020a002a66d8d611ca2a09244c6bf1fdc96937e7ebd4",
+    "Lancamentos_Prototipo_View.html": "44b642ffd1d6df7349e794612cbe9a805ffbdf1f9f7ee8b1c6f50241ca8973b5",
     "Categorias_Seeds.js": "ee65d290aed028b4d2bbb2d924cc13e83655afc87c91fd19b73e2f372f0b88e0",
     "Global_Assets.html": "5f0842b8ddf3b55f6708ac985665eda5f4bcf3efb3913985a423ef6bc97710a0",
     "Relatorios_Email.html": "bd67dcc68254528a8ba91f94a915c8bdcbf7f57153eeaed7c78f343614b420e4",
     "Orcamentos_View.html": "dc73cd6cc27f0aff6ee95cfab7f003981bab6e09b692e728c3d5a14404bd470a",
     "Global_Estilos.html": "b5ffb8bafd4dae35b9e52b860ccbaedf2a50c07bf2663e0862bed778bf0d4005",
     "Rateios_Model.js": "608fb5102bdf1bbac8b8a3fbd79873427872d7044a7e0158e4bd25e85b341a51",
-    "Lancamentos_Prototipo_Demo.html": "8a9bffa36485caad4736f574463738659258c248b89a46be73aae5685910cc3e",
+    "Lancamentos_Prototipo_Demo.html": "29443dfda117dc1f33a3444326c2c08eebed36b5c4c22b92c3cb53dafc7958b6",
     "Lancamentos_Model.js": "057d9a1c84c4e7adb0275ed2cd6104905aeecd47c284a5f4994b28427f30ddfc",
     "Cartoes_View.html": "da28070dd7a96622a6a0ba16fcc37c73315283e81ff005189003efe574fdbfd5",
     "App_Main.js": "ad471bb01540fc26cc47d6ccf5abd44d8982368c887a442e5b28672377a73d2f",
@@ -106,5 +106,37 @@
     "Contas_Nova_Mobile_View.html": "b1a1522d9190b878ac92f09e42d46de9bd00200433b4b226d9374c361f24042b",
     "Cartoes_Controller.js": "cbad5c16fbbaa0106990520e1b4e08c13f9cbdd3e3d77bd05ed7afbe41eee57d",
     "Login_View.html": "fa53220a3eaffc0e8298092a80f119e7c7924cd2ccb71025e7773d4a5da20960"
-  }
+  },
+  "previousEvaluationVersion": 37,
+  "globalPeriodUnit": "month",
+  "globalBalanceScope": "all_demo_screens_independent_of_list_filters",
+  "draftExitChoices": [
+    "Sair",
+    "Sair e salvar rascunho"
+  ],
+  "refinementChecks": [
+    {
+      "device": "desktop",
+      "globalMonthlyBalance": "PASS",
+      "explicitDraft": "PASS",
+      "compactLayout": "PASS"
+    },
+    {
+      "device": "tablet",
+      "globalMonthlyBalance": "PASS",
+      "explicitDraft": "PASS",
+      "compactLayout": "PASS"
+    },
+    {
+      "device": "smartphone",
+      "globalMonthlyBalance": "PASS",
+      "explicitDraft": "PASS",
+      "compactLayout": "PASS"
+    },
+    {
+      "device": "wrapper publicado",
+      "draftPersistence": "PASS",
+      "isolationAndCleanup": "PASS"
+    }
+  ]
 }
