@@ -1,0 +1,557 @@
+<style>
+  .cabecalho-tela {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .btn-primario {
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: var(--cor-primaria);
+    color: white;
+    transition: 0.2s;
+  }
+
+  .btn-secundario {
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: #E0E0E0;
+    color: var(--cor-texto-principal);
+    transition: 0.2s;
+  }
+
+  .btn-acao {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: var(--cor-fundo-app);
+    border: var(--borda-suave);
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: 0.2s;
+  }
+
+  .btn-acao:hover {
+    background-color: var(--cor-primaria);
+    color: white;
+  }
+
+  .cartao {
+    background: var(--cor-superficie);
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: var(--sombra-suave);
+    margin-bottom: 14px;
+  }
+
+  .grupo-campo {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .grupo-campo-duplo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  label {
+    font-size: 14px;
+    color: var(--cor-texto-secundario);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  input,
+  select {
+    padding: 11px 12px;
+    border: var(--borda-suave);
+    border-radius: 8px;
+    font-size: 15px;
+    width: 100%;
+    outline: none;
+    background: white;
+    color: var(--cor-texto-principal);
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  input:disabled,
+  select:disabled {
+    background-color: #F5F5F5;
+    color: #9E9E9E;
+    cursor: not-allowed;
+  }
+
+  .acoes-formulario {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .usuarios-tabela-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .usuarios-tabela-linhas {
+    table-layout: fixed;
+  }
+
+  .usuarios-tabela-linhas th,
+  .usuarios-tabela-linhas td {
+    padding: 12px 10px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    vertical-align: top;
+  }
+
+  .usuarios-col-nome strong,
+  .usuarios-col-email {
+    display: block;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .usuarios-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tabela-mukirana {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .tabela-mukirana th,
+  .tabela-mukirana td {
+    padding: 16px;
+    border-bottom: var(--borda-suave);
+  }
+
+  .badge-ativo {
+    background: var(--cor-sucesso-fundo);
+    color: var(--cor-sucesso-texto);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .badge-inativo {
+    background: var(--cor-erro-fundo);
+    color: var(--cor-erro-texto);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .texto-ajuda {
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  @media (max-width: 700px) {
+    .grupo-campo-duplo {
+      grid-template-columns: 1fr;
+    }
+
+    .cabecalho-tela {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .cabecalho-tela .btn-primario {
+      width: 100%;
+    }
+
+    .usuarios-tabela-linhas {
+      min-width: 720px;
+    }
+
+    .usuarios-tabela-linhas thead {
+      display: table-header-group;
+    }
+
+    .usuarios-tabela-linhas tr {
+      display: table-row;
+      margin-bottom: 0;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    .usuarios-tabela-linhas td,
+    .usuarios-tabela-linhas th {
+      display: table-cell;
+      text-align: left;
+      position: static;
+      padding: 10px 8px;
+      border-bottom: var(--borda-suave);
+      min-height: 0;
+    }
+
+    .usuarios-tabela-linhas td::before {
+      display: none;
+      content: none;
+    }
+  }
+</style>
+
+<div class="cabecalho-tela">
+  <h2>Gestão de Usuários</h2>
+  <button class="btn-primario" id="btn-novo-usuario" data-topbar-label="+ Novo Usuário" onclick="abrirFormularioUsuario()">+ Novo Usuário</button>
+</div>
+
+<div id="container-form-usuario" class="cartao" style="display: none;">
+  <h3 id="titulo-form-usuario">Cadastrar Usuário</h3>
+
+  <form id="form-usuario" onsubmit="enviarFormularioUsuario(event)">
+    <input type="hidden" id="id_usuario">
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label>Nome Completo</label>
+        <input type="text" id="nome_usuario" required placeholder="Ex: Maria Silva">
+      </div>
+
+      <div class="grupo-campo">
+        <label>E-mail</label>
+        <input type="email" id="email_usuario" required placeholder="usuario@email.com">
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label>Senha/PIN de Acesso</label>
+        <input type="password" id="senha_usuario" placeholder="Deixe em branco para manter a senha atual">
+        <div class="texto-ajuda">Em edição, preencha apenas se desejar alterar a senha/PIN.</div>
+      </div>
+
+      <div class="grupo-campo">
+        <label>Papel no Sistema</label>
+        <select id="papel_usuario" required onchange="atualizarObrigatoriedadeUsuarioVirtual()">
+          <option value="Administrador">Administrador</option>
+          <option value="Usuário">Usuário</option>
+          <option value="Usuário Virtual">Usuário Virtual</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label>Tema Preferido</label>
+        <select id="tema_usuario" required>
+          <option value="Claro">Claro</option>
+          <option value="Escuro">Escuro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="acoes-formulario">
+      <button type="button" class="btn-secundario" onclick="fecharFormularioUsuario()">Cancelar</button>
+      <button type="button" class="btn-secundario" id="btn-salvar-e-novo-usuario" onclick="solicitarSalvarENovoUsuario()">Salvar + novo</button>
+      <button type="submit" class="btn-primario" id="btn-salvar-usuario" onclick="definirModoAposSalvarUsuario('fechar')">Salvar Dados</button>
+    </div>
+  </form>
+</div>
+
+<div class="cartao" id="container-lista-usuario">
+  <div class="usuarios-tabela-container">
+  <table class="tabela-mukirana usuarios-tabela-linhas">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>E-mail</th>
+        <th>Papel</th>
+        <th>Status</th>
+        <th style="text-align: right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-tabela-usuarios"></tbody>
+  </table>
+  </div>
+</div>
+
+<script>
+  var usuariosEmMemoria = [];
+  var tokenSessaoUsuario = localStorage.getItem('mukirana_token') || '';
+  var papelLogadoUsuario = localStorage.getItem('mukirana_papel') || 'Usuário';
+  var idLogadoUsuario = localStorage.getItem('mukirana_id') || '';
+  var modoAposSalvarUsuario = 'fechar';
+
+  var acaoPendenteUsuario = localStorage.getItem('mukirana_acao_pendente');
+
+  if (acaoPendenteUsuario === 'meu_perfil') {
+    document.getElementById('container-lista-usuario').style.display = 'none';
+  }
+
+  carregarTabelaUsuarios();
+
+  function abrirFormularioUsuario() {
+    document.getElementById('form-usuario').reset();
+    definirModoAposSalvarUsuario('fechar');
+    document.getElementById('id_usuario').value = '';
+
+    document.getElementById('titulo-form-usuario').innerText = 'Cadastrar Usuário';
+    document.getElementById('senha_usuario').placeholder = 'Informe a senha/PIN do novo usuário';
+
+    document.getElementById('email_usuario').disabled = false;
+    document.getElementById('papel_usuario').disabled = papelLogadoUsuario !== 'Administrador';
+    document.getElementById('papel_usuario').selectedIndex = papelLogadoUsuario === 'Administrador' ? 1 : 2;
+    atualizarObrigatoriedadeUsuarioVirtual();
+    document.getElementById('btn-salvar-e-novo-usuario').style.display = 'inline-block';
+
+    document.getElementById('container-form-usuario').style.display = 'block';
+    document.getElementById('container-lista-usuario').style.display = 'none';
+  }
+
+  function fecharFormularioUsuario() {
+    document.getElementById('container-form-usuario').style.display = 'none';
+    document.getElementById('container-lista-usuario').style.display = 'block';
+  }
+
+  function definirModoAposSalvarUsuario(modo) {
+    modoAposSalvarUsuario = modo === 'novo' ? 'novo' : 'fechar';
+  }
+
+  function solicitarSalvarENovoUsuario() {
+    definirModoAposSalvarUsuario('novo');
+
+    var formulario = document.getElementById('form-usuario');
+
+    if (formulario && typeof formulario.requestSubmit === 'function') {
+      formulario.requestSubmit();
+      return;
+    }
+
+    formulario.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  function atualizarEstadoBotoesSalvarUsuario(salvando) {
+    var btnSalvar = document.getElementById('btn-salvar-usuario');
+    var btnSalvarENovo = document.getElementById('btn-salvar-e-novo-usuario');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#form-usuario',
+        idsProcessando: ['btn-salvar-usuario', 'btn-salvar-e-novo-usuario'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    btnSalvar.disabled = !!salvando;
+    btnSalvar.innerText = salvando ? 'Salvando...' : 'Salvar Dados';
+    btnSalvarENovo.disabled = !!salvando;
+    btnSalvarENovo.innerText = salvando ? 'Salvando...' : 'Salvar + novo';
+  }
+
+  function atualizarObrigatoriedadeUsuarioVirtual() {
+    var papel = document.getElementById('papel_usuario').value || '';
+    var ehVirtual = papel.indexOf('Virtual') !== -1;
+    var campoEmail = document.getElementById('email_usuario');
+    var campoSenha = document.getElementById('senha_usuario');
+
+    campoEmail.required = !ehVirtual;
+    campoSenha.required = false;
+    campoEmail.placeholder = ehVirtual ? 'Opcional para usuário virtual' : 'usuario@email.com';
+    campoSenha.placeholder = ehVirtual ? 'Opcional para usuário virtual' : 'Deixe em branco para manter a senha atual';
+  }
+
+  function carregarTabelaUsuarios() {
+    google.script.run
+      .withSuccessHandler(function(usuarios) {
+        usuariosEmMemoria = Array.isArray(usuarios) ? usuarios : [];
+
+        usuariosEmMemoria.sort(function(a, b) {
+          return (a.Nome || "").localeCompare(b.Nome || "");
+        });
+
+        renderizarTabelaUsuarios();
+
+        if (acaoPendenteUsuario === 'meu_perfil') {
+          localStorage.removeItem('mukirana_acao_pendente');
+          acaoPendenteUsuario = null;
+          prepararEdicaoUsuario(idLogadoUsuario);
+        }
+
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(erro) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao(erro.message, "erro");
+      })
+      .obterListaUsuarios(tokenSessaoUsuario);
+  }
+
+  function renderizarTabelaUsuarios() {
+    var corpo = document.getElementById('corpo-tabela-usuarios');
+    corpo.innerHTML = '';
+
+    usuariosEmMemoria.forEach(function(u) {
+      var tr = document.createElement('tr');
+
+      var ativo = u.Ativo === true || u.Ativo === "true" || u.Ativo === 1;
+      var badgeStatus = ativo ? 'badge-ativo' : 'badge-inativo';
+      var textoStatus = ativo ? 'Ativo' : 'Inativo';
+
+      var ehOUsuarioLogado = u.ID_Usuario === idLogadoUsuario;
+      var ehUsuarioVirtual = (u.Papel || '').indexOf('Virtual') !== -1;
+      var podeEditar = papelLogadoUsuario === 'Administrador' || ehOUsuarioLogado || ehUsuarioVirtual;
+
+      var botoesAcao = '';
+
+      if (podeEditar) {
+        botoesAcao += '<button class="btn-acao" onclick="prepararEdicaoUsuario(\'' + escaparAtributoUsuario(u.ID_Usuario) + '\')">✎ Editar</button>';
+      }
+
+      if ((papelLogadoUsuario === 'Administrador' || ehUsuarioVirtual) && !ehOUsuarioLogado) {
+        var textoBotaoStatus = ativo ? 'Inativar' : 'Restaurar';
+        botoesAcao += '<button class="btn-acao" onclick="alterarStatusUsuario(\'' + escaparAtributoUsuario(u.ID_Usuario) + '\')">' + textoBotaoStatus + '</button>';
+      }
+
+      tr.innerHTML =
+        '<td data-label="Nome" class="usuarios-col-nome"><strong>' + escaparHtmlUsuario(u.Nome || "") + '</strong></td>' +
+        '<td data-label="E-mail" class="usuarios-col-email">' + escaparHtmlUsuario(u.Email || "") + '</td>' +
+        '<td data-label="Papel">' + escaparHtmlUsuario(u.Papel || "") + '</td>' +
+        '<td data-label="Status"><span class="' + badgeStatus + '">' + textoStatus + '</span></td>' +
+        '<td data-label="Ações"><div class="usuarios-acoes">' + botoesAcao + '</div></td>';
+
+      corpo.appendChild(tr);
+    });
+  }
+
+  function prepararEdicaoUsuario(idUsuario) {
+    google.script.run
+      .withSuccessHandler(function(u) {
+        document.getElementById('id_usuario').value = u.ID_Usuario;
+        document.getElementById('nome_usuario').value = u.Nome || "";
+        document.getElementById('email_usuario').value = u.Email || "";
+        document.getElementById('senha_usuario').value = "";
+        document.getElementById('senha_usuario').placeholder = "Deixe em branco para manter a senha atual";
+        document.getElementById('papel_usuario').value = u.Papel || "Usuário";
+        document.getElementById('tema_usuario').value = u.Preferencia_Tema || "Claro";
+
+        var ehOUsuarioLogado = u.ID_Usuario === idLogadoUsuario;
+        var souAdmin = papelLogadoUsuario === 'Administrador';
+        var ehUsuarioVirtual = (u.Papel || '').indexOf('Virtual') !== -1;
+
+        document.getElementById('email_usuario').disabled = !souAdmin && ehOUsuarioLogado && !ehUsuarioVirtual;
+        document.getElementById('papel_usuario').disabled = !souAdmin;
+        atualizarObrigatoriedadeUsuarioVirtual();
+        document.getElementById('btn-salvar-e-novo-usuario').style.display = ehOUsuarioLogado ? 'none' : 'inline-block';
+
+        document.getElementById('titulo-form-usuario').innerText = ehOUsuarioLogado ? 'Meu Perfil' : 'Editar Usuário';
+
+        document.getElementById('container-form-usuario').style.display = 'block';
+        document.getElementById('container-lista-usuario').style.display = 'none';
+      })
+      .withFailureHandler(function(erro) {
+        mostrarNotificacao(erro.message, "erro");
+      })
+      .obterUsuarioParaEdicao(idUsuario, tokenSessaoUsuario);
+  }
+
+  function enviarFormularioUsuario(evento) {
+    evento.preventDefault();
+    var modoSalvamento = modoAposSalvarUsuario === 'novo' ? 'novo' : 'fechar';
+    atualizarEstadoBotoesSalvarUsuario(true);
+
+    var dados = {
+      ID_Usuario: document.getElementById('id_usuario').value,
+      Nome: document.getElementById('nome_usuario').value,
+      Email: document.getElementById('email_usuario').value,
+      Senha: document.getElementById('senha_usuario').value,
+      Papel: document.getElementById('papel_usuario').value,
+      Preferencia_Tema: document.getElementById('tema_usuario').value
+    };
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        atualizarEstadoBotoesSalvarUsuario(false);
+        definirModoAposSalvarUsuario('fechar');
+
+        mostrarNotificacao(msg, 'sucesso');
+
+        if (dados.ID_Usuario === idLogadoUsuario) {
+          localStorage.setItem('mukirana_nome', dados.Nome);
+          localStorage.setItem('mukirana_tema', dados.Preferencia_Tema);
+
+          var nomeLogadoEl = document.getElementById('nome-usuario-logado');
+          if (nomeLogadoEl) {
+            nomeLogadoEl.innerText = dados.Nome;
+          }
+
+          if (typeof aplicarTemaAtualMukirana === 'function') {
+            aplicarTemaAtualMukirana();
+          } else if (typeof aplicarTemaUI === 'function') {
+            aplicarTemaUI(dados.Preferencia_Tema);
+          }
+        }
+
+        if (dados.ID_Usuario === idLogadoUsuario) {
+          fecharFormularioUsuario();
+        } else if (modoSalvamento === 'novo') {
+          abrirFormularioUsuario();
+        } else {
+          fecharFormularioUsuario();
+        }
+
+        carregarTabelaUsuarios();
+      })
+      .withFailureHandler(function(err) {
+        atualizarEstadoBotoesSalvarUsuario(false);
+        definirModoAposSalvarUsuario('fechar');
+        mostrarNotificacao(err.message, 'erro');
+      })
+      .processarSalvarUsuario(dados, tokenSessaoUsuario);
+  }
+
+  function alterarStatusUsuario(idUsuarioAlvo) {
+    confirmarAcao("Alterar o status deste usuário?", function() {
+      google.script.run
+        .withSuccessHandler(function(msg) {
+          carregarTabelaUsuarios();
+          mostrarNotificacao(msg, "sucesso");
+        })
+        .withFailureHandler(function(err) {
+          mostrarNotificacao(err.message, "erro");
+        })
+        .alternarStatusUsuario(idUsuarioAlvo, tokenSessaoUsuario);
+    });
+  }
+
+  function escaparHtmlUsuario(valor) {
+    if (valor === null || valor === undefined) return "";
+
+    return valor.toString()
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function escaparAtributoUsuario(valor) {
+    return escaparHtmlUsuario(valor);
+  }
+</script>

@@ -1,0 +1,795 @@
+<style>
+  /*
+   * Módulo: Login_View.html
+   * Responsabilidade:
+   * - Exibir a vitrine inicial do Mukirana.
+   * - Abrir o formulário de autenticação em modal acessível.
+   * - Manter foco, tabulação e atalhos coerentes com o padrão global do app.
+   */
+
+  .mk-login-page {
+    width: 100%;
+    min-height: calc(100vh - 60px);
+    min-height: calc(100dvh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 18px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background:
+      radial-gradient(circle at top left, rgba(84, 168, 170, 0.14), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(245, 181, 114, 0.11), transparent 26%),
+      var(--cor-fundo-app);
+  }
+
+  .mk-login-vitrine {
+    width: min(1120px, 100%);
+    display: grid;
+    grid-template-columns: minmax(320px, 1.1fr) minmax(280px, 0.9fr);
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .mk-login-painel,
+  .mk-login-resumo {
+    background: var(--cor-superficie);
+    border: var(--borda-suave);
+    border-radius: 20px;
+    box-shadow: var(--sombra-fab);
+  }
+
+  .mk-login-painel {
+    padding: 22px;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.92fr) minmax(260px, 1.08fr);
+    gap: 18px;
+    align-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at top left, rgba(84, 168, 170, 0.14), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(245, 181, 114, 0.12), transparent 24%),
+      var(--cor-superficie);
+  }
+
+  .mk-login-coluna-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .mk-login-brand-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: rgba(84, 168, 170, 0.12);
+    color: var(--cor-texto-principal);
+    border: 1px solid rgba(84, 168, 170, 0.18);
+    font-weight: 700;
+  }
+
+  .mk-login-brand-chip img {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    object-fit: cover;
+  }
+
+  .mk-login-coluna-copy h1 {
+    margin: 0;
+    font-size: 38px;
+    line-height: 1.02;
+    color: var(--cor-texto-principal);
+  }
+
+  .mk-login-coluna-copy p {
+    margin: 0;
+    color: var(--cor-texto-secundario);
+    line-height: 1.55;
+    font-size: 14px;
+  }
+
+  .mk-login-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 2px;
+  }
+
+  .mk-login-atalho {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    min-height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: var(--cor-primaria);
+    color: var(--cor-superficie);
+    cursor: pointer;
+    font-weight: 800;
+    box-shadow: var(--sombra-suave);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+
+  .mk-login-atalho:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--sombra-fab);
+  }
+
+  .mk-login-atalho-secundario {
+    background: rgba(84, 168, 170, 0.11);
+    color: var(--cor-texto-principal);
+    border: 1px solid rgba(84, 168, 170, 0.16);
+    box-shadow: none;
+    font-weight: 700;
+  }
+
+  .mk-login-atalho kbd {
+    font: inherit;
+    font-size: 12px;
+    padding: 3px 7px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+  }
+
+  .mk-login-atalho-secundario kbd {
+    background: rgba(84, 168, 170, 0.10);
+    border-color: rgba(84, 168, 170, 0.18);
+  }
+
+  .mk-login-atalhos-ajuda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  .mk-login-chip-ajuda {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(84, 168, 170, 0.10);
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+  }
+
+  .mk-login-chip-ajuda strong {
+    color: var(--cor-texto-principal);
+    font-weight: 700;
+  }
+
+  .mk-login-ilustracao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+  }
+
+  .mk-login-mascote {
+    width: min(100%, 420px);
+    max-height: 560px;
+    object-fit: contain;
+    filter: drop-shadow(0 26px 34px rgba(20, 29, 36, 0.12));
+  }
+
+  .mk-login-resumo {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mk-login-resumo h2 {
+    margin: 0 0 4px 0;
+    color: var(--cor-texto-principal);
+    font-size: 21px;
+  }
+
+  .mk-login-resumo-linha {
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(84, 168, 170, 0.10);
+  }
+
+  .mk-login-resumo-linha strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--cor-texto-principal);
+    font-size: 13px;
+  }
+
+  .mk-login-resumo-linha span {
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .mk-login-modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(18, 23, 27, 0.44);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 12000;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .mk-login-modal-overlay.oculto {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mk-login-modal {
+    width: min(440px, 100%);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 20px;
+    box-shadow: 0 30px 60px rgba(18, 23, 27, 0.22);
+    overflow: hidden;
+    transform: translateY(0);
+    transition: transform 0.2s ease;
+  }
+
+  .mk-login-modal-overlay.oculto .mk-login-modal {
+    transform: translateY(-8px);
+  }
+
+  .mk-login-modal-topo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 18px 12px 18px;
+    border-bottom: 1px solid rgba(84, 168, 170, 0.12);
+  }
+
+  .mk-login-modal-topo h3 {
+    margin: 0;
+    font-size: 24px;
+    color: var(--cor-texto-principal);
+  }
+
+  .mk-login-modal-topo p {
+    margin: 6px 0 0 0;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .mk-login-fechar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: var(--borda-suave);
+    background: rgba(255, 255, 255, 0.52);
+    color: var(--cor-texto-principal);
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+
+  .mk-login-fechar:hover {
+    background: rgba(84, 168, 170, 0.10);
+  }
+
+  .mk-login-formulario {
+    padding: 18px;
+    text-align: left;
+  }
+
+  .mk-login-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .mk-login-field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .mk-login-label {
+    font-size: 13px;
+    color: var(--cor-texto-secundario);
+    font-weight: 700;
+  }
+
+  .mk-login-input {
+    width: 100%;
+    min-height: 46px;
+    padding: 13px 14px;
+    border: var(--borda-suave);
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--cor-texto-principal);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  .mk-login-input::placeholder {
+    color: var(--cor-texto-secundario);
+    opacity: 0.78;
+  }
+
+  .mk-login-acoes-modal {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .mk-login-botao {
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+
+  .mk-login-botao:hover {
+    transform: translateY(-1px);
+  }
+
+  .mk-login-botao:disabled {
+    opacity: 0.65;
+    cursor: wait;
+    transform: none;
+  }
+
+  .mk-login-botao-principal {
+    border: none;
+    background: var(--cor-primaria);
+    color: var(--cor-superficie);
+    box-shadow: var(--sombra-suave);
+  }
+
+  .mk-login-botao-secundario {
+    border: var(--borda-suave);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--cor-texto-principal);
+  }
+
+  .mk-login-ajuda-modal {
+    margin-top: 12px;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  body.tema-escuro .mk-login-painel,
+  body.tema-escuro .mk-login-resumo {
+    border-color: #384340;
+  }
+
+  body.tema-escuro .mk-login-painel {
+    background:
+      radial-gradient(circle at top left, rgba(84, 168, 170, 0.16), transparent 28%),
+      radial-gradient(circle at bottom right, rgba(245, 181, 114, 0.12), transparent 22%),
+      linear-gradient(180deg, rgba(39, 48, 46, 0.92), rgba(31, 38, 37, 0.98));
+  }
+
+  body.tema-escuro .mk-login-brand-chip,
+  body.tema-escuro .mk-login-resumo-linha,
+  body.tema-escuro .mk-login-chip-ajuda {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(136, 182, 208, 0.16);
+  }
+
+  body.tema-escuro .mk-login-atalho-secundario {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(136, 182, 208, 0.16);
+    color: var(--cor-texto-principal);
+  }
+
+  body.tema-escuro .mk-login-modal {
+    background: rgba(30, 37, 36, 0.92);
+    border-color: rgba(136, 182, 208, 0.16);
+  }
+
+  body.tema-escuro .mk-login-modal-topo {
+    border-bottom-color: rgba(136, 182, 208, 0.12);
+  }
+
+  body.tema-escuro .mk-login-input,
+  body.tema-escuro .mk-login-botao-secundario,
+  body.tema-escuro .mk-login-fechar {
+    background-color: #28312F;
+    color: var(--cor-texto-principal);
+    border-color: #43504B;
+  }
+
+  @media (max-width: 940px) {
+    .mk-login-vitrine {
+      grid-template-columns: 1fr;
+    }
+
+    .mk-login-painel {
+      grid-template-columns: 1fr;
+    }
+
+    .mk-login-ilustracao {
+      order: 2;
+    }
+  }
+
+  @media (max-width: 580px) {
+    .mk-login-page {
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 10px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      max-height: none;
+      overflow-y: auto;
+    }
+
+    .mk-login-vitrine {
+      gap: 10px;
+    }
+
+    .mk-login-painel,
+    .mk-login-resumo,
+    .mk-login-modal {
+      border-radius: 16px;
+    }
+
+    .mk-login-painel {
+      padding: 14px;
+      gap: 10px;
+      overflow: visible;
+    }
+
+    .mk-login-coluna-copy h1 {
+      font-size: 24px;
+      line-height: 1.08;
+    }
+
+    .mk-login-coluna-copy p {
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .mk-login-ilustracao {
+      min-height: 0;
+      order: 2;
+    }
+
+    .mk-login-mascote {
+      width: min(72vw, 240px);
+      max-height: 190px;
+      margin: 0 auto;
+    }
+
+    .mk-login-resumo {
+      padding: 12px;
+    }
+
+    .mk-login-resumo h2 {
+      font-size: 18px;
+    }
+
+    .mk-login-acoes {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .mk-login-atalho {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .mk-login-modal-topo,
+    .mk-login-formulario {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .mk-login-acoes-modal {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="mk-login-page">
+  <div class="mk-login-vitrine">
+    <section class="mk-login-painel" aria-label="Apresentação do Mukirana">
+      <div class="mk-login-coluna-copy">
+        <div class="mk-login-brand-chip">
+          <img data-mukirana-logo alt="Ícone do Mukirana">
+          <span>Mukirana</span>
+        </div>
+
+        <h1>Seu dinheiro com mais clareza, calma e autonomia.</h1>
+        <p>
+          O Mukirana organiza contas, cartões, projetos, rateios, recorrências e orçamento com uma
+          leitura prática da vida financeira pessoal e familiar.
+        </p>
+
+        <div class="mk-login-acoes">
+          <button
+            type="button"
+            id="btn-abrir-login-mukirana"
+            class="mk-login-atalho"
+            onclick="abrirModalLoginMukirana()"
+            aria-keyshortcuts="Alt+Shift+E"
+          >
+            <span class="material-symbols-outlined">lock_open</span>
+            <span>Fazer login</span>
+            <kbd>Alt+Shift+E</kbd>
+          </button>
+
+          <button
+            type="button"
+            class="mk-login-atalho mk-login-atalho-secundario"
+            onclick="mostrarBalaoAjuda(event, 'Use Tab e Shift+Tab para navegar, Enter para entrar e Esc para fechar o modal de login.')"
+          >
+            <span class="material-symbols-outlined">keyboard</span>
+            <span>Atalhos do teclado</span>
+          </button>
+        </div>
+
+        <div class="mk-login-atalhos-ajuda" aria-label="Atalhos principais desta tela">
+          <span class="mk-login-chip-ajuda"><strong>Tab</strong> navega pelos controles</span>
+          <span class="mk-login-chip-ajuda"><strong>Enter</strong> confirma o login</span>
+          <span class="mk-login-chip-ajuda"><strong>Esc</strong> fecha o modal</span>
+        </div>
+      </div>
+
+      <div class="mk-login-ilustracao">
+        <img
+          data-mukirana-login-img
+          class="mk-login-mascote"
+          alt="Mascote do Mukirana olhando para o usuário"
+        >
+      </div>
+    </section>
+
+    <aside class="mk-login-resumo" aria-label="Resumo do comportamento do sistema">
+      <h2>O que você encontra aqui</h2>
+
+      <div class="mk-login-resumo-linha">
+        <strong>Visão familiar</strong>
+        <span>Entenda com clareza o que é seu, o que é compartilhado e quem paga quem em cada período.</span>
+      </div>
+
+      <div class="mk-login-resumo-linha">
+        <strong>Rotina leve</strong>
+        <span>Cadastre rápido, acompanhe pendências e volte ao contexto certo sem perder tempo.</span>
+      </div>
+
+      <div class="mk-login-resumo-linha">
+        <strong>Uso por teclado</strong>
+        <span>O login respeita foco, ordem de tabulação, fechamento com Esc e atalhos sem atrapalhar a digitação.</span>
+      </div>
+    </aside>
+  </div>
+
+  <div
+    id="modal-login-mukirana"
+    class="mk-login-modal-overlay oculto"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-login-mukirana"
+    aria-describedby="descricao-login-mukirana"
+    onclick="fecharModalLoginMukiranaPorOverlay(event)"
+  >
+    <div class="mk-login-modal" onclick="event.stopPropagation()">
+      <div class="mk-login-modal-topo">
+        <div>
+          <h3 id="titulo-login-mukirana">Entrar</h3>
+          <p id="descricao-login-mukirana">
+            Use seu e-mail e sua senha ou PIN para acessar o Mukirana.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          id="btn-fechar-login-mukirana"
+          class="mk-login-fechar"
+          onclick="fecharModalLoginMukirana()"
+          aria-label="Fechar login"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form class="mk-login-formulario" id="form-login" onsubmit="processarLoginFront(event)">
+        <div class="mk-login-grid">
+          <div class="mk-login-field">
+            <label class="mk-login-label" for="login_email">E-mail</label>
+            <input
+              class="mk-login-input"
+              type="email"
+              id="login_email"
+              required
+              autocomplete="email"
+              placeholder="seu@email.com"
+            >
+          </div>
+
+          <div class="mk-login-field">
+            <label class="mk-login-label" for="login_senha">Senha ou PIN</label>
+            <input
+              class="mk-login-input"
+              type="password"
+              id="login_senha"
+              required
+              autocomplete="current-password"
+              placeholder="Digite sua senha ou PIN"
+            >
+          </div>
+        </div>
+
+        <div class="mk-login-acoes-modal">
+          <button
+            type="submit"
+            class="mk-login-botao mk-login-botao-principal"
+            id="btn-entrar"
+          >
+            Entrar
+          </button>
+          <button
+            type="button"
+            class="mk-login-botao mk-login-botao-secundario"
+            onclick="fecharModalLoginMukirana()"
+          >
+            Cancelar
+          </button>
+        </div>
+
+        <div class="mk-login-ajuda-modal">
+          Atalhos desta tela: <strong>Alt+Shift+E</strong> abre o login, <strong>Tab</strong> navega,
+          <strong>Enter</strong> envia e <strong>Esc</strong> fecha o modal.
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  /*
+   * Módulo: Login_View.html
+   * Responsabilidade:
+   * - Exibir a apresentação do Mukirana antes do login.
+   * - Controlar o modal de autenticação com foco e teclado.
+   * - Delegar a validação da sessão ao Index após o sucesso.
+   */
+
+  ocultarEstruturaInternaDuranteLogin();
+  inicializarLoginMukiranaVisual();
+
+  function ocultarEstruturaInternaDuranteLogin() {
+    var menuLateralApp = document.getElementById('menu-lateral');
+    var fabContainer = document.querySelector('.fab-container');
+    var topbarApp = document.getElementById('topbar-app');
+
+    if (menuLateralApp) {
+      menuLateralApp.style.display = 'none';
+    }
+
+    if (fabContainer) {
+      fabContainer.style.display = 'none';
+    }
+
+    if (topbarApp) {
+      topbarApp.style.display = 'none';
+    }
+  }
+
+  function inicializarLoginMukiranaVisual() {
+    if (typeof aplicarIdentidadeVisualMukirana === 'function') {
+      aplicarIdentidadeVisualMukirana();
+    }
+  }
+
+  function abrirModalLoginMukirana() {
+    var overlay = document.getElementById('modal-login-mukirana');
+    var campoEmail = document.getElementById('login_email');
+
+    if (!overlay) {
+      return;
+    }
+
+    overlay.classList.remove('oculto');
+
+    if (typeof ativarAcessibilidadeModalMukirana === 'function') {
+      ativarAcessibilidadeModalMukirana(overlay, {
+        elementoInicial: campoEmail,
+        aoEsc: function() {
+          fecharModalLoginMukirana();
+        }
+      });
+    } else if (campoEmail) {
+      campoEmail.focus();
+    }
+  }
+
+  function fecharModalLoginMukirana() {
+    var overlay = document.getElementById('modal-login-mukirana');
+    var botaoEntrar = document.getElementById('btn-entrar');
+
+    if (overlay) {
+      overlay.classList.add('oculto');
+    }
+
+    if (botaoEntrar) {
+      if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+        definirEstadoAcaoTelaMukirana(false, { escopo: '#form-login' });
+      } else {
+        botaoEntrar.disabled = false;
+        botaoEntrar.innerText = 'Entrar';
+      }
+    }
+
+    if (typeof desativarAcessibilidadeModalMukirana === 'function') {
+      desativarAcessibilidadeModalMukirana();
+    }
+  }
+
+  function fecharModalLoginMukiranaPorOverlay(evento) {
+    if (evento && evento.target === evento.currentTarget) {
+      fecharModalLoginMukirana();
+    }
+  }
+
+  function processarLoginFront(evento) {
+    evento.preventDefault();
+
+    var btn = document.getElementById('btn-entrar');
+    var email = document.getElementById('login_email').value;
+    var senha = document.getElementById('login_senha').value;
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(true, {
+        escopo: '#form-login',
+        idsProcessando: ['btn-entrar'],
+        textoProcessando: 'Autenticando...'
+      });
+    } else {
+      btn.disabled = true;
+      btn.innerText = 'Autenticando...';
+    }
+
+    google.script.run
+      .withSuccessHandler(function(dadosSessao) {
+        localStorage.setItem('mukirana_token', dadosSessao.token);
+        localStorage.setItem('mukirana_id', dadosSessao.id);
+        localStorage.setItem('mukirana_nome', dadosSessao.nome);
+        localStorage.setItem('mukirana_email', dadosSessao.email);
+        localStorage.setItem('mukirana_papel', dadosSessao.papel);
+        localStorage.setItem('mukirana_tema', dadosSessao.tema);
+
+        mostrarNotificacao('Bem-vindo(a), ' + dadosSessao.nome + '!', 'sucesso');
+        fecharModalLoginMukirana();
+
+        if (typeof verificarSessao === 'function') {
+          verificarSessao();
+        }
+      })
+      .withFailureHandler(function(erro) {
+        if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+          definirEstadoAcaoTelaMukirana(false, { escopo: '#form-login' });
+        } else {
+          btn.disabled = false;
+          btn.innerText = 'Entrar';
+        }
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      .autenticarUsuario(email, senha);
+  }
+
+  window.abrirModalLoginMukirana = abrirModalLoginMukirana;
+  finalizarCarregamentoTelaMukirana();
+</script>

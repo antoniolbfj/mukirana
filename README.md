@@ -1,106 +1,53 @@
 # Mukirana
 
-Aplicação de finanças individuais com interface HTML/CSS/JavaScript, backend
-Google Apps Script e PostgreSQL no Supabase. O acesso usa código temporário de
-e-mail e sessões próprias por navegador.
+Base de trabalho reiniciada em 24/10/2026 a partir do sistema existente em
+produção, descrito na implantação como **Mukirana 1.9**. A orientação atual é
+aprimorar sua experiência de uso a partir dessa versão.
 
-## Funcionalidades
+## Origem
 
-- Contas de Consumo, Investimento e Cartão de Crédito, com saldo atual calculado.
-- Categorias e subcategorias individuais em uma única tabela hierárquica.
-- Receitas e despesas nas modalidades Único, Parcelado e Recorrente, no mesmo formulário/lista.
-- Geração antecipada, prévia, totais derivados e edição/exclusão individual ou em lote.
-- Recorrências finitas com término exclusivo e aviso interno para renovação.
-- Transferência como tipo de lançamento, junto de receitas e despesas em uma
-  lista e um formulário; edição/exclusão das duas pontas e integração com saldos.
-- Valores em centavos, classificação fixa/variável e datas passadas ou futuras.
-- Filtros de período, natureza, conta, categoria, classificação e descrição. Transferências podem ser filtradas pelo tipo e por
-  qualquer uma das contas envolvidas.
-- Resultado do período, saldo atual e posição acumulada até o fim do período.
-- Criação rápida de conta, categoria ou subcategoria dentro do lançamento.
-- Saldo inicial como movimentação especial, com data e edição pelo cadastro da
-  conta. Excluí-lo na lista limpa o valor inicial e preserva a conta.
-- Proteção de contas/categorias com movimentações, categorias reservadas,
-  versões concorrentes e acesso de outros usuários.
-- Interface responsiva com temas claro, escuro e sépia; diagnósticos reais de
-  leitura disponíveis dentro do aplicativo.
+- Apps Script: `1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd`.
+- Versão imutável importada: **32**, com 49 arquivos originais.
+- Supabase confirmado pelo usuário: **`wcczkultokrypdfimbsh`**.
+- API do banco: `https://wcczkultokrypdfimbsh.supabase.co`.
+- [Implantação existente](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec), com acesso exigindo conta Google.
 
-Histórico/favoritos, compartilhamentos, metas e relatórios continuam em entregas
-posteriores. Parcelamentos e recorrências fazem parte de Meus lançamentos. O período selecionado é mantido em memória durante
-a navegação; preferência de período salva por usuário será uma entrega posterior.
+O código da versão 32 foi comparado com o conteúdo atual do editor Apps Script:
+os 49 arquivos são idênticos. Os hashes de origem estão em
+[docs/base-producao.json](docs/base-producao.json).
 
 ## Organização
 
-`authentication`, `accounts`, `categories`, `transactions` e `transfers` contêm os contratos,
-serviços e DAOs de cada módulo. `web/ApiController.js` é a fronteira da interface;
-as funções e objetos internos terminam em `_`. `infrastructure/SupabaseDao.js`
-centraliza o acesso às RPCs. A interface existente fica em `generated/App.html`,
-com os módulos adicionais incluídos por `web/WebController.js`.
+Os arquivos do Apps Script ficam na raiz. `App_Main.js` contém a entrada web e o
+roteamento, `Index.html` monta a interface e os arquivos `*_Controller.js`,
+`*_Model.js` e `*_View.html` organizam as funcionalidades existentes.
+`Global_Assets.html` e `Global_Estilos.html` concentram recursos comuns.
 
-As regras de dados e as migrações estão descritas em [supabase/README.md](supabase/README.md).
-As decisões das entregas estão em [docs/lancamentos-unicos.md](docs/lancamentos-unicos.md)
-e [docs/transferencias.md](docs/transferencias.md). A entrega atual está em
-[docs/parcelamentos-recorrencias.md](docs/parcelamentos-recorrencias.md), com o
-restante em [docs/pendencias-requisitos.md](docs/pendencias-requisitos.md).
+`Database_Service.js` seleciona a fonte de dados. `Supabase_Service.js` centraliza
+o acesso server-side e `Supabase_Contexto.js` reúne consultas por RPC.
+O código de migração legado foi preservado como parte da base original.
 
-## Configuração e publicação
+## Configuração
 
-O projeto Apps Script está vinculado por `.clasp.json`. Configure nas propriedades
-privadas do script `SUPABASE_URL` e `SUPABASE_SECRET_KEY`. A chave de servidor fica
-exclusivamente no backend. Não a inclua no HTML, no código-fonte ou no Git.
+O `.clasp.json` aponta para o projeto acima. A aplicação existente utiliza estas
+propriedades privadas do script:
 
-Aplique as migrações ao projeto Supabase correspondente. As tabelas privadas têm
-RLS e nenhum acesso direto pelas roles da API; somente RPCs específicas permitem
-operações com sessão válida e verificação de propriedade.
+- `MUKIRANA_DATA_SOURCE`: `SUPABASE` para usar o banco confirmado.
+- `MUKIRANA_SUPABASE_URL`: `https://wcczkultokrypdfimbsh.supabase.co`.
+- `MUKIRANA_SUPABASE_SERVICE_KEY`: chave server-side do projeto correspondente.
 
-Com o clasp autenticado na conta proprietária:
+As credenciais existentes da produção permanecem no Apps Script. O acesso ao banco
+pelo conector Supabase foi confirmado por consultas de catálogo, sem alterações
+em estrutura ou registros. A credencial de ambiente ligada ao projeto anterior
+não deve ser usada com este banco.
 
-```sh
-clasp push
-clasp create-version "Mukirana v0.5.0: parcelamentos e recorrências"
-clasp create-deployment -V NUMERO_DA_VERSAO -d "Mukirana v0.5.0: parcelamentos e recorrências"
-```
+## Histórico e próximos passos
 
-O manifesto configura execução pela conta responsável pela implantação e acesso
-web público. A autenticação própria protege os dados dentro do aplicativo.
+O trabalho anterior está preservado na branch
+[`archive/pre-v1-reset-2026-10-24`](https://github.com/antoniolbfj/mukirana/tree/archive/pre-v1-reset-2026-10-24).
+Os arquivos, testes, migrações e pendências anteriores foram retirados da base
+ativa. Nenhuma alteração foi publicada no Apps Script nesta importação.
 
-## Verificação
-
-Node.js 18+ e Python 3 são necessários apenas no desenvolvimento. Para o navegador,
-instale `requirements-dev.txt` e o Chromium. O teste usa o Chromium do sistema
-quando disponível, ou o navegador instalado pelo Playwright.
-
-```sh
-npm test
-npm run check
-python3 -m pip install -r requirements-dev.txt
-python3 -m playwright install chromium
-npm run test:ui
-```
-
-Os testes de navegador usam uma ponte Apps Script simulada, sem enviar e-mails.
-Os testes SQL em `supabase/checks` exercitam o banco real com dados isolados em
-subtransações revertidas. A entrega de transferências passou em PostgreSQL 17.11 isolado por 60 verificações
-SQL, quatro cenários de concorrência e as 68 verificações SQL anteriores. Também
-passaram 24 grupos de contratos/utilitários e 37 fluxos de interface. A instalação
-remota do SQL de transferências foi confirmada em 24/10/2026: passaram as 60
-verificações do módulo e as 48 de lançamentos no Supabase, sem fixtures restantes.
-Detalhes estão em `docs/transferencias.md`.
-
-As migrações registradas aqui foram recuperadas do histórico efetivamente aplicado
-no Supabase. As estruturas de autenticação e contas anteriores à primeira migração
-do repositório já existiam no ambiente; este diretório não representa uma instalação
-completa dessas fundações em um banco vazio.
-
-A correção v0.4.1 integra transferências a **Meus lançamentos**, incluindo o
-formulário, a lista, os filtros e as ações. A tela independente foi removida.
-Não há nova instalação SQL: as operações existentes são preservadas. Passaram
-36 grupos de backend (incluindo 30 combinações de paginação mista) e 38 fluxos
-de navegador. Detalhes em `docs/transferencias.md`.
-
-Na v0.5.0, parcelamentos e recorrências estão integrados a Meus lançamentos.
-A migração `20261024120028_add_installments_and_recurring_transactions` foi
-aplicada no Supabase. Passaram 61 verificações novas no banco e as verificações
-anteriores de lançamentos/transferências, cinco cenários concorrentes em banco
-isolado, 50 grupos de backend e 56 fluxos de interface. Limite operacional de
-1.000 ocorrências por geração; o total do conjunto sempre é derivado dos registros.
+Detalhes da preparação e limites da validação estão em
+[docs/reinicio.md](docs/reinicio.md). O escopo vigente está em
+[docs/pendencias-requisitos.md](docs/pendencias-requisitos.md).

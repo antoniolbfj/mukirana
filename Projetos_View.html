@@ -1,0 +1,1308 @@
+<style>
+  .cabecalho-tela {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  .toggle-arquivados {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+
+  .btn-primario {
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: var(--cor-primaria);
+    color: white;
+    transition: 0.2s;
+  }
+
+  .btn-secundario {
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: #E0E0E0;
+    color: var(--cor-texto-principal);
+    transition: 0.2s;
+  }
+
+  .btn-acao {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: var(--cor-fundo-app);
+    border: var(--borda-suave);
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: 0.2s;
+  }
+
+  .btn-acao:hover {
+    background-color: var(--cor-primaria);
+    color: white;
+  }
+
+  .cartao {
+    background: var(--cor-superficie);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: var(--sombra-suave);
+    margin-bottom: 20px;
+  }
+
+  .grupo-campo {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .grupo-campo-duplo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  label {
+    font-size: 14px;
+    color: var(--cor-texto-secundario);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  input,
+  select {
+    padding: 14px;
+    border: var(--borda-suave);
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    outline: none;
+    background: white;
+    color: var(--cor-texto-principal);
+  }
+
+  .acoes-formulario {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .tabela-mukirana {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .tabela-mukirana th,
+  .tabela-mukirana td {
+    padding: 16px;
+    border-bottom: var(--borda-suave);
+  }
+
+  .badge-ativo {
+    background: var(--cor-sucesso-fundo);
+    color: var(--cor-sucesso-texto);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .badge-inativo {
+    background: var(--cor-alerta-fundo);
+    color: var(--cor-alerta-texto);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .estado-vazio {
+    text-align: center;
+    padding: 40px;
+    display: none;
+  }
+
+  .linha-arquivada {
+    opacity: 0.6;
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  body.tema-escuro .linha-arquivada {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  body.tema-escuro .caixa-selecao-usuarios {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: #444 !important;
+  }
+
+  .projeto-periodo {
+    margin-bottom: 12px;
+  }
+
+  .projeto-metrica {
+    display: block;
+    color: var(--cor-texto-principal);
+    font-weight: 700;
+  }
+
+  .projeto-meta {
+    display: block;
+    margin-top: 3px;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .projeto-progresso {
+    min-width: 130px;
+  }
+
+  .projeto-progresso-barra {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-top: 5px;
+  }
+
+  .projeto-progresso-preenchimento {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #53B88A, #F0B24B);
+  }
+
+  .projeto-progresso-preenchimento.excedido {
+    background: #D32F2F;
+  }
+
+  .detalhes-projeto-cabecalho {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 14px;
+  }
+
+  .modal-detalhes-projeto-caixa {
+    max-height: min(90vh, 900px);
+    max-height: min(90dvh, 900px);
+    padding: 0 !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .modal-detalhes-projeto-caixa .detalhes-projeto-cabecalho {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 18px 20px 12px 20px;
+    border-bottom: var(--borda-suave);
+    background: var(--cor-superficie);
+  }
+
+  .detalhes-projeto-corpo {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 14px 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .detalhes-projeto-rodape {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px 16px 20px;
+    border-top: var(--borda-suave);
+    background: var(--cor-superficie);
+  }
+
+  .detalhes-projeto-rodape .projeto-meta {
+    margin: 0;
+  }
+
+  .detalhes-projeto-cabecalho h3 {
+    margin: 0;
+  }
+
+  .detalhes-projeto-selo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--cor-superficie-secundaria);
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .detalhes-projeto-layout {
+    display: grid;
+    gap: 14px;
+  }
+
+  .detalhes-projeto-bloco {
+    border: var(--borda-suave);
+    border-radius: 10px;
+    background: var(--cor-superficie);
+    padding: 14px;
+  }
+
+  .detalhes-projeto-bloco.destaque {
+    background: var(--cor-superficie-secundaria);
+  }
+
+  .detalhes-projeto-bloco h4 {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+    color: var(--cor-texto-principal);
+  }
+
+  .detalhes-projeto-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+  }
+
+  .detalhes-projeto-grid.principal {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .detalhes-projeto-barra-teto {
+    grid-column: 1 / -1;
+    border: var(--borda-suave);
+    border-radius: 10px;
+    background: var(--cor-superficie);
+    padding: 10px 12px;
+  }
+
+  .detalhes-projeto-barra-teto-topo {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 7px;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .detalhes-projeto-barra-teto-trilho {
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(83, 184, 138, 0.22), rgba(240, 178, 75, 0.25), rgba(211, 47, 47, 0.22));
+    overflow: hidden;
+  }
+
+  .detalhes-projeto-barra-teto-preenchimento {
+    height: 100%;
+    border-radius: 999px;
+    background: #53B88A;
+    transition: width 0.25s ease;
+  }
+
+  .detalhes-projeto-barra-teto-preenchimento.alerta {
+    background: #F0B24B;
+  }
+
+  .detalhes-projeto-barra-teto-preenchimento.excedido {
+    background: #D32F2F;
+  }
+
+  .detalhes-projeto-item {
+    border: var(--borda-suave);
+    border-radius: 8px;
+    padding: 12px;
+    background: var(--cor-superficie);
+  }
+
+  .detalhes-projeto-item.enfase {
+    background: rgba(63, 111, 114, 0.10);
+    border-color: rgba(63, 111, 114, 0.22);
+  }
+
+  body.tema-escuro .detalhes-projeto-item.enfase {
+    background: rgba(127, 184, 188, 0.14);
+    border-color: rgba(127, 184, 188, 0.26);
+  }
+
+  .detalhes-projeto-item span {
+    display: block;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .detalhes-projeto-item strong {
+    color: var(--cor-texto-principal);
+    font-size: 17px;
+  }
+
+  .detalhes-projeto-alerta {
+    display: none;
+    margin-top: 10px;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: var(--cor-alerta-fundo);
+    color: var(--cor-alerta-texto);
+    font-weight: 700;
+  }
+
+  @media (max-width: 600px) {
+    .grupo-campo-duplo {
+      grid-template-columns: 1fr;
+    }
+
+    .detalhes-projeto-cabecalho {
+      grid-template-columns: 1fr;
+    }
+
+    .modal-detalhes-projeto-caixa {
+      max-height: calc(100vh - 16px);
+      max-height: calc(100dvh - 16px);
+    }
+
+    .detalhes-projeto-rodape {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .detalhes-projeto-grid,
+    .detalhes-projeto-grid.principal {
+      grid-template-columns: 1fr;
+    }
+
+    .lista-linhas-wrap .tabela-mukirana.lista-linhas-mukirana {
+      min-width: max(840px, 100%);
+    }
+  }
+</style>
+
+<div class="cabecalho-tela">
+  <h2>Centros de Custo (Projetos)</h2>
+  <button class="btn-primario" data-topbar-label="+ Novo Projeto" onclick="abrirFormularioProjeto()">+ Novo Projeto</button>
+</div>
+
+<div class="toggle-arquivados">
+  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--cor-texto-secundario); font-weight: 600;">
+    <input type="checkbox" id="toggle_arquivados" onchange="alternarVisaoArquivados()" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+    Exibir Projetos Concluídos
+  </label>
+</div>
+
+<div class="cartao projeto-periodo" style="display:none;">
+  <div class="grupo-campo-duplo">
+    <div class="grupo-campo" style="margin-bottom: 0;">
+      <label for="projetos_mes_inicial">Mes inicial</label>
+      <input type="month" id="projetos_mes_inicial" onchange="aoAlterarPeriodoProjeto()">
+    </div>
+    <div class="grupo-campo" style="margin-bottom: 0;">
+      <label for="projetos_mes_final">Mes final (opcional)</label>
+      <input type="month" id="projetos_mes_final" onchange="aoAlterarPeriodoProjeto()">
+    </div>
+  </div>
+  <div class="projeto-meta">
+    O consolidado usa meses fechados. A linha mostra apenas o essencial; detalhes completos ficam no botao Detalhes.
+  </div>
+</div>
+
+<div id="container-form-projeto" class="cartao" style="display: none;">
+  <h3 id="titulo-form-projeto">Criar Projeto</h3>
+  <form id="form-projeto" onsubmit="enviarFormularioProjeto(event)">
+    <input type="hidden" id="id_projeto">
+    <input type="hidden" id="linha_planilha_projeto">
+    <input type="hidden" id="criado_por_projeto">
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label>Nome do Projeto</label>
+        <input type="text" id="nome_projeto" required placeholder="Ex: Reforma da Cozinha, Viagem de Férias">
+      </div>
+      <div class="grupo-campo">
+        <label>Orçamento Teto (R$ - Opcional)</label>
+        <input type="text" inputmode="numeric" id="orcamento_teto" oninput="mascaraMoeda(this)" placeholder="0,00 (Deixe em branco para ilimitado)">
+      </div>
+    </div>
+
+    <div class="grupo-campo">
+      <label style="display: flex; flex-direction: row; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
+        <input type="checkbox" id="check_compartilhado_projeto" onchange="toggleCompartilhadoProjeto()" style="width: auto; margin: 0;"> 
+        Projeto Compartilhado (Visível para outros usuários)
+      </label>
+    </div>
+
+    <div class="grupo-campo caixa-selecao-usuarios" id="div_usuarios_compartilhados_projeto"
+      style="display: none; background-color: rgba(0,0,0,0.02); padding: 15px; border-radius: 8px; border: var(--borda-suave);">
+      <label style="margin-bottom: 12px; color: var(--cor-texto-principal);">Selecione com quem partilhar:</label>
+      <div id="lista-checkboxes-usuarios-projeto" style="max-height: 150px; overflow-y: auto;">
+      </div>
+    </div>
+
+    <div class="acoes-formulario">
+      <button type="button" class="btn-secundario" onclick="fecharFormularioProjeto()">Cancelar</button>
+      <button type="button" class="btn-secundario" id="btn-salvar-e-novo-projeto" onclick="solicitarSalvarENovoProjeto()">Salvar + novo</button>
+      <button type="submit" class="btn-primario" id="btn-salvar-projeto" onclick="definirModoAposSalvarProjeto('fechar')">Salvar Projeto</button>
+    </div>
+  </form>
+</div>
+
+<div class="cartao" id="container-lista-projeto">
+  <div class="lista-linhas-wrap">
+  <table class="tabela-mukirana lista-linhas-mukirana" id="tabela-projetos-html">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Teto Estipulado</th>
+        <th>Realizado</th>
+        <th>Minha responsabilidade</th>
+        <th>Disponivel</th>
+        <th>Uso</th>
+        <th>Compartilhado</th>
+        <th>Status</th>
+        <th style="text-align: right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-tabela-projetos"></tbody>
+  </table>
+  </div>
+
+  <div id="estado-vazio-projeto" class="estado-vazio">
+    <h3 style="color: var(--cor-texto-principal); margin-bottom: 8px; font-size: 18px;">Nenhum projeto encontrado</h3>
+    <p style="color: var(--cor-texto-secundario); margin-bottom: 24px; font-size: 14px;">Agrupe despesas em eventos
+      criando o seu primeiro projeto.</p>
+    <button class="btn-primario" onclick="abrirFormularioProjeto()">+ Criar Projeto</button>
+  </div>
+</div>
+
+<div id="modal-detalhes-projeto" class="modal-overlay oculto">
+  <div class="modal-caixa modal-detalhes-projeto-caixa" style="width:min(1040px, 96vw); max-width:min(1040px, 96vw);">
+    <div class="detalhes-projeto-cabecalho">
+      <div>
+        <h3 id="detalhes-projeto-titulo">Detalhes do projeto</h3>
+        <p id="detalhes-projeto-periodo" class="projeto-meta"></p>
+      </div>
+      <span id="detalhes-projeto-status" class="detalhes-projeto-selo"></span>
+    </div>
+    <div class="detalhes-projeto-corpo">
+      <div id="detalhes-projeto-alerta" class="detalhes-projeto-alerta"></div>
+      <div class="detalhes-projeto-layout">
+        <section class="detalhes-projeto-bloco destaque">
+          <h4>Resumo principal</h4>
+          <div class="detalhes-projeto-grid principal" id="detalhes-projeto-principal"></div>
+        </section>
+        <section class="detalhes-projeto-bloco">
+          <h4>Lançamentos futuros</h4>
+          <div class="detalhes-projeto-grid" id="detalhes-projeto-futuros"></div>
+        </section>
+        <section class="detalhes-projeto-bloco">
+          <h4>Responsabilidade dos participantes no resultado</h4>
+          <div class="lista-linhas-wrap">
+            <table class="tabela-mukirana lista-linhas-mukirana">
+              <thead>
+                <tr>
+                  <th>Participante</th>
+                  <th>Receitas</th>
+                  <th>Despesas</th>
+                  <th>Transferencias</th>
+                  <th>Resultado</th>
+                  <th>Lancamentos</th>
+                </tr>
+              </thead>
+              <tbody id="detalhes-projeto-participantes"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="detalhes-projeto-rodape">
+      <p id="detalhes-projeto-equipe" class="projeto-meta"></p>
+      <div class="modal-botoes">
+        <button type="button" class="btn-secundario" onclick="fecharDetalhesProjeto()">Fechar</button>
+        <button type="button" class="btn-primario" id="btn-detalhes-projeto-lancamentos">Ver lancamentos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var projetosEmMemoria = [];
+  var mostrarArquivados = false;
+  // Substituímos o E-mail pelo ID (UUID)
+  var idLogadoProjeto = localStorage.getItem('mukirana_id') || '';
+  var tokenSessao = localStorage.getItem('mukirana_token') || '';
+  var papelLogadoProjeto = localStorage.getItem('mukirana_papel') || 'Usuário';
+  var projetoTabelaInicialCarregada = false;
+  var projetoUsuariosInicialCarregados = false;
+  var modoAposSalvarProjeto = 'fechar';
+  var assinaturaTelaProjetos = String(Date.now()) + '_' + Math.random().toString(36).slice(2);
+  window.assinaturaTelaProjetosAtiva = assinaturaTelaProjetos;
+
+  inicializarPeriodoProjetos();
+  carregarTabelaProjetos();
+  carregarUsuariosParaSelecaoProjeto(); // Reaproveita a API Global que já utiliza IDs
+
+  function inicializarPeriodoProjetos() {
+    aplicarPeriodoGlobalProjetos_();
+  }
+
+  function obterPeriodoGlobalProjetos_() {
+    if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
+      var periodo = obterFiltroPeriodoGlobalMukirana() || {};
+      return {
+        Mes_Inicial: periodo.Mes_Inicial || periodo.Mes_Referencia || gerarMesAtualProjeto(),
+        Mes_Final: periodo.Mes_Final || '',
+        Considerar_Historico_Anterior: periodo.Considerar_Historico_Anterior !== false
+      };
+    }
+
+    var campoInicial = document.getElementById('projetos_mes_inicial');
+    var campoFinal = document.getElementById('projetos_mes_final');
+
+    return {
+      Mes_Inicial: campoInicial && campoInicial.value ? campoInicial.value : gerarMesAtualProjeto(),
+      Mes_Final: campoFinal && campoFinal.value ? campoFinal.value : '',
+      Considerar_Historico_Anterior: true
+    };
+  }
+
+  function aplicarPeriodoGlobalProjetos_() {
+    if (!telaProjetosMontada_()) {
+      return;
+    }
+
+    var periodo = obterPeriodoGlobalProjetos_();
+    var campoInicial = document.getElementById('projetos_mes_inicial');
+    var campoFinal = document.getElementById('projetos_mes_final');
+
+    if (campoInicial) {
+      campoInicial.value = periodo.Mes_Inicial || gerarMesAtualProjeto();
+    }
+
+    if (campoFinal) {
+      campoFinal.value = periodo.Mes_Final || '';
+    }
+  }
+
+  function finalizarCarregamentoInicialProjetoSePronto() {
+    if (!telaProjetosMontada_()) {
+      return;
+    }
+
+    if (projetoTabelaInicialCarregada && projetoUsuariosInicialCarregados) {
+      finalizarCarregamentoTelaMukirana();
+    }
+  }
+
+  function telaProjetosMontada_() {
+    return window.assinaturaTelaProjetosAtiva === assinaturaTelaProjetos &&
+      !!document.getElementById('container-lista-projeto') &&
+      !!document.getElementById('corpo-tabela-projetos');
+  }
+
+  function abrirFormularioProjeto() {
+    document.getElementById('form-projeto').reset();
+    definirModoAposSalvarProjeto('fechar');
+    document.getElementById('id_projeto').value = '';
+    document.getElementById('linha_planilha_projeto').value = '';
+    document.getElementById('criado_por_projeto').value = '';
+    document.getElementById('div_usuarios_compartilhados_projeto').style.display = 'none';
+    document.getElementById('titulo-form-projeto').innerText = 'Criar Projeto';
+    
+    document.getElementById('container-form-projeto').style.display = 'block';
+    document.getElementById('container-lista-projeto').style.display = 'none';
+  }
+
+  function fecharFormularioProjeto() {
+    document.getElementById('container-form-projeto').style.display = 'none';
+    document.getElementById('container-lista-projeto').style.display = 'block';
+  }
+
+  function definirModoAposSalvarProjeto(modo) {
+    modoAposSalvarProjeto = modo === 'novo' ? 'novo' : 'fechar';
+  }
+
+  function solicitarSalvarENovoProjeto() {
+    definirModoAposSalvarProjeto('novo');
+
+    var formulario = document.getElementById('form-projeto');
+
+    if (formulario && typeof formulario.requestSubmit === 'function') {
+      formulario.requestSubmit();
+      return;
+    }
+
+    formulario.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  function atualizarEstadoBotoesSalvarProjeto(salvando) {
+    var btnSalvar = document.getElementById('btn-salvar-projeto');
+    var btnSalvarENovo = document.getElementById('btn-salvar-e-novo-projeto');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#form-projeto',
+        idsProcessando: ['btn-salvar-projeto', 'btn-salvar-e-novo-projeto'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    if (btnSalvar) {
+      btnSalvar.disabled = !!salvando;
+      btnSalvar.innerText = salvando ? 'Salvando...' : 'Salvar Projeto';
+    }
+
+    if (btnSalvarENovo) {
+      btnSalvarENovo.disabled = !!salvando;
+      btnSalvarENovo.innerText = salvando ? 'Salvando...' : 'Salvar + novo';
+    }
+  }
+
+  function alternarVisaoArquivados() {
+    var toggle = document.getElementById('toggle_arquivados');
+    mostrarArquivados = !!(toggle && toggle.checked);
+    renderizarTabelaProjetos();
+  }
+
+  function toggleCompartilhadoProjeto() {
+    const isChecked = document.getElementById('check_compartilhado_projeto').checked;
+    document.getElementById('div_usuarios_compartilhados_projeto').style.display = isChecked ? 'block' : 'none';
+  }
+
+  function carregarUsuariosParaSelecaoProjeto() {
+    google.script.run
+      .withSuccessHandler(function(usuarios) {
+        if (!telaProjetosMontada_()) {
+          return;
+        }
+
+        const container = document.getElementById('lista-checkboxes-usuarios-projeto');
+        if(!container) return;
+        container.innerHTML = '';
+        
+        if (usuarios.length === 0) {
+          container.innerHTML = '<p style="color: var(--cor-texto-secundario); font-size: 14px; margin: 0;">Nenhum outro usuário ativo para compartilhar.</p>';
+          projetoUsuariosInicialCarregados = true;
+          finalizarCarregamentoInicialProjetoSePronto();
+          return;
+        }
+
+        usuarios.forEach(u => {
+          // O ID do Checkbox baseia-se no UUID (u.id) e o "value" também!
+          const idCheckbox = 'cb_proj_' + u.id;
+          container.innerHTML += `
+            <div style="display: flex; align-items: center; margin-bottom: 10px; gap: 10px;">
+              <input type="checkbox" name="user_cb_proj" value="${u.id}" id="${idCheckbox}" style="margin: 0; width: 18px; height: 18px; cursor: pointer;">
+              <label for="${idCheckbox}" style="margin: 0; font-weight: normal; cursor: pointer; color: var(--cor-texto-principal); line-height: 1;">
+                <strong>${u.nome}</strong> 
+                <span style="color: var(--cor-texto-secundario); font-size: 13px; margin-left: 4px;">(${u.email})</span>
+              </label>
+            </div>
+          `;
+        });
+        projetoUsuariosInicialCarregados = true;
+        finalizarCarregamentoInicialProjetoSePronto();
+      })
+      .withFailureHandler(function(erro) {
+        if (!telaProjetosMontada_()) {
+          return;
+        }
+
+        projetoUsuariosInicialCarregados = true;
+        finalizarCarregamentoInicialProjetoSePronto();
+        mostrarNotificacao("Erro ao carregar usuários do projeto: " + erro.message, "erro");
+      })
+      .obterUsuariosAtivos(tokenSessao); // API do Cartoes_Controller.gs baseada em ID
+  }
+
+  function carregarTabelaProjetos() {
+    if (!telaProjetosMontada_()) {
+      return;
+    }
+
+    google.script.run
+      .withSuccessHandler(function(projetos) {
+        if (!telaProjetosMontada_()) {
+          return;
+        }
+
+        projetosEmMemoria = projetos || [];
+        renderizarTabelaProjetos();
+        projetoTabelaInicialCarregada = true;
+        finalizarCarregamentoInicialProjetoSePronto();
+      })
+      .withFailureHandler(function(erro) {
+        if (!telaProjetosMontada_()) {
+          return;
+        }
+
+        projetoTabelaInicialCarregada = true;
+        finalizarCarregamentoInicialProjetoSePronto();
+        mostrarNotificacao("Erro ao carregar projetos: " + erro.message, "erro");
+      })
+      .obterListaProjetos(tokenSessao, obterFiltrosPeriodoProjeto()); // Passa o ID
+  }
+
+  function aoAlterarPeriodoProjeto() {
+    confirmarCarregamentoHistoricoCompletoProjeto_(function() {
+      carregarTabelaProjetos();
+    });
+  }
+
+  function confirmarCarregamentoHistoricoCompletoProjeto_(callback) {
+    var filtros = obterFiltrosPeriodoProjeto();
+
+    if (filtros.Mes_Inicial || filtros.Mes_Final) {
+      callback();
+      return;
+    }
+
+    confirmarAcao(
+      'Você deixou o mês inicial e o mês final em branco. A tela vai buscar todo o histórico de projetos e lançamentos, o que pode demorar mais. Deseja continuar?',
+      callback
+    );
+  }
+
+  function renderizarTabelaProjetosLegado_() {
+    const corpo = document.getElementById('corpo-tabela-projetos');
+    const vazio = document.getElementById('estado-vazio-projeto');
+    const tabela = document.getElementById('tabela-projetos-html');
+
+    if (!corpo || !vazio || !tabela) {
+      return;
+    }
+    
+    corpo.innerHTML = '';
+    
+    let projetosFiltrados = projetosEmMemoria;
+    if (!mostrarArquivados) {
+      projetosFiltrados = projetosEmMemoria.filter(p => p.Status === true);
+    }
+    
+    projetosFiltrados.sort((a, b) => a.Nome.localeCompare(b.Nome));
+
+    if (projetosFiltrados.length === 0) {
+      tabela.style.display = 'none';
+      vazio.style.display = 'block'; 
+    } else {
+      tabela.style.display = 'table';
+      vazio.style.display = 'none';
+      
+      projetosFiltrados.forEach(function(p) {
+        const badgeStatus = p.Status ? 'badge-ativo' : 'badge-inativo';
+        const txtStatus = p.Status ? 'Em Andamento' : 'Concluído';
+        const txtTeto = p.Orcamento_Teto ? 'R$ ' + parseFloat(p.Orcamento_Teto).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '<span style="color:#9E9E9E">Sem teto</span>';
+        
+        // Verifica a propriedade por ID
+        const ehDono = (p.Criado_Por && p.Criado_Por.toString().trim() === idLogadoProjeto.toString().trim());
+        
+        let txtCompartilhado = p.Compartilhado ? 'Sim' : 'Não';
+        if (p.Compartilhado && !ehDono) {
+           txtCompartilhado = '<span style="color: var(--cor-primaria); font-weight: bold;">Comigo</span>';
+        }
+
+        const classeLinha = p.Status ? '' : 'linha-arquivada';
+        const bloqueio = (!ehDono && papelLogadoProjeto !== 'Administrador') ? 'disabled title="Apenas o criador pode modificar"' : '';
+
+        let botoesAcao = `<button class="btn-acao" onclick="abrirLancamentosProjeto('${p.ID_Projeto}')">Lançamentos</button>`;
+        if (p.Status) {
+           botoesAcao += `<button class="btn-acao" onclick="prepararEdicaoProjeto('${p.ID_Projeto}')" ${bloqueio}>✎ Editar</button>`;
+           // Alterado para enviar o ID do Projeto ao invés da linha
+           botoesAcao += `<button class="btn-acao" onclick="alterarStatusProjetoFront('${p.ID_Projeto}')" ${bloqueio}>Concluir</button>`;
+        } else {
+           botoesAcao += `<button class="btn-acao" onclick="alterarStatusProjetoFront('${p.ID_Projeto}')" ${bloqueio}>⟲ Restaurar</button>`;
+        }
+
+        corpo.innerHTML += `<tr class="${classeLinha}">
+          <td data-label="Nome"><strong>${p.Nome}</strong></td>
+          <td data-label="Teto Estipulado">${txtTeto}</td>
+          <td data-label="Compartilhado">${txtCompartilhado}</td>
+          <td data-label="Status"><span class="${badgeStatus}">${txtStatus}</span></td>
+          <td data-label="Ações" style="text-align:right">${botoesAcao}</td>
+        </tr>`;
+      });
+    }
+  }
+
+  function enviarFormularioProjeto(evento) {
+    evento.preventDefault();
+    var modoSalvamento = modoAposSalvarProjeto === 'novo' ? 'novo' : 'fechar';
+    atualizarEstadoBotoesSalvarProjeto(true);
+
+    // O .value agora é o ID do usuário (UUID), então este map funciona perfeitamente!
+    const selecionados = Array.from(document.querySelectorAll('input[name="user_cb_proj"]:checked'))
+                              .map(cb => cb.value).join(',');
+
+    const dados = {
+      ID_Projeto: document.getElementById('id_projeto').value,
+      _linhaPlanilha: document.getElementById('linha_planilha_projeto').value,
+      Criado_Por: document.getElementById('criado_por_projeto').value,
+      Nome: document.getElementById('nome_projeto').value,
+      Orcamento_Teto: reverterMoeda(document.getElementById('orcamento_teto').value),
+      Compartilhado: document.getElementById('check_compartilhado_projeto').checked,
+      Usuarios_Compartilhados: selecionados
+    };
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        atualizarEstadoBotoesSalvarProjeto(false);
+        definirModoAposSalvarProjeto('fechar');
+
+        if (modoSalvamento === 'novo') {
+          abrirFormularioProjeto();
+        } else {
+          fecharFormularioProjeto();
+        }
+
+        carregarTabelaProjetos();
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(err) { 
+        atualizarEstadoBotoesSalvarProjeto(false);
+        definirModoAposSalvarProjeto('fechar');
+        mostrarNotificacao(err.message, 'erro'); 
+      })
+      .processarSalvarProjeto(dados, tokenSessao); // Envia o ID
+  }
+
+  function prepararEdicaoProjeto(idProjeto) {
+    let p = projetosEmMemoria.find(proj => proj.ID_Projeto === idProjeto);
+    if (!p) return;
+
+    // Verificação rigorosa por UUID
+    const ehDono = (p.Criado_Por && p.Criado_Por.toString().trim() === idLogadoProjeto.toString().trim());
+    if (!ehDono && papelLogadoProjeto !== 'Administrador') {
+       mostrarNotificacao("Apenas o criador do projeto pode editá-lo.", "alerta");
+       return;
+    }
+
+    document.getElementById('id_projeto').value = p.ID_Projeto;
+    document.getElementById('linha_planilha_projeto').value = p._linhaPlanilha;
+    document.getElementById('criado_por_projeto').value = p.Criado_Por || "";
+    document.getElementById('nome_projeto').value = p.Nome;
+    document.getElementById('orcamento_teto').value = formatarMoedaParaInput(p.Orcamento_Teto);    
+    document.getElementById('check_compartilhado_projeto').checked = p.Compartilhado;
+    
+    // Marca os checkboxes dos IDs partilhados
+    const idsSalvos = p.Usuarios_Compartilhados ? p.Usuarios_Compartilhados.split(',') : [];
+    document.querySelectorAll('input[name="user_cb_proj"]').forEach(cb => {
+      cb.checked = idsSalvos.map(id => id.trim()).includes(cb.value.trim());
+    });
+
+    toggleCompartilhadoProjeto();
+    
+    document.getElementById('titulo-form-projeto').innerText = 'Editar Projeto';
+    document.getElementById('container-form-projeto').style.display = 'block';
+    document.getElementById('container-lista-projeto').style.display = 'none';
+  }
+
+  // Renomeado e atualizado para enviar o ID do projeto em vez da linha
+  function alterarStatusProjetoFront(idProjeto) {
+    const p = projetosEmMemoria.find(proj => proj.ID_Projeto === idProjeto);
+    const acaoTexto = (p && p.Status) ? "concluir (inativar)" : "restaurar";
+    
+    confirmarAcao(`Tem a certeza que deseja ${acaoTexto} este projeto?`, function() {
+      google.script.run
+        .withSuccessHandler(function(msg) {
+          carregarTabelaProjetos();
+          mostrarNotificacao(msg, "sucesso");
+        })
+        .withFailureHandler(function(err) { 
+          mostrarNotificacao(err.message, "erro"); 
+        })
+        .alternarStatusProjeto(idProjeto, tokenSessao); // Envia o pacote seguro ao servidor
+    });
+  }
+
+  function renderizarTabelaProjetos() {
+    const corpo = document.getElementById('corpo-tabela-projetos');
+    const vazio = document.getElementById('estado-vazio-projeto');
+    const tabela = document.getElementById('tabela-projetos-html');
+
+    if (!corpo || !vazio || !tabela) {
+      return;
+    }
+
+    corpo.innerHTML = '';
+
+    let projetosFiltrados = projetosEmMemoria;
+    if (!mostrarArquivados) {
+      projetosFiltrados = projetosEmMemoria.filter(function(p) { return p.Status === true; });
+    }
+
+    projetosFiltrados.sort(function(a, b) {
+      return (a.Nome || '').localeCompare(b.Nome || '');
+    });
+
+    if (projetosFiltrados.length === 0) {
+      tabela.style.display = 'none';
+      vazio.style.display = 'block';
+      return;
+    }
+
+    tabela.style.display = 'table';
+    vazio.style.display = 'none';
+
+    projetosFiltrados.forEach(function(p) {
+      const consolidado = p.Consolidado_Periodo || {};
+      const teto = obterNumeroProjeto(consolidado.Teto || p.Orcamento_Teto);
+      const realizado = obterNumeroProjeto(consolidado.Realizado);
+      const disponivel = obterNumeroProjeto(consolidado.Disponivel);
+      const percentual = obterNumeroProjeto(consolidado.Percentual_Utilizado);
+      const excedido = obterNumeroProjeto(consolidado.Excedido);
+      const resumoResponsabilidade = montarResumoResponsabilidadeProjeto(consolidado);
+      const ehDono = (p.Criado_Por && p.Criado_Por.toString().trim() === idLogadoProjeto.toString().trim());
+      const badgeStatus = p.Status ? 'badge-ativo' : 'badge-inativo';
+      const txtStatus = p.Status ? 'Em andamento' : 'Concluido';
+      const classeLinha = p.Status ? '' : 'linha-arquivada';
+      const bloqueio = (!ehDono && papelLogadoProjeto !== 'Administrador') ? 'disabled title="Apenas o criador pode modificar"' : '';
+      const txtTeto = teto > 0 ? formatarMoedaProjeto(teto) : '<span style="color:#9E9E9E">Sem teto</span>';
+      const txtDisponivel = teto > 0
+        ? (excedido > 0 ? '<span style="color:#D32F2F; font-weight:700;">Excedido em ' + formatarMoedaProjeto(excedido) + '</span>' : formatarMoedaProjeto(disponivel))
+        : '<span style="color:#9E9E9E">Sem teto</span>';
+      const larguraProgresso = teto > 0 ? Math.min(100, Math.max(0, percentual)) : 0;
+      const classeProgresso = excedido > 0 ? ' excedido' : '';
+      let txtCompartilhado = p.Compartilhado ? 'Sim' : 'Nao';
+
+      if (p.Compartilhado && !ehDono) {
+        txtCompartilhado = '<span style="color: var(--cor-primaria); font-weight: bold;">Comigo</span>';
+      }
+
+      let botoesAcao = '<button class="btn-acao" onclick="abrirDetalhesProjeto(\'' + escaparAtributoProjeto(p.ID_Projeto) + '\')">Detalhes</button>';
+      botoesAcao += '<button class="btn-acao" onclick="abrirLancamentosProjeto(\'' + escaparAtributoProjeto(p.ID_Projeto) + '\')">Lançamentos</button>';
+
+      if (p.Status) {
+        botoesAcao += '<button class="btn-acao" onclick="prepararEdicaoProjeto(\'' + escaparAtributoProjeto(p.ID_Projeto) + '\')" ' + bloqueio + '>Editar</button>';
+        botoesAcao += '<button class="btn-acao" onclick="alterarStatusProjetoFront(\'' + escaparAtributoProjeto(p.ID_Projeto) + '\')" ' + bloqueio + '>Concluir</button>';
+      } else {
+        botoesAcao += '<button class="btn-acao" onclick="alterarStatusProjetoFront(\'' + escaparAtributoProjeto(p.ID_Projeto) + '\')" ' + bloqueio + '>Restaurar</button>';
+      }
+
+      corpo.innerHTML += '<tr class="' + classeLinha + '">' +
+        '<td data-label="Nome"><strong>' + escaparHtmlProjeto(p.Nome) + '</strong></td>' +
+        '<td data-label="Teto Estipulado">' + txtTeto + '</td>' +
+        '<td data-label="Realizado">' +
+          '<span class="projeto-metrica">' + formatarMoedaProjeto(realizado) + '</span>' +
+          '<span class="projeto-meta">' + (consolidado.Quantidade_Lancamentos || 0) + ' lancamento(s)</span>' +
+        '</td>' +
+        '<td data-label="Minha responsabilidade">' + resumoResponsabilidade + '</td>' +
+        '<td data-label="Disponivel">' + txtDisponivel + '</td>' +
+        '<td data-label="Uso">' +
+          '<div class="projeto-progresso">' +
+            '<span class="projeto-meta">' + (teto > 0 ? formatarPercentualProjeto(percentual) : 'Sem teto') + '</span>' +
+            '<div class="projeto-progresso-barra">' +
+              '<div class="projeto-progresso-preenchimento' + classeProgresso + '" style="width:' + larguraProgresso + '%;"></div>' +
+            '</div>' +
+          '</div>' +
+        '</td>' +
+        '<td data-label="Compartilhado">' + txtCompartilhado + '</td>' +
+        '<td data-label="Status"><span class="' + badgeStatus + '">' + txtStatus + '</span></td>' +
+        '<td data-label="Acoes" style="text-align:right">' + botoesAcao + '</td>' +
+      '</tr>';
+    });
+  }
+
+  function montarResumoResponsabilidadeProjeto(consolidado) {
+    const receitas = obterNumeroProjeto(consolidado.Responsabilidade_Receitas);
+    const despesas = obterNumeroProjeto(consolidado.Responsabilidade_Despesas);
+    const transferencias = obterNumeroProjeto(consolidado.Responsabilidade_Transferencias);
+    const resultado = obterNumeroProjeto(consolidado.Responsabilidade_Resultado);
+    const qtd = obterNumeroProjeto(consolidado.Responsabilidade_Quantidade_Lancamentos);
+    const textoTransferencia = transferencias > 0
+      ? '+' + formatarMoedaProjeto(transferencias)
+      : (transferencias < 0 ? '-' + formatarMoedaProjeto(Math.abs(transferencias)) : formatarMoedaProjeto(0));
+
+    return '<span class="projeto-metrica">' + formatarMoedaProjeto(resultado) + '</span>' +
+      '<span class="projeto-meta">R ' + formatarMoedaProjeto(receitas) +
+      ' | D ' + formatarMoedaProjeto(despesas) +
+      ' | T ' + textoTransferencia + '</span>' +
+      '<span class="projeto-meta">' + qtd + ' lancamento(s) sob minha responsabilidade</span>';
+  }
+
+  function abrirDetalhesProjeto(idProjeto) {
+    const projeto = projetosEmMemoria.find(function(item) {
+      return item.ID_Projeto === idProjeto;
+    });
+
+    if (!projeto) {
+      mostrarNotificacao('Projeto nao encontrado na memoria da tela.', 'erro');
+      return;
+    }
+
+    const consolidado = projeto.Consolidado_Periodo || {};
+    const detalhes = consolidado.Detalhes_Geral || consolidado;
+    const teto = obterNumeroProjeto(detalhes.Teto || projeto.Orcamento_Teto);
+    const realizado = obterNumeroProjeto(detalhes.Realizado);
+    const disponivel = obterNumeroProjeto(detalhes.Disponivel);
+    const excedido = obterNumeroProjeto(detalhes.Excedido);
+    const percentual = obterNumeroProjeto(detalhes.Percentual_Utilizado);
+    const alerta = document.getElementById('detalhes-projeto-alerta');
+    const gridPrincipal = document.getElementById('detalhes-projeto-principal');
+    const gridFuturos = document.getElementById('detalhes-projeto-futuros');
+    const corpoParticipantes = document.getElementById('detalhes-projeto-participantes');
+    const periodo = 'Panorama completo do projeto, independente do filtro global.';
+    const participantes = obterDescricaoEquipeProjeto(projeto);
+
+    document.getElementById('detalhes-projeto-titulo').innerText = projeto.Nome || 'Detalhes do projeto';
+    document.getElementById('detalhes-projeto-periodo').innerText = periodo;
+    document.getElementById('detalhes-projeto-equipe').innerText = participantes;
+    document.getElementById('detalhes-projeto-status').innerText = projeto.Status ? 'Em andamento' : 'Concluido';
+
+    alerta.style.display = excedido > 0 ? 'block' : 'none';
+    alerta.innerText = excedido > 0
+      ? 'O projeto ultrapassou o teto em ' + formatarMoedaProjeto(excedido) + ' neste periodo.'
+      : '';
+
+    gridPrincipal.innerHTML =
+      montarBarraUsoTetoProjeto(teto, percentual, excedido) +
+      montarItemDetalheProjeto('Realizado', formatarMoedaProjeto(realizado), true) +
+      montarItemDetalheProjeto('Resultado', formatarMoedaProjeto(detalhes.Resultado || 0), true) +
+      montarItemDetalheProjeto('Teto', teto > 0 ? formatarMoedaProjeto(teto) : 'Sem teto') +
+      montarItemDetalheProjeto('Disponivel', teto > 0 ? formatarMoedaProjeto(disponivel) : 'Sem teto') +
+      montarItemDetalheProjeto('Receitas totais', formatarMoedaProjeto(detalhes.Receitas || 0)) +
+      montarItemDetalheProjeto('Despesas totais', formatarMoedaProjeto(detalhes.Despesas || 0)) +
+      montarItemDetalheProjeto('Transferencias totais', formatarMoedaProjeto(detalhes.Transferencias || 0)) +
+      montarItemDetalheProjeto('Lancamentos totais', String(detalhes.Quantidade_Lancamentos || 0));
+
+    gridFuturos.innerHTML = montarResumoFuturoDetalheProjeto(detalhes.Lancamentos_Futuros || {});
+
+    renderizarParticipantesDetalhesProjeto(corpoParticipantes, detalhes.Participantes || []);
+
+    document.getElementById('btn-detalhes-projeto-lancamentos').onclick = function() {
+      fecharDetalhesProjeto();
+      abrirLancamentosProjeto(idProjeto);
+    };
+
+    document.getElementById('modal-detalhes-projeto').classList.remove('oculto');
+  }
+
+  function fecharDetalhesProjeto() {
+    document.getElementById('modal-detalhes-projeto').classList.add('oculto');
+  }
+
+  function montarItemDetalheProjeto(rotulo, valor, destaque) {
+    return '<div class="detalhes-projeto-item' + (destaque ? ' enfase' : '') + '">' +
+      '<span>' + escaparHtmlProjeto(rotulo) + '</span>' +
+      '<strong>' + escaparHtmlProjeto(valor) + '</strong>' +
+    '</div>';
+  }
+
+  function montarBarraUsoTetoProjeto(teto, percentual, excedido) {
+    if (teto <= 0) {
+      return '<div class="detalhes-projeto-barra-teto">' +
+        '<div class="detalhes-projeto-barra-teto-topo">' +
+          '<span>Teto do projeto</span>' +
+          '<strong>Sem teto definido</strong>' +
+        '</div>' +
+        '<div class="detalhes-projeto-barra-teto-trilho">' +
+          '<div class="detalhes-projeto-barra-teto-preenchimento" style="width:0%;"></div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    const largura = Math.min(100, Math.max(0, percentual));
+    const classe = excedido > 0 ? ' excedido' : (percentual >= 80 ? ' alerta' : '');
+
+    return '<div class="detalhes-projeto-barra-teto">' +
+      '<div class="detalhes-projeto-barra-teto-topo">' +
+        '<span>Uso do teto</span>' +
+        '<strong>' + formatarPercentualProjeto(percentual) + '</strong>' +
+      '</div>' +
+      '<div class="detalhes-projeto-barra-teto-trilho">' +
+        '<div class="detalhes-projeto-barra-teto-preenchimento' + classe + '" style="width:' + largura + '%;"></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function montarResumoFuturoDetalheProjeto(resumo) {
+    return montarItemDetalheProjeto('Receitas futuras', formatarMoedaProjeto(resumo.Receitas || 0), true) +
+      montarItemDetalheProjeto('Despesas futuras', formatarMoedaProjeto(resumo.Despesas || 0), true) +
+      montarItemDetalheProjeto('Transferencias futuras', formatarMoedaProjeto(resumo.Transferencias || 0), true);
+
+    const quantidade = obterNumeroProjeto(resumo.Quantidade);
+
+    if (quantidade <= 0) {
+      return '<div class="detalhes-projeto-item">' +
+        '<span>Próximos lançamentos</span>' +
+        '<strong>Nenhum</strong>' +
+      '</div>';
+    }
+
+    return montarItemDetalheProjeto('Quantidade futura', String(quantidade), true) +
+      montarItemDetalheProjeto('Próxima data', formatarDataProjeto(resumo.Proxima_Data), true) +
+      montarItemDetalheProjeto('Despesas futuras', formatarMoedaProjeto(resumo.Despesas || 0)) +
+      montarItemDetalheProjeto('Receitas futuras', formatarMoedaProjeto(resumo.Receitas || 0)) +
+      montarItemDetalheProjeto('Transferencias futuras', formatarMoedaProjeto(resumo.Transferencias || 0)) +
+      montarItemDetalheProjeto('Resultado futuro', formatarMoedaProjeto(resumo.Resultado || 0));
+  }
+
+  function renderizarParticipantesDetalhesProjeto(corpo, participantes) {
+    if (!corpo) {
+      return;
+    }
+
+    if (!participantes || participantes.length === 0) {
+      corpo.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--cor-texto-secundario);">Nenhum participante com movimentacao neste periodo.</td></tr>';
+      return;
+    }
+
+    corpo.innerHTML = participantes.map(function(participante) {
+      const transferencia = obterNumeroProjeto(participante.Transferencias);
+      const textoTransferencia = transferencia > 0
+        ? '+' + formatarMoedaProjeto(transferencia)
+        : (transferencia < 0 ? '-' + formatarMoedaProjeto(Math.abs(transferencia)) : formatarMoedaProjeto(0));
+
+      return '<tr>' +
+        '<td data-label="Participante"><strong>' + escaparHtmlProjeto(participante.Nome || 'Usuario') + '</strong>' +
+          (participante.Email ? '<span class="projeto-meta">' + escaparHtmlProjeto(participante.Email) + '</span>' : '') +
+        '</td>' +
+        '<td data-label="Receitas">' + formatarMoedaProjeto(participante.Receitas || 0) + '</td>' +
+        '<td data-label="Despesas">' + formatarMoedaProjeto(participante.Despesas || 0) + '</td>' +
+        '<td data-label="Transferencias">' + textoTransferencia + '</td>' +
+        '<td data-label="Resultado"><strong>' + formatarMoedaProjeto(participante.Resultado || 0) + '</strong></td>' +
+        '<td data-label="Lancamentos">' + String(participante.Quantidade_Lancamentos || 0) + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function abrirLancamentosProjeto(idProjeto) {
+    if (typeof abrirLancamentosContextuaisMukirana !== 'function') {
+      return;
+    }
+
+    var filtros = obterFiltrosPeriodoProjeto();
+    var projeto = projetosEmMemoria.find(function(item) {
+      return item.ID_Projeto === idProjeto;
+    });
+    var nomeProjeto = projeto ? (projeto.Nome || 'Projeto') : 'Projeto';
+
+    abrirLancamentosContextuaisMukirana({
+      ID_Projeto: idProjeto,
+      Mes_Inicial: filtros.Mes_Inicial,
+      Mes_Final: filtros.Mes_Final,
+      Titulo: 'Lançamentos do projeto',
+      Subtitulo: 'Este contexto mostra somente os lançamentos vinculados a este projeto no período fechado.',
+      Nome_Contexto: nomeProjeto,
+      Resumo_Contexto: 'Você está vendo somente os lançamentos deste projeto. Limpar filtros mantém o projeto e o período de origem.'
+    });
+  }
+
+  function obterFiltrosPeriodoProjeto() {
+    var periodo = obterPeriodoGlobalProjetos_();
+
+    return {
+      Mes_Inicial: periodo.Mes_Inicial || '',
+      Mes_Final: periodo.Mes_Final || '',
+      Considerar_Historico_Anterior: periodo.Considerar_Historico_Anterior !== false
+    };
+  }
+
+  if (typeof registrarTelaAtualMukirana === 'function') {
+    registrarTelaAtualMukirana('Projetos', {
+      obterContextoNovoLancamento: function() {
+        return obterFiltrosPeriodoProjeto();
+      },
+      atualizarPeriodoGlobal: function() {
+        if (!telaProjetosMontada_()) {
+          return;
+        }
+
+        aplicarPeriodoGlobalProjetos_();
+        carregarTabelaProjetos();
+      }
+    });
+  }
+
+  function obterDescricaoPeriodoProjeto() {
+    var filtros = obterFiltrosPeriodoProjeto();
+    if (!filtros.Mes_Inicial && !filtros.Mes_Final) {
+      return 'Período fechado: todo o histórico disponível.';
+    }
+
+    var prefixo = filtros.Considerar_Historico_Anterior === false
+      ? 'Período fechado'
+      : 'Acumulado com saldo anterior';
+
+    return filtros.Mes_Final
+      ? prefixo + ': ' + filtros.Mes_Inicial + ' a ' + filtros.Mes_Final + '.'
+      : prefixo + ': até ' + filtros.Mes_Inicial + '.';
+  }
+
+  function obterDescricaoEquipeProjeto(projeto) {
+    var totalParticipantes = projeto.Usuarios_Compartilhados
+      ? projeto.Usuarios_Compartilhados.split(',').filter(function(id) { return !!id.trim(); }).length
+      : 0;
+    var complemento = projeto.Compartilhado
+      ? 'Projeto compartilhado com ' + totalParticipantes + ' participante(s).'
+      : 'Projeto individual.';
+
+    return 'Criador: ' + (projeto.Nome_Criador || 'Usuario') + '. ' + complemento;
+  }
+
+  function gerarMesAtualProjeto() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  }
+
+  function obterNumeroProjeto(valor) {
+    var numero = parseFloat(valor);
+    return isNaN(numero) ? 0 : numero;
+  }
+
+  function formatarMoedaProjeto(valor) {
+    return 'R$ ' + obterNumeroProjeto(valor).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function formatarDataProjeto(valor) {
+    var texto = (valor || '').toString();
+    var partes = texto.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+    if (!partes) {
+      return texto || '-';
+    }
+
+    return partes[3] + '/' + partes[2] + '/' + partes[1];
+  }
+
+  function formatarPercentualProjeto(valor) {
+    return obterNumeroProjeto(valor).toLocaleString('pt-BR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1
+    }) + '%';
+  }
+
+  function escaparHtmlProjeto(valor) {
+    if (valor === null || valor === undefined) return '';
+
+    return valor.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escaparAtributoProjeto(valor) {
+    return escaparHtmlProjeto(valor);
+  }
+</script>

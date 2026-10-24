@@ -1,0 +1,555 @@
+<style>
+
+  .cabecalho-tela { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+ 
+
+  .btn-primario { padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; background-color: var(--cor-primaria); color: white; transition: 0.2s; }
+
+  .btn-secundario { padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; background-color: #E0E0E0; color: var(--cor-texto-principal); transition: 0.2s; }
+
+  .btn-acao { padding: 8px 12px; font-size: 14px; background-color: var(--cor-fundo-app); border: var(--borda-suave); border-radius: 8px; cursor: pointer; margin-right: 5px; transition: 0.2s; }
+
+  .btn-acao:hover { background-color: var(--cor-primaria); color: white; }
+
+
+
+  .cartao { background: var(--cor-superficie); padding: 25px; border-radius: 12px; box-shadow: var(--sombra-suave); margin-bottom: 20px; }
+
+  .grupo-campo { margin-bottom: 16px; display: flex; flex-direction: column; }
+
+  .grupo-campo-duplo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  label { font-size: 14px; color: var(--cor-texto-secundario); margin-bottom: 6px; font-weight: 600; }
+
+ 
+
+  input, select { padding: 14px; border: var(--borda-suave); border-radius: 8px; font-size: 16px; width: 100%; outline: none; background: white; color: var(--cor-texto-principal); }
+
+ 
+
+  .acoes-formulario { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+
+  .tabela-mukirana { width: 100%; border-collapse: collapse; text-align: left; }
+
+  .tabela-mukirana th, .tabela-mukirana td { padding: 16px; border-bottom: var(--borda-suave); }
+
+ 
+
+  .badge-ativo { background: var(--cor-sucesso-fundo); color: var(--cor-sucesso-texto); padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+
+  .badge-inativo { background: var(--cor-erro-fundo); color: var(--cor-erro-texto); padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+
+  .badge-global { background: #E3F2FD; color: #1976D2; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 8px;}
+
+ 
+
+  .estado-vazio { text-align: center; padding: 40px; display: none; }
+
+ 
+
+  @media (max-width: 600px) {
+
+    .grupo-campo-duplo { grid-template-columns: 1fr; }
+
+    .lista-linhas-wrap .tabela-mukirana.lista-linhas-mukirana { min-width: 640px; }
+
+  }
+
+</style>
+
+
+
+<div class="cabecalho-tela">
+
+  <h2>Gestão de Categorias</h2>
+
+  <button class="btn-primario" data-topbar-label="+ Nova Categoria" onclick="abrirFormularioCategoria()">+ Nova Categoria</button>
+
+</div>
+
+
+
+<div id="container-form-categoria" class="cartao" style="display: none;">
+
+  <h3 id="titulo-form-categoria">Cadastrar Categoria</h3>
+
+  <form id="form-categoria" onsubmit="enviarFormularioCategoria(event)">
+
+    <input type="hidden" id="cat_id">
+
+    <input type="hidden" id="cat_linha">
+
+
+
+    <div class="grupo-campo-duplo">
+
+      <div class="grupo-campo">
+
+        <label>Nome da Categoria</label>
+
+        <input type="text" id="cat_nome" required placeholder="Ex: Alimentação, Moradia, Salário">
+
+      </div>
+
+      <div class="grupo-campo">
+
+        <label>Tipo</label>
+
+        <select id="cat_tipo" required onchange="atualizarDropdownPais()">
+
+          <option value="">Selecione o tipo...</option>
+
+          <option value="Despesa">Despesa (Saída)</option>
+
+          <option value="Receita">Receita (Entrada)</option>
+
+          <option value="Transferência">Transferência</option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="grupo-campo-duplo">
+
+      <div class="grupo-campo">
+
+        <label>Subcategoria de: (Opcional)</label>
+
+        <select id="cat_pai">
+
+          <option value="">Nenhuma (Categoria Principal)</option>
+
+        </select>
+
+      </div>
+
+     
+
+      <div class="grupo-campo" id="container-global" style="display: none; justify-content: center;">
+
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 25px;">
+
+          <input type="checkbox" id="cat_global" style="width: auto; margin: 0;">
+
+          <strong>Categoria Global</strong> (Todos os utilizadores veem)
+
+        </label>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="acoes-formulario">
+
+      <button type="button" class="btn-secundario" onclick="fecharFormularioCategoria()">Cancelar</button>
+
+      <button type="button" class="btn-secundario" id="btn-salvar-e-novo-categoria" onclick="solicitarSalvarENovaCategoria()">Salvar + novo</button>
+
+      <button type="submit" class="btn-primario" id="btn-salvar-categoria" onclick="definirModoAposSalvarCategoria('fechar')">Salvar Dados</button>
+
+    </div>
+
+  </form>
+
+</div>
+
+
+
+<div class="cartao" id="container-lista-categoria">
+
+  <div class="lista-linhas-wrap">
+
+  <table class="tabela-mukirana lista-linhas-mukirana" id="tabela-categorias-html">
+
+    <thead>
+
+      <tr>
+
+        <th>Hierarquia / Nome da Categoria</th>
+
+        <th>Tipo</th>
+
+        <th>Status</th>
+
+        <th style="text-align: right;">Ações</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="corpo-tabela-categorias"></tbody>
+
+  </table>
+  </div>
+
+ 
+
+  <div id="estado-vazio-categoria" class="estado-vazio">
+
+    <h3 style="color: var(--cor-texto-principal); margin-bottom: 8px; font-size: 18px;">Nenhuma categoria cadastrada</h3>
+
+    <p style="color: var(--cor-texto-secundario); margin-bottom: 24px; font-size: 14px;">Organize as suas transações criando a sua primeira categoria.</p>
+
+    <button class="btn-primario" onclick="abrirFormularioCategoria()">+ Adicionar Primeira Categoria</button>
+
+  </div>
+
+</div>
+
+<script>
+  var tokenSessaoCategoria = localStorage.getItem('mukirana_token') || '';
+
+  var categoriasEmMemoria = [];
+  // Trocado de emailLogadoCategoria para idLogadoCategoria (Chave Estrangeira)
+  var idLogadoCategoria = localStorage.getItem('mukirana_id') || '';
+  var tokenSessao = localStorage.getItem('mukirana_token') || '';
+  var papelLogadoCategoria = localStorage.getItem('mukirana_papel') || 'Usuário';
+  var modoAposSalvarCategoria = 'fechar';
+
+  // Revela o checkbox Global se for Administrador
+  if (papelLogadoCategoria === 'Administrador') {
+    document.getElementById('container-global').style.display = 'flex';
+  }
+
+  carregarTabelaCategorias();
+
+  function normalizarTextoOrdenacaoCategoria(valor) {
+    return (valor || '')
+      .toString()
+      .trim()
+      .toLocaleLowerCase('pt-BR');
+  }
+
+  function compararNomesCategorias(a, b) {
+    return normalizarTextoOrdenacaoCategoria(a).localeCompare(
+      normalizarTextoOrdenacaoCategoria(b),
+      'pt-BR',
+      { sensitivity: 'base' }
+    );
+  }
+
+  function montarMapaCategoriasPorId(categorias) {
+    var mapa = {};
+
+    (categorias || []).forEach(function(categoria) {
+      mapa[categoria.ID_Categoria] = categoria;
+    });
+
+    return mapa;
+  }
+
+  function ordenarCategoriasParaExibicao(categorias) {
+    var mapaPorId = montarMapaCategoriasPorId(categorias);
+    var paisPorTipo = {
+      'Despesa': [],
+      'Receita': []
+    };
+    var filhasPorPai = {};
+    var resultado = [];
+
+    (categorias || []).forEach(function(categoria) {
+      var idPai = categoria.ID_Categoria_Pai || '';
+      var tipo = categoria.Tipo || '';
+
+      if (!idPai) {
+        paisPorTipo[tipo] = paisPorTipo[tipo] || [];
+        paisPorTipo[tipo].push(categoria);
+        return;
+      }
+
+      filhasPorPai[idPai] = filhasPorPai[idPai] || [];
+      filhasPorPai[idPai].push(categoria);
+    });
+
+    ['Despesa', 'Receita'].forEach(function(tipo) {
+      (paisPorTipo[tipo] || [])
+        .sort(function(a, b) {
+          return compararNomesCategorias(a.Nome, b.Nome);
+        })
+        .forEach(function(categoriaPai) {
+          resultado.push(categoriaPai);
+
+          (filhasPorPai[categoriaPai.ID_Categoria] || [])
+            .sort(function(a, b) {
+              return compararNomesCategorias(a.Nome, b.Nome);
+            })
+            .forEach(function(categoriaFilha) {
+              resultado.push(categoriaFilha);
+            });
+        });
+    });
+
+    Object.keys(mapaPorId).forEach(function(idCategoria) {
+      var categoria = mapaPorId[idCategoria];
+      var jaFoiIncluida = resultado.some(function(item) {
+        return item.ID_Categoria === idCategoria;
+      });
+
+      if (jaFoiIncluida) {
+        return;
+      }
+
+      resultado.push(categoria);
+    });
+
+    return resultado;
+  }
+
+  function atualizarDropdownPais(idPreSelecionado = "") {
+    const tipo = document.getElementById('cat_tipo').value;
+    const comboPai = document.getElementById('cat_pai');
+    const idAtual = document.getElementById('cat_id').value;
+    
+    comboPai.innerHTML = '<option value="">Nenhuma (Categoria Principal)</option>';
+
+    if (tipo) {
+      const candidatas = categoriasEmMemoria.filter(c => {
+        const isAtiva = (c.Ativa === true || c.Ativa === "true" || c.Ativa === 1);
+        const ehMesmoTipo = c.Tipo === tipo;
+        const naoEhAMesma = c.ID_Categoria !== idAtual;
+        const ehCategoriaPai = !c.ID_Categoria_Pai;
+        return isAtiva && ehMesmoTipo && naoEhAMesma && ehCategoriaPai;
+      });
+
+      candidatas.sort(function(a, b) {
+        return compararNomesCategorias(a.Nome, b.Nome);
+      });
+
+      candidatas.forEach(c => {
+        let nome = c.Nome || "Sem Nome";
+        comboPai.innerHTML += `<option value="${c.ID_Categoria}">${nome}</option>`;
+      });
+    }
+
+    if (idPreSelecionado) {
+       comboPai.value = idPreSelecionado;
+    }
+  }
+
+  function abrirFormularioCategoria() {
+    document.getElementById('form-categoria').reset();
+    definirModoAposSalvarCategoria('fechar');
+    document.getElementById('cat_id').value = '';
+    document.getElementById('cat_linha').value = '';
+    atualizarDropdownPais(); 
+    
+    document.getElementById('titulo-form-categoria').innerText = 'Cadastrar Categoria';
+    document.getElementById('container-form-categoria').style.display = 'block';
+    document.getElementById('container-lista-categoria').style.display = 'none';
+  }
+
+  function fecharFormularioCategoria() {
+    document.getElementById('container-form-categoria').style.display = 'none';
+    document.getElementById('container-lista-categoria').style.display = 'block';
+  }
+
+  function definirModoAposSalvarCategoria(modo) {
+    modoAposSalvarCategoria = modo === 'novo' ? 'novo' : 'fechar';
+  }
+
+  function solicitarSalvarENovaCategoria() {
+    definirModoAposSalvarCategoria('novo');
+
+    var formulario = document.getElementById('form-categoria');
+
+    if (formulario && typeof formulario.requestSubmit === 'function') {
+      formulario.requestSubmit();
+      return;
+    }
+
+    formulario.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  function atualizarEstadoBotoesSalvarCategoria(salvando) {
+    var btnSalvar = document.getElementById('btn-salvar-categoria');
+    var btnSalvarENovo = document.getElementById('btn-salvar-e-novo-categoria');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#form-categoria',
+        idsProcessando: ['btn-salvar-categoria', 'btn-salvar-e-novo-categoria'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    btnSalvar.disabled = !!salvando;
+    btnSalvar.innerText = salvando ? 'Salvando...' : 'Salvar Dados';
+    btnSalvarENovo.disabled = !!salvando;
+    btnSalvarENovo.innerText = salvando ? 'Salvando...' : 'Salvar + novo';
+  }
+
+  function carregarTabelaCategorias() {
+    google.script.run
+      .withSuccessHandler(function(categorias) {
+        categoriasEmMemoria = categorias || [];
+        const corpo = document.getElementById('corpo-tabela-categorias');
+        const vazio = document.getElementById('estado-vazio-categoria');
+        const tabela = document.getElementById('tabela-categorias-html');
+        
+        corpo.innerHTML = '';
+        
+        if (categoriasEmMemoria.length === 0) {
+          tabela.style.display = 'none';
+          vazio.style.display = 'block'; 
+        } else {
+          tabela.style.display = 'table';
+          vazio.style.display = 'none';
+
+          var categoriasOrdenadas = ordenarCategoriasParaExibicao(categoriasEmMemoria);
+
+          categoriasOrdenadas.forEach(function(c) {
+            const isAtivo = (c.Ativa === true || c.Ativa === "true" || c.Ativa === 1);
+            const badgeStatus = isAtivo ? 'badge-ativo' : 'badge-inativo';
+            const btnTxt = isAtivo ? 'Inativar' : 'Restaurar';
+            
+            let nomeExibicao = c.Nome || "Sem Nome";
+            if (c.ID_Categoria_Pai) {
+               const pai = categoriasEmMemoria.find(p => p.ID_Categoria === c.ID_Categoria_Pai);
+               if (pai) {
+                 nomeExibicao = `<span style="color: #9E9E9E;">${pai.Nome} &gt; </span> ${nomeExibicao}`;
+               }
+            }
+
+            const badgeGlobal = (c.Global === true || c.Global === "true") ? '<span class="badge-global">Global</span>' : '';
+            const tipoExibicao = c.Tipo || "Não definido";
+
+            let celulaAcoes = `<button class="btn-acao" onclick="abrirLancamentosCategoria('${c.ID_Categoria}')">Lançamentos</button>`;
+            // Verificação baseada em ID agora!
+            const ehMinha = (c.Criado_Por && c.Criado_Por.toString().trim() === idLogadoCategoria.toString().trim());
+            const souAdmin = (papelLogadoCategoria === 'Administrador');
+
+            if (ehMinha || souAdmin) {
+                celulaAcoes += `
+                  <button class="btn-acao" onclick="prepararEdicaoCategoria('${c.ID_Categoria}')">✎ Editar</button>
+                  <button class="btn-acao" onclick="alterarStatusCategoria('${c.ID_Categoria}')">${btnTxt}</button>
+                `;
+            }
+
+            corpo.innerHTML += `<tr>
+              <td data-label="Categoria"><strong>${nomeExibicao}</strong> ${badgeGlobal}</td>
+              <td data-label="Tipo">${tipoExibicao}</td>
+              <td data-label="Status"><span class="${badgeStatus}">${isAtivo ? 'Ativa' : 'Inativa'}</span></td>
+              <td data-label="Ações" style="text-align:right">${celulaAcoes}</td>
+            </tr>`;
+          });
+        }
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(erro) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao("Erro ao carregar categorias: " + erro.message, "erro");
+      })
+      .obterListaCategorias(tokenSessaoCategoria); // Envia o ID para o servidor
+  }
+
+  function enviarFormularioCategoria(evento) {
+    evento.preventDefault();
+    var modoSalvamento = modoAposSalvarCategoria === 'novo' ? 'novo' : 'fechar';
+    atualizarEstadoBotoesSalvarCategoria(true);
+
+    // Se estivermos editando uma categoria, mantemos o dono original dela.
+    let catExistente = categoriasEmMemoria.find(c => c.ID_Categoria === document.getElementById('cat_id').value);
+    let donoOriginal = catExistente ? catExistente.Criado_Por : idLogadoCategoria;
+
+    const dados = {
+      ID_Categoria: document.getElementById('cat_id').value,
+      _linhaPlanilha: document.getElementById('cat_linha').value,
+      Nome: document.getElementById('cat_nome').value, 
+      Tipo: document.getElementById('cat_tipo').value,
+      ID_Categoria_Pai: document.getElementById('cat_pai').value,
+      Global: document.getElementById('cat_global').checked,
+      Ativa: true,
+      Criado_Por: donoOriginal // Passa o dono explicitamente
+    };
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        atualizarEstadoBotoesSalvarCategoria(false);
+        definirModoAposSalvarCategoria('fechar');
+
+        if (modoSalvamento === 'novo') {
+          abrirFormularioCategoria();
+        } else {
+          fecharFormularioCategoria();
+        }
+
+        carregarTabelaCategorias();
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(err) { 
+        atualizarEstadoBotoesSalvarCategoria(false);
+        definirModoAposSalvarCategoria('fechar');
+        mostrarNotificacao(err.message, 'erro'); 
+      })
+      .processarSalvarCategoria(dados, tokenSessaoCategoria); // Envia ID em vez de E-mail
+  }
+
+  function prepararEdicaoCategoria(idCategoria) {
+    let c = categoriasEmMemoria.find(cat => cat.ID_Categoria === idCategoria);
+    if (!c) return;
+
+    document.getElementById('cat_id').value = c.ID_Categoria;
+    document.getElementById('cat_linha').value = c._linhaPlanilha;
+    document.getElementById('cat_nome').value = c.Nome;
+    
+    document.getElementById('cat_tipo').value = c.Tipo || "Despesa";
+    atualizarDropdownPais(c.ID_Categoria_Pai); 
+    
+    document.getElementById('cat_global').checked = (c.Global === true || c.Global === "true");
+    
+    document.getElementById('titulo-form-categoria').innerText = 'Editar Categoria';
+    document.getElementById('container-form-categoria').style.display = 'block';
+    document.getElementById('container-lista-categoria').style.display = 'none';
+  }
+
+/**
+ * Solicita alteração de status de categoria.
+ * A View envia apenas o ID_Categoria; o servidor redescobre linha, status e permissão.
+ *
+ * @param {string} idCategoria ID da categoria alvo.
+ */
+function alterarStatusCategoria(idCategoria) {
+  confirmarAcao("Você tem certeza que deseja inativar/restaurar esta categoria?", function() {
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        carregarTabelaCategorias();
+        mostrarNotificacao(msg, "sucesso");
+      })
+      .withFailureHandler(function(err) {
+        mostrarNotificacao(err.message, "erro");
+      })
+      .alternarStatusCategoria(idCategoria, tokenSessaoCategoria);
+  });
+}
+
+function abrirLancamentosCategoria(idCategoria) {
+  if (typeof abrirLancamentosContextuaisMukirana !== 'function') {
+    return;
+  }
+
+  var hoje = new Date();
+  var mesAtual = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  var categoria = categoriasEmMemoria.find(function(item) {
+    return item.ID_Categoria === idCategoria;
+  });
+  var nomeCategoria = categoria ? (categoria.Nome || 'Categoria') : 'Categoria';
+
+  abrirLancamentosContextuaisMukirana({
+    ID_Categoria: idCategoria,
+    Mes_Inicial: mesAtual,
+    Mes_Final: '',
+    Titulo: 'Lançamentos da categoria',
+    Subtitulo: 'Este contexto mostra somente os lançamentos desta categoria no mês atual.',
+    Nome_Contexto: nomeCategoria,
+    Resumo_Contexto: 'Você está vendo somente os lançamentos desta categoria. Limpar filtros mantém a categoria e o período de origem.'
+  });
+}
+</script>

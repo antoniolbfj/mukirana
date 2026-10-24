@@ -1,0 +1,480 @@
+<style>
+  .orcamento-resumo {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .orcamento-resumo-item {
+    border: var(--borda-suave);
+    border-radius: var(--raio-card);
+    background: var(--cor-superficie);
+    padding: 14px;
+  }
+
+  .orcamento-resumo-item span {
+    display: block;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+
+  .orcamento-resumo-item strong {
+    color: var(--cor-texto-principal);
+    font-size: 18px;
+  }
+
+  .barra-uso-orcamento {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--cor-superficie-secundaria);
+    overflow: hidden;
+    margin-top: 6px;
+  }
+
+  .barra-uso-orcamento span {
+    display: block;
+    height: 100%;
+    width: 0;
+  }
+
+  .orcamento-ok {
+    background: #2E7D32;
+  }
+
+  .orcamento-atencao {
+    background: #F9A825;
+  }
+
+  .orcamento-estourado {
+    background: #C62828;
+  }
+
+  .texto-orcamento-ajuda {
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    line-height: 1.45;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 900px) {
+    .orcamento-resumo {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .orcamento-resumo {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="cabecalho-tela">
+  <h2>Orçamento</h2>
+  <button class="btn-primario" type="button" data-topbar-label="+ Nova Categoria" onclick="abrirFormularioOrcamento()">+ Nova Categoria</button>
+</div>
+
+<div class="caixa-informativa">
+  <strong>Como funciona:</strong><br>
+  O orçamento é pedagógico, flexível e fica ativo até você remover uma categoria dele.
+  Você escolhe categorias de despesa e define tetos de gasto. O app não bloqueia lançamentos;
+  ele apenas mostra alertas sutis quando você se aproxima do limite.
+</div>
+
+<div class="cartao" style="display:none;">
+  <div class="grupo-campo-duplo">
+    <div class="grupo-campo">
+      <label for="orcamento_mes">Mês de referência</label>
+      <input type="month" id="orcamento_mes" onchange="carregarPacoteOrcamentos()">
+      <div class="texto-orcamento-ajuda">Este mês é usado apenas para calcular o realizado exibido na tela.</div>
+    </div>
+  </div>
+</div>
+
+<div class="orcamento-resumo">
+  <div class="orcamento-resumo-item">
+    <span>Total orçado</span>
+    <strong id="orc_total_teto">R$ 0,00</strong>
+  </div>
+  <div class="orcamento-resumo-item">
+    <span>Total realizado</span>
+    <strong id="orc_total_realizado">R$ 0,00</strong>
+  </div>
+  <div class="orcamento-resumo-item">
+    <span>Saldo disponível</span>
+    <strong id="orc_saldo">R$ 0,00</strong>
+  </div>
+  <div class="orcamento-resumo-item">
+    <span>Uso do orçamento</span>
+    <strong id="orc_percentual">0%</strong>
+  </div>
+</div>
+
+<div id="container-form-orcamento" class="cartao" style="display: none;">
+  <h3 id="titulo-form-orcamento">Adicionar Categoria ao Orçamento</h3>
+
+  <form id="form-orcamento" onsubmit="enviarFormularioOrcamento(event)">
+    <input type="hidden" id="orc_id">
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label for="orc_categoria">Categoria de despesa</label>
+        <select id="orc_categoria" required></select>
+        <div class="texto-orcamento-ajuda">Apenas categorias de despesa ativas e acessíveis aparecem aqui.</div>
+      </div>
+
+      <div class="grupo-campo">
+        <label for="orc_valor_teto">Teto de gasto</label>
+        <input type="text" id="orc_valor_teto" inputmode="numeric" required placeholder="0,00" oninput="mascaraMoeda(this)">
+      </div>
+    </div>
+
+    <div class="acoes-formulario">
+      <button type="button" class="btn-secundario" onclick="fecharFormularioOrcamento()">Cancelar</button>
+      <button type="button" class="btn-secundario" id="btn-salvar-e-novo-orcamento" onclick="solicitarSalvarENovoOrcamento()">Salvar + novo</button>
+      <button type="submit" class="btn-primario" id="btn-salvar-orcamento" onclick="definirModoAposSalvarOrcamento('fechar')">Salvar</button>
+    </div>
+  </form>
+</div>
+
+<div class="cartao" id="container-lista-orcamento">
+  <div class="lista-linhas-wrap">
+  <table class="tabela-mukirana lista-linhas-mukirana" id="tabela-orcamentos-html">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Teto</th>
+        <th>Realizado</th>
+        <th>Saldo</th>
+        <th>Uso</th>
+        <th style="text-align:right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-tabela-orcamentos"></tbody>
+  </table>
+  </div>
+
+  <div id="estado-vazio-orcamento" class="estado-vazio" style="display:none;">
+    <h3 style="color: var(--cor-texto-principal); margin-bottom: 8px; font-size: 18px;">Nenhuma categoria no orçamento</h3>
+    <p style="color: var(--cor-texto-secundario); margin-bottom: 24px; font-size: 14px;">
+      Adicione categorias de despesa para receber alertas pedagógicos durante seus lançamentos.
+    </p>
+    <button class="btn-primario" type="button" onclick="abrirFormularioOrcamento()">+ Adicionar Categoria</button>
+  </div>
+</div>
+
+<script>
+  var tokenSessaoOrcamento = localStorage.getItem('mukirana_token') || '';
+  var pacoteOrcamentos = {
+    resumo: {},
+    itens: [],
+    categoriasDisponiveis: []
+  };
+  var modoAposSalvarOrcamento = 'fechar';
+
+  inicializarTelaOrcamentos();
+
+  function inicializarTelaOrcamentos() {
+    aplicarPeriodoGlobalOrcamentos_();
+
+    if (typeof registrarTelaAtualMukirana === 'function') {
+      registrarTelaAtualMukirana('Orcamentos', {
+        obterContextoNovoLancamento: function() {
+          var mes = obterMesReferenciaOrcamento_();
+          return {
+            Mes_Referencia: mes,
+            Mes_Inicial: mes,
+            Mes_Final: ''
+          };
+        },
+        atualizarPeriodoGlobal: function() {
+          aplicarPeriodoGlobalOrcamentos_();
+          carregarPacoteOrcamentos();
+        }
+      });
+    }
+
+    carregarPacoteOrcamentos();
+  }
+
+  function obterMesReferenciaOrcamento_() {
+    if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
+      var periodo = obterFiltroPeriodoGlobalMukirana() || {};
+      return periodo.Mes_Inicial || periodo.Mes_Referencia || gerarMesAtualOrcamento();
+    }
+
+    return document.getElementById('orcamento_mes').value || gerarMesAtualOrcamento();
+  }
+
+  function aplicarPeriodoGlobalOrcamentos_() {
+    document.getElementById('orcamento_mes').value = obterMesReferenciaOrcamento_();
+  }
+
+  function carregarPacoteOrcamentos() {
+    aplicarPeriodoGlobalOrcamentos_();
+
+    google.script.run
+      .withSuccessHandler(function(pacote) {
+        pacoteOrcamentos = pacote || { resumo: {}, itens: [], categoriasDisponiveis: [] };
+        renderizarResumoOrcamento();
+        renderizarTabelaOrcamentos();
+        popularCategoriasOrcamento();
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(erro) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao("Erro ao carregar orçamento: " + erro.message, "erro");
+      })
+      .obterPacoteTelaOrcamentos(tokenSessaoOrcamento, obterMesReferenciaOrcamento_());
+  }
+
+  function renderizarResumoOrcamento() {
+    var resumo = pacoteOrcamentos.resumo || {};
+
+    document.getElementById('orc_total_teto').textContent = 'R$ ' + formatarNumeroOrcamento(resumo.Total_Teto || 0);
+    document.getElementById('orc_total_realizado').textContent = 'R$ ' + formatarNumeroOrcamento(resumo.Total_Realizado || 0);
+    document.getElementById('orc_saldo').textContent = 'R$ ' + formatarNumeroOrcamento(resumo.Saldo || 0);
+    document.getElementById('orc_percentual').textContent = (resumo.Percentual_Usado || 0) + '%';
+  }
+
+  function renderizarTabelaOrcamentos() {
+    var corpo = document.getElementById('corpo-tabela-orcamentos');
+    var tabela = document.getElementById('tabela-orcamentos-html');
+    var vazio = document.getElementById('estado-vazio-orcamento');
+    var itens = (pacoteOrcamentos.itens || []).filter(function(item) {
+      return item.Ativo === true;
+    });
+
+    corpo.innerHTML = '';
+
+    if (itens.length === 0) {
+      tabela.style.display = 'none';
+      vazio.style.display = 'block';
+      return;
+    }
+
+    tabela.style.display = 'table';
+    vazio.style.display = 'none';
+
+    itens.sort(function(a, b) {
+      return (a.Nome_Categoria || '').localeCompare(b.Nome_Categoria || '');
+    });
+
+    itens.forEach(function(item) {
+      var tr = document.createElement('tr');
+      var classeBarra = item.Status_Visual === 'estourado'
+        ? 'orcamento-estourado'
+        : (item.Status_Visual === 'atencao' ? 'orcamento-atencao' : 'orcamento-ok');
+      var largura = Math.min(item.Percentual_Usado || 0, 100);
+
+      tr.innerHTML =
+        '<td data-label="Categoria"><strong>' + escaparHtmlOrcamento(item.Nome_Categoria) + '</strong></td>' +
+        '<td data-label="Teto">R$ ' + formatarNumeroOrcamento(item.Valor_Teto) + '</td>' +
+        '<td data-label="Realizado">R$ ' + formatarNumeroOrcamento(item.Valor_Realizado) + '</td>' +
+        '<td data-label="Saldo">R$ ' + formatarNumeroOrcamento(item.Saldo) + '</td>' +
+        '<td data-label="Uso">' +
+          '<strong>' + (item.Percentual_Usado || 0) + '%</strong>' +
+          '<div class="barra-uso-orcamento"><span class="' + classeBarra + '" style="width:' + largura + '%"></span></div>' +
+        '</td>' +
+        '<td data-label="Ações" style="text-align:right">' +
+          '<button class="btn-acao" onclick="prepararEdicaoOrcamento(&quot;' + escaparAtributoOrcamento(item.ID_Orcamento) + '&quot;)">Editar</button>' +
+          '<button class="btn-acao" onclick="removerCategoriaOrcamentoFront(&quot;' + escaparAtributoOrcamento(item.ID_Orcamento) + '&quot;)">Remover</button>' +
+        '</td>';
+
+      corpo.appendChild(tr);
+    });
+  }
+
+  function abrirFormularioOrcamento() {
+    document.getElementById('form-orcamento').reset();
+    definirModoAposSalvarOrcamento('fechar');
+    document.getElementById('orc_id').value = '';
+    document.getElementById('titulo-form-orcamento').innerText = 'Adicionar Categoria ao Orçamento';
+    popularCategoriasOrcamento();
+    document.getElementById('container-form-orcamento').style.display = 'block';
+    document.getElementById('container-lista-orcamento').style.display = 'none';
+  }
+
+  function fecharFormularioOrcamento() {
+    document.getElementById('container-form-orcamento').style.display = 'none';
+    document.getElementById('container-lista-orcamento').style.display = 'block';
+  }
+
+  function definirModoAposSalvarOrcamento(modo) {
+    modoAposSalvarOrcamento = modo === 'novo' ? 'novo' : 'fechar';
+  }
+
+  function solicitarSalvarENovoOrcamento() {
+    definirModoAposSalvarOrcamento('novo');
+
+    var formulario = document.getElementById('form-orcamento');
+
+    if (formulario && typeof formulario.requestSubmit === 'function') {
+      formulario.requestSubmit();
+      return;
+    }
+
+    formulario.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  function atualizarEstadoBotoesSalvarOrcamento(salvando) {
+    var btnSalvar = document.getElementById('btn-salvar-orcamento');
+    var btnSalvarENovo = document.getElementById('btn-salvar-e-novo-orcamento');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#form-orcamento',
+        idsProcessando: ['btn-salvar-orcamento', 'btn-salvar-e-novo-orcamento'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    btnSalvar.disabled = !!salvando;
+    btnSalvar.innerText = salvando ? 'Salvando...' : 'Salvar';
+    btnSalvarENovo.disabled = !!salvando;
+    btnSalvarENovo.innerText = salvando ? 'Salvando...' : 'Salvar + novo';
+  }
+
+  function popularCategoriasOrcamento(categoriaExtra) {
+    var select = document.getElementById('orc_categoria');
+    var categorias = (pacoteOrcamentos.categoriasDisponiveis || []).slice();
+
+    select.innerHTML = '<option value="">Selecione...</option>';
+
+    if (categoriaExtra) {
+      categorias.unshift(categoriaExtra);
+    }
+
+    categorias.forEach(function(categoria) {
+      var opt = document.createElement('option');
+      opt.value = categoria.ID_Categoria;
+      opt.textContent = categoria.Nome;
+      select.appendChild(opt);
+    });
+  }
+
+  function prepararEdicaoOrcamento(idOrcamento) {
+    var item = encontrarItemOrcamento(idOrcamento);
+
+    if (!item) {
+      mostrarNotificacao("Item de orçamento não encontrado.", "erro");
+      return;
+    }
+
+    popularCategoriasOrcamento({
+      ID_Categoria: item.ID_Categoria,
+      Nome: item.Nome_Categoria
+    });
+
+    document.getElementById('orc_id').value = item.ID_Orcamento;
+    document.getElementById('orc_categoria').value = item.ID_Categoria;
+    document.getElementById('orc_valor_teto').value = formatarNumeroOrcamento(item.Valor_Teto);
+    document.getElementById('titulo-form-orcamento').innerText = 'Editar Categoria do Orçamento';
+    document.getElementById('container-form-orcamento').style.display = 'block';
+    document.getElementById('container-lista-orcamento').style.display = 'none';
+  }
+
+  function enviarFormularioOrcamento(evento) {
+    evento.preventDefault();
+    var modoSalvamento = modoAposSalvarOrcamento === 'novo' ? 'novo' : 'fechar';
+    atualizarEstadoBotoesSalvarOrcamento(true);
+
+    var dados = {
+      ID_Orcamento: document.getElementById('orc_id').value,
+      ID_Categoria: document.getElementById('orc_categoria').value,
+      Valor_Teto: converterTextoMoedaParaNumeroOrcamento(document.getElementById('orc_valor_teto').value)
+    };
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        atualizarEstadoBotoesSalvarOrcamento(false);
+        definirModoAposSalvarOrcamento('fechar');
+
+        if (modoSalvamento === 'novo') {
+          abrirFormularioOrcamento();
+        } else {
+          fecharFormularioOrcamento();
+        }
+
+        carregarPacoteOrcamentos();
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(erro) {
+        atualizarEstadoBotoesSalvarOrcamento(false);
+        definirModoAposSalvarOrcamento('fechar');
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      .salvarCategoriaOrcamento(dados, tokenSessaoOrcamento);
+  }
+
+  function removerCategoriaOrcamentoFront(idOrcamento) {
+    confirmarAcao(
+      'Remover esta categoria do orçamento? Você deixará de receber alertas pedagógicos para ela.',
+      function() {
+        google.script.run
+          .withSuccessHandler(function(msg) {
+            carregarPacoteOrcamentos();
+            mostrarNotificacao(msg, 'sucesso');
+          })
+          .withFailureHandler(function(erro) {
+            mostrarNotificacao(erro.message, 'erro');
+          })
+          .removerCategoriaOrcamento(idOrcamento, tokenSessaoOrcamento);
+      }
+    );
+  }
+
+  function encontrarItemOrcamento(idOrcamento) {
+    return (pacoteOrcamentos.itens || []).find(function(item) {
+      return item.ID_Orcamento === idOrcamento;
+    }) || null;
+  }
+
+  function gerarMesAtualOrcamento() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  }
+
+  function converterTextoMoedaParaNumeroOrcamento(valor) {
+    if (typeof valor === 'number') return valor;
+    if (!valor) return 0;
+
+    var texto = valor.toString().trim();
+
+    if (texto.indexOf(',') !== -1) {
+      texto = texto.replace(/\./g, '').replace(',', '.');
+    }
+
+    var numero = parseFloat(texto);
+    return isNaN(numero) ? 0 : numero;
+  }
+
+  function formatarNumeroOrcamento(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+
+    return numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function escaparHtmlOrcamento(valor) {
+    if (valor === null || valor === undefined) return '';
+
+    return valor.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escaparAtributoOrcamento(valor) {
+    return escaparHtmlOrcamento(valor).replace(/\\/g, '\\\\');
+  }
+</script>

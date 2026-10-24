@@ -1,0 +1,4646 @@
+﻿<style>
+  /*
+   * Módulo: Lancamentos_View.html
+   * Responsabilidade:
+   * - Renderizar a tela de lançamentos com filtros por período.
+   * - Carregar lançamentos, rateios e dependências por pacote.
+   * - Integrar rateios diretamente no formulário de lançamento.
+   * - Salvar LANCAMENTOS + RATEIOS em uma única operação lógica no backend.
+   * - Exibir estado de carregamento para melhorar a experiência do usuário.
+   */
+
+  .lancamento-celula-secundaria {
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .lancamentos-piloto {
+    --cor-fundo-app: #F7F8F3;
+    --cor-superficie: #F8FAF5;
+    --cor-superficie-secundaria: #EEF4EE;
+    --cor-texto-principal: #263238;
+    --cor-texto-secundario: #66736B;
+    --cor-primaria: #2F7D68;
+    --cor-primaria-hover: #256654;
+    --cor-sucesso-fundo: #DDF1E9;
+    --cor-sucesso-texto: #2F9E64;
+    --cor-alerta-fundo: #FFF3D7;
+    --cor-alerta-texto: #A56C13;
+    --cor-erro-fundo: #FFE5DF;
+    --cor-erro-texto: #D85C4A;
+    --borda-suave: 1px solid #DDE4DA;
+    --lanc-cor-menta: #DDF1E9;
+    --lanc-cor-ceu: #E7EEFF;
+    --lanc-cor-sol: #FFF3D7;
+    --lanc-cor-coral: #FFE5DF;
+    --lanc-cor-azul: #4C7EDB;
+    --lanc-borda-alegre: rgba(47, 125, 104, 0.18);
+    background:
+      linear-gradient(180deg, rgba(244, 247, 241, 0.98), rgba(239, 244, 238, 0.92)),
+      var(--cor-fundo-app);
+    color: var(--cor-texto-principal);
+    border-radius: 12px;
+    margin: -6px;
+    padding: 6px;
+  }
+
+  .lancamentos-piloto h2,
+  .lancamentos-piloto h3,
+  .lancamentos-piloto h4 {
+    color: var(--cor-texto-principal);
+  }
+
+  .lancamentos-piloto .cartao {
+    background: #F8FAF5;
+    border-color: var(--lanc-borda-alegre);
+    box-shadow: 0 10px 26px rgba(24, 52, 42, 0.07);
+  }
+
+  .lancamentos-piloto .btn-primario {
+    background: var(--cor-primaria);
+    color: #F8FAF5;
+    box-shadow: 0 8px 18px rgba(47, 125, 104, 0.18);
+  }
+
+  .lancamentos-piloto .btn-primario:hover {
+    background: var(--cor-primaria-hover);
+  }
+
+  .lancamentos-piloto .btn-secundario {
+    background: #EEF4EE;
+    color: var(--cor-texto-principal);
+    border: 1px solid #DDE4DA;
+  }
+
+  .lancamentos-piloto .btn-secundario:hover {
+    background: #E3ECE2;
+  }
+
+  .lancamentos-piloto .btn-acao {
+    background: #F9FBF7;
+    border-color: #DDE4DA;
+    color: var(--cor-texto-principal);
+  }
+
+  .lancamentos-piloto .btn-acao:hover {
+    background: var(--cor-primaria);
+    border-color: var(--cor-primaria);
+    color: #F8FAF5;
+  }
+
+  .lancamentos-piloto .btn-perigo:hover {
+    background: var(--cor-erro-texto);
+    border-color: var(--cor-erro-texto);
+    color: #F8FAF5;
+  }
+
+  .lancamentos-piloto input,
+  .lancamentos-piloto select,
+  .lancamentos-piloto textarea {
+    background: #F4F7F1;
+    border-color: #DDE4DA;
+    color: var(--cor-texto-principal);
+  }
+
+  .lancamentos-piloto input:focus,
+  .lancamentos-piloto select:focus,
+  .lancamentos-piloto textarea:focus {
+    border-color: rgba(47, 125, 104, 0.72);
+    box-shadow: 0 0 0 3px rgba(47, 125, 104, 0.12);
+  }
+
+  .lancamentos-piloto .cabecalho-tela {
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .lancamentos-piloto label {
+    margin-bottom: 3px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .lancamentos-piloto input,
+  .lancamentos-piloto select {
+    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 13px;
+  }
+
+  .lancamentos-piloto .grupo-campo {
+    margin-bottom: 6px;
+  }
+
+  .lancamento-subtitulo-tela {
+    margin: 2px 0 0 0;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .lancamento-contexto-ativo {
+    display: none;
+    margin-top: 7px;
+    padding: 8px 10px;
+    border: 1px solid rgba(76, 126, 219, 0.18);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(231, 238, 255, 0.88), rgba(221, 241, 233, 0.46));
+  }
+
+  .lancamento-contexto-ativo.visivel {
+    display: block;
+  }
+
+  .lancamento-contexto-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .lancamento-contexto-topo strong {
+    font-size: 12px;
+    color: var(--cor-texto-principal);
+  }
+
+  .lancamento-contexto-topo span {
+    font-size: 11px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .lancamento-contexto-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .lancamento-contexto-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(248, 250, 245, 0.96);
+    border: 1px solid rgba(47, 125, 104, 0.12);
+    color: var(--cor-texto-principal);
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .lancamento-contexto-chip b {
+    color: var(--cor-texto-secundario);
+    font-weight: 700;
+  }
+
+  .lancamento-cabecalho-linha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lancamento-filtros-compactos,
+  .lancamento-form-compacto {
+    padding: 8px;
+  }
+
+  .lancamento-filtros-grid {
+    display: grid;
+    grid-template-columns:
+      minmax(132px, 0.75fr)
+      minmax(132px, 0.75fr)
+      minmax(118px, 0.7fr)
+      minmax(180px, 1.1fr)
+      minmax(180px, 1.35fr)
+      minmax(118px, 0.7fr)
+      auto;
+    gap: 6px;
+    align-items: end;
+  }
+
+  .lancamento-filtro-contexto {
+    position: relative;
+  }
+
+  .lancamento-filtro-contexto-botao {
+    width: 100%;
+    min-height: 38px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie);
+    color: var(--cor-texto-principal);
+    padding: 7px 10px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .lancamento-filtro-contexto-painel {
+    position: absolute;
+    z-index: 900;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    display: none;
+    max-height: 320px;
+    overflow: auto;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie);
+    box-shadow: var(--sombra-fab);
+    padding: 8px;
+  }
+
+  .lancamento-filtro-contexto-painel.visivel {
+    display: block;
+  }
+
+  .lancamento-filtro-contexto-grupo {
+    margin-bottom: 8px;
+  }
+
+  .lancamento-filtro-contexto-grupo strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+  }
+
+  .lancamento-filtro-contexto-opcao {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 1px;
+    color: var(--cor-texto-principal);
+    font-size: 13px;
+  }
+
+  .lancamento-form-topo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    min-width: 0;
+  }
+
+  .lancamento-form-topo h3 {
+    margin: 0;
+    min-width: 0;
+    line-height: 1.2;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .lancamento-secao-form {
+    border: 1px solid var(--lanc-borda-alegre);
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 8px;
+    background: linear-gradient(180deg, rgba(221, 241, 233, 0.48), rgba(248, 250, 245, 0.86));
+  }
+
+  .lancamento-secao-form h4 {
+    margin: 0 0 7px 0;
+    color: var(--cor-texto-principal);
+    font-size: 13px;
+  }
+
+  .lancamento-toolbar-lote {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 6px 0;
+    padding: 7px 9px;
+    border: 1px solid rgba(31, 136, 97, 0.22);
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--lanc-cor-menta), var(--lanc-cor-ceu));
+    color: #17382B;
+  }
+
+  .lancamento-toolbar-lote.ativa {
+    display: flex;
+  }
+
+  .lancamento-toolbar-lote strong,
+  .lancamento-toolbar-lote span {
+    display: block;
+  }
+
+  .lancamento-toolbar-lote strong {
+    font-size: 13px;
+  }
+
+  .lancamento-toolbar-lote span {
+    margin-top: 1px;
+    font-size: 12px;
+    opacity: 0.84;
+  }
+
+  .lancamento-acoes-lote {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .lancamento-acoes-lote select {
+    min-height: 32px;
+    max-width: 190px;
+    background: rgba(248, 250, 245, 0.90);
+  }
+
+  .lancamento-checkbox-coluna {
+    width: 42px;
+    text-align: center;
+  }
+
+  .lancamento-checkbox-coluna input {
+    width: 16px;
+    height: 16px;
+    min-height: 16px;
+    margin: 0;
+    accent-color: var(--cor-primaria);
+  }
+
+  .lancamento-linha-selecionada {
+    background: rgba(47, 125, 104, 0.08);
+  }
+
+  .lancamento-linha-recorrencia-prevista {
+    background: rgba(79, 140, 247, 0.08) !important;
+    color: var(--cor-texto-secundario);
+  }
+
+  .lancamento-linha-recorrencia-prevista td {
+    border-color: rgba(79, 140, 247, 0.18) !important;
+  }
+
+  .lancamento-linha-recorrencia-prevista .lancamento-descricao-principal {
+    color: var(--cor-texto-principal);
+  }
+
+  .badge-recorrencia-prevista {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(79, 140, 247, 0.14);
+    color: #2D5FAF;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .lancamento-somente-leitura {
+    color: var(--cor-texto-secundario);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .lancamentos-piloto .tabela-mukirana th {
+    color: #596B62;
+    background: rgba(221, 241, 233, 0.34);
+  }
+
+  .lancamentos-piloto .tabela-mukirana td {
+    border-color: #DDE4DA;
+  }
+
+  .lancamentos-piloto .tabela-mukirana tbody tr {
+    background: rgba(248, 250, 245, 0.72);
+  }
+
+  .lancamentos-piloto .tabela-mukirana tbody tr:nth-child(even) {
+    background: rgba(239, 244, 238, 0.48);
+  }
+
+  .lancamento-tabela-compacta th,
+  .lancamento-tabela-compacta td {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    vertical-align: middle;
+  }
+
+  .lancamento-tabela-compacta th {
+    font-size: 12px;
+  }
+
+  .lancamento-acao-icone {
+    min-width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lancamento-descricao-principal {
+    font-weight: 700;
+    color: var(--cor-texto-principal);
+  }
+
+  .lancamento-descricao-projeto {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .lancamento-valor-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .lancamento-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .lancamento-ajuda-categoria {
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--cor-texto-secundario);
+    line-height: 1.25;
+  }
+
+  .bloco-rateio {
+    margin-top: 8px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-card);
+    padding: 10px;
+    background: linear-gradient(180deg, #F2F7F1, #F8FAF5);
+  }
+
+  .cabecalho-rateio {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .cabecalho-rateio h4 {
+    margin: 0 0 2px 0;
+    color: var(--cor-texto-principal);
+  }
+
+  .cabecalho-rateio p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .toggle-rateio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    color: var(--cor-texto-principal);
+    min-width: 0;
+  }
+
+  .toggle-rateio input {
+    flex: 0 0 auto;
+    width: auto;
+    margin: 0;
+  }
+
+  .toggle-rateio strong {
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .rateio-contexto-info {
+    margin: 8px 0 10px 0;
+    padding: 9px 10px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: rgba(76, 126, 219, 0.10);
+    color: var(--cor-texto-principal);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .rateio-contexto-info strong {
+    color: var(--cor-texto-principal);
+  }
+
+  .rateio-contexto-info .rateio-contexto-detalhe {
+    display: block;
+    margin-top: 3px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .rateio-contexto-info .rateio-contexto-alerta {
+    display: block;
+    margin-top: 4px;
+    color: var(--cor-alerta-texto);
+    font-weight: 700;
+  }
+
+  .rateio-resumo-front {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 8px 0;
+  }
+
+  .rateio-resumo-item {
+    background: var(--cor-superficie);
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    padding: 8px;
+  }
+
+  .rateio-resumo-item span {
+    display: block;
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+    margin-bottom: 2px;
+  }
+
+  .rateio-resumo-item strong {
+    color: var(--cor-texto-principal);
+  }
+
+  .lista-participantes-rateio {
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie);
+    overflow: hidden;
+  }
+
+  .linha-participante-rateio {
+    display: grid;
+    grid-template-columns: 36px 1.6fr 1fr 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 8px;
+    border-bottom: var(--borda-suave);
+  }
+
+  .linha-participante-rateio:last-child {
+    border-bottom: none;
+  }
+
+  .linha-participante-rateio label {
+    margin: 0;
+    color: var(--cor-texto-principal);
+    cursor: pointer;
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .linha-participante-rateio .subtexto {
+    display: block;
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+    margin-top: 1px;
+  }
+
+  .linha-participante-rateio input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+  }
+
+  .badge-rateado {
+    background: var(--lanc-cor-ceu);
+    color: #2E62BE;
+    padding: 3px 7px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+  }
+
+  .badge-nao-rateado {
+    background: var(--cor-superficie-secundaria);
+    color: var(--cor-texto-secundario);
+    border: var(--borda-suave);
+    padding: 3px 7px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+  }
+
+  .badge-compartilhado-rateio {
+    background: rgba(76, 126, 219, 0.13);
+    color: #2E62BE;
+    padding: 3px 7px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+    margin-left: 8px;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .estado-carregando-lancamento {
+    text-align: center;
+    padding: 30px 16px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .estado-carregando-lancamento strong {
+    display: block;
+    color: var(--cor-texto-principal);
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .estado-carregando-lancamento span {
+    font-size: 14px;
+  }
+
+  @media (max-width: 960px) {
+    .lancamento-filtros-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .lancamento-filtros-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .indicador-carregamento-lancamento {
+    width: 34px;
+    height: 34px;
+    border: 4px solid rgba(0, 0, 0, 0.12);
+    border-top-color: var(--cor-primaria);
+    border-radius: 50%;
+    margin: 0 auto 18px auto;
+    animation: girar-carregamento-lancamento 0.8s linear infinite;
+  }
+
+  body.tema-escuro .indicador-carregamento-lancamento {
+    border-color: rgba(255, 255, 255, 0.18);
+    border-top-color: #FFFFFF;
+  }
+
+  body.tema-escuro .lancamentos-piloto {
+    --cor-fundo-app: #19231F;
+    --cor-superficie: #223029;
+    --cor-superficie-secundaria: #1E2A25;
+    --cor-texto-principal: #EDF4EF;
+    --cor-texto-secundario: #B7C8BD;
+    --cor-primaria: #6BC6A6;
+    --cor-primaria-hover: #82D6B8;
+    --cor-sucesso-fundo: rgba(107, 198, 166, 0.16);
+    --cor-sucesso-texto: #8CE0BF;
+    --cor-alerta-fundo: rgba(242, 184, 75, 0.16);
+    --cor-alerta-texto: #FFD27A;
+    --cor-erro-fundo: rgba(216, 92, 74, 0.16);
+    --cor-erro-texto: #FF9A8B;
+    --borda-suave: 1px solid rgba(221, 228, 218, 0.16);
+    --lanc-borda-alegre: rgba(139, 211, 185, 0.18);
+    background:
+      linear-gradient(180deg, rgba(25, 35, 31, 0.98), rgba(25, 35, 31, 0.92)),
+      var(--cor-fundo-app);
+  }
+
+  body.tema-escuro .lancamentos-piloto .cartao,
+  body.tema-escuro .lancamentos-piloto .rateio-resumo-item,
+  body.tema-escuro .lancamentos-piloto .lista-participantes-rateio {
+    background: rgba(34, 48, 41, 0.96);
+  }
+
+  body.tema-escuro .lancamentos-piloto input,
+  body.tema-escuro .lancamentos-piloto select,
+  body.tema-escuro .lancamentos-piloto textarea,
+  body.tema-escuro .lancamento-acoes-lote select {
+    background: #1E2A25;
+    border-color: rgba(221, 228, 218, 0.18);
+    color: var(--cor-texto-principal);
+  }
+
+  body.tema-escuro .lancamentos-piloto .btn-secundario,
+  body.tema-escuro .lancamentos-piloto .btn-acao {
+    background: #26362E;
+    border-color: rgba(221, 228, 218, 0.18);
+    color: var(--cor-texto-principal);
+  }
+
+  body.tema-escuro .lancamentos-piloto .tabela-mukirana th {
+    background: rgba(107, 198, 166, 0.10);
+    color: #C7D8CE;
+  }
+
+  body.tema-escuro .lancamentos-piloto .bloco-rateio,
+  body.tema-escuro .lancamentos-piloto .lancamento-secao-form {
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  body.tema-escuro .badge-compartilhado-rateio {
+    background: rgba(100, 181, 246, 0.18);
+    color: #90CAF9;
+  }
+
+  body.tema-escuro .lancamento-secao-form {
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  body.tema-escuro .lancamento-toolbar-lote {
+    background: linear-gradient(90deg, rgba(52, 211, 153, 0.18), rgba(96, 165, 250, 0.16));
+    color: var(--cor-texto-principal);
+  }
+
+  body.tema-escuro .lancamento-contexto-ativo {
+    background: linear-gradient(180deg, rgba(76, 126, 219, 0.14), rgba(107, 198, 166, 0.10));
+    border-color: rgba(144, 202, 249, 0.16);
+  }
+
+  body.tema-escuro .lancamento-contexto-chip {
+    background: rgba(30, 42, 37, 0.92);
+    border-color: rgba(221, 228, 218, 0.14);
+  }
+
+  body.tema-escuro .lancamento-acoes-lote select {
+    background: var(--cor-superficie);
+  }
+
+  @keyframes girar-carregamento-lancamento {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .lancamentos-piloto {
+      margin: 0;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    .modal-contextual-conteudo .lancamentos-piloto {
+      background: transparent;
+    }
+
+    .modal-contextual-conteudo .lancamentos-piloto .cartao {
+      box-shadow: none;
+    }
+
+    .modal-contextual-conteudo #container-form-lancamento {
+      margin: 0;
+    }
+
+    .lancamento-form-topo {
+      align-items: flex-start;
+    }
+
+    .lancamento-form-topo h3 {
+      font-size: 17px;
+    }
+
+    .lancamento-filtros-compactos,
+    .lancamento-form-compacto {
+      padding: 6px;
+    }
+
+    .lancamento-filtros-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+
+    .lancamento-filtros-grid .grupo-campo:nth-child(4),
+    .lancamento-filtros-grid .grupo-campo:nth-child(5) {
+      grid-column: 1 / -1;
+    }
+
+    .lancamento-toolbar-lote {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .lancamento-acoes-lote {
+      align-items: stretch;
+    }
+
+    .lancamento-acoes-lote select,
+    .lancamento-acoes-lote button {
+      width: 100%;
+      max-width: none;
+    }
+
+    .lancamento-acoes {
+      justify-content: flex-end;
+    }
+
+    .lancamento-tabela-compacta {
+      min-width: 980px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .lancamento-tabela-compacta tr {
+      display: table-row;
+    }
+
+    .lancamento-tabela-compacta th,
+    .lancamento-tabela-compacta td {
+      display: table-cell;
+      min-height: auto;
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: var(--borda-suave);
+      white-space: normal;
+      overflow-wrap: normal;
+      word-break: normal;
+      hyphens: none;
+      vertical-align: middle;
+    }
+
+    .lancamento-tabela-compacta td {
+      overflow-wrap: anywhere;
+    }
+
+    .lancamento-tabela-compacta td[data-label="Ações"],
+    .lancamento-tabela-compacta td[data-label="Acoes"] {
+      min-width: max-content;
+      white-space: normal;
+    }
+
+    .lancamento-tabela-compacta td:nth-child(3),
+    .lancamento-tabela-compacta td:nth-child(7) {
+      white-space: normal;
+    }
+
+    .lancamento-tabela-compacta td:nth-child(9) .lancamento-acoes {
+      justify-content: flex-end;
+    }
+
+    .lancamento-tabela-compacta .lancamento-descricao-principal {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+      font-size: 13px;
+    }
+
+    .lancamento-tabela-compacta .lancamento-descricao-projeto,
+    .lancamento-tabela-compacta .lancamento-valor-meta,
+    .lancamento-tabela-compacta .badge-global,
+    .lancamento-tabela-compacta .badge-adicional,
+    .lancamento-tabela-compacta .badge-compartilhado-rateio,
+    .lancamento-tabela-compacta .badge-parcela {
+      display: inline-flex;
+    }
+
+    .cabecalho-rateio {
+      flex-direction: column;
+    }
+
+    .rateio-resumo-front {
+      grid-template-columns: 1fr;
+    }
+
+    .linha-participante-rateio {
+      grid-template-columns: 32px 1fr;
+      align-items: start;
+    }
+
+    .linha-participante-rateio input[data-tipo="valor"],
+    .linha-participante-rateio input[data-tipo="percentual"] {
+      grid-column: 2 / 3;
+    }
+
+    .linha-participante-rateio .badge-rateado,
+    .linha-participante-rateio .badge-nao-rateado {
+      justify-self: start;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .modal-contextual-conteudo .grupo-campo-triplo,
+    .modal-contextual-conteudo .grupo-campo-duplo {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .modal-contextual-conteudo .grupo-campo[style*="grid-column"] {
+      grid-column: auto !important;
+    }
+
+    .modal-contextual-conteudo .toggle-rateio {
+      align-items: flex-start;
+      line-height: 1.3;
+    }
+
+    .modal-contextual-conteudo .acoes-formulario {
+      gap: 8px;
+    }
+
+    .modal-contextual-conteudo .acoes-formulario button,
+    .modal-contextual-conteudo .btn-primario,
+    .modal-contextual-conteudo .btn-secundario {
+      min-width: 0;
+      white-space: normal;
+      line-height: 1.25;
+    }
+  }
+</style>
+
+<div class="lancamentos-piloto">
+<div class="cabecalho-tela">
+  <div>
+    <div class="lancamento-cabecalho-linha">
+      <h2 id="titulo-tela-lancamentos">Lançamentos</h2>
+      <button
+        type="button"
+        class="ajuda-inline"
+        onclick="mostrarBalaoAjuda(event, 'Registre, filtre e revise seus movimentos. Lançamentos pendentes entram nos cálculos, mas ainda precisam de conferência.')"
+        aria-label="Ajuda sobre lançamentos"
+      >
+        <span class="material-symbols-outlined">info</span>
+      </button>
+    </div>
+    <p id="subtitulo-tela-lancamentos" class="lancamento-subtitulo-tela">Use o mes atual como base e amplie o periodo somente quando precisar comparar meses fechados.</p>
+    <div id="lancamento-contexto-ativo" class="lancamento-contexto-ativo">
+      <div class="lancamento-contexto-topo">
+        <strong>Contexto ativo</strong>
+        <span id="lancamento-contexto-resumo">Filtros herdados da tela de origem.</span>
+      </div>
+      <div id="lancamento-contexto-chips" class="lancamento-contexto-chips"></div>
+    </div>
+  </div>
+  <button class="btn-primario" id="btn-novo-lancamento-tela" type="button" data-topbar-label="+ Novo Lançamento" onclick="abrirFormularioLancamento()"><span class="material-symbols-outlined">add</span> Novo Lançamento</button>
+</div>
+
+<div class="cartao lancamento-filtros-compactos" id="container-filtros-lancamentos">
+  <input type="hidden" id="filtro_id_conta_lancamento">
+  <input type="hidden" id="filtro_id_categoria_lancamento">
+  <input type="hidden" id="filtro_id_projeto_lancamento">
+  <input type="hidden" id="filtro_tipo_origem_lancamento">
+  <input type="hidden" id="filtro_id_grupo_cartao_lancamento">
+  <input type="hidden" id="filtro_id_cartao_lancamento">
+  <input type="hidden" id="filtro_parcelado_lancamento">
+  <input type="hidden" id="filtro_id_lancamento">
+  <input type="hidden" id="filtro_modo_contextual_lancamento">
+
+  <div class="lancamento-filtros-grid">
+    <div class="grupo-campo" style="display:none;">
+      <label for="filtro_mes_lancamento">Mes inicial</label>
+      <input type="month" id="filtro_mes_lancamento">
+    </div>
+
+    <div class="grupo-campo" style="display:none;">
+      <label for="filtro_mes_final_lancamento">Mes final (opcional)</label>
+      <input type="month" id="filtro_mes_final_lancamento">
+    </div>
+
+    <div class="grupo-campo">
+      <label for="filtro_tipo_lancamento">Tipo</label>
+      <select id="filtro_tipo_lancamento">
+        <option value="">Todos</option>
+        <option value="Despesa">Despesas</option>
+        <option value="Receita">Receitas</option>
+        <option value="Transferência">Transferências</option>
+      </select>
+    </div>
+
+    <div class="grupo-campo lancamento-filtro-contexto">
+      <label for="botao_filtro_contexto_lancamento">Conta, cartão, projeto...</label>
+      <button type="button" id="botao_filtro_contexto_lancamento" class="lancamento-filtro-contexto-botao" onclick="alternarPainelFiltroContextoLancamento()">
+        Todos os contextos
+      </button>
+      <div id="painel_filtro_contexto_lancamento" class="lancamento-filtro-contexto-painel"></div>
+    </div>
+
+    <div class="grupo-campo">
+      <label for="filtro_texto_lancamento">Buscar na descrição</label>
+      <input
+        type="text"
+        id="filtro_texto_lancamento"
+        placeholder="Ex: mercado, salário, internet"
+        onkeydown="aoDigitarFiltroTextoLancamento(event)"
+      >
+    </div>
+
+    <div class="grupo-campo">
+      <label for="filtro_status_lancamento">Status</label>
+      <select id="filtro_status_lancamento">
+        <option value="">Todos</option>
+        <option value="Efetivado">Efetivados</option>
+        <option value="Pendente">Pendentes</option>
+      </select>
+    </div>
+
+    <div class="grupo-campo">
+      <button type="button" class="btn-primario" onclick="aplicarFiltrosLancamentos()">
+        Aplicar filtros
+      </button>
+    </div>
+
+    <div class="grupo-campo">
+      <button type="button" class="btn-secundario" onclick="limparFiltrosLancamentos()">
+        Limpar filtros
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="container-form-lancamento" class="cartao lancamento-form-compacto" style="display: none;">
+  <div class="lancamento-form-topo">
+    <h3 id="titulo-form-lancamento">Registrar Lançamento</h3>
+    <button
+      type="button"
+      class="ajuda-inline"
+      onclick="mostrarBalaoAjuda(event, 'Preencha somente o necessário. Rateio, parcelamento e transferência aparecem conforme o contexto escolhido.')"
+      aria-label="Ajuda sobre o formulário de lançamentos"
+    >
+      <span class="material-symbols-outlined">info</span>
+    </button>
+  </div>
+
+  <form id="form-lancamento" novalidate onsubmit="enviarFormularioLancamento(event)">
+    <input type="hidden" id="lan_id">
+    <input type="hidden" id="lan_grupo_parcela">
+    <input type="hidden" id="lan_numero_parcela">
+    <input type="hidden" id="lan_total_parcelas">
+
+    <div class="grupo-campo-triplo">
+      <div class="grupo-campo">
+        <label for="lan_tipo">Tipo de Registro</label>
+        <select id="lan_tipo" required onchange="aoAlterarTipoLancamento()">
+          <option value="Despesa">Despesa (Saída)</option>
+          <option value="Receita">Receita (Entrada)</option>
+          <option value="Transferência">Transferência</option>
+        </select>
+      </div>
+
+      <div class="grupo-campo" style="grid-column: span 2;">
+        <label for="lan_descricao">Descrição</label>
+        <input
+          type="text"
+          id="lan_descricao"
+          required
+          placeholder="Ex: Supermercado, salário, internet, passagem"
+        >
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label for="lan_valor" id="label_lan_valor">Valor Total (R$)</label>
+        <input
+          type="text"
+          inputmode="numeric"
+          id="lan_valor"
+          oninput="aoAlterarValorLancamento(this)"
+          required
+          placeholder="0,00"
+        >
+      </div>
+
+      <div class="grupo-campo">
+        <label for="lan_data">Data de Ocorrência</label>
+        <input type="date" id="lan_data" required>
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo" id="container-lan-categoria">
+        <label for="lan_categoria">Categoria</label>
+        <select id="lan_categoria" required>
+          <option value="">Carregando categorias...</option>
+        </select>
+        <div class="lancamento-ajuda-categoria">
+          Categorias principais aparecem com ●. Subcategorias aparecem com ↳ abaixo da categoria principal.
+        </div>
+      </div>
+
+      <div class="grupo-campo">
+        <label for="lan_projeto">Projeto / Centro de Custo</label>
+        <select id="lan_projeto" onchange="aoAlterarContextoRateioLancamento()">
+          <option value="">Carregando projetos...</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grupo-campo-triplo">
+      <div class="grupo-campo">
+        <label for="lan_tipo_origem">Meio de Pagamento / Origem</label>
+        <select id="lan_tipo_origem" required onchange="atualizarDropdownOrigens()">
+          <option value="Conta">Conta Bancária / Carteira</option>
+          <option value="Cartão">Cartão de Crédito</option>
+        </select>
+      </div>
+
+      <div class="grupo-campo">
+        <label for="lan_origem">Selecione a Origem</label>
+        <select id="lan_origem" required onchange="aoAlterarContextoRateioLancamento()">
+          <option value="">Carregando origens...</option>
+        </select>
+      </div>
+
+      <div class="grupo-campo">
+        <label for="lan_status">Status</label>
+        <select id="lan_status" required>
+          <option value="Efetivado">Efetivado (Pago/Recebido)</option>
+          <option value="Pendente">Pendente (Agendado)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo" id="container-transferencia-destino" style="display: none;">
+      <div class="grupo-campo">
+        <label for="lan_destino">Conta de Destino</label>
+        <select id="lan_destino">
+          <option value="">Carregando contas...</option>
+        </select>
+        <div class="texto-ajuda">Transferências usam sempre uma conta de origem e outra conta de destino. Para pagar cartão de crédito, abra a fatura e use o botão Pagar fatura.</div>
+      </div>
+
+      <div class="grupo-campo">
+        <div class="caixa-informativa" style="margin-bottom: 0;">
+          <strong>Como funciona:</strong><br>
+          Transferências não usam categoria nem rateio. O registro apenas move valor entre duas contas válidas; pagamento de cartão deve ser feito pela tela da fatura.
+        </div>
+      </div>
+    </div>
+
+    <div class="grupo-campo">
+      <label class="toggle-rateio" for="check_parcelamento_lancamento">
+        <input type="checkbox" id="check_parcelamento_lancamento" onchange="alternarBlocoParcelamentoLancamento()">
+        <strong>Esta receita/despesa será parcelada</strong>
+      </label>
+      <div class="texto-ajuda">
+        Transferências não podem ser parceladas. A data de ocorrência será usada como data da primeira parcela.
+      </div>
+    </div>
+
+    <div id="container-parcelamento-lancamento" class="bloco-parcelamento" style="display: none;">
+      <div class="grupo-campo-duplo">
+        <div class="grupo-campo">
+          <label for="lan_quantidade_parcelas">Quantidade de parcelas</label>
+          <input type="number" id="lan_quantidade_parcelas" min="2" max="120" value="2" onchange="atualizarResumoParcelamentoFront()" oninput="atualizarResumoParcelamentoFront()">
+        </div>
+
+        <div class="grupo-campo" id="container_escopo_parcelas" style="display: none;">
+          <label for="lan_escopo_edicao_parcelas">Ao editar lançamento parcelado</label>
+          <select id="lan_escopo_edicao_parcelas">
+            <option value="Esta">Editar apenas esta parcela</option>
+            <option value="EstaEProximas">Editar esta e as próximas parcelas</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="resumo_parcelamento_lancamento" class="parcelamento-resumo-front">
+        Informe o valor de cada parcela. O sistema calculará o valor total da compra e criará parcelas mensais com esse mesmo valor.
+      </div>
+    </div>
+
+    <div class="grupo-campo">
+      <label class="toggle-rateio" for="check_rateio_lancamento">
+        <input type="checkbox" id="check_rateio_lancamento" onchange="alternarBlocoRateioLancamento()">
+        <strong>Esta despesa/receita será rateada</strong>
+      </label>
+      <div class="texto-ajuda">
+        O rateio define quem arca financeiramente com o lançamento.
+      </div>
+    </div>
+
+    <div id="container-rateio-lancamento" class="bloco-rateio" style="display: none;">
+      <div class="cabecalho-rateio">
+        <div>
+          <h4>Rateio do lançamento</h4>
+          <p>Selecione os participantes e escolha como o valor será dividido.</p>
+        </div>
+      </div>
+
+      <div class="grupo-campo-duplo">
+        <div class="grupo-campo">
+          <label for="lan_modo_rateio">Modo de divisão</label>
+          <select id="lan_modo_rateio" onchange="atualizarCamposRateioPorModo()">
+            <option value="Igual">Partes iguais</option>
+            <option value="Valor">Valores informados</option>
+            <option value="Percentual">Percentuais informados</option>
+          </select>
+        </div>
+
+        <div class="grupo-campo">
+          <label for="lan_observacao_rateio">Observação do rateio</label>
+          <input type="text" id="lan_observacao_rateio" placeholder="Ex: divisão combinada entre participantes">
+        </div>
+      </div>
+
+      <div class="rateio-resumo-front">
+        <div class="rateio-resumo-item">
+          <span>Total do lançamento</span>
+          <strong id="resumo_rateio_total">R$ 0,00</strong>
+        </div>
+
+        <div class="rateio-resumo-item">
+          <span>Total rateado</span>
+          <strong id="resumo_rateio_rateado">R$ 0,00</strong>
+        </div>
+
+        <div class="rateio-resumo-item">
+          <span>Diferença</span>
+          <strong id="resumo_rateio_diferenca">R$ 0,00</strong>
+        </div>
+      </div>
+
+      <div id="info-contexto-rateio-lancamento" class="rateio-contexto-info"></div>
+
+      <div id="lista-participantes-rateio" class="lista-participantes-rateio"></div>
+    </div>
+
+    <div class="acoes-formulario">
+      <button type="button" class="btn-secundario" onclick="fecharFormularioLancamento()">Cancelar</button>
+      <button type="button" class="btn-secundario" id="btn-salvar-e-novo-lancamento" onclick="solicitarSalvarENovoLancamento()">Salvar + novo</button>
+      <button type="submit" class="btn-primario" id="btn-salvar-lancamento" onclick="definirModoAposSalvarLancamento('fechar')">Salvar</button>
+    </div>
+  </form>
+</div>
+
+<div class="cartao" id="container-lista-lancamento">
+  <div id="estado-carregando-lancamento" class="estado-carregando-lancamento" style="display: none;">
+    <div class="indicador-carregamento-lancamento"></div>
+    <strong>Carregando lançamentos...</strong>
+    <span>Buscando lançamentos, rateios e dados auxiliares.</span>
+  </div>
+
+  <div id="toolbar-lote-lancamento" class="lancamento-toolbar-lote">
+    <div>
+      <strong id="contador-selecao-lancamento">0 lançamentos selecionados</strong>
+      <span>Apenas os selecionados serão alterados. As permissões de acesso continuam valendo.</span>
+      <span id="resumo-total-lancamento">Saldo visível: R$ 0,00</span>
+      <span id="resumo-selecao-lancamento">Saldo selecionado: R$ 0,00</span>
+    </div>
+    <div class="lancamento-acoes-lote">
+      <select id="acao-lote-status-lancamento" aria-label="Novo status dos lançamentos selecionados">
+        <option value="Efetivado">Marcar como efetivado</option>
+        <option value="Pendente">Marcar como pendente</option>
+      </select>
+      <button type="button" class="btn-secundario" onclick="alterarStatusSelecionadosLancamento()">Aplicar status</button>
+      <button type="button" class="btn-secundario btn-perigo" onclick="excluirSelecionadosLancamento()">Excluir selecionados</button>
+      <button type="button" class="btn-secundario" onclick="limparSelecaoLancamentos()">Limpar</button>
+    </div>
+  </div>
+
+  <div class="lista-linhas-wrap lista-linhas-densa lancamento-lista-linhas">
+  <table class="tabela-mukirana lista-linhas-mukirana lancamento-tabela-compacta" id="tabela-lancamentos-html" style="display: none;">
+    <thead>
+      <tr>
+        <th class="lancamento-checkbox-coluna">
+          <input type="checkbox" id="check-todos-lancamentos" aria-label="Selecionar todos os lançamentos visíveis" onchange="alternarSelecaoTodosLancamentos(this.checked)">
+        </th>
+        <th>Data</th>
+        <th>Descrição</th>
+        <th>Categoria</th>
+        <th>Origem</th>
+        <th>Valor</th>
+        <th>Rateio</th>
+        <th>Status</th>
+        <th style="text-align: right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-tabela-lancamentos"></tbody>
+  </table>
+  </div>
+
+  <div id="estado-vazio-lancamento" class="estado-vazio">
+    <h3>Sem lançamentos registrados</h3>
+    <p>Nenhum lançamento encontrado para os filtros selecionados.</p>
+    <button class="btn-primario" type="button" onclick="abrirFormularioLancamento()">+ Criar Lançamento</button>
+  </div>
+</div>
+</div>
+
+
+<div id="modal-exclusao-parcelas-lancamento" class="modal-overlay oculto">
+  <div class="modal-caixa">
+    <h3>Excluir lançamento parcelado</h3>
+    <p>Escolha o escopo da exclusão. Os lançamentos e rateios vinculados serão excluídos definitivamente.</p>
+    <div class="grupo-campo" style="text-align: left; margin-bottom: 20px;">
+      <label for="escopo_exclusao_parcelas_lancamento">Escopo</label>
+      <select id="escopo_exclusao_parcelas_lancamento">
+        <option value="Esta">Excluir apenas esta parcela</option>
+        <option value="EstaEProximas">Excluir esta e as próximas parcelas</option>
+      </select>
+    </div>
+    <div class="modal-botoes">
+      <button class="btn-secundario" type="button" onclick="fecharModalExclusaoParcelasLancamento()">Cancelar</button>
+      <button class="btn-primario" type="button" id="btn-confirmar-exclusao-parcelas-lancamento">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var pacoteLancamentos = {
+    usuarioLogado: {},
+    lancamentos: [],
+    rateios: [],
+    rateiosPorLancamento: {},
+    dependencias: {
+      contas: [],
+      cartoes: [],
+      categorias: [],
+      projetos: [],
+      usuarios: []
+    }
+  };
+
+  var tokenSessaoLancamento = localStorage.getItem('mukirana_token') || '';
+  var carregandoFormularioLancamento = false;
+  var salvandoLancamentoEmAndamento = false;
+  var modoAposSalvarLancamento = 'fechar';
+  var ultimaAssinaturaOrigemRateioFront = '';
+  var selecaoLancamentos = {};
+  var contextoExternoLancamento = null;
+  var contextoBaseLancamento = null;
+
+  inicializarTelaLancamentos();
+
+  /**
+   * Inicializa a tela de lançamentos.
+   *
+   * Regra de performance:
+   * - A tela abre no mês atual por padrão.
+   * - O backend recebe filtros e retorna apenas o pacote necessário.
+   */
+  function inicializarTelaLancamentos() {
+    if (!tokenSessaoLancamento) {
+      mostrarNotificacao("Sessão expirada. Faça login novamente.", "erro");
+      return;
+    }
+
+    if (typeof registrarTelaAtualMukirana === 'function') {
+      registrarTelaAtualMukirana('Lancamentos', {
+        obterContextoNovoLancamento: obterFiltrosTelaLancamentos,
+        abrirNovoLancamento: abrirNovoLancamentoRapidoTelaLancamentos_,
+        atualizarPeriodoGlobal: function() {
+          aplicarPeriodoGlobalLancamentos_();
+          carregarPacoteTelaLancamentos();
+        }
+      });
+    }
+
+    inicializarFiltrosLancamentos();
+    aplicarContextoVisualLancamento();
+    carregarPacoteTelaLancamentos();
+  }
+
+  function aplicarContextoVisualLancamento() {
+    var filtros = contextoExternoLancamento || {};
+    var emModalContextual = typeof estaEmTelaContextualMukirana === 'function' && estaEmTelaContextualMukirana();
+    var titulo = document.getElementById('titulo-tela-lancamentos');
+    var subtitulo = document.getElementById('subtitulo-tela-lancamentos');
+    var botaoNovo = document.getElementById('btn-novo-lancamento-tela');
+
+    if (titulo) {
+      titulo.textContent = filtros.Titulo_Contexto || 'Lançamentos';
+    }
+
+    if (subtitulo) {
+      subtitulo.textContent = filtros.Subtitulo_Contexto ||
+        (emModalContextual
+          ? 'Este contexto permanece vinculado à tela de origem. Ao salvar, tudo volta atualizado.'
+          : 'Use o mes atual como base e amplie o periodo somente quando precisar comparar meses fechados.');
+    }
+
+    if (botaoNovo && filtros.ID_Lancamento) {
+      botaoNovo.style.display = 'none';
+    } else if (botaoNovo) {
+      botaoNovo.style.display = 'inline-flex';
+    }
+  }
+
+  /**
+   * Inicializa filtros da tela.
+   */
+  function inicializarFiltrosLancamentos() {
+    var campoMes = document.getElementById('filtro_mes_lancamento');
+    var campoMesFinal = document.getElementById('filtro_mes_final_lancamento');
+    var filtrosExternos = obterFiltrosExternosLancamentos();
+    var periodoGlobal = obterPeriodoGlobalLancamentos_();
+
+    if (campoMes && !campoMes.value) {
+      campoMes.value = periodoGlobal.Mes_Inicial || gerarMesAtualLancamento();
+    }
+
+    if (campoMesFinal && !campoMesFinal.value) {
+      campoMesFinal.value = periodoGlobal.Mes_Final || '';
+    }
+
+    if (!filtrosExternos) {
+      renderizarResumoContextoLancamento_();
+      return;
+    }
+
+    contextoExternoLancamento = filtrosExternos;
+    contextoBaseLancamento = JSON.parse(JSON.stringify(filtrosExternos));
+    aplicarEstadoFiltrosLancamento_(filtrosExternos);
+    localStorage.removeItem('mukirana_filtros_lancamentos');
+    renderizarResumoContextoLancamento_();
+  }
+
+  function obterPeriodoGlobalLancamentos_() {
+    if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
+      var periodo = obterFiltroPeriodoGlobalMukirana() || {};
+      return {
+        Mes_Inicial: periodo.Mes_Inicial || periodo.Mes_Referencia || gerarMesAtualLancamento(),
+        Mes_Final: periodo.Mes_Final || '',
+        Considerar_Historico_Anterior: periodo.Considerar_Historico_Anterior !== false
+      };
+    }
+
+    return {
+      Mes_Inicial: obterValorCampoLancamento_('filtro_mes_lancamento') || gerarMesAtualLancamento(),
+      Mes_Final: obterValorCampoLancamento_('filtro_mes_final_lancamento') || '',
+      Considerar_Historico_Anterior: true
+    };
+  }
+
+  function aplicarPeriodoGlobalLancamentos_() {
+    var periodo = obterPeriodoGlobalLancamentos_();
+    var campoMes = document.getElementById('filtro_mes_lancamento');
+    var campoMesFinal = document.getElementById('filtro_mes_final_lancamento');
+
+    if (campoMes) {
+      campoMes.value = periodo.Mes_Inicial || gerarMesAtualLancamento();
+    }
+
+    if (campoMesFinal) {
+      campoMesFinal.value = periodo.Mes_Final || '';
+    }
+  }
+
+  /**
+   * Carrega pacote filtrado da tela.
+   */
+  function carregarPacoteTelaLancamentos() {
+    var inicioChamada = performance.now();
+    mostrarEstadoCarregandoLancamentos();
+    limparSelecaoLancamentos(false);
+
+    google.script.run
+      .withSuccessHandler(function(pacote) {
+        var fimChamada = performance.now();
+        var inicioRenderizacao = performance.now();
+
+        try {
+          pacoteLancamentos = normalizarPacoteLancamentos(pacote);
+
+          popularFiltroContextoLancamentos();
+          popularDropdownProjetos();
+          filtrarCategoriasPorTipo();
+          atualizarDropdownOrigens();
+          renderizarResumoContextoLancamento_();
+          renderizarTabelaLancamentos();
+          executarAcaoPendenteLancamentos();
+          registrarPerformanceFrontLancamentos_(pacoteLancamentos._performance, {
+            chamadaMs: Math.round(fimChamada - inicioChamada),
+            renderizacaoMs: Math.round(performance.now() - inicioRenderizacao),
+            lancamentos: pacoteLancamentos.lancamentos.length,
+            rateios: pacoteLancamentos.rateios.length
+          });
+        } catch (erroRenderizacao) {
+          ocultarTodosEstadosListaLancamentos();
+          mostrarEstadoVazioLancamentos();
+          mostrarNotificacao("Erro ao montar a tela de lançamentos: " + erroRenderizacao.message, "erro");
+
+          if (window.console && console.error) {
+            console.error("[Mukirana] Erro ao renderizar lançamentos", erroRenderizacao);
+          }
+        } finally {
+          finalizarCarregamentoTelaMukirana();
+        }
+      })
+      .withFailureHandler(function(erro) {
+        ocultarTodosEstadosListaLancamentos();
+        mostrarEstadoVazioLancamentos();
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao("Erro ao carregar lançamentos: " + erro.message, "erro");
+      })
+      .obterPacoteTelaLancamentos(tokenSessaoLancamento, obterFiltrosTelaLancamentos());
+  }
+
+  function abrirNovoLancamentoRapidoTelaLancamentos_() {
+    document.getElementById('filtro_id_lancamento').value = '';
+
+    if (contextoExternoLancamento && typeof contextoExternoLancamento === 'object') {
+      contextoExternoLancamento.ID_Lancamento = '';
+    }
+
+    localStorage.removeItem('mukirana_acao_pendente');
+    definirModoConsultaLancamento(false);
+    abrirFormularioLancamento();
+  }
+
+  function executarAcaoPendenteLancamentos() {
+    var acao = localStorage.getItem('mukirana_acao_pendente');
+    var partes = acao ? acao.split(':') : [];
+
+    if (acao !== 'novo_lancamento' && partes[0] !== 'editar_lancamento' && partes[0] !== 'detalhes_lancamento') {
+      return;
+    }
+
+    localStorage.removeItem('mukirana_acao_pendente');
+    setTimeout(function() {
+      if (acao === 'novo_lancamento') {
+        abrirFormularioLancamento();
+        return;
+      }
+
+      if (partes[0] === 'editar_lancamento') {
+        prepararEdicaoLancamento(partes.slice(1).join(':'));
+        return;
+      }
+
+      if (partes[0] === 'detalhes_lancamento') {
+        abrirDetalhesLancamento(partes.slice(1).join(':'));
+      }
+    }, 0);
+  }
+
+  /**
+   * Normaliza pacote recebido do backend.
+   */
+  function normalizarPacoteLancamentos(pacote) {
+    pacote = pacote || {};
+
+    return {
+      usuarioLogado: pacote.usuarioLogado || {},
+      lancamentos: Array.isArray(pacote.lancamentos) ? pacote.lancamentos : [],
+      rateios: Array.isArray(pacote.rateios) ? pacote.rateios : [],
+      rateiosPorLancamento: pacote.rateiosPorLancamento || {},
+      _performance: pacote._performance || null,
+      dependencias: {
+        contas: pacote.dependencias && Array.isArray(pacote.dependencias.contas) ? pacote.dependencias.contas : [],
+        cartoes: pacote.dependencias && Array.isArray(pacote.dependencias.cartoes) ? pacote.dependencias.cartoes : [],
+        categorias: pacote.dependencias && Array.isArray(pacote.dependencias.categorias) ? pacote.dependencias.categorias : [],
+        projetos: pacote.dependencias && Array.isArray(pacote.dependencias.projetos) ? pacote.dependencias.projetos : [],
+        usuarios: pacote.dependencias && Array.isArray(pacote.dependencias.usuarios) ? pacote.dependencias.usuarios : []
+      }
+    };
+  }
+
+  /**
+   * Registra metricas tecnicas no console do navegador para diagnostico.
+   */
+  function registrarPerformanceFrontLancamentos_(performanceServidor, performanceFront) {
+    if (!window.console || !console.log) {
+      return;
+    }
+
+    console.log('[Mukirana Performance] Lançamentos', {
+      servidor: performanceServidor,
+      navegador: performanceFront
+    });
+
+    if (performanceServidor && console.table) {
+      console.table(performanceServidor.etapas || []);
+    }
+  }
+
+  /**
+   * Monta objeto de filtros para envio ao backend.
+   */
+  function obterFiltrosTelaLancamentos() {
+    aplicarPeriodoGlobalLancamentos_();
+    var periodo = obterPeriodoGlobalLancamentos_();
+
+    return {
+      Mes_Referencia: periodo.Mes_Inicial,
+      Mes_Inicial: periodo.Mes_Inicial,
+      Mes_Final: periodo.Mes_Final,
+      Tipo: obterValorCampoLancamento_('filtro_tipo_lancamento'),
+      Status: obterValorCampoLancamento_('filtro_status_lancamento'),
+      Texto: obterValorCampoLancamento_('filtro_texto_lancamento'),
+      ID_Conta: obterValorCampoLancamento_('filtro_id_conta_lancamento'),
+      ID_Categoria: obterValorCampoLancamento_('filtro_id_categoria_lancamento'),
+      ID_Projeto: obterValorCampoLancamento_('filtro_id_projeto_lancamento'),
+      Tipo_Origem: obterValorCampoLancamento_('filtro_tipo_origem_lancamento'),
+      ID_Grupo_Cartao: obterValorCampoLancamento_('filtro_id_grupo_cartao_lancamento'),
+      ID_Cartao: obterValorCampoLancamento_('filtro_id_cartao_lancamento'),
+      Parcelado: obterValorCampoLancamento_('filtro_parcelado_lancamento') === 'true',
+      ID_Lancamento: obterValorCampoLancamento_('filtro_id_lancamento'),
+      IDs_Lancamentos: contextoExternoLancamento && contextoExternoLancamento.IDs_Lancamentos ? contextoExternoLancamento.IDs_Lancamentos : '',
+      Modo_Contextual: obterValorCampoLancamento_('filtro_modo_contextual_lancamento') === 'true',
+      Considerar_Historico_Anterior: periodo.Considerar_Historico_Anterior !== false,
+      Titulo_Contexto: contextoExternoLancamento && contextoExternoLancamento.Titulo_Contexto ? contextoExternoLancamento.Titulo_Contexto : '',
+      Subtitulo_Contexto: contextoExternoLancamento && contextoExternoLancamento.Subtitulo_Contexto ? contextoExternoLancamento.Subtitulo_Contexto : ''
+    };
+  }
+
+  /**
+   * Aplica filtros recarregando o pacote.
+   */
+  function aplicarFiltrosLancamentos() {
+    var executarCarregamento = function() {
+      confirmarCarregamentoHistoricoCompletoLancamento_(function() {
+        carregarPacoteTelaLancamentos();
+      });
+    };
+
+    if (formularioLancamentoEstaAberto()) {
+      confirmarAcao(
+        'Há um lançamento aberto. Aplicar filtros fechará o formulário e descartará alterações não salvas. Deseja continuar?',
+        function() {
+          fecharFormularioLancamento();
+          executarCarregamento();
+        }
+      );
+      return;
+    }
+
+    executarCarregamento();
+  }
+
+  function confirmarCarregamentoHistoricoCompletoLancamento_(callback) {
+    var filtros = obterFiltrosTelaLancamentos();
+
+    if (filtros.Mes_Inicial || filtros.Mes_Final || filtros.ID_Lancamento || filtros.IDs_Lancamentos) {
+      callback();
+      return;
+    }
+
+    confirmarAcao(
+      'Você deixou o mês inicial e o mês final em branco. A tela vai buscar lançamentos de todo o histórico disponível no banco e pode demorar mais. Deseja continuar?',
+      callback
+    );
+  }
+
+  function aoAlterarFiltroContextoLancamento() {
+    aplicarSelecoesFiltroContextoLancamentos();
+  }
+
+  function popularFiltroContextoLancamentos() {
+    var painel = document.getElementById('painel_filtro_contexto_lancamento');
+
+    if (!painel) {
+      return;
+    }
+
+    var selecionados = obterMapaValoresFiltroContextoLancamentos_();
+    painel.innerHTML = '';
+
+    adicionarGrupoFiltroContextoLancamentos_(painel, 'Características', [
+      { valor: 'parcelado|true', texto: 'Parcelados' }
+    ], selecionados);
+
+    adicionarGrupoFiltroContextoLancamentos_(painel, 'Contas',
+      (pacoteLancamentos.dependencias.contas || []).map(function(conta) {
+        return { valor: 'conta|' + conta.ID_Conta, texto: conta.Nome_Conta || 'Conta' };
+      }), selecionados);
+
+    adicionarGrupoFiltroContextoLancamentos_(painel, 'Cartões',
+      (pacoteLancamentos.dependencias.cartoes || []).map(function(cartao) {
+        return { valor: 'cartao|' + cartao.ID_Cartao, texto: montarNomeCartaoOrigemLancamento(cartao) };
+      }), selecionados);
+
+    adicionarGrupoFiltroContextoLancamentos_(painel, 'Faturas',
+      obterGruposCartaoFiltroContextoLancamentos_().map(function(grupo) {
+        return { valor: 'fatura|' + grupo.ID_Grupo_Cartao, texto: grupo.Nome_Grupo || 'Fatura' };
+      }), selecionados);
+
+    adicionarGrupoFiltroContextoLancamentos_(painel, 'Projetos',
+      (pacoteLancamentos.dependencias.projetos || []).map(function(projeto) {
+        return { valor: 'projeto|' + projeto.ID_Projeto, texto: projeto.Nome || 'Projeto' };
+      }), selecionados);
+
+    adicionarGrupoFiltroContextoLancamentos_(painel, 'Categorias',
+      (pacoteLancamentos.dependencias.categorias || []).map(function(categoria) {
+        return {
+          valor: 'categoria|' + categoria.ID_Categoria,
+          texto: montarNomeHierarquicoCategoriaLancamento(categoria.ID_Categoria, pacoteLancamentos.dependencias.categorias)
+        };
+      }), selecionados);
+
+    atualizarRotuloFiltroContextoLancamentos_();
+  }
+
+  function alternarPainelFiltroContextoLancamento() {
+    document.getElementById('painel_filtro_contexto_lancamento').classList.toggle('visivel');
+  }
+
+  function aplicarSelecoesFiltroContextoLancamentos() {
+    document.getElementById('filtro_id_conta_lancamento').value = '';
+    document.getElementById('filtro_id_categoria_lancamento').value = '';
+    document.getElementById('filtro_id_projeto_lancamento').value = '';
+    document.getElementById('filtro_tipo_origem_lancamento').value = '';
+    document.getElementById('filtro_id_grupo_cartao_lancamento').value = '';
+    document.getElementById('filtro_id_cartao_lancamento').value = '';
+    document.getElementById('filtro_parcelado_lancamento').value = '';
+
+    var idsPorTipo = { conta: [], cartao: [], fatura: [], projeto: [], categoria: [] };
+
+    Array.from(document.querySelectorAll('input[name="filtro_contexto_lancamento"]:checked')).forEach(function(campo) {
+      var partes = (campo.value || '').split('|');
+      var tipo = partes[0] || '';
+      var id = partes.slice(1).join('|') || '';
+
+      if (tipo === 'parcelado') {
+        document.getElementById('filtro_parcelado_lancamento').value = 'true';
+        return;
+      }
+
+      if (idsPorTipo[tipo] && id) {
+        idsPorTipo[tipo].push(id);
+      }
+    });
+
+    document.getElementById('filtro_id_conta_lancamento').value = idsPorTipo.conta.join(',');
+    document.getElementById('filtro_id_categoria_lancamento').value = idsPorTipo.categoria.join(',');
+    document.getElementById('filtro_id_projeto_lancamento').value = idsPorTipo.projeto.join(',');
+    document.getElementById('filtro_id_cartao_lancamento').value = idsPorTipo.cartao.join(',');
+    document.getElementById('filtro_id_grupo_cartao_lancamento').value = idsPorTipo.fatura.join(',');
+
+    atualizarRotuloFiltroContextoLancamentos_();
+    renderizarResumoContextoLancamento_();
+  }
+
+  function obterMapaValoresFiltroContextoLancamentos_() {
+    var mapa = {};
+
+    adicionarValoresMapaFiltroContextoLancamentos_(mapa, 'conta', obterValorCampoLancamento_('filtro_id_conta_lancamento'));
+    adicionarValoresMapaFiltroContextoLancamentos_(mapa, 'categoria', obterValorCampoLancamento_('filtro_id_categoria_lancamento'));
+    adicionarValoresMapaFiltroContextoLancamentos_(mapa, 'projeto', obterValorCampoLancamento_('filtro_id_projeto_lancamento'));
+    adicionarValoresMapaFiltroContextoLancamentos_(mapa, 'cartao', obterValorCampoLancamento_('filtro_id_cartao_lancamento'));
+    adicionarValoresMapaFiltroContextoLancamentos_(mapa, 'fatura', obterValorCampoLancamento_('filtro_id_grupo_cartao_lancamento'));
+
+    if (obterValorCampoLancamento_('filtro_parcelado_lancamento') === 'true') {
+      mapa['parcelado|true'] = true;
+    }
+
+    return mapa;
+  }
+
+  function adicionarValoresMapaFiltroContextoLancamentos_(mapa, tipo, valor) {
+    (valor || '').split(',').forEach(function(id) {
+      id = (id || '').trim();
+      if (id) mapa[tipo + '|' + id] = true;
+    });
+  }
+
+  function adicionarGrupoFiltroContextoLancamentos_(painel, rotulo, opcoes, selecionados) {
+    opcoes = (opcoes || []).filter(function(opcao) {
+      return opcao && opcao.valor && opcao.texto;
+    });
+
+    if (opcoes.length === 0) {
+      return;
+    }
+
+    opcoes.sort(function(a, b) {
+      return a.texto.localeCompare(b.texto);
+    });
+
+    var grupo = document.createElement('div');
+    grupo.className = 'lancamento-filtro-contexto-grupo';
+    grupo.innerHTML = '<strong>' + escaparHtmlLancamento(rotulo) + '</strong>';
+
+    opcoes.forEach(function(opcao) {
+      var label = document.createElement('label');
+      label.className = 'lancamento-filtro-contexto-opcao';
+      label.innerHTML =
+        '<input type="checkbox" name="filtro_contexto_lancamento" value="' + escaparAtributoLancamento(opcao.valor) + '"' +
+        (selecionados && selecionados[opcao.valor] ? ' checked' : '') +
+        ' onchange="aoAlterarFiltroContextoLancamento()">' +
+        '<span>' + escaparHtmlLancamento(opcao.texto) + '</span>';
+      grupo.appendChild(label);
+    });
+
+    painel.appendChild(grupo);
+  }
+
+  function obterGruposCartaoFiltroContextoLancamentos_() {
+    var mapa = {};
+
+    (pacoteLancamentos.dependencias.cartoes || []).forEach(function(cartao) {
+      if (!cartao.ID_Grupo_Cartao || mapa[cartao.ID_Grupo_Cartao]) {
+        return;
+      }
+
+      mapa[cartao.ID_Grupo_Cartao] = {
+        ID_Grupo_Cartao: cartao.ID_Grupo_Cartao,
+        Nome_Grupo: cartao.Nome_Grupo || cartao.Nome_Cartao || 'Fatura'
+      };
+    });
+
+    return Object.keys(mapa).map(function(idGrupo) {
+      return mapa[idGrupo];
+    });
+  }
+
+  function atualizarRotuloFiltroContextoLancamentos_() {
+    var botao = document.getElementById('botao_filtro_contexto_lancamento');
+    var selecionados = Array.from(document.querySelectorAll('input[name="filtro_contexto_lancamento"]:checked'));
+
+    if (!botao) return;
+
+    botao.textContent = selecionados.length === 0
+      ? 'Todos os contextos'
+      : selecionados.length + ' filtro(s) selecionado(s)';
+  }
+
+  /**
+   * Aplica filtro textual apenas ao pressionar Enter.
+   */
+  function aoDigitarFiltroTextoLancamento(evento) {
+    if (evento.key === 'Enter') {
+      evento.preventDefault();
+      aplicarFiltrosLancamentos();
+    }
+  }
+
+  /**
+   * Limpa filtros e retorna ao mês atual.
+   */
+  function limparFiltrosLancamentos() {
+    if (contextoBaseLancamento && obterValorCampoLancamento_('filtro_modo_contextual_lancamento') === 'true') {
+      contextoExternoLancamento = JSON.parse(JSON.stringify(contextoBaseLancamento));
+      aplicarEstadoFiltrosLancamento_(contextoBaseLancamento);
+      popularFiltroContextoLancamentos();
+      atualizarRotuloFiltroContextoLancamentos_();
+      aplicarContextoVisualLancamento();
+      renderizarResumoContextoLancamento_();
+      aplicarFiltrosLancamentos();
+      return;
+    }
+
+    aplicarPeriodoGlobalLancamentos_();
+    document.getElementById('filtro_tipo_lancamento').value = '';
+    document.getElementById('filtro_status_lancamento').value = '';
+    document.getElementById('filtro_texto_lancamento').value = '';
+    document.getElementById('filtro_id_conta_lancamento').value = '';
+    document.getElementById('filtro_id_categoria_lancamento').value = '';
+    document.getElementById('filtro_id_projeto_lancamento').value = '';
+    document.getElementById('filtro_tipo_origem_lancamento').value = '';
+    document.getElementById('filtro_id_grupo_cartao_lancamento').value = '';
+    document.getElementById('filtro_id_cartao_lancamento').value = '';
+    document.getElementById('filtro_parcelado_lancamento').value = '';
+    document.getElementById('filtro_id_lancamento').value = '';
+    document.getElementById('filtro_modo_contextual_lancamento').value = '';
+    Array.from(document.querySelectorAll('input[name="filtro_contexto_lancamento"]:checked')).forEach(function(campo) {
+      campo.checked = false;
+    });
+    atualizarRotuloFiltroContextoLancamentos_();
+    contextoExternoLancamento = null;
+    contextoBaseLancamento = null;
+    aplicarContextoVisualLancamento();
+    renderizarResumoContextoLancamento_();
+
+    aplicarFiltrosLancamentos();
+  }
+
+  function aplicarEstadoFiltrosLancamento_(filtrosExternos) {
+    filtrosExternos = filtrosExternos || {};
+    if (filtrosExternos.Ignorar_Periodo_Global === true) {
+      document.getElementById('filtro_mes_lancamento').value = '';
+      document.getElementById('filtro_mes_final_lancamento').value = '';
+    } else {
+      aplicarPeriodoGlobalLancamentos_();
+    }
+    document.getElementById('filtro_tipo_lancamento').value = filtrosExternos.Tipo || '';
+    document.getElementById('filtro_status_lancamento').value = filtrosExternos.Status || '';
+    document.getElementById('filtro_texto_lancamento').value = filtrosExternos.Texto || '';
+    document.getElementById('filtro_id_conta_lancamento').value = filtrosExternos.ID_Conta || '';
+    document.getElementById('filtro_id_categoria_lancamento').value = filtrosExternos.ID_Categoria || '';
+    document.getElementById('filtro_id_projeto_lancamento').value = filtrosExternos.ID_Projeto || '';
+    document.getElementById('filtro_tipo_origem_lancamento').value = filtrosExternos.Tipo_Origem || '';
+    document.getElementById('filtro_id_grupo_cartao_lancamento').value = filtrosExternos.ID_Grupo_Cartao || '';
+    document.getElementById('filtro_id_cartao_lancamento').value = filtrosExternos.ID_Cartao || '';
+    document.getElementById('filtro_parcelado_lancamento').value = filtrosExternos.Parcelado ? 'true' : '';
+    document.getElementById('filtro_id_lancamento').value = filtrosExternos.ID_Lancamento || '';
+    document.getElementById('filtro_modo_contextual_lancamento').value = filtrosExternos.Modo_Contextual ? 'true' : '';
+  }
+
+  function renderizarResumoContextoLancamento_() {
+    var caixa = document.getElementById('lancamento-contexto-ativo');
+    var resumo = document.getElementById('lancamento-contexto-resumo');
+    var chips = document.getElementById('lancamento-contexto-chips');
+    var itens = montarResumoContextoLancamento_();
+
+    if (!caixa || !resumo || !chips) {
+      return;
+    }
+
+    if (itens.length === 0) {
+      caixa.classList.remove('visivel');
+      resumo.textContent = '';
+      chips.innerHTML = '';
+      return;
+    }
+
+    resumo.textContent = obterValorCampoLancamento_('filtro_modo_contextual_lancamento') === 'true'
+      ? ((contextoExternoLancamento && contextoExternoLancamento.Resumo_Contexto) || 'A tela continua presa ao contexto de origem. Limpar filtros restaura esse recorte.')
+      : 'Os filtros abaixo explicam exatamente o recorte que está sendo exibido agora.';
+    chips.innerHTML = itens.map(function(item) {
+      return '<span class="lancamento-contexto-chip"><b>' + escaparHtmlLancamento(item.rotulo) + '</b><span>' + escaparHtmlLancamento(item.valor) + '</span></span>';
+    }).join('');
+    caixa.classList.add('visivel');
+  }
+
+  function montarResumoContextoLancamento_() {
+    var itens = [];
+    var mesInicial = obterValorCampoLancamento_('filtro_mes_lancamento');
+    var mesFinal = obterValorCampoLancamento_('filtro_mes_final_lancamento');
+    var tipo = obterValorCampoLancamento_('filtro_tipo_lancamento');
+    var status = obterValorCampoLancamento_('filtro_status_lancamento');
+    var texto = obterValorCampoLancamento_('filtro_texto_lancamento');
+    var filtroConta = obterValorCampoLancamento_('filtro_id_conta_lancamento');
+    var filtroCategoria = obterValorCampoLancamento_('filtro_id_categoria_lancamento');
+    var filtroProjeto = obterValorCampoLancamento_('filtro_id_projeto_lancamento');
+    var filtroGrupoCartao = obterValorCampoLancamento_('filtro_id_grupo_cartao_lancamento');
+    var filtroCartao = obterValorCampoLancamento_('filtro_id_cartao_lancamento');
+    var filtroParcelado = obterValorCampoLancamento_('filtro_parcelado_lancamento');
+    var nomeContexto = contextoExternoLancamento && contextoExternoLancamento.Nome_Contexto
+      ? contextoExternoLancamento.Nome_Contexto
+      : '';
+
+    if (nomeContexto) {
+      itens.push({
+        rotulo: 'Origem',
+        valor: nomeContexto
+      });
+    }
+
+    if (mesInicial || mesFinal) {
+      itens.push({
+        rotulo: 'Período',
+        valor: mesFinal ? mesInicial + ' a ' + mesFinal : mesInicial
+      });
+    } else {
+      itens.push({
+        rotulo: 'Período',
+        valor: 'Todo o histórico'
+      });
+    }
+
+    if (tipo) {
+      itens.push({ rotulo: 'Tipo', valor: tipo });
+    }
+
+    if (status) {
+      itens.push({ rotulo: 'Status', valor: status });
+    }
+
+    if (filtroConta) {
+      itens.push({ rotulo: 'Contas', valor: montarNomesContaResumoLancamento_(filtroConta) });
+    }
+
+    if (filtroGrupoCartao) {
+      itens.push({ rotulo: 'Faturas', valor: montarNomesGrupoCartaoResumoLancamento_(filtroGrupoCartao) });
+    }
+
+    if (filtroCartao) {
+      itens.push({ rotulo: 'Cartões', valor: montarNomesCartaoResumoLancamento_(filtroCartao) });
+    }
+
+    if (filtroProjeto) {
+      itens.push({ rotulo: 'Projetos', valor: montarNomesProjetoResumoLancamento_(filtroProjeto) });
+    }
+
+    if (filtroCategoria) {
+      itens.push({ rotulo: 'Categorias', valor: montarNomesCategoriaResumoLancamento_(filtroCategoria) });
+    }
+
+    if (filtroParcelado === 'true') {
+      itens.push({ rotulo: 'Características', valor: 'Somente parcelados' });
+    }
+
+    if (texto) {
+      itens.push({ rotulo: 'Busca', valor: texto });
+    }
+
+    return itens;
+  }
+
+  /**
+   * Lê filtros enviados por outras telas, como o Dashboard.
+   */
+  function obterFiltrosExternosLancamentos() {
+    var bruto = localStorage.getItem('mukirana_filtros_lancamentos');
+
+    if (!bruto) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(bruto);
+    } catch (erro) {
+      localStorage.removeItem('mukirana_filtros_lancamentos');
+      return null;
+    }
+  }
+
+  /**
+   * Gera o mês atual em yyyy-MM.
+   */
+  function gerarMesAtualLancamento() {
+    var hoje = new Date();
+    var ano = hoje.getFullYear();
+    var mes = String(hoje.getMonth() + 1).padStart(2, '0');
+
+    return ano + '-' + mes;
+  }
+
+  /**
+   * Obtém valor seguro de campo por ID.
+   */
+  function obterValorCampoLancamento_(idCampo) {
+    var campo = document.getElementById(idCampo);
+    return campo ? (campo.value || '') : '';
+  }
+
+  /**
+   * Esconde todos os estados da lista.
+   */
+  function ocultarTodosEstadosListaLancamentos() {
+    var carregando = document.getElementById('estado-carregando-lancamento');
+    var tabela = document.getElementById('tabela-lancamentos-html');
+    var vazio = document.getElementById('estado-vazio-lancamento');
+
+    if (carregando) carregando.style.display = 'none';
+    if (tabela) tabela.style.display = 'none';
+    if (vazio) vazio.style.display = 'none';
+  }
+
+  /**
+   * Mostra estado de carregamento.
+   */
+  function mostrarEstadoCarregandoLancamentos() {
+    ocultarTodosEstadosListaLancamentos();
+
+    var carregando = document.getElementById('estado-carregando-lancamento');
+    if (carregando) carregando.style.display = 'block';
+  }
+
+  /**
+   * Mostra tabela.
+   */
+  function mostrarTabelaLancamentos() {
+    ocultarTodosEstadosListaLancamentos();
+
+    var tabela = document.getElementById('tabela-lancamentos-html');
+    if (tabela) tabela.style.display = 'table';
+  }
+
+  /**
+   * Mostra estado vazio real.
+   */
+  function mostrarEstadoVazioLancamentos() {
+    ocultarTodosEstadosListaLancamentos();
+
+    var vazio = document.getElementById('estado-vazio-lancamento');
+    if (vazio) vazio.style.display = 'block';
+  }
+
+  /**
+   * Renderiza tabela de lançamentos.
+   */
+  function renderizarTabelaLancamentos() {
+    var corpo = document.getElementById('corpo-tabela-lancamentos');
+
+    if (!corpo) {
+      return;
+    }
+
+    corpo.innerHTML = '';
+
+    if (!pacoteLancamentos.lancamentos || pacoteLancamentos.lancamentos.length === 0) {
+      mostrarEstadoVazioLancamentos();
+      return;
+    }
+
+    pacoteLancamentos.lancamentos.forEach(function(lancamento) {
+      var tr = document.createElement('tr');
+
+      if (selecaoLancamentos[lancamento.ID_Lancamento] === true) {
+        tr.classList.add('lancamento-linha-selecionada');
+      }
+
+      if (lancamento._Programado_Recorrencia === true) {
+        tr.classList.add('lancamento-linha-recorrencia-prevista');
+        tr.title = 'Recorrência prevista. Esta linha ainda não é um lançamento real.';
+      }
+
+      tr.appendChild(criarCelulaSelecaoLancamento(lancamento));
+      tr.appendChild(criarCelulaTextoLancamento('Data', formatarDataLancamentoParaTela(lancamento.Data_Ocorrencia)));
+      tr.appendChild(criarCelulaDescricaoLancamento(lancamento));
+      tr.appendChild(criarCelulaTextoLancamento('Categoria', obterNomeCategoriaLancamento(lancamento), 'lancamento-celula-secundaria'));
+      tr.appendChild(criarCelulaTextoLancamento('Origem / Destino', obterNomeOrigemLancamento(lancamento), 'lancamento-celula-secundaria'));
+      tr.appendChild(criarCelulaValorLancamento(lancamento));
+      tr.appendChild(criarCelulaRateioLancamento(lancamento));
+      tr.appendChild(criarCelulaStatusLancamento(lancamento.Status));
+      tr.appendChild(criarCelulaAcoesLancamento(lancamento));
+
+      corpo.appendChild(tr);
+    });
+
+    mostrarTabelaLancamentos();
+    atualizarBarraAcoesLoteLancamento();
+  }
+
+  /**
+   * Cria célula de seleção para ações em lote.
+   */
+  function criarCelulaSelecaoLancamento(lancamento) {
+    var td = document.createElement('td');
+    var checkbox = document.createElement('input');
+    var podeSelecionar = lancamento.Origem_Registro !== 'Pagamento_Fatura' &&
+      (lancamento.Pode_Editar === true || lancamento.Pode_Excluir === true);
+
+    td.className = 'lancamento-checkbox-coluna';
+    td.setAttribute('data-label', 'Selecionar');
+
+    checkbox.type = 'checkbox';
+    checkbox.checked = selecaoLancamentos[lancamento.ID_Lancamento] === true;
+    checkbox.disabled = !podeSelecionar;
+    checkbox.setAttribute('aria-label', 'Selecionar lançamento ' + (lancamento.Descricao || ''));
+    checkbox.addEventListener('change', function() {
+      alternarSelecaoLancamento(lancamento.ID_Lancamento, checkbox.checked);
+    });
+
+    if (!podeSelecionar) {
+      checkbox.title = 'Este lançamento está disponível apenas para consulta.';
+    }
+
+    td.appendChild(checkbox);
+    return td;
+  }
+
+  /**
+   * Cria célula simples.
+   */
+  function criarCelulaTextoLancamento(dataLabel, texto, classeCss) {
+    var td = document.createElement('td');
+
+    td.setAttribute('data-label', dataLabel);
+    td.textContent = texto || '';
+
+    if (classeCss) {
+      td.className = classeCss;
+    }
+
+    return td;
+  }
+
+  /**
+   * Cria célula de descrição.
+   */
+  function criarCelulaDescricaoLancamento(lancamento) {
+    var td = document.createElement('td');
+    var descricao = document.createElement('span');
+    var nomeProjeto = obterNomeProjetoLancamento(lancamento);
+
+    td.setAttribute('data-label', 'Descrição');
+
+    descricao.className = 'lancamento-descricao-principal';
+    descricao.textContent = lancamento.Descricao || '';
+
+    td.appendChild(descricao);
+
+    if (lancamentoEhParceladoFront(lancamento)) {
+      var badgeParcela = document.createElement('span');
+      badgeParcela.className = 'badge-parcela';
+      badgeParcela.textContent = 'Parcela ' + lancamento.Numero_Parcela + '/' + lancamento.Total_Parcelas;
+      td.appendChild(badgeParcela);
+    }
+
+    if (lancamento.Origem_Registro === 'Pagamento_Fatura') {
+      var badgePagamentoFatura = document.createElement('span');
+      var dicaPagamentoFatura = document.createElement('span');
+
+      badgePagamentoFatura.className = 'badge-global';
+      badgePagamentoFatura.textContent = 'Pagamento de fatura';
+      td.appendChild(badgePagamentoFatura);
+
+      dicaPagamentoFatura.className = 'lancamento-descricao-projeto';
+      dicaPagamentoFatura.textContent = 'Abate o cartão e reduz a conta; não entra no orçamento.';
+      td.appendChild(dicaPagamentoFatura);
+    }
+
+    if (lancamento.ID_Recorrencia_Origem) {
+      var badgeRecorrencia = document.createElement('span');
+      var badgeModoRecorrencia = document.createElement('span');
+
+      badgeRecorrencia.className = lancamento._Programado_Recorrencia === true
+        ? 'badge-recorrencia-prevista'
+        : 'badge-global';
+      badgeRecorrencia.textContent = lancamento._Programado_Recorrencia === true
+        ? 'Recorrência prevista'
+        : 'Recorrência';
+      td.appendChild(badgeRecorrencia);
+
+      if (lancamento._Programado_Recorrencia !== true) {
+        badgeModoRecorrencia.className = 'badge-adicional';
+        badgeModoRecorrencia.textContent = lancamento.Modo_Recorrencia_Origem || 'Automática';
+        td.appendChild(badgeModoRecorrencia);
+      }
+    }
+
+    if (lancamento.Eh_Compartilhado_Por_Rateio === true) {
+      var badge = document.createElement('span');
+      badge.className = 'badge-compartilhado-rateio';
+      badge.textContent = 'Rateado comigo';
+      td.appendChild(badge);
+
+      var autor = document.createElement('span');
+      autor.className = 'lancamento-descricao-projeto';
+      autor.textContent = 'Criado por: ' + (lancamento.Nome_Autor || 'Usuário');
+      td.appendChild(autor);
+    }
+
+    if (nomeProjeto) {
+      var projeto = document.createElement('span');
+      projeto.className = 'lancamento-descricao-projeto';
+      projeto.textContent = 'Projeto: ' + nomeProjeto;
+      td.appendChild(projeto);
+    }
+
+    return td;
+  }
+
+  /**
+   * Cria célula de valor.
+   */
+  function criarCelulaValorLancamento(lancamento) {
+    var td = document.createElement('td');
+    var valorPrincipal = document.createElement('span');
+    var meta = document.createElement('span');
+    var tipo = lancamento.Tipo || '';
+    var valor = lancamento.Valor_Exibicao !== undefined
+      ? parseFloat(lancamento.Valor_Exibicao)
+      : parseFloat(lancamento.Valor_Total);
+    var valorTotal = lancamento.Valor_Total_Original !== undefined
+      ? parseFloat(lancamento.Valor_Total_Original)
+      : parseFloat(lancamento.Valor_Total);
+    var sinal = '';
+
+    if (isNaN(valor)) valor = 0;
+    if (isNaN(valorTotal)) valorTotal = 0;
+
+    if (tipo === 'Receita') {
+      sinal = '+ ';
+      td.className = 'valor-receita';
+    } else if (tipo === 'Despesa') {
+      sinal = '- ';
+      td.className = 'valor-despesa';
+    } else if (lancamento.Origem_Registro === 'Pagamento_Fatura') {
+      sinal = '- ';
+      td.className = 'valor-despesa';
+    }
+
+    td.setAttribute('data-label', 'Valor');
+
+    valorPrincipal.textContent = sinal + 'R$ ' + formatarNumeroLancamento(valor);
+    td.appendChild(valorPrincipal);
+
+    if (lancamento.Possui_Rateio === true) {
+      meta.className = 'lancamento-valor-meta';
+      meta.textContent = (lancamento.Rotulo_Valor_Exibicao || 'Resumo do rateio') +
+        ' | total: R$ ' + formatarNumeroLancamento(valorTotal);
+      meta.title = 'A tabela mostra somente o valor devido neste lançamento. Valores a receber serão tratados no consolidado do período.';
+      td.appendChild(meta);
+    }
+
+    return td;
+  }
+
+  function contextoCompromissoCartaoAtivoLancamento_() {
+    return !!(obterValorCampoLancamento_('filtro_id_cartao_lancamento') || obterValorCampoLancamento_('filtro_id_grupo_cartao_lancamento'));
+  }
+
+  function obterRotuloResumoLancamentos_() {
+    return contextoCompromissoCartaoAtivoLancamento_() ? 'Total' : 'Saldo';
+  }
+
+  /**
+   * Cria célula de rateio.
+   */
+  function criarCelulaRateioLancamento(lancamento) {
+    var td = document.createElement('td');
+    var span = document.createElement('span');
+    var rateios = obterRateiosAtivosDoLancamento(lancamento.ID_Lancamento);
+
+    td.setAttribute('data-label', 'Rateio');
+
+    if (lancamento.Origem_Registro === 'Pagamento_Fatura') {
+      span.className = 'badge-global';
+      span.textContent = 'Fatura';
+    } else if (rateios.length > 0) {
+      span.className = 'badge-rateado';
+      span.textContent = 'Rateado (' + rateios.length + ')';
+    } else {
+      span.className = 'badge-nao-rateado';
+      span.textContent = 'Não rateado';
+    }
+
+    td.appendChild(span);
+    return td;
+  }
+
+  /**
+   * Cria célula de status.
+   */
+  function criarCelulaStatusLancamento(status) {
+    var td = document.createElement('td');
+    var span = document.createElement('span');
+    var statusFinal = status || 'Pendente';
+
+    td.setAttribute('data-label', 'Status');
+
+    span.className = statusFinal === 'Efetivado' ? 'badge-efetivado' : 'badge-pendente';
+    span.textContent = statusFinal;
+
+    td.appendChild(span);
+
+    return td;
+  }
+
+  /**
+   * Cria célula de ações.
+   */
+  function criarCelulaAcoesLancamento(lancamento) {
+    var td = document.createElement('td');
+    var container = document.createElement('div');
+
+    td.setAttribute('data-label', 'Ações');
+    td.style.textAlign = 'right';
+
+    container.className = 'lancamento-acoes';
+
+    if (lancamento.Origem_Registro === 'Pagamento_Fatura') {
+      var btnDetalhesFatura = document.createElement('button');
+      btnDetalhesFatura.type = 'button';
+      btnDetalhesFatura.className = 'btn-acao lancamento-acao-icone';
+      btnDetalhesFatura.title = 'Abrir fatura';
+      btnDetalhesFatura.innerHTML = '<span class="material-symbols-outlined">visibility</span>';
+      btnDetalhesFatura.addEventListener('click', function() {
+        abrirFaturaDoPagamentoLancamento(lancamento, false);
+      });
+      container.appendChild(btnDetalhesFatura);
+
+      var btnEditarFatura = document.createElement('button');
+      btnEditarFatura.type = 'button';
+      btnEditarFatura.className = 'btn-acao lancamento-acao-icone';
+      btnEditarFatura.title = 'Editar pagamento';
+      btnEditarFatura.innerHTML = '<span class="material-symbols-outlined">edit</span>';
+      btnEditarFatura.addEventListener('click', function() {
+        abrirFaturaDoPagamentoLancamento(lancamento, true);
+      });
+      container.appendChild(btnEditarFatura);
+
+      var btnExcluirFatura = document.createElement('button');
+      btnExcluirFatura.type = 'button';
+      btnExcluirFatura.className = 'btn-acao btn-perigo lancamento-acao-icone';
+      btnExcluirFatura.title = 'Excluir pagamento';
+      btnExcluirFatura.innerHTML = '<span class="material-symbols-outlined">delete</span>';
+      btnExcluirFatura.addEventListener('click', function() {
+        excluirPagamentoFaturaPelaTelaLancamentos(lancamento);
+      });
+      container.appendChild(btnExcluirFatura);
+
+      td.appendChild(container);
+      return td;
+    }
+
+    if (lancamento._Programado_Recorrencia === true || lancamento.Somente_Leitura === true) {
+      container.innerHTML = '<span class="lancamento-somente-leitura">Previsto</span>';
+      td.appendChild(container);
+      return td;
+    }
+
+    var btnDetalhes = document.createElement('button');
+    btnDetalhes.type = 'button';
+    btnDetalhes.className = 'btn-acao lancamento-acao-icone';
+    btnDetalhes.title = 'Detalhes';
+    btnDetalhes.innerHTML = '<span class="material-symbols-outlined">visibility</span>';
+    btnDetalhes.addEventListener('click', function() {
+      abrirDetalhesLancamento(lancamento.ID_Lancamento);
+    });
+    container.appendChild(btnDetalhes);
+
+    if (lancamento.Pode_Editar === true) {
+      var btnEditar = document.createElement('button');
+      btnEditar.type = 'button';
+      btnEditar.className = 'btn-acao lancamento-acao-icone';
+      btnEditar.title = 'Editar';
+      btnEditar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
+      btnEditar.addEventListener('click', function() {
+        prepararEdicaoLancamento(lancamento.ID_Lancamento);
+      });
+      container.appendChild(btnEditar);
+    }
+
+    if (lancamento.Pode_Excluir === true) {
+      var btnExcluir = document.createElement('button');
+      btnExcluir.type = 'button';
+      btnExcluir.className = 'btn-acao btn-perigo lancamento-acao-icone';
+      btnExcluir.title = 'Excluir';
+      btnExcluir.innerHTML = '<span class="material-symbols-outlined">delete</span>';
+      btnExcluir.addEventListener('click', function() {
+        excluirLancamentoFront(lancamento.ID_Lancamento);
+      });
+      container.appendChild(btnExcluir);
+    }
+
+    td.appendChild(container);
+
+    return td;
+  }
+
+  function alternarSelecaoLancamento(idLancamento, selecionado) {
+    if (selecionado) {
+      selecaoLancamentos[idLancamento] = true;
+    } else {
+      delete selecaoLancamentos[idLancamento];
+    }
+
+    renderizarTabelaLancamentos();
+  }
+
+  function alternarSelecaoTodosLancamentos(selecionado) {
+    var lancamentos = pacoteLancamentos.lancamentos || [];
+
+    lancamentos.forEach(function(lancamento) {
+      var podeSelecionar = lancamento.Pode_Editar === true || lancamento.Pode_Excluir === true;
+
+      if (!podeSelecionar) {
+        return;
+      }
+
+      if (selecionado) {
+        selecaoLancamentos[lancamento.ID_Lancamento] = true;
+      } else {
+        delete selecaoLancamentos[lancamento.ID_Lancamento];
+      }
+    });
+
+    renderizarTabelaLancamentos();
+  }
+
+  function limparSelecaoLancamentos(renderizar) {
+    selecaoLancamentos = {};
+
+    if (renderizar !== false) {
+      renderizarTabelaLancamentos();
+    } else {
+      atualizarBarraAcoesLoteLancamento();
+    }
+  }
+
+  function obterIdsSelecionadosLancamento() {
+    return Object.keys(selecaoLancamentos).filter(function(idLancamento) {
+      return selecaoLancamentos[idLancamento] === true;
+    });
+  }
+
+  function atualizarBarraAcoesLoteLancamento() {
+    var toolbar = document.getElementById('toolbar-lote-lancamento');
+    var contador = document.getElementById('contador-selecao-lancamento');
+    var resumoTotal = document.getElementById('resumo-total-lancamento');
+    var resumoSelecao = document.getElementById('resumo-selecao-lancamento');
+    var checkTodos = document.getElementById('check-todos-lancamentos');
+    var ids = obterIdsSelecionadosLancamento();
+    var selecionaveis = (pacoteLancamentos.lancamentos || []).filter(function(lancamento) {
+      return lancamento.Pode_Editar === true || lancamento.Pode_Excluir === true;
+    });
+
+    if (toolbar) {
+      toolbar.classList.toggle('ativa', ids.length > 0);
+    }
+
+    if (contador) {
+      contador.textContent = ids.length === 1
+        ? '1 lançamento selecionado'
+        : ids.length + ' lançamentos selecionados';
+    }
+
+    if (resumoTotal) {
+      resumoTotal.textContent = obterRotuloResumoLancamentos_() + ' visível: ' + formatarMoedaResumoSelecaoLancamento_(calcularSaldoVisivelLancamentos_());
+    }
+
+    if (resumoSelecao) {
+      resumoSelecao.textContent = obterRotuloResumoLancamentos_() + ' selecionado: ' + formatarMoedaResumoSelecaoLancamento_(calcularSaldoSelecionadoLancamentos_());
+    }
+
+    if (checkTodos) {
+      checkTodos.checked = selecionaveis.length > 0 && ids.length === selecionaveis.length;
+      checkTodos.indeterminate = ids.length > 0 && ids.length < selecionaveis.length;
+    }
+  }
+
+  function obterValorAssinadoSelecaoLancamento_(lancamento) {
+    var tipo = (lancamento.Tipo || '').toLowerCase();
+    var valorBase = contextoCompromissoCartaoAtivoLancamento_()
+      ? (lancamento.Valor_Total_Original !== undefined ? lancamento.Valor_Total_Original : lancamento.Valor_Total)
+      : (lancamento.Valor_Exibicao !== undefined ? lancamento.Valor_Exibicao : lancamento.Valor_Total);
+    var valor = parseFloat(valorBase);
+
+    if (isNaN(valor)) valor = 0;
+
+    if (contextoCompromissoCartaoAtivoLancamento_()) {
+      if (tipo === 'despesa') return valor;
+      if (tipo === 'receita') return valor * -1;
+      return 0;
+    }
+
+    if (tipo === 'receita') return valor;
+    if (tipo === 'despesa') return valor * -1;
+    return 0;
+  }
+
+  function calcularSaldoVisivelLancamentos_() {
+    return (pacoteLancamentos.lancamentos || []).reduce(function(soma, lancamento) {
+      return soma + obterValorAssinadoSelecaoLancamento_(lancamento);
+    }, 0);
+  }
+
+  function calcularSaldoSelecionadoLancamentos_() {
+    return (pacoteLancamentos.lancamentos || []).reduce(function(soma, lancamento) {
+      if (selecaoLancamentos[lancamento.ID_Lancamento] !== true) {
+        return soma;
+      }
+
+      return soma + obterValorAssinadoSelecaoLancamento_(lancamento);
+    }, 0);
+  }
+
+  function formatarMoedaResumoSelecaoLancamento_(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+    return (numero < 0 ? '-R$ ' : 'R$ ') + formatarNumeroLancamento(Math.abs(numero));
+  }
+
+  function alterarStatusSelecionadosLancamento() {
+    var ids = obterIdsSelecionadosLancamento();
+    var status = document.getElementById('acao-lote-status-lancamento').value || 'Efetivado';
+
+    if (ids.length === 0) {
+      mostrarNotificacao('Selecione pelo menos um lançamento para alterar o status.', 'alerta');
+      return;
+    }
+
+    confirmarAcao('Confirma alterar o status dos lançamentos selecionados para "' + status + '"?', function() {
+      executarAcaoLoteLancamentos({
+        Tipo_Acao: 'AlterarStatus',
+        IDs_Lancamentos: ids,
+        Status: status
+      });
+    });
+  }
+
+  function excluirSelecionadosLancamento() {
+    var ids = obterIdsSelecionadosLancamento();
+
+    if (ids.length === 0) {
+      mostrarNotificacao('Selecione pelo menos um lançamento para excluir.', 'alerta');
+      return;
+    }
+
+    confirmarAcao(
+      'Atenção: esta ação é definitiva. Serão excluídos apenas os lançamentos selecionados, junto com seus rateios vinculados. Deseja continuar?',
+      function() {
+        executarAcaoLoteLancamentos({
+          Tipo_Acao: 'Excluir',
+          IDs_Lancamentos: ids
+        });
+      }
+    );
+  }
+
+  function executarAcaoLoteLancamentos(dados) {
+    mostrarEstadoCarregandoLancamentos();
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        limparSelecaoLancamentos(false);
+        carregarPacoteTelaLancamentos();
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(err) {
+        ocultarTodosEstadosListaLancamentos();
+        renderizarTabelaLancamentos();
+        mostrarNotificacao(err.message, 'erro');
+      })
+      .processarAcaoLoteLancamentos(dados, tokenSessaoLancamento);
+  }
+
+  /**
+   * Abre formulário para novo lançamento.
+   */
+  function abrirFormularioLancamento() {
+    controlarFabLancamentos(false);
+    definirModoConsultaLancamento(false);
+    carregandoFormularioLancamento = true;
+    definirModoAposSalvarLancamento('fechar');
+    document.getElementById('form-lancamento').reset();
+
+    document.getElementById('lan_id').value = '';
+    document.getElementById('lan_grupo_parcela').value = '';
+    document.getElementById('lan_numero_parcela').value = '';
+    document.getElementById('lan_total_parcelas').value = '';
+
+    document.getElementById('lan_tipo').value = 'Despesa';
+    document.getElementById('lan_tipo_origem').value = 'Conta';
+    document.getElementById('lan_status').value = 'Efetivado';
+    document.getElementById('lan_data').value = gerarDataHojeInputLancamento();
+
+    document.getElementById('titulo-form-lancamento').innerText = 'Registrar Lançamento';
+
+    popularDropdownProjetos();
+    filtrarCategoriasPorTipo();
+    atualizarDropdownOrigens();
+    atualizarDropdownDestinos();
+    atualizarCamposTransferenciaLancamento();
+
+    limparFormularioParcelamentoLancamento();
+    limparFormularioRateioLancamento();
+    ultimaAssinaturaOrigemRateioFront = obterAssinaturaContextoRateioFront();
+    carregandoFormularioLancamento = false;
+
+    document.getElementById('container-form-lancamento').style.display = 'block';
+    document.getElementById('container-lista-lancamento').style.display = 'none';
+    focarCampoInicialLancamento();
+  }
+
+  /**
+   * Fecha formulário.
+   */
+  function fecharFormularioLancamento() {
+    if (deveFecharTelaContextualLancamentoAoCancelar()) {
+      fecharTelaContextualMukirana(false);
+      return;
+    }
+
+    document.getElementById('container-form-lancamento').style.display = 'none';
+    document.getElementById('container-lista-lancamento').style.display = 'block';
+    controlarFabLancamentos(true);
+  }
+
+  function deveFecharTelaContextualLancamentoAoCancelar() {
+    return obterValorCampoLancamento_('filtro_modo_contextual_lancamento') === 'true' &&
+      typeof estaEmTelaContextualMukirana === 'function' &&
+      estaEmTelaContextualMukirana() &&
+      !!obterValorCampoLancamento_('filtro_id_lancamento');
+  }
+
+  function finalizarFluxoContextualLancamentoAposSalvar(modoAposSalvar) {
+    if (
+      obterValorCampoLancamento_('filtro_modo_contextual_lancamento') === 'true' &&
+      typeof estaEmTelaContextualMukirana === 'function' &&
+      estaEmTelaContextualMukirana()
+    ) {
+      document.getElementById('filtro_id_lancamento').value = '';
+
+      if (contextoExternoLancamento && typeof contextoExternoLancamento === 'object') {
+        contextoExternoLancamento.ID_Lancamento = '';
+      }
+
+      if (modoAposSalvar === 'novo') {
+        if (typeof atualizarTelaOrigemContextualMukirana === 'function') {
+          atualizarTelaOrigemContextualMukirana();
+        }
+
+        return false;
+      }
+
+      if (typeof fecharTelaContextualMukirana === 'function') {
+        fecharTelaContextualMukirana(true);
+        return true;
+      }
+
+      if (typeof atualizarTelaOrigemContextualMukirana === 'function') {
+        atualizarTelaOrigemContextualMukirana();
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
+  function definirModoAposSalvarLancamento(modo) {
+    modoAposSalvarLancamento = modo === 'novo' ? 'novo' : 'fechar';
+  }
+
+  function solicitarSalvarENovoLancamento() {
+    if (salvandoLancamentoEmAndamento) {
+      mostrarNotificacao('Aguarde a conclusão do salvamento atual.', 'alerta');
+      return;
+    }
+
+    definirModoAposSalvarLancamento('novo');
+
+    var formulario = document.getElementById('form-lancamento');
+
+    if (formulario && typeof formulario.requestSubmit === 'function') {
+      formulario.requestSubmit();
+      return;
+    }
+
+    formulario.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  function focarCampoInicialLancamento() {
+    setTimeout(function() {
+      focarCampoLancamento('lan_tipo');
+    }, 0);
+  }
+
+  function atualizarEstadoBotoesSalvarLancamento(salvando) {
+    var btnSalvar = document.getElementById('btn-salvar-lancamento');
+    var btnSalvarENovo = document.getElementById('btn-salvar-e-novo-lancamento');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#form-lancamento',
+        idsProcessando: ['btn-salvar-lancamento', 'btn-salvar-e-novo-lancamento'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    if (btnSalvar) {
+      btnSalvar.disabled = !!salvando;
+      btnSalvar.innerText = salvando ? 'Salvando...' : 'Salvar';
+    }
+
+    if (btnSalvarENovo) {
+      btnSalvarENovo.disabled = !!salvando;
+      btnSalvarENovo.innerText = salvando ? 'Salvando...' : 'Salvar + novo';
+    }
+  }
+
+  function controlarFabLancamentos(visivel) {
+    if (typeof definirFabMukiranaVisivel === 'function') {
+      definirFabMukiranaVisivel(visivel);
+    }
+  }
+
+  /**
+   * Indica se o formulário está aberto.
+   */
+  function formularioLancamentoEstaAberto() {
+    var form = document.getElementById('container-form-lancamento');
+    return !!form && form.style.display !== 'none';
+  }
+
+  /**
+   * Reage à alteração do tipo.
+   */
+  function aoAlterarTipoLancamento() {
+    filtrarCategoriasPorTipo();
+    atualizarCamposTransferenciaLancamento();
+    atualizarDisponibilidadeParcelamentoPorTipo();
+    atualizarDisponibilidadeRateioPorTipo();
+  }
+
+  /**
+   * Reage à alteração do valor.
+   */
+  function aoAlterarValorLancamento(campo) {
+    aplicarMascaraMoedaLancamento(campo);
+    atualizarResumoParcelamentoFront();
+    recalcularRateioFront();
+  }
+
+  /**
+   * Filtra categorias por tipo usando optgroup.
+   */
+  function filtrarCategoriasPorTipo(idPreSelecionado) {
+    idPreSelecionado = idPreSelecionado || '';
+
+    var tipoSelecionado = document.getElementById('lan_tipo').value;
+    var comboCat = document.getElementById('lan_categoria');
+    var containerCategoria = document.getElementById('container-lan-categoria');
+
+    comboCat.innerHTML = '';
+
+    if (tipoSelecionado === 'Transferência') {
+      comboCat.required = false;
+      comboCat.disabled = true;
+      comboCat.innerHTML = '<option value="">Não se aplica para transferências</option>';
+      if (containerCategoria) containerCategoria.style.display = 'none';
+      return;
+    }
+
+    comboCat.required = true;
+    comboCat.disabled = false;
+    if (containerCategoria) containerCategoria.style.display = 'flex';
+
+    var optInicial = document.createElement('option');
+    optInicial.value = '';
+    optInicial.textContent = 'Selecione uma categoria...';
+    comboCat.appendChild(optInicial);
+
+    var categorias = pacoteLancamentos.dependencias.categorias || [];
+
+    var categoriasValidas = categorias.filter(function(categoria) {
+      return categoria.Tipo === tipoSelecionado;
+    });
+
+    categoriasValidas
+      .slice()
+      .sort(function(a, b) {
+        return obterNomeCategoriaDropdownLancamento_(a, categoriasValidas).localeCompare(
+          obterNomeCategoriaDropdownLancamento_(b, categoriasValidas)
+        );
+      })
+      .forEach(function(categoria) {
+        var opt = document.createElement('option');
+        opt.value = categoria.ID_Categoria;
+        opt.textContent = obterNomeCategoriaDropdownLancamento_(categoria, categoriasValidas);
+        comboCat.appendChild(opt);
+      });
+
+    if (idPreSelecionado) {
+      comboCat.value = idPreSelecionado;
+    }
+  }
+
+  function obterNomeCategoriaDropdownLancamento_(categoria, categorias) {
+    var nome = categoria && categoria.Nome ? categoria.Nome : 'Sem nome';
+    var idPai = categoria && categoria.ID_Categoria_Pai ? categoria.ID_Categoria_Pai : '';
+
+    if (!idPai) {
+      return nome;
+    }
+
+    var pai = (categorias || []).find(function(item) {
+      return item.ID_Categoria === idPai;
+    });
+
+    return pai && pai.Nome ? pai.Nome + ' / ' + nome : nome;
+  }
+
+  /**
+   * Monta estrutura hierárquica de categorias.
+   */
+  function montarEstruturaCategoriasParaDropdownLancamento(categorias) {
+    var mapaCategorias = {};
+    var filhosPorPai = {};
+    var pais = [];
+
+    categorias.forEach(function(categoria) {
+      if (categoria.ID_Categoria) {
+        mapaCategorias[categoria.ID_Categoria] = categoria;
+      }
+    });
+
+    categorias.forEach(function(categoria) {
+      var idPai = categoria.ID_Categoria_Pai || '';
+
+      if (idPai && mapaCategorias[idPai]) {
+        if (!filhosPorPai[idPai]) {
+          filhosPorPai[idPai] = [];
+        }
+
+        filhosPorPai[idPai].push(categoria);
+      } else {
+        pais.push(categoria);
+      }
+    });
+
+    pais.sort(function(a, b) {
+      return (a.Nome || '').localeCompare(b.Nome || '');
+    });
+
+    return pais.map(function(pai) {
+      var filhas = filhosPorPai[pai.ID_Categoria] || [];
+
+      filhas.sort(function(a, b) {
+        return (a.Nome || '').localeCompare(b.Nome || '');
+      });
+
+      return {
+        pai: pai,
+        filhas: filhas
+      };
+    });
+  }
+
+  /**
+   * Atualiza dropdown de origens.
+   */
+  function atualizarDropdownOrigens(idPreSelecionado) {
+    idPreSelecionado = idPreSelecionado || '';
+
+    var tipoOrigem = document.getElementById('lan_tipo_origem').value;
+    var comboOrigem = document.getElementById('lan_origem');
+
+    comboOrigem.innerHTML = '';
+
+    var opcoes = [];
+
+    if (tipoOrigem === 'Conta') {
+      opcoes = (pacoteLancamentos.dependencias.contas || []).slice();
+
+      opcoes.sort(function(a, b) {
+        return (a.Nome_Conta || '').localeCompare(b.Nome_Conta || '');
+      });
+
+      opcoes.forEach(function(conta) {
+        var opt = document.createElement('option');
+        opt.value = conta.ID_Conta;
+        opt.textContent = conta.Nome_Conta || 'Conta';
+        comboOrigem.appendChild(opt);
+      });
+    }
+
+    if (tipoOrigem === 'Cartão') {
+      opcoes = (pacoteLancamentos.dependencias.cartoes || []).slice();
+
+      opcoes.sort(function(a, b) {
+        var grupoA = a.Nome_Grupo || '';
+        var grupoB = b.Nome_Grupo || '';
+
+        if (grupoA !== grupoB) return grupoA.localeCompare(grupoB);
+        if (a.Tipo_Cartao === 'Titular' && b.Tipo_Cartao !== 'Titular') return -1;
+        if (a.Tipo_Cartao !== 'Titular' && b.Tipo_Cartao === 'Titular') return 1;
+
+        return (a.Nome_Cartao || '').localeCompare(b.Nome_Cartao || '');
+      });
+
+      opcoes.forEach(function(cartao) {
+        var opt = document.createElement('option');
+        opt.value = cartao.ID_Cartao;
+        opt.textContent = montarNomeCartaoOrigemLancamento(cartao);
+        comboOrigem.appendChild(opt);
+      });
+    }
+
+    if (opcoes.length === 0) {
+      var optVazio = document.createElement('option');
+      optVazio.value = '';
+      optVazio.textContent = 'Nenhum(a) ' + tipoOrigem + ' disponível';
+      comboOrigem.appendChild(optVazio);
+    }
+
+    if (idPreSelecionado) {
+      comboOrigem.value = idPreSelecionado;
+    }
+
+    if (document.getElementById('lan_tipo').value === 'Transferência') {
+      atualizarDropdownDestinos(document.getElementById('lan_destino').value);
+    }
+
+    aoAlterarContextoRateioLancamento();
+  }
+
+  function atualizarDropdownDestinos(idPreSelecionado) {
+    idPreSelecionado = idPreSelecionado || '';
+
+    var comboDestino = document.getElementById('lan_destino');
+    var contas = (pacoteLancamentos.dependencias.contas || []).slice();
+    var idOrigemAtual = document.getElementById('lan_origem').value || '';
+
+    if (!comboDestino) return;
+
+    comboDestino.innerHTML = '';
+
+    contas = contas.filter(function(conta) {
+      return conta.ID_Conta !== idOrigemAtual;
+    });
+
+    contas.sort(function(a, b) {
+      return (a.Nome_Conta || '').localeCompare(b.Nome_Conta || '');
+    });
+
+    contas.forEach(function(conta) {
+      var opt = document.createElement('option');
+      opt.value = conta.ID_Conta;
+      opt.textContent = conta.Nome_Conta || 'Conta';
+      comboDestino.appendChild(opt);
+    });
+
+    if (contas.length === 0) {
+      comboDestino.innerHTML = '<option value="">Nenhuma conta disponível</option>';
+    }
+
+    if (idPreSelecionado) {
+      comboDestino.value = idPreSelecionado;
+    }
+  }
+
+  function atualizarCamposTransferenciaLancamento() {
+    var tipo = document.getElementById('lan_tipo').value;
+    var containerDestino = document.getElementById('container-transferencia-destino');
+    var selectTipoOrigem = document.getElementById('lan_tipo_origem');
+    var selectDestino = document.getElementById('lan_destino');
+
+    if (tipo === 'Transferência') {
+      selectTipoOrigem.value = 'Conta';
+      selectTipoOrigem.disabled = true;
+      selectDestino.required = true;
+      if (containerDestino) containerDestino.style.display = 'grid';
+      atualizarDropdownOrigens(document.getElementById('lan_origem').value);
+      atualizarDropdownDestinos(document.getElementById('lan_destino').value);
+      return;
+    }
+
+    selectTipoOrigem.disabled = false;
+    selectDestino.required = false;
+    selectDestino.value = '';
+    if (containerDestino) containerDestino.style.display = 'none';
+  }
+
+  /**
+   * Popula projetos.
+   */
+  function popularDropdownProjetos(idPreSelecionado) {
+    idPreSelecionado = idPreSelecionado || '';
+
+    var comboProj = document.getElementById('lan_projeto');
+    var projetos = (pacoteLancamentos.dependencias.projetos || []).slice();
+
+    comboProj.innerHTML = '';
+
+    var optInicial = document.createElement('option');
+    optInicial.value = '';
+    optInicial.textContent = 'Nenhum (Lançamento Avulso)';
+    comboProj.appendChild(optInicial);
+
+    projetos.sort(function(a, b) {
+      return (a.Nome || '').localeCompare(b.Nome || '');
+    });
+
+    projetos.forEach(function(projeto) {
+      var opt = document.createElement('option');
+      opt.value = projeto.ID_Projeto;
+      opt.textContent = projeto.Nome || 'Projeto';
+      comboProj.appendChild(opt);
+    });
+
+    if (idPreSelecionado) {
+      comboProj.value = idPreSelecionado;
+    }
+
+    aoAlterarContextoRateioLancamento();
+  }
+
+  /**
+   * Limpa os campos de parcelamento para um novo lançamento simples.
+   */
+  function limparFormularioParcelamentoLancamento() {
+    document.getElementById('check_parcelamento_lancamento').checked = false;
+    document.getElementById('check_parcelamento_lancamento').disabled = false;
+    document.getElementById('lan_quantidade_parcelas').value = '2';
+    document.getElementById('lan_quantidade_parcelas').disabled = false;
+    document.getElementById('lan_escopo_edicao_parcelas').value = 'Esta';
+    document.getElementById('container_escopo_parcelas').style.display = 'none';
+    document.getElementById('container-parcelamento-lancamento').style.display = 'none';
+    atualizarDisponibilidadeParcelamentoPorTipo();
+    atualizarRotuloValorLancamento_();
+    atualizarResumoParcelamentoFront();
+  }
+
+  /**
+   * Alterna a exibição das opções de parcelamento.
+   */
+  function alternarBlocoParcelamentoLancamento() {
+    var marcado = document.getElementById('check_parcelamento_lancamento').checked;
+    document.getElementById('container-parcelamento-lancamento').style.display = marcado ? 'block' : 'none';
+    atualizarRotuloValorLancamento_();
+    atualizarResumoParcelamentoFront();
+    recalcularRateioFront();
+  }
+
+  /**
+   * Bloqueia parcelamento quando o tipo selecionado é Transferência.
+   */
+  function atualizarDisponibilidadeParcelamentoPorTipo() {
+    var tipo = document.getElementById('lan_tipo').value;
+    var check = document.getElementById('check_parcelamento_lancamento');
+    var ehEdicaoParcelada = obterNumeroParcelaFormularioFront() > 0 && obterTotalParcelasFormularioFront() > 1;
+
+    if (tipo === 'Transferência') {
+      check.checked = false;
+      check.disabled = true;
+      document.getElementById('container-parcelamento-lancamento').style.display = ehEdicaoParcelada ? 'block' : 'none';
+      atualizarRotuloValorLancamento_();
+      atualizarResumoParcelamentoFront();
+      return;
+    }
+
+    check.disabled = ehEdicaoParcelada;
+    atualizarRotuloValorLancamento_();
+  }
+
+  /**
+   * Configura o bloco de parcelamento durante a edição ou consulta de um lançamento.
+   *
+   * @param {Object} lancamento Lançamento em edição ou consulta.
+   */
+  function configurarFormularioParcelamentoParaLancamento(lancamento) {
+    var ehParcelado = lancamentoEhParceladoFront(lancamento);
+
+    document.getElementById('lan_grupo_parcela').value = ehParcelado ? (lancamento.ID_Grupo_Parcela || '') : '';
+    document.getElementById('lan_numero_parcela').value = ehParcelado ? (lancamento.Numero_Parcela || '') : '';
+    document.getElementById('lan_total_parcelas').value = ehParcelado ? (lancamento.Total_Parcelas || '') : '';
+
+    if (!ehParcelado) {
+      limparFormularioParcelamentoLancamento();
+
+      if (document.getElementById('lan_id').value) {
+        document.getElementById('check_parcelamento_lancamento').disabled = true;
+        document.getElementById('container-parcelamento-lancamento').style.display = 'none';
+      }
+
+      return;
+    }
+
+    document.getElementById('check_parcelamento_lancamento').checked = true;
+    document.getElementById('check_parcelamento_lancamento').disabled = true;
+    document.getElementById('lan_quantidade_parcelas').value = lancamento.Total_Parcelas || '2';
+    document.getElementById('lan_quantidade_parcelas').disabled = true;
+    document.getElementById('container_escopo_parcelas').style.display = 'block';
+    document.getElementById('lan_escopo_edicao_parcelas').value = 'Esta';
+    document.getElementById('container-parcelamento-lancamento').style.display = 'block';
+    atualizarRotuloValorLancamento_();
+    atualizarResumoParcelamentoFront();
+  }
+
+  function atualizarRotuloValorLancamento_() {
+    var label = document.getElementById('label_lan_valor');
+    var parcelamentoAtivo = document.getElementById('check_parcelamento_lancamento').checked;
+    var numeroParcela = obterNumeroParcelaFormularioFront();
+
+    if (!label) {
+      return;
+    }
+
+    if (parcelamentoAtivo || numeroParcela > 0) {
+      label.textContent = 'Valor da Parcela (R$)';
+      return;
+    }
+
+    label.textContent = 'Valor Total (R$)';
+  }
+
+  /**
+   * Atualiza texto explicativo do parcelamento.
+   */
+  function atualizarResumoParcelamentoFront() {
+    var resumo = document.getElementById('resumo_parcelamento_lancamento');
+    var quantidade = parseInt(document.getElementById('lan_quantidade_parcelas').value || '0', 10);
+    var valorParcela = obterValorFormularioLancamento('lan_valor');
+    var numeroParcela = obterNumeroParcelaFormularioFront();
+    var totalParcelas = obterTotalParcelasFormularioFront();
+
+    if (!resumo) return;
+
+    if (numeroParcela > 0 && totalParcelas > 1) {
+      resumo.innerHTML = 'Este lançamento é a parcela <strong>' + numeroParcela + '/' + totalParcelas + '</strong>. ' +
+        'Ao escolher "esta e as próximas", o valor informado será aplicado como valor de cada parcela afetada.';
+      return;
+    }
+
+    if (!document.getElementById('check_parcelamento_lancamento').checked) {
+      resumo.innerHTML = 'Informe o valor total da operação quando o lançamento não for parcelado.';
+      return;
+    }
+
+    if (isNaN(quantidade) || quantidade < 2 || valorParcela <= 0) {
+      resumo.innerHTML = 'Informe o valor da parcela e a quantidade de parcelas para visualizar o total da compra.';
+      return;
+    }
+
+    var valorParcelaCentavos = Math.round(valorParcela * 100);
+    var totalCompraCentavos = valorParcelaCentavos * quantidade;
+
+    resumo.innerHTML = 'Serão criadas <strong>' + quantidade + '</strong> parcelas mensais. ' +
+      'Cada parcela terá <strong>R$ ' + formatarNumeroLancamento(valorParcelaCentavos / 100) + '</strong>. ' +
+      'Valor total da compra: <strong>R$ ' + formatarNumeroLancamento(totalCompraCentavos / 100) + '</strong>.';
+  }
+
+  function obterNumeroParcelaFormularioFront() {
+    return parseInt(document.getElementById('lan_numero_parcela').value || '0', 10) || 0;
+  }
+
+  function obterTotalParcelasFormularioFront() {
+    return parseInt(document.getElementById('lan_total_parcelas').value || '0', 10) || 0;
+  }
+
+  function lancamentoEhParceladoFront(lancamento) {
+    return !!(lancamento && lancamento.ID_Grupo_Parcela) &&
+      parseInt(lancamento.Numero_Parcela || 0, 10) > 0 &&
+      parseInt(lancamento.Total_Parcelas || 0, 10) > 1;
+  }
+
+  function removerSufixoParcelaDescricaoFront(descricao) {
+    if (!descricao) return '';
+    return descricao.toString().replace(/\s*\(\d+\/\d+\)\s*$/, '').trim();
+  }
+
+  /**
+   * Reage à mudança de origem ou projeto, preservando participantes do rateio.
+   *
+   * Regra atual:
+   * - O rateio é o compartilhamento da despesa ou receita.
+   * - Conta, cartão e projeto não restringem participantes.
+   */
+  function aoAlterarContextoRateioLancamento() {
+    if (carregandoFormularioLancamento) {
+      return;
+    }
+
+    if (document.getElementById('lan_tipo').value === 'Transferência') {
+      atualizarDropdownDestinos(document.getElementById('lan_destino').value);
+    }
+
+    var rateioAtivo = document.getElementById('check_rateio_lancamento').checked === true;
+    var rateiosAtuais = coletarParticipantesRateioFormulario();
+
+    renderizarParticipantesRateioLancamento(rateiosAtuais.map(function(item) {
+      return {
+        ID_Usuario_Responsavel: item.ID_Usuario,
+        Valor_Rateado: item.Valor_Rateado,
+        Percentual: item.Percentual
+      };
+    }));
+
+    if (rateioAtivo) {
+      marcarUsuarioLogadoComoParticipanteRateio();
+      recalcularRateioFront();
+    }
+
+    ultimaAssinaturaOrigemRateioFront = obterAssinaturaContextoRateioFront();
+  }
+
+  /**
+   * Limpa rateio.
+   */
+  function limparFormularioRateioLancamento() {
+    document.getElementById('check_rateio_lancamento').checked = false;
+    document.getElementById('lan_modo_rateio').value = 'Igual';
+    document.getElementById('lan_observacao_rateio').value = '';
+    document.getElementById('container-rateio-lancamento').style.display = 'none';
+
+    renderizarParticipantesRateioLancamento([]);
+    atualizarResumoRateioFront();
+    atualizarDisponibilidadeRateioPorTipo();
+  }
+
+  /**
+   * Alterna bloco de rateio.
+   */
+  function alternarBlocoRateioLancamento() {
+    var marcado = document.getElementById('check_rateio_lancamento').checked;
+
+    document.getElementById('container-rateio-lancamento').style.display = marcado ? 'block' : 'none';
+
+    if (marcado) {
+      atualizarInfoContextoRateioFront(obterUsuariosElegiveisRateioFront());
+    }
+
+    if (marcado && obterParticipantesSelecionadosRateioFront().length === 0) {
+      marcarUsuarioLogadoComoParticipanteRateio();
+    }
+
+    atualizarCamposRateioPorModo();
+    recalcularRateioFront();
+  }
+
+  /**
+   * Bloqueia rateio para transferências.
+   */
+  function atualizarDisponibilidadeRateioPorTipo() {
+    var tipo = document.getElementById('lan_tipo').value;
+    var check = document.getElementById('check_rateio_lancamento');
+
+    if (tipo === 'Transferência') {
+      check.checked = false;
+      check.disabled = true;
+      document.getElementById('container-rateio-lancamento').style.display = 'none';
+      return;
+    }
+
+    check.disabled = false;
+  }
+
+  /**
+   * Renderiza participantes de rateio.
+   */
+  function renderizarParticipantesRateioLancamento(rateiosExistentes) {
+    var container = document.getElementById('lista-participantes-rateio');
+    var usuarios = obterUsuariosElegiveisRateioFront(rateiosExistentes);
+    var idLogado = pacoteLancamentos.usuarioLogado.id || '';
+
+    atualizarInfoContextoRateioFront(usuarios);
+
+    container.innerHTML = '';
+
+    if (usuarios.length === 0) {
+      container.innerHTML = '<div style="padding: 14px; color: var(--cor-texto-secundario); font-size: 14px;">Nenhum usuário ativo disponível para participar do rateio.</div>';
+      atualizarCamposRateioPorModo();
+      return;
+    }
+
+    usuarios.sort(function(a, b) {
+      if (a.ID_Usuario === idLogado) return -1;
+      if (b.ID_Usuario === idLogado) return 1;
+      return (a.Nome || '').localeCompare(b.Nome || '');
+    });
+
+    usuarios.forEach(function(usuario) {
+      var rateio = encontrarRateioPorUsuario(rateiosExistentes, usuario.ID_Usuario);
+      var ehCriador = usuario.ID_Usuario === idLogado;
+      var linha = document.createElement('div');
+      var checkbox = document.createElement('input');
+      var label = document.createElement('label');
+      var inputValor = document.createElement('input');
+      var inputPercentual = document.createElement('input');
+
+      linha.className = 'linha-participante-rateio';
+
+      checkbox.type = 'checkbox';
+      checkbox.name = 'participante_rateio_lancamento';
+      checkbox.value = usuario.ID_Usuario;
+      checkbox.checked = ehCriador || !!rateio;
+      checkbox.disabled = ehCriador;
+      checkbox.addEventListener('change', recalcularRateioFront);
+
+      label.textContent = usuario.Nome || 'Usuário';
+
+      var sub = document.createElement('span');
+      sub.className = 'subtexto';
+      sub.textContent = ehCriador ? 'Criador do lançamento - mantenha marcado; a parte dele pode ser 0' : montarDescricaoElegibilidadeRateioFront(usuario);
+      label.appendChild(sub);
+
+      if (usuario.Papel === 'Usuário Virtual') {
+        var subVirtual = document.createElement('span');
+        subVirtual.className = 'subtexto';
+        subVirtual.textContent = 'Usuário virtual';
+        label.appendChild(subVirtual);
+      }
+
+      inputValor.type = 'text';
+      inputValor.placeholder = 'Valor';
+      inputValor.dataset.tipo = 'valor';
+      inputValor.dataset.usuario = usuario.ID_Usuario;
+      inputValor.value = rateio ? formatarNumeroLancamento(rateio.Valor_Rateado) : '';
+      inputValor.addEventListener('input', function() {
+        aplicarMascaraMoedaLancamento(inputValor);
+        recalcularRateioFront();
+      });
+
+      inputPercentual.type = 'number';
+      inputPercentual.placeholder = '%';
+      inputPercentual.min = '0';
+      inputPercentual.step = '0.01';
+      inputPercentual.dataset.tipo = 'percentual';
+      inputPercentual.dataset.usuario = usuario.ID_Usuario;
+      inputPercentual.value = rateio ? rateio.Percentual : '';
+      inputPercentual.addEventListener('input', recalcularRateioFront);
+
+      linha.appendChild(checkbox);
+      linha.appendChild(label);
+      linha.appendChild(inputValor);
+      linha.appendChild(inputPercentual);
+
+      container.appendChild(linha);
+    });
+
+    atualizarCamposRateioPorModo();
+  }
+
+  /**
+   * Atualiza a explicação visual sobre a regra de participação no rateio.
+   *
+   * A View não substitui a validação do backend; ela apenas antecipa ao usuário
+   * a mesma regra aplicada no servidor.
+   *
+   * @param {Array<Object>} usuariosElegiveis Usuários atualmente elegíveis.
+   */
+  function atualizarInfoContextoRateioFront(usuariosElegiveis) {
+    var info = document.getElementById('info-contexto-rateio-lancamento');
+
+    if (!info) return;
+
+    var contextos = obterDescricoesContextosRateioFront();
+    var nomesElegiveis = (usuariosElegiveis || []).map(function(usuario) {
+      return usuario.Nome || 'Usuário';
+    });
+
+    var html = '<strong>Regra do rateio:</strong> o rateio compartilha apenas esta despesa ou receita. ' +
+      'A conta, o cartão e o projeto continuam com as próprias permissões e não restringem os participantes. ' +
+      'O criador do lançamento permanece marcado no rateio, mas a parte dele pode ser 0.';
+
+    html += '<span class="rateio-contexto-detalhe"><strong>Contextos aplicados:</strong> ' +
+      escaparHtmlLancamento(contextos.length ? contextos.join(' + ') : 'nenhum contexto selecionado') + '</span>';
+
+    if (nomesElegiveis.length > 0) {
+      html += '<span class="rateio-contexto-detalhe"><strong>Participantes disponíveis:</strong> ' +
+        escaparHtmlLancamento(nomesElegiveis.join(', ')) + '</span>';
+    } else {
+      html += '<span class="rateio-contexto-alerta">Nenhum usuário ativo disponível para participar do rateio.</span>';
+    }
+
+    info.innerHTML = html;
+  }
+
+  /**
+   * Monta descrições curtas dos contextos ativos do rateio.
+   *
+   * @returns {Array<string>} Descrições dos contextos.
+   */
+  function obterDescricoesContextosRateioFront() {
+    var descricoes = [];
+    var tipoOrigem = document.getElementById('lan_tipo_origem').value;
+    var idOrigem = document.getElementById('lan_origem').value;
+    var idProjeto = document.getElementById('lan_projeto').value;
+
+    if (tipoOrigem === 'Conta') {
+      var conta = encontrarContaDependenciaLancamento(idOrigem);
+
+      if (conta) {
+        descricoes.push((conta.Compartilhada === true ? 'Conta compartilhada: ' : 'Conta pessoal: ') + (conta.Nome_Conta || 'Conta'));
+      }
+    }
+
+    if (tipoOrigem === 'Cartão') {
+      var cartao = encontrarCartaoDependenciaLancamento(idOrigem);
+
+      if (cartao) {
+        descricoes.push('Cartão/fatura: ' + montarNomeCartaoOrigemLancamento(cartao));
+      }
+    }
+
+    if (idProjeto) {
+      var projeto = encontrarProjetoDependenciaLancamento(idProjeto);
+
+      if (projeto) {
+        descricoes.push((projeto.Compartilhado === true ? 'Projeto compartilhado: ' : 'Projeto pessoal: ') + (projeto.Nome || 'Projeto') + ' (centro de custo)');
+      }
+    }
+
+    return descricoes;
+  }
+
+  /**
+   * Obtém usuários disponíveis para o rateio no contexto selecionado.
+   *
+   * A View reflete a mesma regra aplicada no backend:
+   * o rateio pode envolver qualquer usuário ativo, sem abrir acesso à origem.
+   *
+   * @returns {Array<Object>} Usuários disponíveis.
+   */
+  function obterUsuariosElegiveisRateioFront() {
+    var usuarios = (pacoteLancamentos.dependencias.usuarios || []).slice();
+    var mapaElegiveis = obterMapaUsuariosElegiveisRateioFront();
+
+    return usuarios.filter(function(usuario) {
+      return mapaElegiveis[usuario.ID_Usuario] === true;
+    });
+  }
+
+  /**
+   * Monta mapa de usuários disponíveis para rateio.
+   */
+  function obterMapaUsuariosElegiveisRateioFront() {
+    var mapa = {};
+
+    (pacoteLancamentos.dependencias.usuarios || []).forEach(function(usuario) {
+      if (usuario && usuario.ID_Usuario) {
+        mapa[usuario.ID_Usuario] = true;
+      }
+    });
+
+    return mapa;
+  }
+
+  /**
+   * Obtém o conjunto elegível pelo contexto da origem selecionada.
+   */
+  function obterConjuntoElegivelPorOrigemRateioFront() {
+    var tipoOrigem = document.getElementById('lan_tipo_origem').value;
+    var idOrigem = document.getElementById('lan_origem').value;
+
+    if (tipoOrigem === 'Conta') {
+      var conta = encontrarContaDependenciaLancamento(idOrigem);
+
+      if (!conta) {
+        return null;
+      }
+
+      var conjuntoConta = {};
+
+      adicionarUsuarioElegivelRateioFront(conjuntoConta, conta.ID_Usuario);
+
+      if (conta.Compartilhada === true) {
+        adicionarListaUsuariosElegiveisRateioFront(conjuntoConta, conta.Usuarios_Compartilhados);
+      }
+
+      return conjuntoConta;
+    }
+
+    if (tipoOrigem === 'Cartão') {
+      var cartao = encontrarCartaoDependenciaLancamento(idOrigem);
+
+      if (!cartao) {
+        return null;
+      }
+
+      var conjuntoCartao = {};
+      var idGrupo = cartao.ID_Grupo_Cartao || '';
+
+      adicionarUsuarioElegivelRateioFront(conjuntoCartao, cartao.ID_Titular);
+
+      (pacoteLancamentos.dependencias.cartoes || []).forEach(function(item) {
+        if (item.ID_Grupo_Cartao === idGrupo && item.Ativo === true && item.Grupo_Ativo === true) {
+          adicionarUsuarioElegivelRateioFront(conjuntoCartao, item.ID_Usuario);
+        }
+      });
+
+      return conjuntoCartao;
+    }
+
+    return null;
+  }
+
+  /**
+   * Intersecciona os conjuntos elegíveis calculados para a View.
+   */
+  function interseccionarConjuntosElegiveisRateioFront(conjuntos) {
+    var resultado = {};
+    var primeiro = conjuntos[0] || {};
+
+    Object.keys(primeiro).forEach(function(idUsuario) {
+      var presenteEmTodos = conjuntos.every(function(conjunto) {
+        return conjunto && conjunto[idUsuario] === true;
+      });
+
+      if (presenteEmTodos) {
+        resultado[idUsuario] = true;
+      }
+    });
+
+    return resultado;
+  }
+
+  function adicionarUsuarioElegivelRateioFront(mapa, idUsuario) {
+    if (idUsuario) mapa[idUsuario] = true;
+  }
+
+  function adicionarListaUsuariosElegiveisRateioFront(mapa, listaIds) {
+    if (!listaIds) return;
+
+    listaIds.toString().split(',').forEach(function(id) {
+      id = id.trim();
+      if (id) mapa[id] = true;
+    });
+  }
+
+  function montarDescricaoElegibilidadeRateioFront(usuario) {
+    if (!usuario || !usuario.ID_Usuario) return 'Participante disponível';
+    if (usuario.Papel === 'Usuário Virtual') return 'Participante virtual disponível';
+    return 'Participante disponível para este rateio';
+  }
+
+  function encontrarContaDependenciaLancamento(idConta) {
+    return (pacoteLancamentos.dependencias.contas || []).find(function(conta) {
+      return conta.ID_Conta === idConta;
+    }) || null;
+  }
+
+  function encontrarCartaoDependenciaLancamento(idCartao) {
+    return (pacoteLancamentos.dependencias.cartoes || []).find(function(cartao) {
+      return cartao.ID_Cartao === idCartao;
+    }) || null;
+  }
+
+  function encontrarProjetoDependenciaLancamento(idProjeto) {
+    return (pacoteLancamentos.dependencias.projetos || []).find(function(projeto) {
+      return projeto.ID_Projeto === idProjeto;
+    }) || null;
+  }
+
+  function obterNomeGrupoCartaoDependenciaLancamento_(idGrupoCartao) {
+    var nome = '';
+
+    (pacoteLancamentos.dependencias.cartoes || []).some(function(cartao) {
+      if (cartao.ID_Grupo_Cartao === idGrupoCartao) {
+        nome = cartao.Nome_Grupo || cartao.Nome_Cartao || 'Fatura';
+        return true;
+      }
+
+      return false;
+    });
+
+    return nome || 'Fatura';
+  }
+
+  function montarNomesContaResumoLancamento_(ids) {
+    return montarResumoNomesLancamento_(ids, function(idConta) {
+      var conta = encontrarContaDependenciaLancamento(idConta);
+      return conta ? (conta.Nome_Conta || 'Conta') : 'Conta';
+    });
+  }
+
+  function montarNomesCartaoResumoLancamento_(ids) {
+    return montarResumoNomesLancamento_(ids, function(idCartao) {
+      var cartao = encontrarCartaoDependenciaLancamento(idCartao);
+      return cartao ? montarNomeCartaoOrigemLancamento(cartao) : 'Cartão';
+    });
+  }
+
+  function montarNomesGrupoCartaoResumoLancamento_(ids) {
+    return montarResumoNomesLancamento_(ids, function(idGrupoCartao) {
+      return obterNomeGrupoCartaoDependenciaLancamento_(idGrupoCartao);
+    });
+  }
+
+  function montarNomesProjetoResumoLancamento_(ids) {
+    return montarResumoNomesLancamento_(ids, function(idProjeto) {
+      var projeto = encontrarProjetoDependenciaLancamento(idProjeto);
+      return projeto ? (projeto.Nome || 'Projeto') : 'Projeto';
+    });
+  }
+
+  function montarNomesCategoriaResumoLancamento_(ids) {
+    return montarResumoNomesLancamento_(ids, function(idCategoria) {
+      return montarNomeHierarquicoCategoriaLancamento(idCategoria, pacoteLancamentos.dependencias.categorias || []) || 'Categoria';
+    });
+  }
+
+  function montarResumoNomesLancamento_(ids, resolvedor) {
+    var nomes = (ids || '').split(',').map(function(id) {
+      return (id || '').trim();
+    }).filter(Boolean).map(function(id) {
+      return typeof resolvedor === 'function' ? resolvedor(id) : id;
+    }).filter(Boolean);
+
+    if (nomes.length === 0) {
+      return '';
+    }
+
+    if (nomes.length <= 2) {
+      return nomes.join(' • ');
+    }
+
+    return nomes.slice(0, 2).join(' • ') + ' +' + (nomes.length - 2);
+  }
+
+  function escaparHtmlLancamento(valor) {
+    if (valor === null || valor === undefined) return '';
+
+    return valor.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escaparAtributoLancamento(valor) {
+    return escaparHtmlLancamento(valor);
+  }
+
+  function encontrarRateioPorUsuario(rateios, idUsuario) {
+    rateios = rateios || [];
+
+    for (var i = 0; i < rateios.length; i++) {
+      if (rateios[i].ID_Usuario_Responsavel === idUsuario) {
+        return rateios[i];
+      }
+    }
+
+    return null;
+  }
+
+  function marcarUsuarioLogadoComoParticipanteRateio() {
+    var idLogado = pacoteLancamentos.usuarioLogado.id;
+    var checkbox = document.querySelector('input[name="participante_rateio_lancamento"][value="' + idLogado + '"]');
+
+    if (checkbox) checkbox.checked = true;
+  }
+
+
+  /**
+   * Monta a assinatura visual do contexto financeiro atual.
+   *
+   * A assinatura não restringe participantes; ela existe apenas para preservar
+   * compatibilidade com fluxos antigos da tela.
+   *
+   * @returns {string} Assinatura do contexto financeiro atual.
+   */
+  function obterAssinaturaContextoRateioFront() {
+    return [
+      document.getElementById('lan_tipo_origem').value || '',
+      document.getElementById('lan_origem').value || ''
+    ].join('|');
+  }
+
+  function atualizarCamposRateioPorModo() {
+    var modo = document.getElementById('lan_modo_rateio').value;
+    var inputsValor = document.querySelectorAll('input[data-tipo="valor"]');
+    var inputsPercentual = document.querySelectorAll('input[data-tipo="percentual"]');
+
+    inputsValor.forEach(function(input) {
+      input.disabled = modo === 'Igual' || modo === 'Percentual';
+    });
+
+    inputsPercentual.forEach(function(input) {
+      input.disabled = modo === 'Igual' || modo === 'Valor';
+    });
+
+    recalcularRateioFront();
+  }
+
+  /**
+   * Obtém o valor visual usado para calcular o rateio na tela.
+   *
+   * Em lançamento parcelado novo, o campo de valor representa o valor da parcela.
+   * Por isso o rateio visual usa exatamente esse mesmo valor base.
+   */
+  function obterValorBaseRateioLancamentoFront() {
+    var valorFormulario = obterValorFormularioLancamento('lan_valor');
+    return valorFormulario;
+  }
+
+  function recalcularRateioFront() {
+    var checkRateio = document.getElementById('check_rateio_lancamento');
+
+    if (!checkRateio || !checkRateio.checked) {
+      atualizarResumoRateioFront();
+      return;
+    }
+
+    var modo = document.getElementById('lan_modo_rateio').value;
+    var selecionados = obterParticipantesSelecionadosRateioFront();
+    var total = obterValorBaseRateioLancamentoFront();
+    var totalCentavos = Math.round(total * 100);
+
+    if (selecionados.length === 0 || totalCentavos <= 0) {
+      atualizarResumoRateioFront();
+      return;
+    }
+
+    if (modo === 'Igual') aplicarRateioIgualFront(selecionados, totalCentavos);
+    if (modo === 'Valor') aplicarRateioPorValorFront(selecionados, totalCentavos);
+    if (modo === 'Percentual') aplicarRateioPorPercentualFront(selecionados, totalCentavos);
+
+    atualizarResumoRateioFront();
+  }
+
+  function obterParticipantesSelecionadosRateioFront() {
+    return Array.from(document.querySelectorAll('input[name="participante_rateio_lancamento"]:checked'));
+  }
+
+  function aplicarRateioIgualFront(selecionados, totalCentavos) {
+    var base = Math.floor(totalCentavos / selecionados.length);
+    var resto = totalCentavos - (base * selecionados.length);
+
+    selecionados.forEach(function(cb) {
+      var centavos = base;
+
+      if (resto > 0) {
+        centavos += 1;
+        resto -= 1;
+      }
+
+      definirValorRateioUsuario(cb.value, centavos / 100);
+      definirPercentualRateioUsuario(cb.value, totalCentavos > 0 ? (centavos / totalCentavos) * 100 : 0);
+    });
+  }
+
+  function aplicarRateioPorValorFront(selecionados, totalCentavos) {
+    selecionados.forEach(function(cb) {
+      var valor = obterValorRateioUsuario(cb.value);
+      var percentual = totalCentavos > 0 ? ((valor * 100) / totalCentavos) * 100 : 0;
+      definirPercentualRateioUsuario(cb.value, percentual);
+    });
+  }
+
+  function aplicarRateioPorPercentualFront(selecionados, totalCentavos) {
+    selecionados.forEach(function(cb) {
+      var percentual = obterPercentualRateioUsuario(cb.value);
+      var valor = ((totalCentavos * percentual) / 100) / 100;
+      definirValorRateioUsuario(cb.value, valor);
+    });
+  }
+
+  function atualizarResumoRateioFront() {
+    var total = obterValorBaseRateioLancamentoFront();
+    var totalRateado = calcularTotalRateadoFront();
+    var diferenca = total - totalRateado;
+
+    document.getElementById('resumo_rateio_total').textContent = 'R$ ' + formatarNumeroLancamento(total);
+    document.getElementById('resumo_rateio_rateado').textContent = 'R$ ' + formatarNumeroLancamento(totalRateado);
+    document.getElementById('resumo_rateio_diferenca').textContent = 'R$ ' + formatarNumeroLancamento(diferenca);
+  }
+
+  function calcularTotalRateadoFront() {
+    var selecionados = obterParticipantesSelecionadosRateioFront();
+    var total = 0;
+
+    selecionados.forEach(function(cb) {
+      total += obterValorRateioUsuario(cb.value);
+    });
+
+    return total;
+  }
+
+  function definirValorRateioUsuario(idUsuario, valor) {
+    var input = document.querySelector('input[data-tipo="valor"][data-usuario="' + idUsuario + '"]');
+    if (input) input.value = formatarNumeroLancamento(valor);
+  }
+
+  function definirPercentualRateioUsuario(idUsuario, percentual) {
+    var input = document.querySelector('input[data-tipo="percentual"][data-usuario="' + idUsuario + '"]');
+    if (input) input.value = isNaN(percentual) ? '' : percentual.toFixed(2);
+  }
+
+  function obterValorRateioUsuario(idUsuario) {
+    var input = document.querySelector('input[data-tipo="valor"][data-usuario="' + idUsuario + '"]');
+    return input ? converterTextoMoedaParaNumeroLancamento(input.value) : 0;
+  }
+
+  function obterPercentualRateioUsuario(idUsuario) {
+    var input = document.querySelector('input[data-tipo="percentual"][data-usuario="' + idUsuario + '"]');
+    var numero = input ? parseFloat(input.value || 0) : 0;
+    return isNaN(numero) ? 0 : numero;
+  }
+
+  function coletarParticipantesRateioFormulario() {
+    if (!document.getElementById('check_rateio_lancamento').checked) {
+      return [];
+    }
+
+    return obterParticipantesSelecionadosRateioFront().map(function(cb) {
+      return {
+        ID_Usuario: cb.value,
+        Valor_Rateado: obterValorRateioUsuario(cb.value),
+        Percentual: obterPercentualRateioUsuario(cb.value)
+      };
+    });
+  }
+
+  /**
+   * Salva lançamento completo.
+   */
+  function enviarFormularioLancamento(evento) {
+    evento.preventDefault();
+
+    if (salvandoLancamentoEmAndamento) {
+      mostrarNotificacao("Aguarde. O lançamento já está sendo salvo.", "alerta");
+      return;
+    }
+
+    var modoSalvamento = modoAposSalvarLancamento === 'novo' ? 'novo' : 'fechar';
+    var dataVal = document.getElementById('lan_data').value;
+    var tipoLancamento = document.getElementById('lan_tipo').value;
+    var rateioAtivo = document.getElementById('check_rateio_lancamento').checked && tipoLancamento !== 'Transferência';
+    var validacao = validarFormularioLancamentoFront(tipoLancamento, rateioAtivo);
+
+    if (!validacao.ok) {
+      mostrarNotificacao(validacao.mensagem, 'alerta');
+
+      if (validacao.idCampo) {
+        focarCampoLancamento(validacao.idCampo);
+      }
+
+      return;
+    }
+
+    salvandoLancamentoEmAndamento = true;
+    atualizarEstadoBotoesSalvarLancamento(true);
+
+    var dados = {
+      ID_Lancamento: document.getElementById('lan_id').value,
+      Tipo: tipoLancamento,
+      Descricao: document.getElementById('lan_descricao').value,
+      Valor_Total: obterValorOperacaoFormularioLancamento_(),
+      Valor_Parcela: obterValorFormularioLancamento('lan_valor'),
+      Data_Ocorrencia: dataVal,
+      Mes_Referencia: gerarMesReferenciaLancamentoFront(dataVal),
+      ID_Categoria: tipoLancamento === 'Transferência' ? '' : document.getElementById('lan_categoria').value,
+      Tipo_Origem: document.getElementById('lan_tipo_origem').value,
+      ID_Origem: document.getElementById('lan_origem').value,
+      ID_Destino: tipoLancamento === 'Transferência' ? document.getElementById('lan_destino').value : '',
+      ID_Projeto: document.getElementById('lan_projeto').value,
+      Status: document.getElementById('lan_status').value,
+      ID_Grupo_Parcela: document.getElementById('lan_grupo_parcela').value,
+      Numero_Parcela: document.getElementById('lan_numero_parcela').value,
+      Total_Parcelas: document.getElementById('lan_total_parcelas').value,
+
+      Parcelamento_Ativo: document.getElementById('check_parcelamento_lancamento').checked,
+      Quantidade_Parcelas: document.getElementById('lan_quantidade_parcelas').value,
+      Escopo_Edicao_Parcelas: document.getElementById('lan_escopo_edicao_parcelas').value,
+
+      Rateio_Ativo: rateioAtivo,
+      Modo_Rateio: document.getElementById('lan_modo_rateio').value,
+      Observacao_Rateio: document.getElementById('lan_observacao_rateio').value,
+      Participantes_Rateio: coletarParticipantesRateioFormulario()
+    };
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        salvandoLancamentoEmAndamento = false;
+        atualizarEstadoBotoesSalvarLancamento(false);
+        definirModoAposSalvarLancamento('fechar');
+
+        mostrarNotificacao(msg, 'sucesso');
+
+        if (finalizarFluxoContextualLancamentoAposSalvar(modoSalvamento)) {
+          return;
+        }
+
+        carregarPacoteTelaLancamentos(true);
+
+        if (modoSalvamento === 'novo') {
+          prepararFormularioParaProximoLancamento();
+          return;
+        }
+
+        fecharFormularioLancamento();
+      })
+      .withFailureHandler(function(err) {
+        salvandoLancamentoEmAndamento = false;
+        atualizarEstadoBotoesSalvarLancamento(false);
+        mostrarNotificacao(err.message, 'erro');
+      })
+      .processarSalvarLancamentoCompleto(dados, tokenSessaoLancamento);
+  }
+
+  function prepararFormularioParaProximoLancamento() {
+    abrirFormularioLancamento();
+  }
+
+  /**
+   * Valida o formulário no padrão do Mukirana, com mensagem visível.
+   *
+   * Motivo:
+   * A validação nativa do navegador pode bloquear o envio sem passar pelo
+   * google.script.run, especialmente quando algum campo obrigatório está oculto
+   * por mudança de tipo, parcelamento ou origem. Esta função transforma esse
+   * bloqueio silencioso em orientação clara para o usuário.
+   */
+  function validarFormularioLancamentoFront(tipoLancamento, rateioAtivo) {
+    var valor = obterValorFormularioLancamento('lan_valor');
+    var origem = document.getElementById('lan_origem').value;
+    var descricao = document.getElementById('lan_descricao').value.trim();
+    var data = document.getElementById('lan_data').value;
+    var categoria = document.getElementById('lan_categoria').value;
+    var destino = document.getElementById('lan_destino').value;
+    var parcelamentoAtivo = document.getElementById('check_parcelamento_lancamento').checked;
+    var quantidadeParcelas = parseInt(document.getElementById('lan_quantidade_parcelas').value || '0', 10);
+
+    if (!tipoLancamento) {
+      return { ok: false, mensagem: 'Informe o tipo do lançamento.', idCampo: 'lan_tipo' };
+    }
+
+    if (!descricao) {
+      return { ok: false, mensagem: 'Informe uma descrição para o lançamento.', idCampo: 'lan_descricao' };
+    }
+
+    if (!data) {
+      return { ok: false, mensagem: 'Informe a data de ocorrência do lançamento.', idCampo: 'lan_data' };
+    }
+
+    if (valor <= 0) {
+      return { ok: false, mensagem: 'Informe um valor maior que zero.', idCampo: 'lan_valor' };
+    }
+
+    if (tipoLancamento !== 'Transferência' && !categoria) {
+      return { ok: false, mensagem: 'Selecione uma categoria para o lançamento.', idCampo: 'lan_categoria' };
+    }
+
+    if (!origem) {
+      return { ok: false, mensagem: 'Selecione a origem financeira do lançamento.', idCampo: 'lan_origem' };
+    }
+
+    if (tipoLancamento === 'Transferência' && !destino) {
+      return { ok: false, mensagem: 'Selecione a conta de destino da transferência.', idCampo: 'lan_destino' };
+    }
+
+    if (parcelamentoAtivo && (isNaN(quantidadeParcelas) || quantidadeParcelas < 2)) {
+      return { ok: false, mensagem: 'Informe pelo menos 2 parcelas para um lançamento parcelado.', idCampo: 'lan_quantidade_parcelas' };
+    }
+
+    if (rateioAtivo) {
+      return validarRateioFormularioLancamentoFront();
+    }
+
+    return { ok: true };
+  }
+
+  function obterValorOperacaoFormularioLancamento_() {
+    var valorInformado = obterValorFormularioLancamento('lan_valor');
+    var parcelamentoAtivo = document.getElementById('check_parcelamento_lancamento').checked;
+    var numeroParcela = obterNumeroParcelaFormularioFront();
+    var quantidadeParcelas = parseInt(document.getElementById('lan_quantidade_parcelas').value || '0', 10);
+
+    if (!parcelamentoAtivo || numeroParcela > 0 || isNaN(quantidadeParcelas) || quantidadeParcelas < 2) {
+      return valorInformado;
+    }
+
+    return valorInformado * quantidadeParcelas;
+  }
+
+  function validarRateioFormularioLancamentoFront() {
+    var selecionados = obterParticipantesSelecionadosRateioFront();
+    var idLogado = pacoteLancamentos.usuarioLogado.id || '';
+    var totalRateado = calcularTotalRateadoFront();
+    var totalBase = obterValorBaseRateioLancamentoFront();
+    var diferencaCentavos = Math.round((totalBase - totalRateado) * 100);
+    var mapaElegiveis = obterMapaUsuariosElegiveisRateioFront();
+    var possuiCriador = selecionados.some(function(cb) {
+      return cb.value === idLogado;
+    });
+
+    if (selecionados.length === 0) {
+      return { ok: false, mensagem: 'Selecione pelo menos um participante para o rateio.', idCampo: 'check_rateio_lancamento' };
+    }
+
+    if (!possuiCriador) {
+      return { ok: false, mensagem: 'Mantenha o criador do lançamento marcado no rateio. Se a despesa for só do outro participante, deixe 0% para você e 100% para ele.', idCampo: 'check_rateio_lancamento' };
+    }
+
+    for (var i = 0; i < selecionados.length; i++) {
+      if (mapaElegiveis[selecionados[i].value] !== true) {
+        return {
+          ok: false,
+          mensagem: 'Um dos participantes selecionados não está disponível para este rateio. Atualize a tela e tente novamente.',
+          idCampo: 'check_rateio_lancamento'
+        };
+      }
+    }
+
+    if (Math.abs(diferencaCentavos) > 1) {
+      return {
+        ok: false,
+        mensagem: 'O total rateado precisa fechar com o valor exibido no rateio. Ajuste os valores ou use partes iguais.',
+        idCampo: 'lan_modo_rateio'
+      };
+    }
+
+    return { ok: true };
+  }
+
+  function focarCampoLancamento(idCampo) {
+    var campo = document.getElementById(idCampo);
+
+    if (!campo) return;
+
+    campo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    if (!campo.disabled && typeof campo.focus === 'function') {
+      campo.focus();
+    }
+  }
+
+  /**
+   * Prepara edição.
+   */
+  function prepararEdicaoLancamento(idLancamento) {
+    var lancamento = encontrarLancamentoPorId(idLancamento);
+
+    if (!lancamento) {
+      mostrarNotificacao("Lançamento não encontrado na memória da tela.", "erro");
+      return;
+    }
+
+    if (lancamento.Pode_Editar !== true) {
+      mostrarNotificacao("Este lançamento foi compartilhado por rateio e está disponível apenas para consulta.", "alerta");
+      return;
+    }
+
+    controlarFabLancamentos(false);
+    definirModoConsultaLancamento(false);
+    carregandoFormularioLancamento = true;
+
+    var rateios = obterRateiosAtivosDoLancamento(idLancamento);
+
+    document.getElementById('lan_id').value = lancamento.ID_Lancamento;
+    document.getElementById('lan_grupo_parcela').value = lancamento.ID_Grupo_Parcela || '';
+    document.getElementById('lan_numero_parcela').value = lancamento.Numero_Parcela || '';
+    document.getElementById('lan_total_parcelas').value = lancamento.Total_Parcelas || '';
+
+    document.getElementById('lan_tipo').value = lancamento.Tipo || 'Despesa';
+    document.getElementById('lan_valor').value = obterValorFormatadoFormularioLancamento(lancamento.Valor_Total);
+    document.getElementById('lan_data').value = lancamento.Data_Ocorrencia || '';
+    document.getElementById('lan_descricao').value = lancamentoEhParceladoFront(lancamento)
+      ? removerSufixoParcelaDescricaoFront(lancamento.Descricao || '')
+      : (lancamento.Descricao || '');
+    document.getElementById('lan_status').value = lancamento.Status || 'Efetivado';
+
+    popularDropdownProjetos(lancamento.ID_Projeto);
+
+    document.getElementById('lan_tipo').value = lancamento.Tipo || 'Despesa';
+    filtrarCategoriasPorTipo(lancamento.ID_Categoria);
+
+    document.getElementById('lan_tipo_origem').value = lancamento.Tipo_Origem || 'Conta';
+    atualizarDropdownOrigens(lancamento.ID_Origem);
+    atualizarDropdownDestinos(lancamento.ID_Destino || '');
+    atualizarCamposTransferenciaLancamento();
+
+    configurarFormularioParcelamentoParaLancamento(lancamento);
+
+    document.getElementById('check_rateio_lancamento').checked = rateios.length > 0;
+    document.getElementById('container-rateio-lancamento').style.display = rateios.length > 0 ? 'block' : 'none';
+    document.getElementById('lan_modo_rateio').value = obterModoRateioLancamento(rateios);
+    document.getElementById('lan_observacao_rateio').value = rateios.length > 0 ? (rateios[0].Observacao || '') : '';
+
+    renderizarParticipantesRateioLancamento(rateios);
+    atualizarDisponibilidadeRateioPorTipo();
+    recalcularRateioFront();
+    ultimaAssinaturaOrigemRateioFront = obterAssinaturaContextoRateioFront();
+    carregandoFormularioLancamento = false;
+
+    document.getElementById('titulo-form-lancamento').innerText = 'Editar Lançamento';
+
+    document.getElementById('container-form-lancamento').style.display = 'block';
+    document.getElementById('container-lista-lancamento').style.display = 'none';
+  }
+
+  /**
+   * Abre detalhes em modo consulta.
+   */
+  function abrirDetalhesLancamento(idLancamento) {
+    var lancamento = encontrarLancamentoPorId(idLancamento);
+
+    if (!lancamento) {
+      mostrarNotificacao("Lançamento não encontrado na memória da tela.", "erro");
+      return;
+    }
+
+    preencherFormularioLancamentoParaDetalhes(lancamento);
+    definirModoConsultaLancamento(true);
+  }
+
+  function preencherFormularioLancamentoParaDetalhes(lancamento) {
+    var rateios = obterRateiosAtivosDoLancamento(lancamento.ID_Lancamento);
+
+    controlarFabLancamentos(false);
+    carregandoFormularioLancamento = true;
+    document.getElementById('form-lancamento').reset();
+    document.getElementById('lan_id').value = lancamento.ID_Lancamento;
+    document.getElementById('lan_grupo_parcela').value = lancamento.ID_Grupo_Parcela || '';
+    document.getElementById('lan_numero_parcela').value = lancamento.Numero_Parcela || '';
+    document.getElementById('lan_total_parcelas').value = lancamento.Total_Parcelas || '';
+    document.getElementById('lan_tipo').value = lancamento.Tipo || 'Despesa';
+    document.getElementById('lan_valor').value = obterValorFormatadoFormularioLancamento(lancamento.Valor_Total_Original || lancamento.Valor_Total);
+    document.getElementById('lan_data').value = lancamento.Data_Ocorrencia || '';
+    document.getElementById('lan_descricao').value = lancamento.Descricao || '';
+    document.getElementById('lan_status').value = lancamento.Status || 'Efetivado';
+
+    popularDropdownProjetos(lancamento.ID_Projeto);
+    filtrarCategoriasPorTipo(lancamento.ID_Categoria);
+    garantirOpcaoSelecionadaLancamento('lan_categoria', lancamento.ID_Categoria, lancamento.Nome_Categoria_Visualizacao || 'Categoria do lançamento');
+    garantirOpcaoSelecionadaLancamento('lan_projeto', lancamento.ID_Projeto, lancamento.Nome_Projeto_Visualizacao || 'Projeto do lançamento');
+
+    document.getElementById('lan_tipo_origem').value = lancamento.Tipo_Origem || 'Conta';
+    atualizarDropdownOrigens(lancamento.ID_Origem);
+    atualizarDropdownDestinos(lancamento.ID_Destino || '');
+    atualizarCamposTransferenciaLancamento();
+    garantirOpcaoSelecionadaLancamento('lan_origem', lancamento.ID_Origem, lancamento.Nome_Origem_Visualizacao || 'Origem do lançamento');
+    if (lancamento.ID_Destino) {
+      garantirOpcaoSelecionadaLancamento('lan_destino', lancamento.ID_Destino, obterNomeContaDestinoLancamento(lancamento.ID_Destino));
+    }
+
+    configurarFormularioParcelamentoParaLancamento(lancamento);
+
+    document.getElementById('check_rateio_lancamento').checked = rateios.length > 0;
+    document.getElementById('container-rateio-lancamento').style.display = rateios.length > 0 ? 'block' : 'none';
+    document.getElementById('lan_modo_rateio').value = obterModoRateioLancamento(rateios);
+    document.getElementById('lan_observacao_rateio').value = rateios.length > 0 ? (rateios[0].Observacao || '') : '';
+
+    renderizarParticipantesRateioLancamento(rateios);
+    atualizarDisponibilidadeRateioPorTipo();
+    recalcularRateioFront();
+    ultimaAssinaturaOrigemRateioFront = obterAssinaturaContextoRateioFront();
+    carregandoFormularioLancamento = false;
+
+    document.getElementById('titulo-form-lancamento').innerText = 'Detalhes do Lançamento';
+    document.getElementById('container-form-lancamento').style.display = 'block';
+    document.getElementById('container-lista-lancamento').style.display = 'none';
+  }
+
+  function abrirFaturaDoPagamentoLancamento(lancamento, editarPagamento) {
+    var idGrupo = lancamento.ID_Grupo_Cartao || '';
+    var mes = (lancamento.Mes_Referencia || '').substring(0, 7);
+
+    if (!idGrupo) {
+      mostrarNotificacao('Grupo do cartao nao encontrado para este pagamento.', 'erro');
+      return;
+    }
+
+    localStorage.setItem('mukirana_fatura_cartao', JSON.stringify({
+      ID_Grupo_Cartao: idGrupo,
+      Mes_Referencia: mes,
+      Mes_Inicial: mes,
+      Mes_Final: ''
+    }));
+
+    if (typeof salvarFiltroPeriodoGlobalMukirana === 'function') {
+      var periodoAtual = obterPeriodoGlobalLancamentos_();
+      salvarFiltroPeriodoGlobalMukirana({
+        Mes_Inicial: mes,
+        Mes_Final: '',
+        Considerar_Historico_Anterior: periodoAtual.Considerar_Historico_Anterior !== false
+      });
+    }
+
+    if (editarPagamento === true && lancamento.ID_Pagamento_Fatura) {
+      localStorage.setItem('mukirana_acao_pendente_fatura', 'editar_pagamento_fatura:' + lancamento.ID_Pagamento_Fatura);
+    }
+
+    if (typeof abrirTelaContextualMukirana === 'function') {
+      abrirTelaContextualMukirana('FaturasCartao', {
+        titulo: 'Fatura do cartao',
+        subtitulo: 'Revise e edite o pagamento desta fatura.',
+        contexto: {
+          ID_Grupo_Cartao: idGrupo,
+          Mes_Referencia: mes,
+          Mes_Inicial: mes
+        },
+        aoAtualizarOrigem: carregarPacoteTelaLancamentos
+      });
+      return;
+    }
+
+    if (typeof navegarPara === 'function') {
+      navegarPara('FaturasCartao');
+    }
+  }
+
+  function excluirPagamentoFaturaPelaTelaLancamentos(lancamento) {
+    var idPagamento = lancamento.ID_Pagamento_Fatura || '';
+
+    if (!idPagamento) {
+      mostrarNotificacao('Pagamento de fatura nao informado.', 'erro');
+      return;
+    }
+
+    confirmarAcao('Confirma a exclusao definitiva deste pagamento de fatura?', function() {
+      mostrarEstadoCarregandoLancamentos();
+
+      google.script.run
+        .withSuccessHandler(function(mensagem) {
+          mostrarNotificacao(mensagem, 'sucesso');
+          carregarPacoteTelaLancamentos();
+        })
+        .withFailureHandler(function(erro) {
+          ocultarTodosEstadosListaLancamentos();
+          renderizarTabelaLancamentos();
+          mostrarNotificacao(erro.message, 'erro');
+        })
+        .excluirPagamentoFaturaCartao(tokenSessaoLancamento, idPagamento);
+    });
+  }
+
+  /**
+   * Exclui lançamento.
+   */
+  function excluirLancamentoFront(idLancamento) {
+    var lancamento = encontrarLancamentoPorId(idLancamento);
+
+    if (!lancamento) {
+      mostrarNotificacao('Lançamento não encontrado na memória da tela.', 'erro');
+      return;
+    }
+
+    if (lancamentoEhParceladoFront(lancamento)) {
+      abrirModalExclusaoParcelasLancamento(lancamento);
+      return;
+    }
+
+    confirmarAcao('Atenção: esta ação é definitiva. O lançamento e seus rateios vinculados serão excluídos de verdade. Deseja continuar?', function() {
+      executarExclusaoLancamento(idLancamento, 'Esta');
+    });
+  }
+
+  function abrirModalExclusaoParcelasLancamento(lancamento) {
+    var overlay = document.getElementById('modal-exclusao-parcelas-lancamento');
+    var select = document.getElementById('escopo_exclusao_parcelas_lancamento');
+    var btn = document.getElementById('btn-confirmar-exclusao-parcelas-lancamento');
+
+    select.value = 'Esta';
+    controlarFabLancamentos(false);
+    overlay.classList.remove('oculto');
+
+    btn.onclick = function() {
+      var escopo = select.value || 'Esta';
+      fecharModalExclusaoParcelasLancamento();
+
+      confirmarAcao('Confirma a exclusão definitiva conforme o escopo escolhido? Esta ação removerá também os rateios vinculados.', function() {
+        executarExclusaoLancamento(lancamento.ID_Lancamento, escopo);
+      });
+    };
+  }
+
+  function fecharModalExclusaoParcelasLancamento() {
+    document.getElementById('modal-exclusao-parcelas-lancamento').classList.add('oculto');
+    controlarFabLancamentos(true);
+  }
+
+  function executarExclusaoLancamento(idLancamento, escopoExclusao) {
+    mostrarEstadoCarregandoLancamentos();
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        mostrarNotificacao(msg, 'sucesso');
+
+        if (finalizarFluxoContextualLancamentoAposSalvar()) {
+          return;
+        }
+
+        carregarPacoteTelaLancamentos();
+      })
+      .withFailureHandler(function(err) {
+        ocultarTodosEstadosListaLancamentos();
+        renderizarTabelaLancamentos();
+        mostrarNotificacao(err.message, 'erro');
+      })
+      .excluirLancamentoCompleto(idLancamento, tokenSessaoLancamento, escopoExclusao || 'Esta');
+  }
+
+  function encontrarLancamentoPorId(idLancamento) {
+    for (var i = 0; i < pacoteLancamentos.lancamentos.length; i++) {
+      if (pacoteLancamentos.lancamentos[i].ID_Lancamento === idLancamento) {
+        return pacoteLancamentos.lancamentos[i];
+      }
+    }
+
+    return null;
+  }
+
+  function obterRateiosAtivosDoLancamento(idLancamento) {
+    var lista = pacoteLancamentos.rateiosPorLancamento[idLancamento] || [];
+
+    return lista.filter(function(rateio) {
+      return rateio.Status !== 'Cancelado';
+    });
+  }
+
+  function obterModoRateioLancamento(rateios) {
+    rateios = rateios || [];
+
+    if (rateios.length === 0) {
+      return 'Igual';
+    }
+
+    var modo = rateios[0].Modo_Rateio || 'Valor';
+    var permitidos = ['Igual', 'Valor', 'Percentual'];
+
+    return permitidos.indexOf(modo) === -1 ? 'Valor' : modo;
+  }
+
+  function definirModoConsultaLancamento(consultaAtiva) {
+    var campos = document.querySelectorAll('#form-lancamento input, #form-lancamento select');
+    var btnSalvar = document.getElementById('btn-salvar-lancamento');
+    var btnSalvarENovo = document.getElementById('btn-salvar-e-novo-lancamento');
+
+    campos.forEach(function(campo) {
+      if (campo.type !== 'hidden') {
+        campo.disabled = consultaAtiva;
+      }
+    });
+
+    btnSalvar.style.display = consultaAtiva ? 'none' : 'inline-block';
+    btnSalvarENovo.style.display = consultaAtiva ? 'none' : 'inline-block';
+  }
+
+  function garantirOpcaoSelecionadaLancamento(idSelect, valor, texto) {
+    if (!valor) return;
+
+    var select = document.getElementById(idSelect);
+
+    if (!select) return;
+
+    var existe = Array.from(select.options).some(function(option) {
+      return option.value === valor;
+    });
+
+    if (!existe) {
+      var option = document.createElement('option');
+      option.value = valor;
+      option.textContent = texto;
+      select.appendChild(option);
+    }
+
+    select.value = valor;
+  }
+
+  function obterNomeCategoriaLancamento(lancamento) {
+    if (lancamento && lancamento.Nome_Categoria_Visualizacao) {
+      return lancamento.Nome_Categoria_Visualizacao;
+    }
+
+    var idCategoria = lancamento ? lancamento.ID_Categoria : '';
+
+    if (!idCategoria) return 'Sem categoria';
+
+    var categorias = pacoteLancamentos.dependencias.categorias || [];
+    var nomeHierarquico = montarNomeHierarquicoCategoriaLancamento(idCategoria, categorias);
+
+    return nomeHierarquico || 'Sem categoria';
+  }
+
+  function montarNomeHierarquicoCategoriaLancamento(idCategoria, categoriasFonte) {
+    var categorias = categoriasFonte || [];
+    var mapa = {};
+    var partes = [];
+    var visitados = {};
+
+    categorias.forEach(function(categoria) {
+      if (categoria.ID_Categoria) {
+        mapa[categoria.ID_Categoria] = categoria;
+      }
+    });
+
+    var atual = mapa[idCategoria];
+
+    while (atual && atual.ID_Categoria) {
+      if (visitados[atual.ID_Categoria]) {
+        partes.unshift('[hierarquia circular]');
+        break;
+      }
+
+      visitados[atual.ID_Categoria] = true;
+      partes.unshift(atual.Nome || 'Sem nome');
+
+      if (!atual.ID_Categoria_Pai) break;
+
+      atual = mapa[atual.ID_Categoria_Pai];
+    }
+
+    return partes.join(' > ');
+  }
+
+  function obterNomeProjetoLancamento(lancamento) {
+    if (lancamento && lancamento.Nome_Projeto_Visualizacao) {
+      return lancamento.Nome_Projeto_Visualizacao;
+    }
+
+    var idProjeto = lancamento ? lancamento.ID_Projeto : '';
+
+    if (!idProjeto) return '';
+
+    var projetos = pacoteLancamentos.dependencias.projetos || [];
+
+    for (var i = 0; i < projetos.length; i++) {
+      if (projetos[i].ID_Projeto === idProjeto) {
+        return projetos[i].Nome || '';
+      }
+    }
+
+    return '';
+  }
+
+  function obterNomeOrigemLancamento(lancamento) {
+    if (lancamento && lancamento.Nome_Origem_Visualizacao) {
+      return lancamento.Nome_Origem_Visualizacao;
+    }
+
+    if (lancamento && lancamento.Tipo === 'Transferência') {
+      return obterNomeContaDestinoLancamento(lancamento.ID_Origem) + ' -> ' + obterNomeContaDestinoLancamento(lancamento.ID_Destino);
+    }
+
+    var tipoOrigem = lancamento ? lancamento.Tipo_Origem : '';
+    var idOrigem = lancamento ? lancamento.ID_Origem : '';
+
+    if (tipoOrigem === 'Conta') {
+      var contas = pacoteLancamentos.dependencias.contas || [];
+
+      for (var i = 0; i < contas.length; i++) {
+        if (contas[i].ID_Conta === idOrigem) {
+          return contas[i].Nome_Conta || 'Conta';
+        }
+      }
+
+      return 'Conta não encontrada';
+    }
+
+    if (tipoOrigem === 'Cartão') {
+      var cartoes = pacoteLancamentos.dependencias.cartoes || [];
+
+      for (var j = 0; j < cartoes.length; j++) {
+        if (cartoes[j].ID_Cartao === idOrigem) {
+          return montarNomeCartaoOrigemLancamento(cartoes[j]);
+        }
+      }
+
+      return 'Cartão não encontrado';
+    }
+
+    return 'Origem desconhecida';
+  }
+
+  function obterNomeContaDestinoLancamento(idConta) {
+    var conta = encontrarContaDependenciaLancamento(idConta);
+    return conta ? (conta.Nome_Conta || 'Conta') : 'Conta não encontrada';
+  }
+
+  function montarNomeCartaoOrigemLancamento(cartao) {
+    if (!cartao) return 'Cartão';
+
+    var nomeGrupo = cartao.Nome_Grupo || '';
+    var nomeCartao = cartao.Nome_Cartao || 'Cartão';
+    var tipoCartao = cartao.Tipo_Cartao || '';
+
+    if (nomeGrupo && nomeCartao.indexOf(nomeGrupo) === -1) {
+      return nomeGrupo + ' — ' + nomeCartao + (tipoCartao ? ' [' + tipoCartao + ']' : '');
+    }
+
+    return nomeCartao + (tipoCartao ? ' [' + tipoCartao + ']' : '');
+  }
+
+  function formatarDataLancamentoParaTela(valor) {
+    if (!valor) return '';
+
+    var texto = valor.toString();
+
+    if (/^\d{4}-\d{2}-\d{2}/.test(texto)) {
+      var partes = texto.substring(0, 10).split('-');
+      return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+
+    return texto;
+  }
+
+  function gerarDataHojeInputLancamento() {
+    var hoje = new Date();
+    var ano = hoje.getFullYear();
+    var mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    var dia = String(hoje.getDate()).padStart(2, '0');
+
+    return ano + '-' + mes + '-' + dia;
+  }
+
+  function gerarMesReferenciaLancamentoFront(dataVal) {
+    if (!dataVal || !/^\d{4}-\d{2}-\d{2}$/.test(dataVal)) {
+      return '';
+    }
+
+    return dataVal.substring(0, 7);
+  }
+
+  function aplicarMascaraMoedaLancamento(campo) {
+    if (typeof mascaraMoeda === 'function') {
+      mascaraMoeda(campo);
+      return;
+    }
+
+    var valor = campo.value.replace(/\D/g, '');
+
+    if (!valor) {
+      campo.value = '';
+      return;
+    }
+
+    var numero = parseFloat(valor) / 100;
+    campo.value = formatarNumeroLancamento(numero);
+  }
+
+  function obterValorFormularioLancamento(idCampo) {
+    var valor = document.getElementById(idCampo).value;
+    return converterTextoMoedaParaNumeroLancamento(valor);
+  }
+
+  function converterTextoMoedaParaNumeroLancamento(valor) {
+    if (typeof valor === 'number') return valor;
+    if (!valor) return 0;
+
+    var texto = valor.toString().trim();
+
+    if (texto.indexOf(',') !== -1) {
+      texto = texto.replace(/\./g, '').replace(',', '.');
+    }
+
+    var numero = parseFloat(texto);
+    return isNaN(numero) ? 0 : numero;
+  }
+
+  function formatarNumeroLancamento(valor) {
+    var numero = parseFloat(valor);
+
+    if (isNaN(numero)) numero = 0;
+
+    return numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function obterValorFormatadoFormularioLancamento(valor) {
+    if (typeof formatarMoedaParaInput === 'function') {
+      return formatarMoedaParaInput(valor);
+    }
+
+    return formatarNumeroLancamento(valor);
+  }
+</script>

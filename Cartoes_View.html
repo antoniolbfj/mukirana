@@ -1,0 +1,1218 @@
+<style>
+  /*
+   * Módulo: Cartoes_View.html
+   * Responsabilidade:
+   * - Renderizar a gestão de grupos de cartões/faturas.
+   * - Permitir que o titular cadastre a fatura consolidada.
+   * - Permitir que o titular selecione usuários adicionais.
+   * - Exibir os cartões físicos vinculados ao grupo/fatura.
+   */
+
+  .cabecalho-tela {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .btn-primario {
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: var(--cor-primaria);
+    color: white;
+    transition: 0.2s;
+  }
+
+  .btn-secundario {
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: #E0E0E0;
+    color: var(--cor-texto-principal);
+    transition: 0.2s;
+  }
+
+  .btn-acao {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: var(--cor-fundo-app);
+    border: var(--borda-suave);
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: 0.2s;
+  }
+
+  .btn-acao:hover {
+    background-color: var(--cor-primaria);
+    color: white;
+  }
+
+  .cartao {
+    background: var(--cor-superficie);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: var(--sombra-suave);
+    margin-bottom: 20px;
+  }
+
+  .grupo-campo {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .grupo-campo-duplo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .grupo-campo-triplo {
+    display: grid;
+    grid-template-columns: 1.3fr 0.9fr 0.9fr;
+    gap: 16px;
+  }
+
+  label {
+    font-size: 14px;
+    color: var(--cor-texto-secundario);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  input,
+  select {
+    padding: 14px;
+    border: var(--borda-suave);
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    outline: none;
+    background: white;
+    color: var(--cor-texto-principal);
+  }
+
+  .texto-ajuda {
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    line-height: 1.4;
+    margin-top: 6px;
+  }
+
+  .caixa-informativa {
+    background-color: rgba(0, 0, 0, 0.03);
+    border: var(--borda-suave);
+    border-radius: 8px;
+    padding: 14px;
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  body.tema-escuro .caixa-informativa,
+  body.tema-escuro .caixa-selecao-usuarios {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: #444 !important;
+  }
+
+  .caixa-selecao-usuarios {
+    background-color: rgba(0, 0, 0, 0.02);
+    padding: 15px;
+    border-radius: 8px;
+    border: var(--borda-suave);
+  }
+
+  .acoes-formulario {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .tabela-mukirana {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .tabela-mukirana th,
+  .tabela-mukirana td {
+    padding: 16px;
+    border-bottom: var(--borda-suave);
+    vertical-align: top;
+  }
+
+  .badge-ativo {
+    background: var(--cor-sucesso-fundo);
+    color: var(--cor-sucesso-texto);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .badge-inativo {
+    background: var(--cor-erro-fundo);
+    color: var(--cor-erro-texto);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .badge-titular {
+    background: #E3F2FD;
+    color: #1976D2;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 6px;
+  }
+
+  .badge-adicional {
+    background: var(--cor-alerta-fundo);
+    color: var(--cor-alerta-texto);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 6px;
+  }
+
+  .lista-cartoes-fisicos {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .item-cartao-fisico {
+    font-size: 13px;
+    color: var(--cor-texto-principal);
+    line-height: 1.4;
+  }
+
+  .botao-cartao-fisico {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border: var(--borda-suave);
+    border-radius: 8px;
+    background: var(--cor-superficie-secundaria);
+    color: var(--cor-texto-principal);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .botao-cartao-fisico:hover,
+  .botao-cartao-fisico:focus-visible {
+    background: rgba(76, 175, 80, 0.08);
+    border-color: var(--cor-primaria);
+    outline: none;
+  }
+
+  .cartao-fisico-meta {
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  #tabela-grupos-cartoes-html th:nth-child(5),
+  #tabela-grupos-cartoes-html td:nth-child(5) {
+    white-space: nowrap;
+    min-width: 92px;
+  }
+
+  .estado-vazio {
+    text-align: center;
+    padding: 40px;
+    display: none;
+  }
+
+  .linha-inativa {
+    opacity: 0.65;
+  }
+
+  @media (max-width: 800px) {
+    .grupo-campo-duplo,
+    .grupo-campo-triplo {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .lista-cartoes-fisicos {
+      align-items: flex-start;
+    }
+
+    .lista-linhas-wrap .tabela-mukirana.lista-linhas-mukirana {
+      min-width: 760px;
+    }
+  }
+</style>
+
+<div class="cartao" style="margin-bottom: 12px; display:none;">
+  <div class="grupo-campo-duplo">
+    <div class="grupo-campo" style="margin-bottom: 0;">
+      <label for="cartoes_mes_inicial">Mes inicial</label>
+      <input type="month" id="cartoes_mes_inicial" onchange="aoAlterarPeriodoCartao()">
+    </div>
+    <div class="grupo-campo" style="margin-bottom: 0;">
+      <label for="cartoes_mes_final">Mes final (opcional)</label>
+      <input type="month" id="cartoes_mes_final" onchange="aoAlterarPeriodoCartao()">
+    </div>
+  </div>
+  <div class="texto-ajuda" style="margin-top: 8px;">
+    O limite e a fatura sao calculados no periodo fechado selecionado. Abra a fatura ou os lancamentos sem sair do contexto do cartao.
+  </div>
+</div>
+
+<div class="cabecalho-tela">
+  <h2>Grupos de Cartões / Faturas</h2>
+  <button class="btn-primario" data-topbar-label="+ Novo Grupo" onclick="abrirFormularioGrupoCartao()">+ Novo Grupo</button>
+</div>
+
+<div id="container-form-grupo-cartao" class="cartao" style="display: none;">
+  <h3 id="titulo-form-grupo-cartao">Cadastrar Grupo de Cartões</h3>
+
+  <div class="caixa-informativa">
+    <strong>Como funciona:</strong><br>
+    O grupo representa a fatura consolidada paga pelo titular. O cartão físico do titular e os cartões físicos adicionais
+    pertencem ao mesmo grupo. Nos lançamentos, a origem será o cartão físico usado. O acerto financeiro entre pessoas
+    será tratado futuramente pelo módulo de rateios.
+  </div>
+
+  <form id="form-grupo-cartao" onsubmit="enviarFormularioGrupoCartao(event)">
+    <input type="hidden" id="id_grupo_cartao">
+
+    <div class="grupo-campo-triplo">
+      <div class="grupo-campo">
+        <label>Nome do Grupo/Fatura</label>
+        <input type="text" id="nome_grupo_cartao" required placeholder="Ex: Nubank Família, Itaú Casa">
+        <div class="texto-ajuda">Use um nome que identifique a fatura consolidada.</div>
+      </div>
+
+      <div class="grupo-campo">
+        <label>Limite Total (R$)</label>
+        <input type="text" inputmode="numeric" id="limite_grupo_cartao" oninput="mascaraMoeda(this)" required placeholder="0,00">
+      </div>
+
+      <div class="grupo-campo">
+        <label>Titular</label>
+        <input type="text" id="titular_grupo_cartao" disabled>
+        <div class="texto-ajuda">O titular é o usuário logado que cadastra o grupo.</div>
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label>Dia do Fechamento</label>
+        <input type="number" id="dia_fechamento_grupo_cartao" required min="1" max="31" placeholder="Ex: 5">
+      </div>
+
+      <div class="grupo-campo">
+        <label>Dia do Vencimento</label>
+        <input type="number" id="dia_vencimento_grupo_cartao" required min="1" max="31" placeholder="Ex: 12">
+      </div>
+    </div>
+
+    <div class="grupo-campo caixa-selecao-usuarios">
+      <label style="margin-bottom: 12px; color: var(--cor-texto-principal);">
+        Cartões físicos adicionais
+      </label>
+      <div class="texto-ajuda" style="margin-bottom: 12px;">
+        Selecione os usuários que terão cartão físico adicional vinculado a esta fatura.
+      </div>
+      <div id="lista-checkboxes-adicionais-cartao" style="max-height: 180px; overflow-y: auto;"></div>
+    </div>
+
+    <div class="acoes-formulario">
+      <button type="button" class="btn-secundario" onclick="fecharFormularioGrupoCartao()">Cancelar</button>
+      <button type="button" class="btn-secundario" id="btn-salvar-e-novo-grupo-cartao" onclick="solicitarSalvarENovoGrupoCartao()">Salvar + novo</button>
+      <button type="submit" class="btn-primario" id="btn-salvar-grupo-cartao" onclick="definirModoAposSalvarGrupoCartao('fechar')">Salvar Grupo</button>
+    </div>
+  </form>
+</div>
+
+<div class="cartao" id="container-lista-grupo-cartao">
+  <div class="lista-linhas-wrap">
+  <table class="tabela-mukirana lista-linhas-mukirana" id="tabela-grupos-cartoes-html">
+    <thead>
+      <tr>
+        <th>Grupo/Fatura</th>
+        <th>Fechamento / Venc.</th>
+        <th>Limite / Fatura</th>
+        <th>Cartões Físicos</th>
+        <th>Status</th>
+        <th style="text-align: right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-tabela-grupos-cartoes"></tbody>
+  </table>
+  </div>
+
+  <div id="estado-vazio-grupo-cartao" class="estado-vazio">
+    <h3 style="color: var(--cor-texto-principal); margin-bottom: 8px; font-size: 18px;">
+      Nenhum grupo de cartões cadastrado
+    </h3>
+    <p style="color: var(--cor-texto-secundario); margin-bottom: 24px; font-size: 14px;">
+      Cadastre uma fatura e vincule cartões físicos do titular e dos adicionais.
+    </p>
+    <button class="btn-primario" onclick="abrirFormularioGrupoCartao()">+ Criar Grupo</button>
+  </div>
+</div>
+
+<script>
+  /*
+   * Estado local da View.
+   * O token é usado apenas para autenticar chamadas ao servidor.
+   * Permissões reais continuam sendo verificadas no backend.
+   */
+  var gruposCartoesEmMemoria = [];
+  var gruposCartoesEstruturaEmMemoria = [];
+  var usuariosAtivosCartao = [];
+  var tokenSessaoCartao = localStorage.getItem('mukirana_token') || '';
+  var idLogadoCartao = localStorage.getItem('mukirana_id') || '';
+  var nomeLogadoCartao = localStorage.getItem('mukirana_nome') || 'Usuário';
+  var modoAposSalvarGrupoCartao = 'fechar';
+
+  inicializarTelaCartoes();
+
+  /**
+   * Inicializa a tela carregando usuários ativos e grupos de cartões.
+   * O carregamento de usuários vem primeiro porque o formulário depende da lista de adicionais.
+   */
+  function inicializarTelaCartoes() {
+    document.getElementById('titular_grupo_cartao').value = nomeLogadoCartao;
+    var filtroPeriodo = obterFiltrosPeriodoCartao();
+    document.getElementById('cartoes_mes_inicial').value = filtroPeriodo.Mes_Inicial || gerarMesAtualGrupoCartao();
+    document.getElementById('cartoes_mes_final').value = filtroPeriodo.Mes_Final || '';
+    gruposCartoesEstruturaEmMemoria = carregarEstruturaPersistenteGruposCartao_();
+
+    carregarUsuariosAtivosCartao(function() {
+      carregarTabelaGruposCartoes();
+    });
+  }
+
+  /**
+   * Carrega usuários ativos que podem ser selecionados como adicionais.
+   *
+   * @param {Function} callback Função opcional executada após carregar os usuários.
+   */
+  function carregarUsuariosAtivosCartao(callback) {
+    if (!tokenSessaoCartao) {
+      mostrarNotificacao("Sessão expirada. Faça login novamente.", "erro");
+      return;
+    }
+
+    google.script.run
+      .withSuccessHandler(function(usuarios) {
+        usuariosAtivosCartao = Array.isArray(usuarios) ? usuarios : [];
+        renderizarCheckboxesAdicionaisCartao([]);
+
+        if (typeof callback === 'function') {
+          callback();
+        }
+      })
+      .withFailureHandler(function(erro) {
+        mostrarNotificacao("Erro ao carregar usuários: " + erro.message, "erro");
+      })
+      .obterUsuariosAtivos(tokenSessaoCartao);
+  }
+
+  /**
+   * Carrega grupos de cartões/faturas acessíveis ao usuário logado.
+   */
+  function carregarTabelaGruposCartoes() {
+    var filtros = obterFiltrosPeriodoCartao();
+
+    google.script.run
+      .withSuccessHandler(function(grupos) {
+        var gruposRetornados = Array.isArray(grupos) ? grupos : [];
+
+        if (gruposRetornados.length === 0 && filtroPeriodoCartaoTemRecorte_(filtros)) {
+          carregarEstruturaFallbackGruposCartoes_(filtros);
+          return;
+        }
+
+        if (gruposRetornados.length === 0 && Array.isArray(gruposCartoesEmMemoria) && gruposCartoesEmMemoria.length > 0) {
+          atualizarEstruturaPersistenteGruposCartao_(gruposCartoesEmMemoria);
+        }
+
+        atualizarEstruturaPersistenteGruposCartao_(gruposRetornados);
+        gruposCartoesEmMemoria = montarListaVisivelGruposCartao_(gruposRetornados, filtros);
+        renderizarTabelaGruposCartoes();
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(erro) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao("Erro ao carregar grupos de cartões: " + erro.message, "erro");
+      })
+      .obterListaCartoes(tokenSessaoCartao, filtros);
+  }
+
+  function filtroPeriodoCartaoTemRecorte_(filtros) {
+    return !!(filtros && (filtros.Mes_Inicial || filtros.Mes_Final || filtros.Mes_Referencia));
+  }
+
+  function carregarEstruturaFallbackGruposCartoes_(filtrosOriginais) {
+    google.script.run
+      .withSuccessHandler(function(gruposEstruturais) {
+        var gruposBase = Array.isArray(gruposEstruturais) ? gruposEstruturais : [];
+        atualizarEstruturaPersistenteGruposCartao_(gruposBase);
+        gruposCartoesEmMemoria = montarListaVisivelGruposCartao_([], filtrosOriginais);
+        renderizarTabelaGruposCartoes();
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(erro) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao("Erro ao carregar a estrutura dos cartões: " + erro.message, "erro");
+      })
+      .obterListaCartoes(tokenSessaoCartao, {
+        Mes_Inicial: '',
+        Mes_Final: ''
+      });
+  }
+
+  function atualizarEstruturaPersistenteGruposCartao_(gruposRetornados) {
+    var mapaExistente = {};
+
+    if (!Array.isArray(gruposCartoesEstruturaEmMemoria) || gruposCartoesEstruturaEmMemoria.length === 0) {
+      gruposCartoesEstruturaEmMemoria = carregarEstruturaPersistenteGruposCartao_();
+    }
+
+    (gruposCartoesEstruturaEmMemoria || []).forEach(function(grupo) {
+      mapaExistente[grupo.ID_Grupo_Cartao] = grupo;
+    });
+
+    (gruposRetornados || []).forEach(function(grupo) {
+      mapaExistente[grupo.ID_Grupo_Cartao] = mesclarEstruturaGrupoCartao_(mapaExistente[grupo.ID_Grupo_Cartao], grupo);
+    });
+
+    gruposCartoesEstruturaEmMemoria = Object.keys(mapaExistente).map(function(idGrupo) {
+      return mapaExistente[idGrupo];
+    });
+
+    salvarEstruturaPersistenteGruposCartao_(gruposCartoesEstruturaEmMemoria);
+  }
+
+  function montarListaVisivelGruposCartao_(gruposRetornados, filtros) {
+    var gruposPorId = {};
+    var lista = [];
+    var baseEstrutural = Array.isArray(gruposCartoesEstruturaEmMemoria) && gruposCartoesEstruturaEmMemoria.length > 0
+      ? gruposCartoesEstruturaEmMemoria
+      : gruposCartoesEmMemoria;
+
+    if (Array.isArray(gruposRetornados) && gruposRetornados.length > 0) {
+      return gruposRetornados;
+    }
+
+    (gruposRetornados || []).forEach(function(grupo) {
+      gruposPorId[grupo.ID_Grupo_Cartao] = grupo;
+    });
+
+    (baseEstrutural || []).forEach(function(grupoBase) {
+      var grupoAtualizado = gruposPorId[grupoBase.ID_Grupo_Cartao];
+
+      if (grupoAtualizado) {
+        lista.push(grupoAtualizado);
+        return;
+      }
+
+      var grupoVisivel = copiarEstruturaGrupoCartao_(grupoBase);
+      grupoVisivel.Consolidado_Periodo = montarConsolidadoVazioGrupoCartaoFront_(grupoBase, filtros);
+      lista.push(grupoVisivel);
+    });
+
+    return lista;
+  }
+
+  function obterChaveEstruturaPersistenteGruposCartao_() {
+    return 'mukirana_cartoes_estrutura_' + (idLogadoCartao || 'usuario');
+  }
+
+  function carregarEstruturaPersistenteGruposCartao_() {
+    var bruto = localStorage.getItem(obterChaveEstruturaPersistenteGruposCartao_());
+
+    if (!bruto) {
+      return [];
+    }
+
+    try {
+      var lista = JSON.parse(bruto);
+      return Array.isArray(lista) ? lista : [];
+    } catch (erro) {
+      return [];
+    }
+  }
+
+  function salvarEstruturaPersistenteGruposCartao_(grupos) {
+    try {
+      localStorage.setItem(
+        obterChaveEstruturaPersistenteGruposCartao_(),
+        JSON.stringify(Array.isArray(grupos) ? grupos : [])
+      );
+    } catch (erro) {
+      if (window.console && console.warn) {
+        console.warn('Não foi possível guardar a estrutura de cartões no navegador.', erro);
+      }
+    }
+  }
+
+  function copiarEstruturaGrupoCartao_(grupo) {
+    return {
+      ID_Grupo_Cartao: grupo.ID_Grupo_Cartao,
+      ID_Titular: grupo.ID_Titular,
+      Nome_Grupo: grupo.Nome_Grupo,
+      Limite: grupo.Limite,
+      Dia_Fechamento: grupo.Dia_Fechamento,
+      Dia_Vencimento: grupo.Dia_Vencimento,
+      Ativo: grupo.Ativo === true,
+      Cartoes_Fisicos: Array.isArray(grupo.Cartoes_Fisicos)
+        ? grupo.Cartoes_Fisicos.map(function(cartao) {
+            return {
+              ID_Cartao: cartao.ID_Cartao,
+              ID_Grupo_Cartao: cartao.ID_Grupo_Cartao,
+              ID_Usuario: cartao.ID_Usuario,
+              Nome_Cartao: cartao.Nome_Cartao,
+              Tipo_Cartao: cartao.Tipo_Cartao,
+              Ativo: cartao.Ativo === true
+            };
+          })
+        : [],
+      Pode_Editar: grupo.Pode_Editar === true,
+      Pode_Excluir: grupo.Pode_Excluir === true,
+      Eh_Titular: grupo.Eh_Titular === true,
+      Eh_Adicional: grupo.Eh_Adicional === true
+    };
+  }
+
+  function mesclarEstruturaGrupoCartao_(grupoAnterior, grupoNovo) {
+    var base = grupoAnterior ? copiarEstruturaGrupoCartao_(grupoAnterior) : null;
+    var atual = copiarEstruturaGrupoCartao_(grupoNovo);
+    var mapaCartoes = {};
+
+    (base && Array.isArray(base.Cartoes_Fisicos) ? base.Cartoes_Fisicos : []).forEach(function(cartao) {
+      mapaCartoes[cartao.ID_Cartao] = cartao;
+    });
+
+    (Array.isArray(atual.Cartoes_Fisicos) ? atual.Cartoes_Fisicos : []).forEach(function(cartao) {
+      mapaCartoes[cartao.ID_Cartao] = cartao;
+    });
+
+    atual.Cartoes_Fisicos = Object.keys(mapaCartoes).map(function(idCartao) {
+      return mapaCartoes[idCartao];
+    });
+
+    return atual;
+  }
+
+  function montarConsolidadoVazioGrupoCartaoFront_(grupo, filtros) {
+    var limite = parseFloat(grupo && grupo.Limite);
+    if (isNaN(limite)) limite = 0;
+
+    return {
+      Mes_Inicial: filtros && filtros.Mes_Inicial ? filtros.Mes_Inicial : '',
+      Mes_Final: filtros && filtros.Mes_Final ? filtros.Mes_Final : '',
+      Limite_Total: limite,
+      Valor_Fatura: 0,
+      Valor_Recorrencias_Previstas: 0,
+      Quantidade_Lancamentos: 0,
+      Quantidade_Recorrencias_Previstas: 0,
+      Limite_Disponivel: limite,
+      Limite_Excedido: 0,
+      Percentual_Utilizado: 0
+    };
+  }
+
+  function aoAlterarPeriodoCartao() {
+    confirmarCarregamentoHistoricoCompletoCartao_(function() {
+      carregarTabelaGruposCartoes();
+    });
+  }
+
+  function confirmarCarregamentoHistoricoCompletoCartao_(callback) {
+    var filtros = obterFiltrosPeriodoCartao();
+
+    if (filtros.Mes_Inicial || filtros.Mes_Final) {
+      callback();
+      return;
+    }
+
+    confirmarAcao(
+      'Você deixou o mês inicial e o mês final em branco. A tela vai buscar todo o histórico de cartões, faturas e lançamentos, o que pode demorar mais. Deseja continuar?',
+      callback
+    );
+  }
+
+  /**
+   * Renderiza a tabela principal de grupos/faturas.
+   */
+  function renderizarTabelaGruposCartoes() {
+    var corpo = document.getElementById('corpo-tabela-grupos-cartoes');
+    var tabela = document.getElementById('tabela-grupos-cartoes-html');
+    var vazio = document.getElementById('estado-vazio-grupo-cartao');
+
+    corpo.innerHTML = '';
+
+    if (!gruposCartoesEmMemoria || gruposCartoesEmMemoria.length === 0) {
+      tabela.style.display = 'none';
+      vazio.style.display = 'block';
+      return;
+    }
+
+    gruposCartoesEmMemoria.sort(function(a, b) {
+      return (a.Nome_Grupo || "").localeCompare(b.Nome_Grupo || "");
+    });
+
+    tabela.style.display = 'table';
+    vazio.style.display = 'none';
+
+    gruposCartoesEmMemoria.forEach(function(grupo) {
+      var tr = document.createElement('tr');
+
+      if (!grupo.Ativo) {
+        tr.className = 'linha-inativa';
+      }
+
+      var statusClasse = grupo.Ativo ? 'badge-ativo' : 'badge-inativo';
+      var statusTexto = grupo.Ativo ? 'Ativo' : 'Inativo';
+
+      var consolidado = grupo.Consolidado_Periodo || {};
+      var limite = parseFloat(consolidado.Limite_Total !== undefined ? consolidado.Limite_Total : grupo.Limite);
+      var fatura = parseFloat(consolidado.Valor_Fatura || 0);
+      var disponivel = parseFloat(consolidado.Limite_Disponivel || 0);
+      var percentual = parseFloat(consolidado.Percentual_Utilizado || 0);
+      if (isNaN(limite)) limite = 0;
+      if (isNaN(fatura)) fatura = 0;
+      if (isNaN(disponivel)) disponivel = 0;
+      if (isNaN(percentual)) percentual = 0;
+
+      var limiteFormatado = "R$ " + limite.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      var faturaFormatada = "R$ " + fatura.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      var disponivelFormatado = "R$ " + disponivel.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      var podeEditar = grupo.Pode_Editar === true;
+      var textoBotaoStatus = grupo.Ativo ? 'Inativar' : 'Restaurar';
+
+      var celulaAcoes = '';
+
+      if (podeEditar) {
+        celulaAcoes =
+          '<button class="btn-acao" onclick="prepararEdicaoGrupoCartao(\'' + escaparAtributoCartao(grupo.ID_Grupo_Cartao) + '\')">✎ Editar</button>' +
+          '<button class="btn-acao" onclick="alternarStatusGrupoCartaoFront(\'' + escaparAtributoCartao(grupo.ID_Grupo_Cartao) + '\')">' + textoBotaoStatus + '</button>';
+      } else {
+        celulaAcoes = '<span style="font-size: 13px; color: #9E9E9E; font-style: italic;">Apenas leitura</span>';
+      }
+
+      tr.innerHTML =
+        '<td data-label="Grupo/Fatura">' +
+          '<strong>' + escaparHtmlCartao(grupo.Nome_Grupo || "Sem nome") + '</strong>' +
+          (grupo.Eh_Titular ? '<span class="badge-titular">Sou titular</span>' : '<span class="badge-adicional">Sou adicional</span>') +
+        '</td>' +
+        '<td data-label="Fechamento / Venc.">Dia ' + escaparHtmlCartao(grupo.Dia_Fechamento || "") + ' / Dia ' + escaparHtmlCartao(grupo.Dia_Vencimento || "") + '</td>' +
+        '<td data-label="Limite">' + escaparHtmlCartao(limiteFormatado) + '</td>' +
+        '<td data-label="Cartões Físicos">' + montarHtmlCartoesFisicos(grupo.Cartoes_Fisicos || []) + '</td>' +
+        '<td data-label="Status"><span class="' + statusClasse + '">' + statusTexto + '</span></td>' +
+        '<td data-label="Ações" style="text-align:right">' + celulaAcoes + '</td>';
+
+      var celulaLimite = tr.querySelector('td[data-label="Limite"]');
+      var celulaAcoesHtml = tr.querySelector('td:last-child');
+
+      if (celulaLimite) {
+        var recorrenciasTexto = consolidado && consolidado.Valor_Recorrencias_Previstas > 0
+          ? '<div class="texto-ajuda">Inclui R$ ' + escaparHtmlCartao(formatarMoedaGrupoCartao(consolidado.Valor_Recorrencias_Previstas)) + ' de recorrencias previstas.</div>'
+          : '';
+        celulaLimite.setAttribute('data-label', 'Limite / Fatura');
+        celulaLimite.innerHTML =
+          '<strong>' + escaparHtmlCartao(limiteFormatado) + '</strong>' +
+          '<div class="texto-ajuda" style="margin-top:4px;">Fatura: ' + escaparHtmlCartao(faturaFormatada) + ' · Disponivel: ' + escaparHtmlCartao(disponivelFormatado) + '</div>' +
+          '<div class="texto-ajuda">Uso do limite: ' + escaparHtmlCartao(formatarPercentualGrupoCartao(percentual)) + '</div>' +
+          recorrenciasTexto;
+      }
+
+      if (celulaAcoesHtml) {
+        var acoesContextuais =
+          '<button class="btn-acao" onclick="abrirFaturaGrupoCartao(\'' + escaparAtributoCartao(grupo.ID_Grupo_Cartao) + '\')">Fatura</button>';
+
+        if (podeEditar) {
+          acoesContextuais +=
+            '<button class="btn-acao" onclick="prepararEdicaoGrupoCartao(\'' + escaparAtributoCartao(grupo.ID_Grupo_Cartao) + '\')">Editar</button>' +
+            '<button class="btn-acao" onclick="alternarStatusGrupoCartaoFront(\'' + escaparAtributoCartao(grupo.ID_Grupo_Cartao) + '\')">' + textoBotaoStatus + '</button>';
+        }
+
+        celulaAcoesHtml.innerHTML = acoesContextuais;
+      }
+
+      if (tr.children[3]) {
+        tr.children[3].innerHTML = montarHtmlCartoesFisicosAcoes_(grupo.Cartoes_Fisicos || []);
+      }
+
+      corpo.appendChild(tr);
+    });
+  }
+
+  /**
+   * Monta a lista visual de cartões físicos vinculados ao grupo.
+   *
+   * @param {Array<Object>} cartoesFisicos Cartões físicos do grupo/fatura.
+   * @returns {string} HTML seguro para exibição.
+   */
+  function montarHtmlCartoesFisicos(cartoesFisicos) {
+    if (!cartoesFisicos || cartoesFisicos.length === 0) {
+      return '<span style="color:#9E9E9E; font-size:13px;">Nenhum cartão físico vinculado</span>';
+    }
+
+    var ordenados = cartoesFisicos.slice().sort(function(a, b) {
+      if (a.Tipo_Cartao === 'Titular' && b.Tipo_Cartao !== 'Titular') return -1;
+      if (a.Tipo_Cartao !== 'Titular' && b.Tipo_Cartao === 'Titular') return 1;
+      return (a.Nome_Cartao || "").localeCompare(b.Nome_Cartao || "");
+    });
+
+    var html = '<div class="lista-cartoes-fisicos">';
+
+    ordenados.forEach(function(c) {
+      var tipo = c.Tipo_Cartao === 'Titular' ? 'Titular' : 'Adicional';
+      var status = c.Ativo ? '' : ' <span style="color:#9E9E9E;">(inativo)</span>';
+      var nomeCartao = c.Nome_Cartao || 'Cartão';
+
+      html +=
+        '<div class="item-cartao-fisico">' +
+          '<strong>' + escaparHtmlCartao(c.Nome_Cartao || "Cartão") + '</strong>' +
+          ' <span style="color: var(--cor-texto-secundario);">[' + tipo + ']</span>' +
+          status +
+        '</div>';
+    });
+
+    html += '</div>';
+
+    return html;
+  }
+
+  function montarHtmlCartoesFisicosAcoes_(cartoesFisicos) {
+    if (!cartoesFisicos || cartoesFisicos.length === 0) {
+      return '<span style="color:#9E9E9E; font-size:13px;">Nenhum cartao fisico vinculado</span>';
+    }
+
+    var ordenados = cartoesFisicos.slice().sort(function(a, b) {
+      if (a.Tipo_Cartao === 'Titular' && b.Tipo_Cartao !== 'Titular') return -1;
+      if (a.Tipo_Cartao !== 'Titular' && b.Tipo_Cartao === 'Titular') return 1;
+      return (a.Nome_Cartao || '').localeCompare(b.Nome_Cartao || '');
+    });
+
+    var html = '<div class="lista-cartoes-fisicos">';
+
+    ordenados.forEach(function(cartao) {
+      var tipo = cartao.Tipo_Cartao === 'Titular' ? 'Titular' : 'Adicional';
+      var status = cartao.Ativo ? '' : ' <span style="color:#9E9E9E;">(inativo)</span>';
+      var nomeCartao = cartao.Nome_Cartao || 'Cartao';
+
+      html +=
+        '<div class="item-cartao-fisico">' +
+          '<button type="button" class="botao-cartao-fisico" title="Ver somente os lancamentos deste cartao no periodo escolhido"' +
+            ' onclick="abrirLancamentosCartaoFisico(\'' + escaparAtributoCartao(cartao.ID_Cartao) + '\')">' +
+            '<span><strong>' + escaparHtmlCartao(nomeCartao) + '</strong> <span style="color: var(--cor-texto-secundario);">[' + tipo + ']</span>' + status + '</span>' +
+            '<span class="cartao-fisico-meta">Ver lancamentos</span>' +
+          '</button>' +
+        '</div>';
+    });
+
+    html += '</div>';
+
+    return html;
+  }
+
+  /**
+   * Abre formulário para criação de novo grupo/fatura.
+   */
+  function abrirFormularioGrupoCartao() {
+    document.getElementById('form-grupo-cartao').reset();
+    definirModoAposSalvarGrupoCartao('fechar');
+
+    document.getElementById('id_grupo_cartao').value = '';
+    document.getElementById('titular_grupo_cartao').value = nomeLogadoCartao;
+    document.getElementById('titulo-form-grupo-cartao').innerText = 'Cadastrar Grupo de Cartões';
+
+    renderizarCheckboxesAdicionaisCartao([]);
+
+    document.getElementById('container-form-grupo-cartao').style.display = 'block';
+    document.getElementById('container-lista-grupo-cartao').style.display = 'none';
+  }
+
+  /**
+   * Fecha formulário e retorna para a listagem.
+   */
+  function fecharFormularioGrupoCartao() {
+    document.getElementById('container-form-grupo-cartao').style.display = 'none';
+    document.getElementById('container-lista-grupo-cartao').style.display = 'block';
+  }
+
+  function definirModoAposSalvarGrupoCartao(modo) {
+    modoAposSalvarGrupoCartao = modo === 'novo' ? 'novo' : 'fechar';
+  }
+
+  function solicitarSalvarENovoGrupoCartao() {
+    definirModoAposSalvarGrupoCartao('novo');
+
+    var formulario = document.getElementById('form-grupo-cartao');
+
+    if (formulario && typeof formulario.requestSubmit === 'function') {
+      formulario.requestSubmit();
+      return;
+    }
+
+    formulario.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  function atualizarEstadoBotoesSalvarGrupoCartao(salvando) {
+    var btnSalvar = document.getElementById('btn-salvar-grupo-cartao');
+    var btnSalvarENovo = document.getElementById('btn-salvar-e-novo-grupo-cartao');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#form-grupo-cartao',
+        idsProcessando: ['btn-salvar-grupo-cartao', 'btn-salvar-e-novo-grupo-cartao'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    btnSalvar.disabled = !!salvando;
+    btnSalvar.innerText = salvando ? 'Salvando...' : 'Salvar Grupo';
+    btnSalvarENovo.disabled = !!salvando;
+    btnSalvarENovo.innerText = salvando ? 'Salvando...' : 'Salvar + novo';
+  }
+
+  /**
+   * Prepara o formulário para edição de um grupo/fatura.
+   *
+   * @param {string} idGrupoCartao ID do grupo/fatura.
+   */
+  function prepararEdicaoGrupoCartao(idGrupoCartao) {
+    var grupo = gruposCartoesEmMemoria.find(function(g) {
+      return g.ID_Grupo_Cartao === idGrupoCartao;
+    });
+
+    if (!grupo) {
+      mostrarNotificacao("Grupo de cartões não encontrado na memória da tela.", "erro");
+      return;
+    }
+
+    if (grupo.Pode_Editar !== true) {
+      mostrarNotificacao("Apenas o titular pode editar este grupo de cartões.", "alerta");
+      return;
+    }
+
+    document.getElementById('id_grupo_cartao').value = grupo.ID_Grupo_Cartao;
+    document.getElementById('nome_grupo_cartao').value = grupo.Nome_Grupo || "";
+    document.getElementById('limite_grupo_cartao').value = formatarMoedaParaInput(grupo.Limite);
+    document.getElementById('dia_fechamento_grupo_cartao').value = grupo.Dia_Fechamento || "";
+    document.getElementById('dia_vencimento_grupo_cartao').value = grupo.Dia_Vencimento || "";
+    document.getElementById('titular_grupo_cartao').value = nomeLogadoCartao;
+
+    var idsAdicionaisAtivos = obterIdsAdicionaisAtivosDoGrupo(grupo);
+    renderizarCheckboxesAdicionaisCartao(idsAdicionaisAtivos);
+
+    document.getElementById('titulo-form-grupo-cartao').innerText = 'Editar Grupo de Cartões';
+
+    document.getElementById('container-form-grupo-cartao').style.display = 'block';
+    document.getElementById('container-lista-grupo-cartao').style.display = 'none';
+  }
+
+  /**
+   * Obtém IDs dos adicionais ativos do grupo.
+   *
+   * @param {Object} grupo Grupo/fatura carregado da memória.
+   * @returns {Array<string>} IDs dos adicionais ativos.
+   */
+  function obterIdsAdicionaisAtivosDoGrupo(grupo) {
+    var cartoes = grupo.Cartoes_Fisicos || [];
+
+    return cartoes
+      .filter(function(c) {
+        return c.Tipo_Cartao === 'Adicional' && c.Ativo === true;
+      })
+      .map(function(c) {
+        return c.ID_Usuario;
+      });
+  }
+
+  /**
+   * Renderiza checkboxes de usuários adicionais.
+   *
+   * @param {Array<string>} idsSelecionados IDs que devem iniciar marcados.
+   */
+  function renderizarCheckboxesAdicionaisCartao(idsSelecionados) {
+    var container = document.getElementById('lista-checkboxes-adicionais-cartao');
+    container.innerHTML = '';
+
+    var selecionados = Array.isArray(idsSelecionados) ? idsSelecionados : [];
+
+    if (!usuariosAtivosCartao || usuariosAtivosCartao.length === 0) {
+      container.innerHTML = '<p style="color: var(--cor-texto-secundario); font-size: 14px; margin: 0;">Nenhum outro usuário ativo disponível.</p>';
+      return;
+    }
+
+    usuariosAtivosCartao
+      .slice()
+      .sort(function(a, b) {
+        return (a.nome || "").localeCompare(b.nome || "");
+      })
+      .forEach(function(usuario) {
+        var idCheckbox = 'cb_adicional_cartao_' + usuario.id;
+        var checked = selecionados.indexOf(usuario.id) !== -1 ? 'checked' : '';
+
+        var linha = document.createElement('div');
+        linha.style.display = 'flex';
+        linha.style.alignItems = 'center';
+        linha.style.marginBottom = '10px';
+        linha.style.gap = '10px';
+
+        linha.innerHTML =
+          '<input type="checkbox" name="cb_adicional_cartao" value="' + escaparAtributoCartao(usuario.id) + '" id="' + escaparAtributoCartao(idCheckbox) + '" ' + checked + ' style="margin: 0; width: 18px; height: 18px; cursor: pointer;">' +
+          '<label for="' + escaparAtributoCartao(idCheckbox) + '" style="margin: 0; font-weight: normal; cursor: pointer; color: var(--cor-texto-principal); line-height: 1.2;">' +
+            '<strong>' + escaparHtmlCartao(usuario.nome || "Usuário") + '</strong>' +
+            '<span style="color: var(--cor-texto-secundario); font-size: 13px; margin-left: 4px;">(' + escaparHtmlCartao(usuario.email || "") + ')</span>' +
+          '</label>';
+
+        container.appendChild(linha);
+      });
+  }
+
+  /**
+   * Envia formulário para criação ou edição de grupo/fatura.
+   *
+   * @param {Event} evento Evento de submit do formulário.
+   */
+  function enviarFormularioGrupoCartao(evento) {
+    evento.preventDefault();
+    var modoSalvamento = modoAposSalvarGrupoCartao === 'novo' ? 'novo' : 'fechar';
+    atualizarEstadoBotoesSalvarGrupoCartao(true);
+
+    var idsAdicionais = Array.from(document.querySelectorAll('input[name="cb_adicional_cartao"]:checked'))
+      .map(function(cb) {
+        return cb.value;
+      })
+      .join(',');
+
+    var dados = {
+      ID_Grupo_Cartao: document.getElementById('id_grupo_cartao').value,
+      Nome_Grupo: document.getElementById('nome_grupo_cartao').value,
+      Limite: reverterMoeda(document.getElementById('limite_grupo_cartao').value),
+      Dia_Fechamento: document.getElementById('dia_fechamento_grupo_cartao').value,
+      Dia_Vencimento: document.getElementById('dia_vencimento_grupo_cartao').value,
+      IDs_Adicionais: idsAdicionais
+    };
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        atualizarEstadoBotoesSalvarGrupoCartao(false);
+        definirModoAposSalvarGrupoCartao('fechar');
+
+        if (modoSalvamento === 'novo') {
+          abrirFormularioGrupoCartao();
+        } else {
+          fecharFormularioGrupoCartao();
+        }
+
+        carregarTabelaGruposCartoes();
+
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(err) {
+        atualizarEstadoBotoesSalvarGrupoCartao(false);
+        definirModoAposSalvarGrupoCartao('fechar');
+
+        mostrarNotificacao(err.message, 'erro');
+      })
+      .processarSalvarCartao(dados, tokenSessaoCartao);
+  }
+
+  /**
+   * Solicita inativação ou restauração de um grupo/fatura.
+   *
+   * @param {string} idGrupoCartao ID do grupo/fatura.
+   */
+  function alternarStatusGrupoCartaoFront(idGrupoCartao) {
+    confirmarAcao("Você tem certeza que deseja inativar/restaurar este grupo de cartões?", function() {
+      google.script.run
+        .withSuccessHandler(function(msg) {
+          carregarTabelaGruposCartoes();
+          mostrarNotificacao(msg, "sucesso");
+        })
+        .withFailureHandler(function(err) {
+          mostrarNotificacao(err.message, "erro");
+        })
+        .alternarStatusCartao(idGrupoCartao, tokenSessaoCartao);
+    });
+  }
+
+  /**
+   * Escapa texto para uso seguro em HTML.
+   *
+   * @param {*} valor Valor original.
+   * @returns {string} Texto escapado.
+   */
+  function escaparHtmlCartao(valor) {
+    if (valor === null || valor === undefined) return '';
+
+    return valor.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  /**
+   * Escapa texto para uso seguro em atributos HTML.
+   *
+   * @param {*} valor Valor original.
+   * @returns {string} Texto escapado.
+   */
+  function escaparAtributoCartao(valor) {
+    return escaparHtmlCartao(valor);
+  }
+
+  function obterFiltrosPeriodoCartao() {
+    if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
+      return obterFiltroPeriodoGlobalMukirana();
+    }
+
+    return {
+      Mes_Inicial: document.getElementById('cartoes_mes_inicial').value || '',
+      Mes_Final: document.getElementById('cartoes_mes_final').value || ''
+    };
+  }
+
+  if (typeof registrarTelaAtualMukirana === 'function') {
+    registrarTelaAtualMukirana('Cartoes', {
+      atualizarPeriodoGlobal: function() {
+        carregarTabelaGruposCartoes();
+      },
+      obterContextoNovoLancamento: function() {
+        return obterFiltrosPeriodoCartao();
+      }
+    });
+  }
+
+  function gerarMesAtualGrupoCartao() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  }
+
+  function formatarPercentualGrupoCartao(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+
+    return numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: numero % 1 === 0 ? 0 : 1,
+      maximumFractionDigits: 1
+    }) + '%';
+  }
+
+  function formatarMoedaGrupoCartao(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+
+    return numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function abrirFaturaGrupoCartao(idGrupoCartao) {
+    var filtros = obterFiltrosPeriodoCartao();
+
+    localStorage.setItem('mukirana_fatura_cartao', JSON.stringify({
+      ID_Grupo_Cartao: idGrupoCartao,
+      Mes_Inicial: filtros.Mes_Inicial,
+      Mes_Final: filtros.Mes_Final
+    }));
+
+    navegarPara('FaturasCartao');
+  }
+
+  function abrirLancamentosGrupoCartao(idGrupoCartao) {
+    if (typeof abrirLancamentosContextuaisMukirana !== 'function') {
+      return;
+    }
+
+    var filtros = obterFiltrosPeriodoCartao();
+    var grupo = gruposCartoesEmMemoria.find(function(item) {
+      return item.ID_Grupo_Cartao === idGrupoCartao;
+    });
+    var nomeGrupo = grupo ? (grupo.Nome_Grupo || 'Fatura') : 'Fatura';
+
+    abrirLancamentosContextuaisMukirana({
+      ID_Grupo_Cartao: idGrupoCartao,
+      Mes_Inicial: filtros.Mes_Inicial,
+      Mes_Final: filtros.Mes_Final,
+      Titulo: 'Lançamentos do cartão',
+      Subtitulo: 'Este contexto mostra somente os lançamentos desta fatura no período fechado escolhido.',
+      Nome_Contexto: nomeGrupo,
+      Resumo_Contexto: 'Você está vendo somente os lançamentos desta fatura. Limpar filtros mantém este cartão e o período de origem.'
+    });
+  }
+  function abrirLancamentosCartaoFisico(idCartao) {
+    if (typeof abrirLancamentosContextuaisMukirana !== 'function') {
+      return;
+    }
+
+    var filtros = obterFiltrosPeriodoCartao();
+    var cartaoEncontrado = null;
+
+    gruposCartoesEmMemoria.some(function(grupo) {
+      var cartao = (grupo.Cartoes_Fisicos || []).find(function(item) {
+        return item.ID_Cartao === idCartao;
+      });
+
+      if (!cartao) {
+        return false;
+      }
+
+      cartaoEncontrado = cartao;
+      return true;
+    });
+
+    if (!cartaoEncontrado) {
+      mostrarNotificacao('Cartao fisico nao encontrado no contexto atual.', 'erro');
+      return;
+    }
+
+    abrirLancamentosContextuaisMukirana({
+      ID_Cartao: idCartao,
+      Mes_Inicial: filtros.Mes_Inicial,
+      Mes_Final: filtros.Mes_Final,
+      Titulo: 'Lancamentos do cartao',
+      Subtitulo: 'Este contexto mostra somente os lancamentos do cartao selecionado no periodo fechado escolhido.',
+      Nome_Contexto: cartaoEncontrado.Nome_Cartao || 'Cartao',
+      Resumo_Contexto: 'Voce esta vendo somente os lancamentos deste cartao. Limpar filtros mantem o cartao e o periodo de origem.'
+    });
+  }
+</script>

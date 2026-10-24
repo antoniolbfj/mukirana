@@ -1,0 +1,1390 @@
+<style>
+  .lancamento-cabecalho-linha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lancamento-subtitulo-tela {
+    margin: 4px 0 0 0;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .lancamento-acao-icone {
+    min-width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fatura-topo {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .fatura-filtros {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    gap: 10px;
+    max-width: 420px;
+  }
+
+  .fatura-filtros-acoes {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    grid-column: 1 / -1;
+  }
+
+  .fatura-resumo {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .fatura-resumo-item {
+    border: var(--borda-suave);
+    border-radius: var(--raio-card);
+    background: var(--cor-superficie);
+    padding: 14px;
+  }
+
+  .fatura-resumo-item span {
+    display: block;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .fatura-resumo-item strong {
+    color: var(--cor-texto-principal);
+    font-size: 20px;
+  }
+
+  .fatura-limite-bloco {
+    margin-top: 12px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-card);
+    padding: 14px;
+    background: var(--cor-superficie);
+  }
+
+  .fatura-limite-topo {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .fatura-limite-topo strong {
+    color: var(--cor-texto-principal);
+    font-size: 18px;
+  }
+
+  .fatura-limite-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+  }
+
+  .fatura-limite-barra {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  .fatura-limite-progresso {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #53B88A, #F0B24B);
+  }
+
+  .fatura-limite-alerta {
+    color: var(--cor-erro-texto);
+    font-weight: 700;
+  }
+
+  .fatura-subtotais {
+    display: grid;
+    gap: 10px;
+  }
+
+  .fatura-subtotal {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    padding: 12px;
+    background: var(--cor-superficie-secundaria);
+  }
+
+  .fatura-subtotal-clicavel {
+    cursor: pointer;
+    transition: transform 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+  }
+
+  .fatura-subtotal-clicavel:hover {
+    transform: translateY(-1px);
+    border-color: var(--cor-primaria);
+    background: rgba(31, 136, 97, 0.08);
+  }
+
+  .fatura-subtotal strong,
+  .fatura-subtotal span {
+    color: var(--cor-texto-principal);
+  }
+
+  .fatura-tabela-compacta th,
+  .fatura-tabela-compacta td {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    vertical-align: middle;
+  }
+
+  .fatura-checkbox-coluna {
+    width: 42px;
+    text-align: center;
+  }
+
+  .fatura-checkbox-coluna input {
+    width: 16px;
+    height: 16px;
+    min-height: 16px;
+    margin: 0;
+  }
+
+  .fatura-toolbar-lote {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 10px 0;
+    padding: 10px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie-secundaria);
+  }
+
+  .fatura-toolbar-lote.visivel {
+    display: flex;
+  }
+
+  .fatura-toolbar-lote span {
+    display: block;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .fatura-linha-selecionada {
+    background: rgba(31, 136, 97, 0.08);
+  }
+
+  .fatura-acoes-lote {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .fatura-acoes-lote select {
+    min-width: 180px;
+    padding: 10px;
+  }
+
+  .fatura-valor-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .fatura-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .fatura-linha-secundaria {
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .fatura-pagamentos-lista {
+    display: grid;
+    gap: 8px;
+  }
+
+  .fatura-pagamento-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    padding: 10px 12px;
+    background: var(--cor-superficie-secundaria);
+  }
+
+  .fatura-pagamento-item span {
+    display: block;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+  }
+
+  .fatura-pagamento-acoes {
+    display: inline-flex;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  .fatura-modal-pagamento {
+    position: fixed;
+    inset: 0;
+    z-index: 2400;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(0, 0, 0, 0.42);
+  }
+
+  .fatura-modal-pagamento.visivel {
+    display: flex;
+  }
+
+  .fatura-modal-caixa {
+    width: min(520px, 100%);
+    border: var(--borda-suave);
+    border-radius: var(--raio-card);
+    background: var(--cor-superficie);
+    box-shadow: var(--sombra-fab);
+    padding: 18px;
+  }
+
+  .fatura-modal-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  @media (max-width: 900px) {
+    .fatura-resumo {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .fatura-topo {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .fatura-filtros,
+    .fatura-resumo {
+      grid-template-columns: 1fr;
+      max-width: none;
+    }
+
+    .fatura-filtros-acoes {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .fatura-filtros-acoes button {
+      width: 100%;
+    }
+
+    .fatura-subtotal {
+      flex-direction: column;
+    }
+
+    .fatura-toolbar-lote {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .fatura-acoes-lote {
+      justify-content: flex-start;
+    }
+
+    .fatura-pagamento-item {
+      grid-template-columns: 1fr;
+    }
+
+    .fatura-modal-pagamento {
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 8px;
+    }
+
+    .fatura-modal-caixa {
+      width: 100%;
+      max-height: calc(100vh - 16px);
+      max-height: calc(100dvh - 16px);
+      overflow: auto;
+      padding: 14px;
+    }
+
+    .fatura-modal-acoes {
+      flex-direction: column-reverse;
+      align-items: stretch;
+    }
+
+    .fatura-modal-acoes button {
+      width: 100%;
+    }
+
+    .fatura-lista-linhas .tabela-mukirana.lista-linhas-mukirana {
+      min-width: 860px;
+    }
+  }
+</style>
+
+<div class="cabecalho-tela">
+  <div>
+    <div class="lancamento-cabecalho-linha">
+      <h2>Fatura do Cartao</h2>
+      <button
+        type="button"
+        class="ajuda-inline"
+        onclick="mostrarBalaoAjuda(event, 'A fatura mostra o consolidado do periodo fechado escolhido. Voce pode abrir, revisar e editar lancamentos sem sair desta tela.')"
+        aria-label="Ajuda sobre a fatura"
+      >
+        <span class="material-symbols-outlined">info</span>
+      </button>
+    </div>
+    <p class="lancamento-subtitulo-tela" id="fatura_resumo_periodo">O periodo fechado usa mes inicial e mes final opcional.</p>
+  </div>
+</div>
+
+<div class="fatura-topo">
+  <div class="caixa-informativa" style="margin:0; flex:1;">
+    <strong>Como funciona:</strong><br>
+    A tela mostra compras, pagamentos e saldo em aberto da fatura. Para pagar cartao, use o botao Pagar fatura; nao cadastre esse pagamento como despesa.
+    <div style="margin-top:10px;">
+      <button type="button" class="btn-primario" onclick="abrirModalPagamentoFaturaCartao()">Pagar fatura</button>
+    </div>
+  </div>
+
+  <div class="fatura-filtros" style="display:none;">
+    <div class="grupo-campo" style="margin-bottom:0;">
+      <label for="fatura_mes">Mes inicial</label>
+      <input type="month" id="fatura_mes">
+    </div>
+    <div class="grupo-campo" style="margin-bottom:0;">
+      <label for="fatura_mes_final">Mes final (opcional)</label>
+      <input type="month" id="fatura_mes_final">
+    </div>
+    <div class="fatura-filtros-acoes">
+      <button type="button" class="btn-primario" onclick="aplicarFiltrosFaturaCartao()">Aplicar filtros</button>
+      <button type="button" class="btn-secundario" onclick="limparFiltrosFaturaCartao()">Limpar filtros</button>
+    </div>
+  </div>
+</div>
+
+<div class="fatura-resumo">
+  <div class="fatura-resumo-item">
+    <span>Fatura</span>
+    <strong id="fatura_nome">-</strong>
+  </div>
+  <div class="fatura-resumo-item">
+    <span>Total do periodo</span>
+    <strong id="fatura_total">R$ 0,00</strong>
+    <span id="fatura_total_recorrencias" class="fatura-valor-meta"></span>
+  </div>
+  <div class="fatura-resumo-item">
+    <span>Pago</span>
+    <strong id="fatura_pago">R$ 0,00</strong>
+  </div>
+  <div class="fatura-resumo-item">
+    <span>Em aberto</span>
+    <strong id="fatura_em_aberto">R$ 0,00</strong>
+  </div>
+  <div class="fatura-resumo-item">
+    <span>Lancamentos</span>
+    <strong id="fatura_qtd">0</strong>
+  </div>
+  <div class="fatura-resumo-item">
+    <span>Limite disponivel</span>
+    <strong id="fatura_limite_disponivel">R$ 0,00</strong>
+  </div>
+</div>
+
+<div class="fatura-limite-bloco">
+  <div class="fatura-limite-topo">
+    <div>
+      <span style="display:block; color:var(--cor-texto-secundario); font-size:12px;">Uso do limite</span>
+      <strong id="fatura_limite_topo">R$ 0,00 de R$ 0,00</strong>
+    </div>
+    <strong id="fatura_percentual">0%</strong>
+  </div>
+  <div class="fatura-limite-meta">
+    <span id="fatura_meta_fechamento">Fechamento: -</span>
+    <span id="fatura_meta_vencimento">Vencimento: -</span>
+    <span id="fatura_meta_excedido"></span>
+  </div>
+  <div class="fatura-limite-barra">
+    <div id="fatura_limite_progresso" class="fatura-limite-progresso" style="width:0%;"></div>
+  </div>
+</div>
+
+<div id="modal-pagamento-fatura" class="fatura-modal-pagamento" onclick="fecharModalPagamentoFaturaCartaoAoClicarFora(event)">
+  <div class="fatura-modal-caixa">
+    <h3 id="titulo-modal-pagamento-fatura" style="margin-bottom:6px;">Pagar fatura</h3>
+    <p class="texto-ajuda" style="margin-bottom:12px;">
+      O pagamento reduz o saldo da conta escolhida e abate o valor em aberto desta fatura. Ele nao entra como despesa, receita ou orcamento.
+    </p>
+    <input type="hidden" id="pag_fatura_id">
+    <div class="grid-2">
+      <div class="grupo-campo">
+        <label for="pag_fatura_conta">Conta de origem</label>
+        <select id="pag_fatura_conta"></select>
+      </div>
+      <div class="grupo-campo">
+        <label for="pag_fatura_valor">Valor pago</label>
+        <input type="text" id="pag_fatura_valor" placeholder="0,00" oninput="mascaraMoeda(this)">
+      </div>
+      <div class="grupo-campo">
+        <label for="pag_fatura_data">Data do pagamento</label>
+        <input type="date" id="pag_fatura_data">
+      </div>
+      <div class="grupo-campo">
+        <label for="pag_fatura_status">Status</label>
+        <select id="pag_fatura_status">
+          <option value="Efetivado">Efetivado</option>
+          <option value="Pendente">Pendente</option>
+        </select>
+      </div>
+    </div>
+    <div class="grupo-campo">
+      <label for="pag_fatura_observacao">Observacao</label>
+      <input type="text" id="pag_fatura_observacao" placeholder="Opcional">
+    </div>
+    <div class="fatura-modal-acoes">
+      <button type="button" class="btn-secundario" onclick="fecharModalPagamentoFaturaCartao()">Cancelar</button>
+      <button type="button" class="btn-primario" id="btn-salvar-pagamento-fatura" onclick="salvarPagamentoFaturaCartao()">Salvar pagamento</button>
+    </div>
+  </div>
+</div>
+
+<div class="cartao">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
+    <h3 style="margin:0;">Subtotal por Cart&atilde;o</h3>
+    <button type="button" class="btn-secundario" onclick="abrirLancamentosDaFatura()">Ver lançamentos deste período</button>
+  </div>
+  <div id="fatura_subtotais" class="fatura-subtotais"></div>
+</div>
+
+<div class="cartao">
+  <h3>Pagamentos da fatura</h3>
+  <div id="fatura_pagamentos" class="fatura-pagamentos-lista"></div>
+</div>
+
+<div class="cartao">
+  <h3>Lancamentos da fatura</h3>
+  <div id="toolbar-lote-fatura" class="fatura-toolbar-lote">
+    <div>
+      <strong id="contador-selecao-fatura">0 lancamentos selecionados</strong>
+      <span>As acoes em lote respeitam as mesmas permissoes da tela de lancamentos.</span>
+      <span id="resumo-total-fatura">Total visivel: R$ 0,00</span>
+      <span id="resumo-selecao-fatura">Total selecionado: R$ 0,00</span>
+    </div>
+    <div class="fatura-acoes-lote">
+      <select id="acao-lote-status-fatura" aria-label="Novo status dos lancamentos selecionados">
+        <option value="Efetivado">Marcar como efetivado</option>
+        <option value="Pendente">Marcar como pendente</option>
+      </select>
+      <button type="button" class="btn-secundario" onclick="alterarStatusSelecionadosFaturaCartao()">Aplicar status</button>
+      <button type="button" class="btn-secundario btn-perigo" onclick="excluirSelecionadosFaturaCartao()">Excluir selecionados</button>
+      <button type="button" class="btn-secundario" onclick="limparSelecaoFaturaCartao()">Limpar</button>
+    </div>
+  </div>
+  <div class="lista-linhas-wrap lista-linhas-densa fatura-lista-linhas">
+  <table class="tabela-mukirana lista-linhas-mukirana fatura-tabela-compacta" id="tabela-fatura-cartao">
+    <thead>
+      <tr>
+        <th class="fatura-checkbox-coluna">
+          <input type="checkbox" id="check-todos-fatura" aria-label="Selecionar todos os lancamentos visiveis da fatura" onchange="alternarSelecaoTodosFaturaCartao(this.checked)">
+        </th>
+        <th>Data</th>
+        <th>Descricao</th>
+        <th>Categoria</th>
+        <th>Cartao</th>
+        <th style="text-align:right;">Valor</th>
+        <th>Status</th>
+        <th style="text-align:right;">Acoes</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-fatura-cartao"></tbody>
+  </table>
+  </div>
+  <div id="estado-vazio-fatura" class="estado-vazio" style="display:none;">
+    <h3>Nenhum lancamento nesta fatura</h3>
+    <p>Altere o periodo fechado ou registre lancamentos em cartoes deste grupo.</p>
+  </div>
+</div>
+
+<script>
+  var tokenSessaoFaturaCartao = localStorage.getItem('mukirana_token') || '';
+  var parametrosFaturaCartao = obterParametrosFaturaCartao();
+  var pacoteFaturaCartao = null;
+  var selecaoLancamentosFaturaCartao = {};
+
+  inicializarFaturaCartao();
+
+  function inicializarFaturaCartao() {
+    aplicarPeriodoGlobalFaturaCartao_();
+
+    if (typeof registrarTelaAtualMukirana === 'function') {
+      registrarTelaAtualMukirana('FaturasCartao', {
+        obterContextoNovoLancamento: function() {
+          var periodo = obterPeriodoGlobalFaturaCartao_();
+          return {
+            Mes_Referencia: periodo.Mes_Inicial || '',
+            Mes_Inicial: periodo.Mes_Inicial || '',
+            Mes_Final: periodo.Mes_Final || '',
+            ID_Grupo_Cartao: parametrosFaturaCartao.ID_Grupo_Cartao || ''
+          };
+        },
+        atualizarPeriodoGlobal: function() {
+          aplicarPeriodoGlobalFaturaCartao_();
+          carregarFaturaCartao();
+        }
+      });
+    }
+
+    if (typeof registrarAtualizacaoTelaContextualMukirana === 'function') {
+      registrarAtualizacaoTelaContextualMukirana(carregarFaturaCartao);
+    }
+
+    carregarFaturaCartao();
+  }
+
+  function obterPeriodoGlobalFaturaCartao_() {
+    if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
+      var periodo = obterFiltroPeriodoGlobalMukirana() || {};
+      return {
+        Mes_Inicial: periodo.Mes_Inicial || periodo.Mes_Referencia || gerarMesAtualFaturaCartao(),
+        Mes_Final: periodo.Mes_Final || ''
+      };
+    }
+
+    return {
+      Mes_Inicial: document.getElementById('fatura_mes').value || parametrosFaturaCartao.Mes_Inicial || parametrosFaturaCartao.Mes_Referencia || gerarMesAtualFaturaCartao(),
+      Mes_Final: document.getElementById('fatura_mes_final').value || ''
+    };
+  }
+
+  function aplicarPeriodoGlobalFaturaCartao_() {
+    var periodo = obterPeriodoGlobalFaturaCartao_();
+    document.getElementById('fatura_mes').value = periodo.Mes_Inicial || gerarMesAtualFaturaCartao();
+    document.getElementById('fatura_mes_final').value = periodo.Mes_Final || '';
+  }
+
+  function carregarFaturaCartao() {
+    aplicarPeriodoGlobalFaturaCartao_();
+    var periodo = obterPeriodoGlobalFaturaCartao_();
+
+    google.script.run
+      .withSuccessHandler(function(pacote) {
+        pacoteFaturaCartao = pacote || {};
+        renderizarFaturaCartao();
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(erro) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao("Erro ao carregar fatura: " + erro.message, "erro");
+      })
+      .obterPacoteFaturaCartao(tokenSessaoFaturaCartao, {
+        ID_Grupo_Cartao: parametrosFaturaCartao.ID_Grupo_Cartao,
+        Mes_Referencia: periodo.Mes_Inicial,
+        Mes_Inicial: periodo.Mes_Inicial,
+        Mes_Final: periodo.Mes_Final
+      });
+  }
+
+  function aplicarFiltrosFaturaCartao() {
+    confirmarCarregamentoHistoricoCompletoFaturaCartao_(function() {
+      carregarFaturaCartao();
+    });
+  }
+
+  function limparFiltrosFaturaCartao() {
+    aplicarPeriodoGlobalFaturaCartao_();
+    carregarFaturaCartao();
+  }
+
+  function confirmarCarregamentoHistoricoCompletoFaturaCartao_(callback) {
+    var periodo = obterPeriodoGlobalFaturaCartao_();
+    var mesInicial = periodo.Mes_Inicial || '';
+    var mesFinal = periodo.Mes_Final || '';
+
+    if (mesInicial || mesFinal) {
+      callback();
+      return;
+    }
+
+    confirmarAcao(
+      'Você deixou o mês inicial e o mês final em branco. A tela vai buscar todo o histórico da fatura e pode demorar mais. Deseja continuar?',
+      callback
+    );
+  }
+
+  function renderizarFaturaCartao() {
+    var lancamentos = pacoteFaturaCartao.Lancamentos || [];
+    var total = pacoteFaturaCartao.Valor_Total || 0;
+    var totalRecorrenciasPrevistas = pacoteFaturaCartao.Valor_Recorrencias_Previstas || 0;
+    var pago = pacoteFaturaCartao.Valor_Pago || 0;
+    var emAberto = pacoteFaturaCartao.Valor_Em_Aberto || 0;
+    var limite = pacoteFaturaCartao.Limite_Total || 0;
+    var disponivel = pacoteFaturaCartao.Limite_Disponivel || 0;
+    var excedido = pacoteFaturaCartao.Limite_Excedido || 0;
+    var percentual = pacoteFaturaCartao.Percentual_Utilizado || 0;
+    var progresso = Math.min(100, Math.max(0, percentual));
+
+    document.getElementById('fatura_nome').textContent = pacoteFaturaCartao.Nome_Grupo || 'Fatura';
+    document.getElementById('fatura_total').textContent = 'R$ ' + formatarNumeroFaturaCartao(total);
+    document.getElementById('fatura_total_recorrencias').textContent = totalRecorrenciasPrevistas > 0
+      ? 'Inclui R$ ' + formatarNumeroFaturaCartao(totalRecorrenciasPrevistas) + ' de recorrencias previstas.'
+      : '';
+    document.getElementById('fatura_pago').textContent = 'R$ ' + formatarNumeroFaturaCartao(pago);
+    document.getElementById('fatura_em_aberto').textContent = 'R$ ' + formatarNumeroFaturaCartao(emAberto);
+    document.getElementById('fatura_qtd').textContent = lancamentos.length;
+    document.getElementById('fatura_limite_disponivel').textContent = 'R$ ' + formatarNumeroFaturaCartao(disponivel);
+    document.getElementById('fatura_limite_topo').textContent = 'R$ ' + formatarNumeroFaturaCartao(total) + ' de R$ ' + formatarNumeroFaturaCartao(limite);
+    document.getElementById('fatura_percentual').textContent = formatarPercentualFaturaCartao(percentual);
+    document.getElementById('fatura_limite_progresso').style.width = progresso + '%';
+    document.getElementById('fatura_meta_fechamento').textContent = 'Fechamento: dia ' + (pacoteFaturaCartao.Dia_Fechamento || '-');
+    document.getElementById('fatura_meta_vencimento').textContent = 'Vencimento: dia ' + (pacoteFaturaCartao.Dia_Vencimento || '-');
+    document.getElementById('fatura_resumo_periodo').textContent = pacoteFaturaCartao.Resumo_Periodo || 'Periodo fechado do contexto atual.';
+    document.getElementById('fatura_meta_excedido').textContent = excedido > 0
+      ? 'Limite excedido em R$ ' + formatarNumeroFaturaCartao(excedido)
+      : 'Uso dentro do limite cadastrado';
+    document.getElementById('fatura_meta_excedido').className = excedido > 0 ? 'fatura-limite-alerta' : '';
+
+    renderizarSubtotaisFaturaCartao();
+    renderizarPagamentosFaturaCartao();
+    renderizarLancamentosFaturaCartao();
+    executarAcaoPendentePagamentoFaturaCartao_();
+  }
+
+  function renderizarPagamentosFaturaCartao() {
+    var container = document.getElementById('fatura_pagamentos');
+    var pagamentos = pacoteFaturaCartao.Pagamentos || [];
+    container.innerHTML = '';
+
+    if (pagamentos.length === 0) {
+      container.innerHTML = '<div class="texto-ajuda">Nenhum pagamento registrado para esta fatura.</div>';
+      return;
+    }
+
+    pagamentos.forEach(function(pagamento) {
+      var item = document.createElement('div');
+      item.className = 'fatura-pagamento-item';
+      item.innerHTML =
+        '<div>' +
+          '<strong>' + escaparHtmlFaturaCartao(pagamento.Nome_Conta || 'Conta') + '</strong>' +
+          '<span>' + formatarDataFaturaCartao(pagamento.Data_Pagamento) + ' · ' + escaparHtmlFaturaCartao(pagamento.Status || '') +
+            (pagamento.Observacao ? ' · ' + escaparHtmlFaturaCartao(pagamento.Observacao) : '') +
+          '</span>' +
+        '</div>' +
+        '<strong>R$ ' + formatarNumeroFaturaCartao(pagamento.Valor || 0) + '</strong>' +
+        '<div class="fatura-pagamento-acoes">' +
+          '<button type="button" class="btn-acao lancamento-acao-icone" title="Editar pagamento" onclick="abrirModalPagamentoFaturaCartaoPorId(\'' + escaparAtributoFaturaCartao(pagamento.ID_Pagamento_Fatura || '') + '\')"><span class="material-symbols-outlined">edit</span></button>' +
+          '<button type="button" class="btn-acao btn-perigo lancamento-acao-icone" title="Excluir pagamento" onclick="excluirPagamentoFaturaCartaoFront(\'' + escaparAtributoFaturaCartao(pagamento.ID_Pagamento_Fatura || '') + '\')"><span class="material-symbols-outlined">delete</span></button>' +
+        '</div>';
+      container.appendChild(item);
+    });
+  }
+
+  function abrirModalPagamentoFaturaCartaoPorId(idPagamento) {
+    var pagamento = encontrarPagamentoFaturaCartaoPorId(idPagamento);
+
+    if (!pagamento) {
+      mostrarNotificacao('Pagamento de fatura nao encontrado na memoria da tela.', 'erro');
+      return;
+    }
+
+    abrirModalPagamentoFaturaCartao(pagamento);
+  }
+
+  function abrirModalPagamentoFaturaCartao(pagamento) {
+    var modal = document.getElementById('modal-pagamento-fatura');
+    var valorAberto = pacoteFaturaCartao ? (pacoteFaturaCartao.Valor_Em_Aberto || 0) : 0;
+    var emEdicao = pagamento && pagamento.ID_Pagamento_Fatura;
+
+    popularContasPagamentoFaturaCartao();
+    document.getElementById('pag_fatura_id').value = emEdicao ? pagamento.ID_Pagamento_Fatura : '';
+    document.getElementById('pag_fatura_conta').value = emEdicao ? (pagamento.ID_Conta || '') : '';
+    document.getElementById('pag_fatura_valor').value = formatarNumeroFaturaCartao(emEdicao ? (pagamento.Valor || 0) : valorAberto);
+    document.getElementById('pag_fatura_data').value = emEdicao ? (pagamento.Data_Pagamento || gerarDataHojeFaturaCartao()) : gerarDataHojeFaturaCartao();
+    document.getElementById('pag_fatura_status').value = emEdicao ? (pagamento.Status || 'Efetivado') : 'Efetivado';
+    document.getElementById('pag_fatura_observacao').value = emEdicao ? (pagamento.Observacao || '') : '';
+    document.getElementById('titulo-modal-pagamento-fatura').textContent = emEdicao ? 'Editar pagamento da fatura' : 'Pagar fatura';
+    document.getElementById('btn-salvar-pagamento-fatura').textContent = emEdicao ? 'Salvar alteracoes' : 'Salvar pagamento';
+    modal.classList.add('visivel');
+  }
+
+  function fecharModalPagamentoFaturaCartao() {
+    document.getElementById('modal-pagamento-fatura').classList.remove('visivel');
+  }
+
+  function fecharModalPagamentoFaturaCartaoAoClicarFora(evento) {
+    if (evento.target && evento.target.id === 'modal-pagamento-fatura') {
+      fecharModalPagamentoFaturaCartao();
+    }
+  }
+
+  function atualizarEstadoBotaoSalvarPagamentoFaturaCartao(salvando) {
+    var botao = document.getElementById('btn-salvar-pagamento-fatura');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#modal-pagamento-fatura .fatura-modal-caixa',
+        idsProcessando: ['btn-salvar-pagamento-fatura'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    if (botao) {
+      botao.disabled = !!salvando;
+      botao.textContent = salvando ? 'Salvando...' : 'Salvar pagamento';
+    }
+  }
+
+  function popularContasPagamentoFaturaCartao() {
+    var select = document.getElementById('pag_fatura_conta');
+    var contas = pacoteFaturaCartao && pacoteFaturaCartao.Contas_Origem ? pacoteFaturaCartao.Contas_Origem : [];
+    select.innerHTML = '<option value="">Selecione...</option>';
+
+    contas.forEach(function(conta) {
+      var option = document.createElement('option');
+      option.value = conta.ID_Conta;
+      option.textContent = conta.Nome_Conta || 'Conta';
+      select.appendChild(option);
+    });
+  }
+
+  function salvarPagamentoFaturaCartao() {
+    var idPagamento = document.getElementById('pag_fatura_id').value || '';
+    var idConta = document.getElementById('pag_fatura_conta').value;
+    var valor = converterTextoMoedaFaturaCartao(document.getElementById('pag_fatura_valor').value || '0');
+    var data = document.getElementById('pag_fatura_data').value;
+    var status = document.getElementById('pag_fatura_status').value || 'Efetivado';
+    var observacao = document.getElementById('pag_fatura_observacao').value || '';
+    var emAberto = pacoteFaturaCartao ? parseFloat(pacoteFaturaCartao.Valor_Em_Aberto || 0) : 0;
+    var pagamentoAtual = idPagamento ? encontrarPagamentoFaturaCartaoPorId(idPagamento) : null;
+    var limitePermitido = emAberto + (pagamentoAtual ? parseFloat(pagamentoAtual.Valor || 0) : 0);
+
+    if (!idConta) {
+      mostrarNotificacao('Selecione a conta de origem do pagamento.', 'alerta');
+      return;
+    }
+
+    if (!valor || valor <= 0) {
+      mostrarNotificacao('Informe um valor de pagamento maior que zero.', 'alerta');
+      return;
+    }
+
+    if (valor > limitePermitido) {
+      mostrarNotificacao('O pagamento informado e maior que o saldo em aberto da fatura.', 'alerta');
+      return;
+    }
+
+    if (!data) {
+      mostrarNotificacao('Informe a data do pagamento.', 'alerta');
+      return;
+    }
+
+    atualizarEstadoBotaoSalvarPagamentoFaturaCartao(true);
+
+    google.script.run
+      .withSuccessHandler(function(mensagem) {
+        atualizarEstadoBotaoSalvarPagamentoFaturaCartao(false);
+        fecharModalPagamentoFaturaCartao();
+        carregarFaturaCartao();
+        if (typeof estaEmTelaContextualMukirana === 'function' &&
+            estaEmTelaContextualMukirana() &&
+            typeof atualizarTelaOrigemExternaContextualMukirana === 'function') {
+          atualizarTelaOrigemExternaContextualMukirana();
+        }
+        mostrarNotificacao(mensagem, 'sucesso');
+      })
+      .withFailureHandler(function(erro) {
+        atualizarEstadoBotaoSalvarPagamentoFaturaCartao(false);
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      [idPagamento ? 'atualizarPagamentoFaturaCartao' : 'registrarPagamentoFaturaCartao'](tokenSessaoFaturaCartao, {
+        ID_Pagamento_Fatura: idPagamento,
+        ID_Grupo_Cartao: parametrosFaturaCartao.ID_Grupo_Cartao,
+        Mes_Referencia: obterPeriodoGlobalFaturaCartao_().Mes_Inicial,
+        ID_Conta: idConta,
+        Valor: valor,
+        Data_Pagamento: data,
+        Status: status,
+        Observacao: observacao
+      });
+  }
+
+  function excluirPagamentoFaturaCartaoFront(idPagamento) {
+    if (!idPagamento) {
+      mostrarNotificacao('Pagamento de fatura nao informado.', 'erro');
+      return;
+    }
+
+    confirmarAcao('Confirma a exclusao definitiva deste pagamento de fatura?', function() {
+      google.script.run
+        .withSuccessHandler(function(mensagem) {
+          carregarFaturaCartao();
+          if (typeof estaEmTelaContextualMukirana === 'function' &&
+              estaEmTelaContextualMukirana() &&
+              typeof atualizarTelaOrigemExternaContextualMukirana === 'function') {
+            atualizarTelaOrigemExternaContextualMukirana();
+          }
+          mostrarNotificacao(mensagem, 'sucesso');
+        })
+        .withFailureHandler(function(erro) {
+          mostrarNotificacao(erro.message, 'erro');
+        })
+        .excluirPagamentoFaturaCartao(tokenSessaoFaturaCartao, idPagamento);
+    });
+  }
+
+  function encontrarPagamentoFaturaCartaoPorId(idPagamento) {
+    var pagamentos = pacoteFaturaCartao && pacoteFaturaCartao.Pagamentos ? pacoteFaturaCartao.Pagamentos : [];
+
+    for (var i = 0; i < pagamentos.length; i++) {
+      if ((pagamentos[i].ID_Pagamento_Fatura || '') === idPagamento) {
+        return pagamentos[i];
+      }
+    }
+
+    return null;
+  }
+
+  function executarAcaoPendentePagamentoFaturaCartao_() {
+    var acao = localStorage.getItem('mukirana_acao_pendente_fatura') || '';
+
+    if (!acao) {
+      return;
+    }
+
+    localStorage.removeItem('mukirana_acao_pendente_fatura');
+
+    if (acao.indexOf('editar_pagamento_fatura:') === 0) {
+      abrirModalPagamentoFaturaCartaoPorId(acao.substring('editar_pagamento_fatura:'.length));
+    }
+  }
+
+  function renderizarSubtotaisFaturaCartao() {
+    var container = document.getElementById('fatura_subtotais');
+    var subtotais = pacoteFaturaCartao.Subtotais || [];
+    container.innerHTML = '';
+
+    if (subtotais.length === 0) {
+      container.innerHTML = '<div class="texto-ajuda">Nenhum cartao acessivel nesta fatura.</div>';
+      return;
+    }
+
+    subtotais.forEach(function(item) {
+      var linha = document.createElement('div');
+      linha.className = 'fatura-subtotal fatura-subtotal-clicavel';
+      linha.tabIndex = 0;
+      linha.setAttribute('role', 'button');
+      linha.setAttribute('aria-label', 'Abrir lancamentos do cartao ' + (item.Nome_Cartao || ''));
+      linha.onclick = function() {
+        abrirLancamentosDoCartaoDaFatura(item.ID_Cartao, item.Nome_Cartao);
+      };
+      linha.onkeydown = function(evento) {
+        if (evento.key === 'Enter' || evento.key === ' ') {
+          evento.preventDefault();
+          abrirLancamentosDoCartaoDaFatura(item.ID_Cartao, item.Nome_Cartao);
+        }
+      };
+      linha.innerHTML =
+        '<strong>' + escaparHtmlFaturaCartao(item.Nome_Cartao) + '</strong>' +
+        '<span>R$ ' + formatarNumeroFaturaCartao(item.Valor_Total) + ' · ' + item.Quantidade + ' lancamento(s)</span>';
+      if ((item.Quantidade_Recorrencias_Previstas || 0) > 0) {
+        linha.innerHTML =
+          '<strong>' + escaparHtmlFaturaCartao(item.Nome_Cartao) + '</strong>' +
+          '<span>R$ ' + formatarNumeroFaturaCartao(item.Valor_Total) + ' | ' + item.Quantidade + ' lancamento(s) | ' +
+            item.Quantidade_Recorrencias_Previstas + ' recorrencia(s) prevista(s)</span>';
+      }
+      container.appendChild(linha);
+    });
+  }
+
+  function renderizarLancamentosFaturaCartao() {
+    var corpo = document.getElementById('corpo-fatura-cartao');
+    var tabela = document.getElementById('tabela-fatura-cartao');
+    var vazio = document.getElementById('estado-vazio-fatura');
+    var lancamentos = pacoteFaturaCartao.Lancamentos || [];
+
+    corpo.innerHTML = '';
+    limparSelecaoFaturaCartao(false);
+
+    if (lancamentos.length === 0) {
+      tabela.style.display = 'none';
+      vazio.style.display = 'block';
+      atualizarBarraAcoesLoteFaturaCartao();
+      return;
+    }
+
+    tabela.style.display = 'table';
+    vazio.style.display = 'none';
+
+    lancamentos.forEach(function(lancamento) {
+      var tr = document.createElement('tr');
+      var ehFantasma = ehLancamentoFantasmaFaturaCartao_(lancamento);
+      var valorLinha = parseFloat(lancamento.Valor_Total);
+      var totalOriginal = parseFloat(
+        lancamento.Valor_Total_Original !== undefined ? lancamento.Valor_Total_Original : lancamento.Valor_Total
+      );
+
+      if (ehFantasma) {
+        tr.classList.add('lancamento-linha-recorrencia-prevista');
+        tr.title = 'Recorrencia prevista. Esta linha ainda nao e um lancamento real.';
+      }
+
+      if (selecaoLancamentosFaturaCartao[lancamento.ID_Lancamento] === true) {
+        tr.classList.add('fatura-linha-selecionada');
+      }
+
+      if (isNaN(valorLinha)) valorLinha = 0;
+      if (isNaN(totalOriginal)) totalOriginal = 0;
+
+      tr.innerHTML =
+        montarCelulaSelecaoFaturaCartao(lancamento) +
+        '<td data-label="Data">' + formatarDataFaturaCartao(lancamento.Data_Ocorrencia) + '</td>' +
+        '<td data-label="Descricao">' +
+          '<strong class="lancamento-descricao-principal">' + escaparHtmlFaturaCartao(lancamento.Descricao) + '</strong>' +
+          (ehFantasma
+            ? '<span class="badge-recorrencia-prevista">Recorrencia prevista</span>'
+            : '') +
+          (lancamento.Nome_Projeto_Visualizacao
+            ? '<span class="fatura-linha-secundaria">Projeto: ' + escaparHtmlFaturaCartao(lancamento.Nome_Projeto_Visualizacao) + '</span>'
+            : '') +
+        '</td>' +
+        '<td data-label="Categoria">' + escaparHtmlFaturaCartao(lancamento.Nome_Categoria_Visualizacao || lancamento.Nome_Categoria || '') + '</td>' +
+        '<td data-label="Cartao">' + escaparHtmlFaturaCartao(lancamento.Nome_Cartao || '') + '</td>' +
+        '<td data-label="Valor" style="text-align:right;">' +
+          'R$ ' + formatarNumeroFaturaCartao(valorLinha) +
+          (lancamento.Possui_Rateio === true
+            ? '<span class="fatura-valor-meta">' +
+                'Rateada | sua parte: R$ ' + formatarNumeroFaturaCartao(lancamento.Valor_Exibicao || 0) +
+              '</span>'
+            : '') +
+          (ehFantasma
+            ? '<span class="fatura-valor-meta">Somente leitura | ainda nao virou lancamento</span>'
+            : '') +
+        '</td>' +
+        '<td data-label="Status">' + escaparHtmlFaturaCartao(lancamento.Status || '') + '</td>' +
+        '<td data-label="Acoes" style="text-align:right;">' + montarAcoesLinhaFaturaCartao(lancamento) + '</td>';
+      corpo.appendChild(tr);
+    });
+
+    atualizarBarraAcoesLoteFaturaCartao();
+  }
+
+  function montarCelulaSelecaoFaturaCartao(lancamento) {
+    var id = escaparAtributoFaturaCartao(lancamento.ID_Lancamento || '');
+    var podeSelecionar = !ehLancamentoFantasmaFaturaCartao_(lancamento) &&
+      (lancamento.Pode_Editar === true || lancamento.Pode_Excluir === true);
+    var desabilitado = podeSelecionar ? '' : ' disabled title="Este lancamento esta disponivel apenas para consulta."';
+
+    return '<td class="fatura-checkbox-coluna" data-label="Selecionar">' +
+      '<input type="checkbox" aria-label="Selecionar lancamento ' + escaparAtributoFaturaCartao(lancamento.Descricao || '') + '"' +
+      ' onchange="alternarSelecaoFaturaCartao(\'' + id + '\', this.checked, this)"' + desabilitado + '>' +
+      '</td>';
+  }
+
+  function alternarSelecaoFaturaCartao(idLancamento, selecionado, campo) {
+    if (selecionado) {
+      selecaoLancamentosFaturaCartao[idLancamento] = true;
+    } else {
+      delete selecaoLancamentosFaturaCartao[idLancamento];
+    }
+
+    if (campo && campo.closest) {
+      var linha = campo.closest('tr');
+      if (linha) {
+        linha.classList.toggle('fatura-linha-selecionada', selecionado);
+      }
+    }
+
+    atualizarBarraAcoesLoteFaturaCartao();
+  }
+
+  function alternarSelecaoTodosFaturaCartao(selecionado) {
+    var lancamentos = pacoteFaturaCartao && pacoteFaturaCartao.Lancamentos ? pacoteFaturaCartao.Lancamentos : [];
+
+    lancamentos.forEach(function(lancamento) {
+      var podeSelecionar = !ehLancamentoFantasmaFaturaCartao_(lancamento) &&
+        (lancamento.Pode_Editar === true || lancamento.Pode_Excluir === true);
+      if (podeSelecionar) {
+        alternarSelecaoFaturaCartao(lancamento.ID_Lancamento, selecionado);
+      }
+    });
+
+    Array.from(document.querySelectorAll('#corpo-fatura-cartao input[type="checkbox"]')).forEach(function(campo) {
+      if (!campo.disabled) {
+        campo.checked = selecionado;
+
+        if (campo.closest) {
+          var linha = campo.closest('tr');
+          if (linha) {
+            linha.classList.toggle('fatura-linha-selecionada', selecionado);
+          }
+        }
+      }
+    });
+  }
+
+  function obterIdsSelecionadosFaturaCartao() {
+    return Object.keys(selecaoLancamentosFaturaCartao).filter(function(idLancamento) {
+      return selecaoLancamentosFaturaCartao[idLancamento] === true;
+    });
+  }
+
+  function limparSelecaoFaturaCartao(renderizarChecks) {
+    selecaoLancamentosFaturaCartao = {};
+
+    if (renderizarChecks !== false) {
+      Array.from(document.querySelectorAll('#corpo-fatura-cartao input[type="checkbox"]')).forEach(function(campo) {
+        campo.checked = false;
+      });
+    }
+
+    atualizarBarraAcoesLoteFaturaCartao();
+  }
+
+  function atualizarBarraAcoesLoteFaturaCartao() {
+    var toolbar = document.getElementById('toolbar-lote-fatura');
+    var contador = document.getElementById('contador-selecao-fatura');
+    var resumoTotal = document.getElementById('resumo-total-fatura');
+    var resumoSelecao = document.getElementById('resumo-selecao-fatura');
+    var checkTodos = document.getElementById('check-todos-fatura');
+    var ids = obterIdsSelecionadosFaturaCartao();
+    var lancamentos = pacoteFaturaCartao && pacoteFaturaCartao.Lancamentos ? pacoteFaturaCartao.Lancamentos : [];
+    var selecionaveis = lancamentos.filter(function(lancamento) {
+      return !ehLancamentoFantasmaFaturaCartao_(lancamento) &&
+        (lancamento.Pode_Editar === true || lancamento.Pode_Excluir === true);
+    });
+
+    if (toolbar) {
+      toolbar.classList.toggle('visivel', ids.length > 0);
+    }
+
+    if (contador) {
+      contador.textContent = ids.length === 1
+        ? '1 lancamento selecionado'
+        : ids.length + ' lancamentos selecionados';
+    }
+
+    if (resumoTotal) {
+      resumoTotal.textContent = 'Total visivel: ' + formatarMoedaResumoFaturaCartao_(calcularTotalVisivelFaturaCartao_());
+    }
+
+    if (resumoSelecao) {
+      resumoSelecao.textContent = 'Total selecionado: ' + formatarMoedaResumoFaturaCartao_(calcularTotalSelecionadoFaturaCartao_());
+    }
+
+    if (checkTodos) {
+      checkTodos.checked = selecionaveis.length > 0 && ids.length === selecionaveis.length;
+      checkTodos.indeterminate = ids.length > 0 && ids.length < selecionaveis.length;
+    }
+  }
+
+  function obterValorCompromissoFaturaCartao_(lancamento) {
+    var tipo = (lancamento.Tipo || '').toLowerCase();
+    var valorBase = lancamento.Valor_Total_Original !== undefined ? lancamento.Valor_Total_Original : lancamento.Valor_Total;
+    var valor = parseFloat(valorBase);
+
+    if (isNaN(valor)) valor = 0;
+
+    if (tipo === 'receita') return valor * -1;
+    if (tipo === 'despesa') return valor;
+    return 0;
+  }
+
+  function calcularTotalVisivelFaturaCartao_() {
+    var lancamentos = pacoteFaturaCartao && pacoteFaturaCartao.Lancamentos ? pacoteFaturaCartao.Lancamentos : [];
+    return lancamentos.reduce(function(soma, lancamento) {
+      return soma + obterValorCompromissoFaturaCartao_(lancamento);
+    }, 0);
+  }
+
+  function calcularTotalSelecionadoFaturaCartao_() {
+    var lancamentos = pacoteFaturaCartao && pacoteFaturaCartao.Lancamentos ? pacoteFaturaCartao.Lancamentos : [];
+    return lancamentos.reduce(function(soma, lancamento) {
+      if (selecaoLancamentosFaturaCartao[lancamento.ID_Lancamento] !== true) {
+        return soma;
+      }
+
+      return soma + obterValorCompromissoFaturaCartao_(lancamento);
+    }, 0);
+  }
+
+  function formatarMoedaResumoFaturaCartao_(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+    return (numero < 0 ? '-R$ ' : 'R$ ') + formatarNumeroFaturaCartao(Math.abs(numero));
+  }
+
+  function alterarStatusSelecionadosFaturaCartao() {
+    var ids = obterIdsSelecionadosFaturaCartao();
+    var status = document.getElementById('acao-lote-status-fatura').value || 'Efetivado';
+
+    if (ids.length === 0) {
+      mostrarNotificacao('Selecione pelo menos um lancamento para alterar o status.', 'alerta');
+      return;
+    }
+
+    confirmarAcao('Confirma alterar o status dos lancamentos selecionados para "' + status + '"?', function() {
+      executarAcaoLoteFaturaCartao({
+        Tipo_Acao: 'AlterarStatus',
+        IDs_Lancamentos: ids,
+        Status: status
+      });
+    });
+  }
+
+  function excluirSelecionadosFaturaCartao() {
+    var ids = obterIdsSelecionadosFaturaCartao();
+
+    if (ids.length === 0) {
+      mostrarNotificacao('Selecione pelo menos um lancamento para excluir.', 'alerta');
+      return;
+    }
+
+    confirmarAcao(
+      'Atencao: esta acao e definitiva. Serao excluidos apenas os lancamentos selecionados, junto com seus rateios vinculados. Deseja continuar?',
+      function() {
+        executarAcaoLoteFaturaCartao({
+          Tipo_Acao: 'Excluir',
+          IDs_Lancamentos: ids
+        });
+      }
+    );
+  }
+
+  function executarAcaoLoteFaturaCartao(dados) {
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        limparSelecaoFaturaCartao(false);
+        carregarFaturaCartao();
+        if (typeof estaEmTelaContextualMukirana === 'function' &&
+            estaEmTelaContextualMukirana() &&
+            typeof atualizarTelaOrigemExternaContextualMukirana === 'function') {
+          atualizarTelaOrigemExternaContextualMukirana();
+        }
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(err) {
+        mostrarNotificacao(err.message, 'erro');
+      })
+      .processarAcaoLoteLancamentos(dados, tokenSessaoFaturaCartao);
+  }
+
+  function montarAcoesLinhaFaturaCartao(lancamento) {
+    if (ehLancamentoFantasmaFaturaCartao_(lancamento)) {
+      return '<span class="fatura-valor-meta">Previsto</span>';
+    }
+
+    var html = '<div class="fatura-acoes">';
+
+    html += '<button type="button" class="btn-acao lancamento-acao-icone" title="Detalhes" onclick="abrirContextoLinhaFaturaCartao(\'' +
+      escaparAtributoFaturaCartao(lancamento.ID_Lancamento) + '\', \'Detalhes\')"><span class="material-symbols-outlined">visibility</span></button>';
+
+    if (lancamento.Pode_Editar === true) {
+      html += '<button type="button" class="btn-acao lancamento-acao-icone" title="Editar" onclick="abrirContextoLinhaFaturaCartao(\'' +
+        escaparAtributoFaturaCartao(lancamento.ID_Lancamento) + '\', \'Editar\')"><span class="material-symbols-outlined">edit</span></button>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  function ehLancamentoFantasmaFaturaCartao_(lancamento) {
+    return !!(
+      lancamento &&
+      (lancamento._Programado_Recorrencia === true ||
+        (lancamento.Somente_Leitura === true && lancamento.ID_Recorrencia_Origem))
+    );
+  }
+
+  function abrirContextoLinhaFaturaCartao(idLancamento, acao) {
+    var periodo = obterPeriodoGlobalFaturaCartao_();
+    var mesInicial = periodo.Mes_Inicial || '';
+    var mesFinal = periodo.Mes_Final || '';
+    var nomeGrupo = pacoteFaturaCartao && pacoteFaturaCartao.Nome_Grupo ? pacoteFaturaCartao.Nome_Grupo : 'Fatura';
+
+    if (typeof abrirLancamentosContextuaisMukirana !== 'function') {
+      mostrarNotificacao('O contexto de lancamentos nao esta disponivel nesta tela.', 'erro');
+      return;
+    }
+
+    abrirLancamentosContextuaisMukirana({
+      ID_Lancamento: idLancamento,
+      ID_Grupo_Cartao: parametrosFaturaCartao.ID_Grupo_Cartao,
+      Mes_Inicial: mesInicial,
+      Mes_Final: mesFinal,
+      Titulo: 'Lançamento da fatura',
+      Subtitulo: 'Após salvar, você volta para esta fatura com os dados atualizados.',
+      Nome_Contexto: nomeGrupo,
+      Resumo_Contexto: 'Você está revisando um lançamento dentro da fatura. Ao fechar, a tela de origem continua atualizada.',
+      Acao: acao
+    });
+  }
+
+  function abrirLancamentosDaFatura() {
+    var periodo = obterPeriodoGlobalFaturaCartao_();
+    var mesInicial = periodo.Mes_Inicial || '';
+    var mesFinal = periodo.Mes_Final || '';
+    var nomeGrupo = pacoteFaturaCartao && pacoteFaturaCartao.Nome_Grupo ? pacoteFaturaCartao.Nome_Grupo : 'Fatura';
+
+    if (typeof abrirLancamentosContextuaisMukirana !== 'function') {
+      return;
+    }
+
+    abrirLancamentosContextuaisMukirana({
+      ID_Grupo_Cartao: parametrosFaturaCartao.ID_Grupo_Cartao,
+      Mes_Inicial: mesInicial,
+      Mes_Final: mesFinal,
+      Titulo: 'Lançamentos da fatura',
+      Subtitulo: 'Este contexto mostra somente os lançamentos do cartão no período escolhido.',
+      Nome_Contexto: nomeGrupo,
+      Resumo_Contexto: 'Você está vendo somente os lançamentos desta fatura. Limpar filtros mantém a fatura e o período de origem.'
+    });
+  }
+
+  function abrirLancamentosDoCartaoDaFatura(idCartao, nomeCartao) {
+    var periodo = obterPeriodoGlobalFaturaCartao_();
+    var mesInicial = periodo.Mes_Inicial || '';
+    var mesFinal = periodo.Mes_Final || '';
+
+    if (typeof abrirLancamentosContextuaisMukirana !== 'function') {
+      return;
+    }
+
+    abrirLancamentosContextuaisMukirana({
+      ID_Grupo_Cartao: parametrosFaturaCartao.ID_Grupo_Cartao,
+      ID_Cartao: idCartao,
+      Mes_Inicial: mesInicial,
+      Mes_Final: mesFinal,
+      Titulo: 'Lancamentos do cartao',
+      Subtitulo: 'Este contexto mostra somente os lancamentos do cartao selecionado dentro da fatura.',
+      Nome_Contexto: nomeCartao || 'Cartao',
+      Resumo_Contexto: 'Voce esta vendo somente os lancamentos deste cartao no periodo filtrado.'
+    });
+  }
+
+  function popularCategoriasFiltroFaturaCartao() {}
+
+  function obterCategoriasSelecionadasFaturaCartao_() {
+    return '';
+  }
+
+  function obterParametrosFaturaCartao() {
+    var bruto = localStorage.getItem('mukirana_fatura_cartao') || '{}';
+
+    try {
+      return JSON.parse(bruto);
+    } catch (erro) {
+      return {};
+    }
+  }
+
+  function gerarMesAtualFaturaCartao() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  }
+
+  function gerarDataHojeFaturaCartao() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' +
+      String(hoje.getMonth() + 1).padStart(2, '0') + '-' +
+      String(hoje.getDate()).padStart(2, '0');
+  }
+
+  function converterTextoMoedaFaturaCartao(valor) {
+    if (valor === null || valor === undefined) return 0;
+
+    var texto = valor.toString().trim();
+
+    if (!texto) return 0;
+
+    texto = texto.replace(/[^\d,.-]/g, '');
+
+    if (texto.indexOf(',') >= 0) {
+      texto = texto.replace(/\./g, '').replace(',', '.');
+    }
+
+    var numero = parseFloat(texto);
+    return isNaN(numero) ? 0 : numero;
+  }
+
+  function formatarNumeroFaturaCartao(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+
+    return numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function formatarPercentualFaturaCartao(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+
+    return numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: numero % 1 === 0 ? 0 : 1,
+      maximumFractionDigits: 1
+    }) + '%';
+  }
+
+  function formatarDataFaturaCartao(valor) {
+    if (!valor) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+      var partes = valor.split('-');
+      return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+    return valor;
+  }
+
+  function escaparHtmlFaturaCartao(valor) {
+    if (valor === null || valor === undefined) return '';
+
+    return valor.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escaparAtributoFaturaCartao(valor) {
+    return escaparHtmlFaturaCartao(valor);
+  }
+</script>

@@ -8,3 +8,7 @@ requirements*.txt
 **/*.md
 .gitignore
 .claspignore
+.env*
+.clasprc*
+*credentials*.json
+*secret*.json

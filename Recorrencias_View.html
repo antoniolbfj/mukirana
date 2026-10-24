@@ -1,0 +1,1773 @@
+<style>
+  .recorrencia-resumo {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .recorrencia-resumo-item {
+    border: var(--borda-suave);
+    border-radius: var(--raio-card);
+    background: var(--cor-superficie);
+    padding: 14px;
+  }
+
+  .recorrencia-resumo-item span {
+    display: block;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .recorrencia-resumo-item strong {
+    color: var(--cor-texto-principal);
+    font-size: 18px;
+  }
+
+  .recorrencia-ajuda-status {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin: 0 6px 0 0 !important;
+    border-radius: 50%;
+    background: var(--cor-alerta-fundo);
+    color: var(--cor-alerta-texto) !important;
+    font-size: 12px !important;
+    font-weight: 800;
+    cursor: help;
+  }
+
+  .recorrencia-grupo-linha td {
+    background: var(--cor-superficie-secundaria);
+    color: var(--cor-texto-secundario);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    font-size: 12px;
+  }
+
+  .tabela-mukirana td .lancamento-descricao-projeto {
+    display: block;
+    margin-top: 4px;
+  }
+
+  .recorrencia-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+
+  #container-lista-recorrencias {
+    overflow-x: auto;
+  }
+
+  #container-lista-recorrencias .tabela-mukirana {
+    min-width: 1080px;
+    table-layout: auto;
+  }
+
+  #container-lista-recorrencias .tabela-mukirana th,
+  #container-lista-recorrencias .tabela-mukirana td {
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+  }
+
+  #container-lista-recorrencias .tabela-mukirana th,
+  #container-lista-recorrencias .tabela-mukirana td[data-label="Início"],
+  #container-lista-recorrencias .tabela-mukirana td[data-label="Modo"],
+  #container-lista-recorrencias .tabela-mukirana td[data-label="Status"],
+  #container-lista-recorrencias .tabela-mukirana td[data-label="Ações"] {
+    white-space: nowrap;
+  }
+
+  #container-lista-recorrencias .tabela-mukirana td[data-label="Descrição"] {
+    min-width: 220px;
+    white-space: normal;
+  }
+
+  #container-lista-recorrencias .recorrencia-acoes,
+  #container-lista-recorrencias .recorrencia-acoes button {
+    white-space: nowrap;
+  }
+
+  .recorrencia-alerta-revisao {
+    background: rgba(245, 127, 23, 0.10);
+    border: 1px solid rgba(245, 127, 23, 0.24);
+    color: var(--cor-alerta-texto);
+    border-radius: var(--raio-campo);
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 16px;
+  }
+
+  .recorrencia-campo-alerta {
+    color: var(--cor-alerta-texto);
+    font-size: 12px;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .recorrencia-campo-invalido {
+    border-color: #F57F17 !important;
+    box-shadow: 0 0 0 2px rgba(245, 127, 23, 0.12) !important;
+  }
+
+  .recorrencia-campo-descricao {
+    grid-column: span 2;
+  }
+
+  .recorrencia-pendencias-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .recorrencia-pendencias-toolbar .grupo-campo {
+    margin-bottom: 0;
+    flex: 1;
+  }
+
+  .recorrencia-lote-toolbar {
+    display: none;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0;
+    padding: 12px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie-secundaria);
+  }
+
+  .recorrencia-lote-toolbar.visivel {
+    display: flex;
+  }
+
+  .recorrencia-lote-controles {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) minmax(130px, 0.7fr) auto;
+    gap: 10px;
+    align-items: end;
+  }
+
+  .recorrencia-checkbox-coluna {
+    width: 42px;
+    text-align: center;
+  }
+
+  .recorrencia-checkbox-coluna input {
+    width: 16px;
+    height: 16px;
+    min-height: 16px;
+    margin: 0;
+  }
+
+  .recorrencia-linha-gerada {
+    opacity: 0.62;
+    background: var(--cor-superficie-secundaria);
+  }
+
+  .recorrencia-linha-gerada td {
+    color: var(--cor-texto-secundario);
+  }
+
+  .recorrencia-badge-revisao {
+    background: var(--cor-alerta-fundo);
+    color: var(--cor-alerta-texto);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+  }
+
+  .bloco-rateio {
+    margin-top: 20px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-card);
+    padding: 18px;
+    background: var(--cor-superficie-secundaria);
+  }
+
+  .rateio-contexto-info {
+    margin: 14px 0 16px 0;
+    padding: 13px 14px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: rgba(25, 118, 210, 0.08);
+    color: var(--cor-texto-principal);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .lista-participantes-rateio {
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie);
+    overflow: hidden;
+  }
+
+  .linha-participante-rateio {
+    display: grid;
+    grid-template-columns: 36px 1.6fr 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border-bottom: var(--borda-suave);
+  }
+
+  .linha-participante-rateio:last-child {
+    border-bottom: none;
+  }
+
+  .linha-participante-rateio label {
+    margin: 0;
+    color: var(--cor-texto-principal);
+    cursor: pointer;
+  }
+
+  .linha-participante-rateio .subtexto {
+    display: block;
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+    margin-top: 2px;
+  }
+
+  .linha-participante-rateio input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+  }
+
+  .recorrencia-opcoes-data {
+    display: grid;
+    gap: 10px;
+    margin: 16px 0;
+    text-align: left;
+  }
+
+  .recorrencia-opcao-data {
+    align-items: flex-start;
+    border: 1px solid var(--cor-borda);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .recorrencia-opcao-data input {
+    margin-top: 3px;
+  }
+
+  .recorrencia-opcao-data span {
+    display: block;
+  }
+
+  @media (max-width: 900px) {
+    .recorrencia-resumo {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .recorrencia-pendencias-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .recorrencia-lote-toolbar {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .recorrencia-lote-controles {
+      grid-template-columns: 1fr;
+    }
+
+    .linha-participante-rateio {
+      grid-template-columns: 32px 1fr;
+    }
+
+    .linha-participante-rateio input[data-tipo="valor"],
+    .linha-participante-rateio input[data-tipo="percentual"] {
+      grid-column: 2 / 3;
+    }
+
+    .recorrencia-campo-descricao {
+      grid-column: auto;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .recorrencia-resumo {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="cabecalho-tela">
+  <h2>Recorrências</h2>
+  <button class="btn-primario" type="button" data-topbar-label="+ Nova Recorrência" onclick="abrirFormularioRecorrencia()">+ Nova Recorrência</button>
+</div>
+
+<div class="caixa-informativa">
+  <strong>Como funciona:</strong><br>
+  Recorrências existem para diminuir o trabalho manual: elas criam lançamentos automaticamente ou deixam ocorrências prontas para geração por seleção. Ocorrências pendentes ainda podem virar lançamentos; ocorrências geradas já viraram lançamentos reais, não entram mais nas previsões e aparecem como fantasmas apenas para mostrar que aquela repetição já foi processada.
+</div>
+
+<div class="recorrencia-resumo">
+  <div class="recorrencia-resumo-item">
+    <span><span class="recorrencia-ajuda-status" title="Ocorrências prontas para virar lançamento real. Uma ocorrência ativa pode ser gerada pontualmente, seja manual ou automática.">!</span>Pendentes</span>
+    <strong id="rec_pendentes">0</strong>
+  </div>
+  <div class="recorrencia-resumo-item">
+    <span><span class="recorrencia-ajuda-status" title="Ocorrências que já criaram lançamentos reais e não entram mais nas previsões.">!</span>Geradas</span>
+    <strong id="rec_geradas">0</strong>
+  </div>
+  <div class="recorrencia-resumo-item">
+    <span><span class="recorrencia-ajuda-status" title="Automações que o sistema tenta gerar sozinho conforme a periodicidade.">!</span>Automáticas</span>
+    <strong id="rec_automaticas">0</strong>
+  </div>
+  <div class="recorrencia-resumo-item">
+    <span><span class="recorrencia-ajuda-status" title="Automações que aguardam sua seleção antes de virar lançamento.">!</span>Manuais</span>
+    <strong id="rec_manuais">0</strong>
+  </div>
+</div>
+
+<div id="container-form-recorrencia" class="cartao" style="display:none;">
+  <h3 id="titulo-form-recorrencia">Nova Recorrência</h3>
+
+  <div id="aviso-revisao-recorrencia" class="recorrencia-alerta-revisao" style="display:none;"></div>
+
+  <form id="form-recorrencia" onsubmit="enviarFormularioRecorrencia(event)">
+    <input type="hidden" id="rec_id">
+
+    <div class="grupo-campo-triplo">
+      <div class="grupo-campo">
+        <label for="rec_tipo">Tipo da automação</label>
+        <select id="rec_tipo" required onchange="aoAlterarTipoRecorrencia()">
+          <option value="Despesa">Despesa</option>
+          <option value="Receita">Receita</option>
+          <option value="Transferência">Transferência</option>
+        </select>
+        <div id="erro_rec_tipo" class="recorrencia-campo-alerta" style="display:none;"></div>
+      </div>
+
+      <div class="grupo-campo recorrencia-campo-descricao">
+        <label for="rec_descricao">Descrição base</label>
+        <input type="text" id="rec_descricao" required placeholder="Ex: Aluguel, salário, mensalidade escolar">
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label for="rec_valor">Valor base (R$)</label>
+        <input type="text" id="rec_valor" inputmode="numeric" required placeholder="0,00" oninput="mascaraMoeda(this)">
+      </div>
+
+      <div class="grupo-campo">
+        <label for="rec_data_inicio">Data de início</label>
+        <input type="date" id="rec_data_inicio" required>
+        <div class="texto-ajuda">A primeira execução automática acontece na próxima rotina da madrugada.</div>
+        <div id="erro_rec_data_inicio" class="recorrencia-campo-alerta" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div class="grupo-campo-triplo">
+      <div class="grupo-campo">
+        <label for="rec_periodicidade_tipo">Periodicidade</label>
+        <select id="rec_periodicidade_tipo" required onchange="aoAlterarPeriodicidadeRecorrencia()">
+          <option value="Mensal">Mensal</option>
+          <option value="Personalizada">Personalizada</option>
+        </select>
+        <div class="texto-ajuda">Na recorrência mensal, o sistema usa o dia da data de início. Se o mês não tiver esse dia, o lançamento será gerado no último dia do mês.</div>
+      </div>
+
+      <div class="grupo-campo" id="container_rec_intervalo" style="display:none;">
+        <label for="rec_intervalo_dias">Intervalo em dias</label>
+        <input type="number" id="rec_intervalo_dias" min="1" max="365">
+      </div>
+
+      <div class="grupo-campo">
+        <label for="rec_modo_geracao">Modo de geração</label>
+        <select id="rec_modo_geracao" required>
+          <option value="Manual">Manual</option>
+          <option value="Automática">Automática</option>
+        </select>
+        <div class="texto-ajuda">Manual: as ocorrências ficam disponíveis na lista superior para você decidir quando gerar. Automática: o sistema tenta gerar sozinho na rotina da madrugada.</div>
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo" id="container-rec-categoria">
+        <label for="rec_categoria">Categoria</label>
+        <select id="rec_categoria" required></select>
+        <div id="erro_rec_categoria" class="recorrencia-campo-alerta" style="display:none;"></div>
+      </div>
+
+      <div class="grupo-campo">
+        <label for="rec_projeto">Projeto / Centro de custo</label>
+        <select id="rec_projeto"></select>
+        <div id="erro_rec_projeto" class="recorrencia-campo-alerta" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div class="grupo-campo-triplo">
+      <div class="grupo-campo">
+        <label for="rec_tipo_origem">Origem financeira</label>
+        <select id="rec_tipo_origem" required onchange="atualizarDropdownOrigemRecorrencia()">
+          <option value="Conta">Conta</option>
+          <option value="Cartão">Cartão</option>
+        </select>
+      </div>
+
+      <div class="grupo-campo">
+        <label for="rec_origem">Selecione a origem</label>
+        <select id="rec_origem" required onchange="aoAlterarContextoRateioRecorrencia()"></select>
+        <div id="erro_rec_origem" class="recorrencia-campo-alerta" style="display:none;"></div>
+      </div>
+
+      <div class="grupo-campo">
+        <label for="rec_status_lancamento">Status do lançamento gerado</label>
+        <select id="rec_status_lancamento" required>
+          <option value="Efetivado">Efetivado</option>
+          <option value="Pendente">Pendente</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grupo-campo-duplo" id="container-rec-destino" style="display:none;">
+      <div class="grupo-campo">
+        <label for="rec_destino">Conta de destino</label>
+        <select id="rec_destino"></select>
+        <div id="erro_rec_destino" class="recorrencia-campo-alerta" style="display:none;"></div>
+      </div>
+
+      <div class="grupo-campo">
+        <div class="caixa-informativa" style="margin-bottom:0;">
+          <strong>Transferência recorrente:</strong><br>
+          O sistema usa sempre uma conta de origem e outra conta de destino. Categoria e rateio não se aplicam a este tipo. Para pagar cartão de crédito, use o botão Pagar fatura na tela da fatura.
+        </div>
+      </div>
+    </div>
+
+    <div class="grupo-campo">
+      <label class="toggle-rateio" for="rec_rateio_ativo">
+        <input type="checkbox" id="rec_rateio_ativo" onchange="alternarRateioRecorrencia()">
+        <strong>Automatizar rateio</strong>
+      </label>
+      <div class="texto-ajuda">Use rateio apenas para despesas e receitas. O criador da recorrência continua obrigado a participar do rateio.</div>
+    </div>
+
+    <div id="container-rateio-recorrencia" class="bloco-rateio" style="display:none;">
+      <div class="grupo-campo-duplo">
+        <div class="grupo-campo">
+          <label for="rec_modo_rateio">Tipo de rateio</label>
+          <select id="rec_modo_rateio" onchange="atualizarCamposRateioRecorrencia()">
+            <option value="Igual">Meio a meio</option>
+            <option value="Valor">Valores informados</option>
+            <option value="Percentual">Percentuais informados</option>
+          </select>
+        </div>
+
+        <div class="grupo-campo">
+          <label for="rec_observacao_rateio">Observação do rateio</label>
+          <input type="text" id="rec_observacao_rateio" placeholder="Ex: divisão fixa entre os participantes">
+        </div>
+      </div>
+
+      <div id="rec_info_rateio" class="rateio-contexto-info"></div>
+      <div id="rec_participantes_rateio" class="lista-participantes-rateio"></div>
+      <div id="erro_rec_rateio" class="recorrencia-campo-alerta" style="display:none;"></div>
+    </div>
+
+    <div class="acoes-formulario">
+      <button type="button" class="btn-secundario" onclick="fecharFormularioRecorrencia()">Cancelar</button>
+      <button type="button" class="btn-secundario" id="btn_salvar_e_novo_recorrencia" onclick="solicitarSalvarENovaRecorrencia()">Salvar + novo</button>
+      <button type="submit" class="btn-primario" id="btn_salvar_recorrencia" onclick="definirModoAposSalvarRecorrencia('fechar')">Salvar Recorrência</button>
+    </div>
+  </form>
+</div>
+
+<div class="cartao" id="container-lista-recorrencias">
+  <div class="cabecalho-secao" style="margin-bottom:16px;">
+    <h3 style="margin:0;">Recorrências cadastradas</h3>
+    <div class="texto-ajuda">A lista mostra as recorrências cadastradas, independentemente do período global. Recorrências inativas aparecem somente quando a opção de exibir inativas estiver marcada.</div>
+  </div>
+
+  <div class="recorrencia-pendencias-toolbar" id="toolbar-lote-recorrencia">
+    <div class="grupo-campo">
+      <label id="contador-selecao-recorrencia">Nenhuma recorrência selecionada</label>
+      <div class="texto-ajuda">Altere um parâmetro por vez. Recorrências que já possuem o valor escolhido não serão alteradas.</div>
+    </div>
+
+    <div class="grupo-campo">
+      <label for="rec_lote_campo">Campo</label>
+      <select id="rec_lote_campo" onchange="atualizarCampoValorLoteRecorrencia()">
+        <option value="Modo_Geracao">Modo de geração</option>
+        <option value="Periodicidade_Tipo">Periodicidade</option>
+        <option value="Status_Lancamento">Status do lançamento gerado</option>
+      </select>
+    </div>
+
+    <div class="grupo-campo">
+      <label for="rec_lote_valor">Novo valor</label>
+      <select id="rec_lote_valor" onchange="atualizarCampoValorLoteRecorrencia()"></select>
+    </div>
+
+    <div class="grupo-campo" id="container-rec-lote-intervalo" style="display:none;">
+      <label for="rec_lote_intervalo">Intervalo em dias</label>
+      <input type="number" id="rec_lote_intervalo" min="1" step="1">
+    </div>
+
+    <button type="button" class="btn-primario" onclick="aplicarAlteracaoLoteRecorrencia()">Aplicar em lote</button>
+  </div>
+  <table class="tabela-mukirana" id="tabela-recorrencias">
+    <thead>
+      <tr>
+        <th class="recorrencia-checkbox-coluna">
+          <input type="checkbox" id="check-todas-recorrencias" aria-label="Selecionar todas as recorrências" onchange="alternarSelecaoTodasRecorrencias(this.checked)">
+        </th>
+        <th>Início</th>
+        <th>Descrição</th>
+        <th>Tipo</th>
+        <th>Valor</th>
+        <th>Modo</th>
+        <th>Origem</th>
+        <th>Projeto</th>
+        <th>Rateio</th>
+        <th>Status</th>
+        <th style="text-align:right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-recorrencias"></tbody>
+  </table>
+
+  <div id="estado-vazio-recorrencias" class="estado-vazio" style="display:none;">
+    <h3>Nenhuma recorrência cadastrada</h3>
+    <p>Cadastre automações para reduzir o trabalho manual nos lançamentos futuros.</p>
+    <button class="btn-primario" type="button" onclick="abrirFormularioRecorrencia()">+ Nova Recorrência</button>
+  </div>
+</div>
+
+<div id="modal-reativar-recorrencia" class="modal-overlay oculto">
+  <div class="modal-caixa">
+    <h3>Reativar recorrência</h3>
+    <p>Informe a nova data de início. A recorrência retomará a partir dela sem alterar os lançamentos já criados.</p>
+    <div class="grupo-campo" style="text-align:left; margin-bottom:20px;">
+      <label for="rec_reativar_data">Nova data de início</label>
+      <input type="date" id="rec_reativar_data">
+    </div>
+    <div class="modal-botoes">
+      <button class="btn-secundario" type="button" onclick="fecharModalReativarRecorrencia()">Cancelar</button>
+      <button class="btn-primario" type="button" onclick="confirmarReativacaoRecorrencia()">Reativar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-gerar-recorrencia" class="modal-overlay oculto">
+  <div class="modal-caixa">
+    <h3>Gerar lançamento da recorrência</h3>
+    <p id="rec_gerar_resumo"></p>
+
+    <div class="recorrencia-opcoes-data">
+      <label class="recorrencia-opcao-data">
+        <input type="radio" name="rec_gerar_opcao_data" value="prevista" checked onchange="atualizarOpcaoDataGeracaoRecorrencia()">
+        <span>
+          <strong>Manter a data prevista</strong>
+          <span class="texto-ajuda" id="rec_gerar_data_prevista_texto"></span>
+        </span>
+      </label>
+
+      <label class="recorrencia-opcao-data">
+        <input type="radio" name="rec_gerar_opcao_data" value="outra" onchange="atualizarOpcaoDataGeracaoRecorrencia()">
+        <span>
+          <strong>Usar outra data neste lançamento</strong>
+          <span class="texto-ajuda">A programação das próximas ocorrências não será alterada.</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="grupo-campo" id="container-rec-gerar-outra-data" style="display:none; text-align:left; margin-bottom:20px;">
+      <label for="rec_gerar_data_lancamento">Data do lançamento</label>
+      <input type="date" id="rec_gerar_data_lancamento">
+    </div>
+
+    <div class="modal-botoes">
+      <button class="btn-secundario" type="button" onclick="fecharModalGerarRecorrencia()">Cancelar</button>
+      <button class="btn-primario" id="btn_confirmar_gerar_recorrencia" type="button" onclick="confirmarGeracaoPontualRecorrencia()">Gerar lançamento</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var tokenSessaoRecorrencia = localStorage.getItem('mukirana_token') || '';
+  var pacoteRecorrencias = {
+    recorrencias: [],
+    ocorrenciasManuais: [],
+    ocorrenciasPeriodo: [],
+    dependencias: { contas: [], cartoes: [], categorias: [], projetos: [], usuarios: [] },
+    resumo: {}
+  };
+  var recorrenciaEmReativacao = '';
+  var diagnosticoRecorrenciaAtual = null;
+  var dependenciasRecorrenciaCarregadas = false;
+  var modoAposSalvarRecorrencia = 'fechar';
+  var selecaoRecorrencias = {};
+  var recorrenciaEmGeracao = null;
+
+  inicializarTelaRecorrencias();
+
+  function inicializarTelaRecorrencias() {
+    if (typeof registrarTelaAtualMukirana === 'function') {
+      registrarTelaAtualMukirana('Recorrencias', {
+        atualizarPeriodoGlobal: function() {
+          carregarPacoteRecorrencias();
+        }
+      });
+    }
+
+    carregarPacoteRecorrencias();
+  }
+
+  function carregarPacoteRecorrencias() {
+    google.script.run
+      .withSuccessHandler(function(pacote) {
+        pacoteRecorrencias = pacote || pacoteRecorrencias;
+        dependenciasRecorrenciaCarregadas = true;
+        limparSelecaoRecorrencias(false);
+        renderizarResumoRecorrencias();
+        renderizarListaRecorrencias();
+        sincronizarFormularioRecorrenciaComDependencias();
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(erro) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao("Erro ao carregar recorrências: " + erro.message, "erro");
+      })
+      .obterPacoteTelaRecorrencias(tokenSessaoRecorrencia, obterFiltrosRecorrenciaFront());
+  }
+
+  function obterFiltrosRecorrenciaFront() {
+    var periodo = obterPeriodoGlobalRecorrenciaFront_();
+
+    return {
+      Mes_Inicial: periodo.Mes_Inicial,
+      Mes_Final: periodo.Mes_Final,
+      Data_Limite_Manual: periodo.Data_Fim
+    };
+  }
+
+  function obterPeriodoGlobalRecorrenciaFront_() {
+    var periodo = typeof obterFiltroPeriodoGlobalMukirana === 'function'
+      ? obterFiltroPeriodoGlobalMukirana()
+      : {};
+    var mesInicial = periodo.Mes_Inicial || periodo.Mes_Referencia || gerarMesAtualRecorrenciaFront_();
+    var mesFinal = periodo.Mes_Final || '';
+    var mesLimite = mesFinal || mesInicial;
+
+    return {
+      Mes_Inicial: mesInicial,
+      Mes_Final: mesFinal,
+      Data_Fim: obterFimMesRecorrenciaFront_(mesLimite)
+    };
+  }
+
+  function gerarMesAtualRecorrenciaFront_() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  }
+
+  function obterFimMesRecorrenciaFront_(mesReferencia) {
+    var partes = String(mesReferencia || '').match(/^(\d{4})-(\d{2})$/);
+
+    if (!partes) {
+      return gerarDataHojeRecorrenciaFront();
+    }
+
+    var data = new Date(parseInt(partes[1], 10), parseInt(partes[2], 10), 0);
+    return data.getFullYear() + '-' +
+      String(data.getMonth() + 1).padStart(2, '0') + '-' +
+      String(data.getDate()).padStart(2, '0');
+  }
+
+  function renderizarResumoRecorrencias() {
+    var resumo = pacoteRecorrencias.resumo || {};
+
+    document.getElementById('rec_pendentes').textContent = resumo.Pendentes || 0;
+    document.getElementById('rec_geradas').textContent = resumo.Geradas || 0;
+    document.getElementById('rec_automaticas').textContent = resumo.Automaticas || 0;
+    document.getElementById('rec_manuais').textContent = resumo.Manuais || 0;
+  }
+
+  function renderizarListaRecorrencias() {
+    var corpo = document.getElementById('corpo-recorrencias');
+    var tabela = document.getElementById('tabela-recorrencias');
+    var vazio = document.getElementById('estado-vazio-recorrencias');
+    var lista = pacoteRecorrencias.recorrencias || [];
+    var grupoAtual = '';
+
+    corpo.innerHTML = '';
+
+    if (lista.length === 0) {
+      tabela.style.display = 'none';
+      vazio.style.display = 'block';
+      atualizarToolbarLoteRecorrencia();
+      return;
+    }
+
+    tabela.style.display = 'table';
+    vazio.style.display = 'none';
+
+    lista.forEach(function(item) {
+      var tr = document.createElement('tr');
+      var status = item.Status_Recorrencia || 'Ativa';
+      var inativa = status === 'Inativa';
+      var revisao = status === 'Revisão necessária';
+      var grupo = montarGrupoRecorrenciaFront(item);
+      var statusHtml = inativa
+        ? '<span class="badge-pendente">Inativa</span>'
+        : revisao
+          ? '<span class="badge-pendente">Revisão necessária</span>'
+          : '<span class="badge-global">Ativa</span>';
+      var detalheStatus = item.Info_Bloqueio
+        ? '<span class="lancamento-descricao-projeto">' + escaparHtmlRecorrencia(item.Info_Bloqueio) + '</span>'
+        : '';
+
+      if (grupo !== grupoAtual) {
+        var trGrupo = document.createElement('tr');
+        trGrupo.className = 'recorrencia-grupo-linha';
+        trGrupo.innerHTML = '<td colspan="11">' + escaparHtmlRecorrencia(grupo) + '</td>';
+        corpo.appendChild(trGrupo);
+        grupoAtual = grupo;
+      }
+
+      if (inativa) {
+        tr.classList.add('recorrencia-linha-gerada');
+        tr.title = 'Recorrência inativa. Marque exibir inativas para visualizar e reativar quando necessário.';
+      }
+
+      tr.innerHTML =
+        '<td class="recorrencia-checkbox-coluna" data-label="Selecionar"><input type="checkbox" name="recorrencia_lote_check" data-id="' + escaparHtmlRecorrencia(item.ID_Recorrencia) + '" onchange="alternarSelecaoRecorrencia(&quot;' + escaparHtmlRecorrencia(item.ID_Recorrencia) + '&quot;, this.checked)"' + (selecaoRecorrencias[item.ID_Recorrencia] ? ' checked' : '') + '></td>' +
+        '<td data-label="Início">' + formatarDataRecorrenciaFront(item.Data_Inicio) + '</td>' +
+        '<td data-label="Descrição"><strong>' + escaparHtmlRecorrencia(item.Descricao) + '</strong><span class="lancamento-descricao-projeto">' + escaparHtmlRecorrencia(item.Periodicidade_Visual) + '</span>' + detalheStatus + '</td>' +
+        '<td data-label="Tipo">' + escaparHtmlRecorrencia(item.Tipo) + '</td>' +
+        '<td data-label="Valor">R$ ' + formatarNumeroRecorrencia(item.Valor_Base) + '</td>' +
+        '<td data-label="Modo"><span class="badge-adicional">' + escaparHtmlRecorrencia(item.Modo_Geracao) + '</span></td>' +
+        '<td data-label="Origem">' + escaparHtmlRecorrencia(item.Nome_Origem_Visualizacao) + '</td>' +
+        '<td data-label="Projeto">' + escaparHtmlRecorrencia(item.Nome_Projeto_Visualizacao || '') + '</td>' +
+        '<td data-label="Rateio">' + escaparHtmlRecorrencia(item.Resumo_Rateio) + '</td>' +
+        '<td data-label="Status">' + statusHtml + '</td>' +
+        '<td data-label="Ações" style="text-align:right;">' + montarAcoesRecorrenciaFront(item) + '</td>';
+
+      corpo.appendChild(tr);
+    });
+
+    atualizarToolbarLoteRecorrencia();
+  }
+
+  function montarGrupoRecorrenciaFront(item) {
+    var modo = item.Modo_Geracao || 'Sem modo';
+    var status = item.Status_Recorrencia || 'Ativa';
+
+    return modo + ' - ' + status;
+  }
+  function montarGrupoOcorrenciaFront(item) {
+    var gerada = item.Status_Ocorrencia === 'Gerada';
+    var automatica = item.Modo_Geracao === 'Automática';
+
+    if (gerada) {
+      return automatica ? 'Automáticas geradas' : 'Manuais geradas';
+    }
+
+    return automatica ? 'Automáticas pendentes' : 'Manuais pendentes';
+  }
+
+  function alternarSelecaoTodasOcorrencias(selecionado) {
+    Array.from(document.querySelectorAll('input[name="rec_ocorrencia_check"]')).forEach(function(check) {
+      check.checked = !!selecionado;
+    });
+
+    atualizarCheckTodasOcorrencias();
+  }
+
+  function atualizarCheckTodasOcorrencias() {
+    var checkTodas = document.getElementById('check-todas-ocorrencias');
+    var checks = Array.from(document.querySelectorAll('input[name="rec_ocorrencia_check"]'));
+    var selecionados = checks.filter(function(check) {
+      return check.checked;
+    });
+
+    if (!checkTodas) {
+      return;
+    }
+
+    checkTodas.checked = checks.length > 0 && selecionados.length === checks.length;
+    checkTodas.indeterminate = selecionados.length > 0 && selecionados.length < checks.length;
+    checkTodas.disabled = checks.length === 0;
+  }
+
+  function alternarSelecaoRecorrencia(idRecorrencia, selecionado) {
+    if (selecionado) {
+      selecaoRecorrencias[idRecorrencia] = true;
+    } else {
+      delete selecaoRecorrencias[idRecorrencia];
+    }
+
+    atualizarToolbarLoteRecorrencia();
+  }
+
+  function alternarSelecaoTodasRecorrencias(selecionado) {
+    (pacoteRecorrencias.recorrencias || []).forEach(function(item) {
+      if (selecionado) {
+        selecaoRecorrencias[item.ID_Recorrencia] = true;
+      } else {
+        delete selecaoRecorrencias[item.ID_Recorrencia];
+      }
+    });
+
+    renderizarListaRecorrencias();
+  }
+
+  function limparSelecaoRecorrencias(renderizar) {
+    selecaoRecorrencias = {};
+
+    if (renderizar !== false) {
+      renderizarListaRecorrencias();
+    }
+  }
+
+  function obterIdsSelecionadosRecorrencia() {
+    return Object.keys(selecaoRecorrencias).filter(function(id) {
+      return selecaoRecorrencias[id] === true;
+    });
+  }
+
+  function atualizarToolbarLoteRecorrencia() {
+    var ids = obterIdsSelecionadosRecorrencia();
+    var toolbar = document.getElementById('toolbar-lote-recorrencia');
+    var contador = document.getElementById('contador-selecao-recorrencia');
+    var checkTodas = document.getElementById('check-todas-recorrencias');
+    var checks = document.querySelectorAll('input[name="recorrencia_lote_check"]');
+
+    if (toolbar) {
+      toolbar.classList.toggle('visivel', ids.length > 0);
+    }
+
+    if (contador) {
+      contador.textContent = ids.length + ' recorrência(s) selecionada(s)';
+    }
+
+    if (checkTodas) {
+      checkTodas.checked = checks.length > 0 && ids.length === checks.length;
+      checkTodas.indeterminate = ids.length > 0 && ids.length < checks.length;
+    }
+
+    atualizarCampoValorLoteRecorrencia();
+  }
+
+  function atualizarCampoValorLoteRecorrencia() {
+    var campo = document.getElementById('rec_lote_campo');
+    var valor = document.getElementById('rec_lote_valor');
+    var containerIntervalo = document.getElementById('container-rec-lote-intervalo');
+    var valorAtual = valor ? valor.value : '';
+    var opcoes = [];
+
+    if (!campo || !valor) {
+      return;
+    }
+
+    if (campo.value === 'Modo_Geracao') {
+      opcoes = [
+        { valor: 'Manual', texto: 'Manual' },
+        { valor: 'Automática', texto: 'Automática' }
+      ];
+    } else if (campo.value === 'Periodicidade_Tipo') {
+      opcoes = [
+        { valor: 'Mensal', texto: 'Mensal' },
+        { valor: 'Personalizada', texto: 'Personalizada' }
+      ];
+    } else {
+      opcoes = [
+        { valor: 'Efetivado', texto: 'Efetivado' },
+        { valor: 'Pendente', texto: 'Pendente' }
+      ];
+    }
+
+    valor.innerHTML = opcoes.map(function(item) {
+      return '<option value="' + item.valor + '">' + item.texto + '</option>';
+    }).join('');
+
+    if (opcoes.some(function(item) { return item.valor === valorAtual; })) {
+      valor.value = valorAtual;
+    }
+
+    if (containerIntervalo) {
+      containerIntervalo.style.display = campo.value === 'Periodicidade_Tipo' && valor.value === 'Personalizada'
+        ? 'block'
+        : 'none';
+    }
+  }
+
+  function aplicarAlteracaoLoteRecorrencia() {
+    var ids = obterIdsSelecionadosRecorrencia();
+    var campo = document.getElementById('rec_lote_campo').value;
+    var valor = document.getElementById('rec_lote_valor').value;
+    var intervalo = document.getElementById('rec_lote_intervalo').value || '';
+    var rotuloCampo = document.getElementById('rec_lote_campo').selectedOptions[0].textContent;
+    var rotuloValor = document.getElementById('rec_lote_valor').selectedOptions[0].textContent;
+
+    if (ids.length === 0) {
+      mostrarNotificacao('Selecione ao menos uma recorrência.', 'alerta');
+      return;
+    }
+
+    if (campo === 'Periodicidade_Tipo' && valor === 'Personalizada' && (!intervalo || parseInt(intervalo, 10) <= 0)) {
+      mostrarNotificacao('Informe o intervalo em dias para a periodicidade personalizada.', 'alerta');
+      return;
+    }
+
+    confirmarAcao('Confirma alterar ' + rotuloCampo + ' para ' + rotuloValor + ' em ' + ids.length + ' recorrência(s) selecionada(s)? Recorrências que já possuem esse valor não serão alteradas.', function() {
+      google.script.run
+        .withSuccessHandler(function(mensagem) {
+          mostrarNotificacao(mensagem, 'sucesso');
+          limparSelecaoRecorrencias(false);
+          carregarPacoteRecorrencias();
+        })
+        .withFailureHandler(function(erro) {
+          mostrarNotificacao(erro.message, 'erro');
+        })
+        .alterarRecorrenciasEmLote(tokenSessaoRecorrencia, {
+          IDs_Recorrencias: ids,
+          Campo: campo,
+          Valor: valor,
+          Intervalo_Dias: intervalo
+        });
+    });
+  }
+
+  function montarAcoesRecorrenciaFront(item) {
+    if (item.Status_Recorrencia === 'Inativa') {
+      return '<div class="recorrencia-acoes"><button class="btn-acao" onclick="abrirReativacaoRecorrencia(&quot;' + escaparHtmlRecorrencia(item.ID_Recorrencia) + '&quot;)">Reativar</button></div>';
+    }
+
+    if (item.Status_Recorrencia === 'Revisão necessária') {
+      return '<div class="recorrencia-acoes"><button class="btn-acao" onclick="prepararEdicaoRecorrencia(&quot;' + escaparHtmlRecorrencia(item.ID_Recorrencia) + '&quot;)">Reavaliar</button></div>';
+    }
+
+    return '<div class="recorrencia-acoes">' +
+      '<button class="btn-acao" onclick="abrirGeracaoPontualRecorrencia(&quot;' + escaparHtmlRecorrencia(item.ID_Recorrencia) + '&quot;)">Gerar lançamento</button>' +
+      '<button class="btn-acao" onclick="prepararEdicaoRecorrencia(&quot;' + escaparHtmlRecorrencia(item.ID_Recorrencia) + '&quot;)">Editar</button>' +
+      '<button class="btn-acao btn-perigo" onclick="inativarRecorrenciaFront(&quot;' + escaparHtmlRecorrencia(item.ID_Recorrencia) + '&quot;)">Inativar</button>' +
+      '</div>';
+  }
+
+  function abrirFormularioRecorrencia() {
+    if (!dependenciasRecorrenciaCarregadas) {
+      mostrarNotificacao('Aguarde o carregamento das dependências da tela e tente novamente em instantes.', 'alerta');
+      return;
+    }
+
+    diagnosticoRecorrenciaAtual = null;
+    definirModoAposSalvarRecorrencia('fechar');
+    document.getElementById('form-recorrencia').reset();
+    document.getElementById('rec_id').value = '';
+    document.getElementById('rec_tipo').value = 'Despesa';
+    document.getElementById('rec_periodicidade_tipo').value = 'Mensal';
+    document.getElementById('rec_modo_geracao').value = 'Manual';
+    document.getElementById('rec_status_lancamento').value = 'Efetivado';
+    document.getElementById('rec_modo_rateio').value = 'Igual';
+    document.getElementById('rec_observacao_rateio').value = '';
+    document.getElementById('rec_rateio_ativo').checked = false;
+    document.getElementById('rec_data_inicio').value = gerarDataHojeRecorrenciaFront();
+    document.getElementById('titulo-form-recorrencia').innerText = 'Nova Recorrência';
+    popularCategoriasRecorrencia();
+    popularProjetosRecorrencia();
+    atualizarDropdownOrigemRecorrencia();
+    atualizarDropdownDestinoRecorrencia();
+    limparDiagnosticoRecorrenciaFront();
+    aoAlterarPeriodicidadeRecorrencia();
+    aoAlterarTipoRecorrencia();
+    alternarRateioRecorrencia([]);
+    document.getElementById('container-form-recorrencia').style.display = 'block';
+    document.getElementById('container-lista-recorrencias').style.display = 'none';
+    focarCampoInicialRecorrencia();
+  }
+
+  function fecharFormularioRecorrencia() {
+    document.getElementById('container-form-recorrencia').style.display = 'none';
+    document.getElementById('container-lista-recorrencias').style.display = 'block';
+  }
+
+  function focarCampoInicialRecorrencia() {
+    setTimeout(function() {
+      var campo = document.getElementById('rec_tipo');
+      if (campo && !campo.disabled && typeof campo.focus === 'function') {
+        campo.focus();
+      }
+    }, 0);
+  }
+
+  function definirModoAposSalvarRecorrencia(modo) {
+    modoAposSalvarRecorrencia = modo === 'novo' ? 'novo' : 'fechar';
+  }
+
+  function solicitarSalvarENovaRecorrencia() {
+    definirModoAposSalvarRecorrencia('novo');
+
+    var formulario = document.getElementById('form-recorrencia');
+
+    if (formulario && typeof formulario.requestSubmit === 'function') {
+      formulario.requestSubmit();
+      return;
+    }
+
+    formulario.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  function atualizarEstadoBotoesSalvarRecorrencia(salvando) {
+    var btnSalvar = document.getElementById('btn_salvar_recorrencia');
+    var btnSalvarENovo = document.getElementById('btn_salvar_e_novo_recorrencia');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#form-recorrencia',
+        idsProcessando: ['btn_salvar_recorrencia', 'btn_salvar_e_novo_recorrencia'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    btnSalvar.disabled = !!salvando;
+    btnSalvar.innerText = salvando ? 'Salvando...' : 'Salvar Recorrência';
+    btnSalvarENovo.disabled = !!salvando;
+    btnSalvarENovo.innerText = salvando ? 'Salvando...' : 'Salvar + novo';
+  }
+
+  function sincronizarFormularioRecorrenciaComDependencias() {
+    if (document.getElementById('container-form-recorrencia').style.display === 'none') {
+      return;
+    }
+
+    var idCategoria = document.getElementById('rec_categoria').value;
+    var idProjeto = document.getElementById('rec_projeto').value;
+    var idOrigem = document.getElementById('rec_origem').value;
+    var idDestino = document.getElementById('rec_destino').value;
+    var rateios = coletarParticipantesRateioRecorrenciaFront();
+
+    popularCategoriasRecorrencia(idCategoria);
+    popularProjetosRecorrencia(idProjeto);
+    atualizarDropdownOrigemRecorrencia(idOrigem);
+    atualizarDropdownDestinoRecorrencia(idDestino);
+    alternarRateioRecorrencia(rateios);
+  }
+
+  function popularCategoriasRecorrencia(idSelecionado) {
+    var select = document.getElementById('rec_categoria');
+    var tipo = document.getElementById('rec_tipo').value;
+    var mapaCategorias = {};
+    var categorias = (pacoteRecorrencias.dependencias.categorias || []).filter(function(item) {
+      return item.Tipo === tipo;
+    });
+
+    select.innerHTML = '<option value="">Selecione...</option>';
+
+    categorias.forEach(function(categoria) {
+      mapaCategorias[categoria.ID_Categoria] = categoria;
+    });
+
+    categorias.sort(function(a, b) {
+      var paiA = a.ID_Categoria_Pai ? (mapaCategorias[a.ID_Categoria_Pai] || {}).Nome || '' : a.Nome || '';
+      var paiB = b.ID_Categoria_Pai ? (mapaCategorias[b.ID_Categoria_Pai] || {}).Nome || '' : b.Nome || '';
+      var comparacaoPai = paiA.localeCompare(paiB, 'pt-BR', { sensitivity: 'base' });
+
+      if (comparacaoPai !== 0) {
+        return comparacaoPai;
+      }
+
+      if (!a.ID_Categoria_Pai && b.ID_Categoria_Pai) return -1;
+      if (a.ID_Categoria_Pai && !b.ID_Categoria_Pai) return 1;
+
+      return (a.Nome || '').localeCompare(b.Nome || '', 'pt-BR', { sensitivity: 'base' });
+    });
+
+    categorias.forEach(function(categoria) {
+      var categoriaPai = categoria.ID_Categoria_Pai ? mapaCategorias[categoria.ID_Categoria_Pai] : null;
+      var opt = document.createElement('option');
+      opt.value = categoria.ID_Categoria;
+      opt.textContent = categoriaPai ? categoriaPai.Nome + ' > ' + categoria.Nome : categoria.Nome;
+      select.appendChild(opt);
+    });
+
+    if (idSelecionado) {
+      select.value = idSelecionado;
+    }
+  }
+
+  function popularProjetosRecorrencia(idSelecionado) {
+    var select = document.getElementById('rec_projeto');
+    var projetos = (pacoteRecorrencias.dependencias.projetos || []).slice();
+
+    select.innerHTML = '<option value="">Nenhum</option>';
+
+    projetos.sort(function(a, b) {
+      return (a.Nome || '').localeCompare(b.Nome || '');
+    });
+
+    projetos.forEach(function(projeto) {
+      var opt = document.createElement('option');
+      opt.value = projeto.ID_Projeto;
+      opt.textContent = projeto.Nome;
+      select.appendChild(opt);
+    });
+
+    if (idSelecionado) {
+      select.value = idSelecionado;
+    }
+  }
+
+  function atualizarDropdownOrigemRecorrencia(idSelecionado) {
+    var tipoOrigem = document.getElementById('rec_tipo_origem').value;
+    var select = document.getElementById('rec_origem');
+    var opcoes = tipoOrigem === 'Cartão'
+      ? (pacoteRecorrencias.dependencias.cartoes || []).slice()
+      : (pacoteRecorrencias.dependencias.contas || []).slice();
+
+    select.innerHTML = '<option value="">Selecione...</option>';
+
+    opcoes.sort(function(a, b) {
+      if (tipoOrigem === 'Cartão') {
+        return montarNomeCartaoOrigemLancamento(a).localeCompare(montarNomeCartaoOrigemLancamento(b));
+      }
+
+      return (a.Nome_Conta || '').localeCompare(b.Nome_Conta || '');
+    });
+
+    opcoes.forEach(function(item) {
+      var opt = document.createElement('option');
+      opt.value = tipoOrigem === 'Cartão' ? item.ID_Cartao : item.ID_Conta;
+      opt.textContent = tipoOrigem === 'Cartão' ? montarNomeCartaoOrigemLancamento(item) : (item.Nome_Conta || 'Conta');
+      select.appendChild(opt);
+    });
+
+    if (idSelecionado) {
+      select.value = idSelecionado;
+    }
+
+    atualizarDropdownDestinoRecorrencia(document.getElementById('rec_destino').value);
+    aoAlterarContextoRateioRecorrencia();
+  }
+
+  function atualizarDropdownDestinoRecorrencia(idSelecionado) {
+    var select = document.getElementById('rec_destino');
+    var contas = (pacoteRecorrencias.dependencias.contas || []).slice();
+    var origemAtual = document.getElementById('rec_origem').value;
+
+    select.innerHTML = '<option value="">Selecione...</option>';
+
+    contas = contas.filter(function(conta) {
+      return conta.ID_Conta !== origemAtual;
+    });
+
+    contas.sort(function(a, b) {
+      return (a.Nome_Conta || '').localeCompare(b.Nome_Conta || '');
+    });
+
+    contas.forEach(function(conta) {
+      var opt = document.createElement('option');
+      opt.value = conta.ID_Conta;
+      opt.textContent = conta.Nome_Conta || 'Conta';
+      select.appendChild(opt);
+    });
+
+    if (idSelecionado) {
+      select.value = idSelecionado;
+    }
+  }
+
+  function aoAlterarPeriodicidadeRecorrencia() {
+    var tipo = document.getElementById('rec_periodicidade_tipo').value;
+    document.getElementById('container_rec_intervalo').style.display = tipo === 'Personalizada' ? 'block' : 'none';
+  }
+
+  function aoAlterarTipoRecorrencia() {
+    var tipo = document.getElementById('rec_tipo').value;
+    var transferencia = tipo === 'Transferência';
+
+    document.getElementById('container-rec-categoria').style.display = transferencia ? 'none' : 'flex';
+    document.getElementById('rec_categoria').required = !transferencia;
+    document.getElementById('rec_categoria').disabled = transferencia;
+    document.getElementById('container-rec-destino').style.display = transferencia ? 'grid' : 'none';
+    document.getElementById('rec_destino').required = transferencia;
+    document.getElementById('rec_tipo_origem').disabled = transferencia;
+
+    if (transferencia) {
+      document.getElementById('rec_tipo_origem').value = 'Conta';
+      document.getElementById('rec_rateio_ativo').checked = false;
+    }
+
+    popularCategoriasRecorrencia();
+    atualizarDropdownOrigemRecorrencia();
+    atualizarDropdownDestinoRecorrencia();
+    alternarRateioRecorrencia(coletarParticipantesRateioRecorrenciaFront());
+  }
+
+  function alternarRateioRecorrencia(rateiosExistentes) {
+    var ativo = document.getElementById('rec_rateio_ativo').checked;
+    var transferencia = document.getElementById('rec_tipo').value === 'Transferência';
+    var container = document.getElementById('container-rateio-recorrencia');
+    var participantes = document.getElementById('rec_participantes_rateio');
+    var info = document.getElementById('rec_info_rateio');
+
+    container.style.display = (ativo && !transferencia) ? 'block' : 'none';
+
+    if (ativo && !transferencia) {
+      renderizarParticipantesRateioRecorrencia(Array.isArray(rateiosExistentes) ? rateiosExistentes : coletarParticipantesRateioRecorrenciaFront());
+      atualizarCamposRateioRecorrencia();
+      return;
+    }
+
+    participantes.innerHTML = '';
+    info.innerHTML = '<strong>Rateio:</strong> ative esta opção para configurar os participantes da automação.';
+  }
+
+  function aoAlterarContextoRateioRecorrencia() {
+    if (document.getElementById('rec_tipo').value === 'Transferência') {
+      atualizarDropdownDestinoRecorrencia(document.getElementById('rec_destino').value);
+    }
+
+    if (!document.getElementById('rec_rateio_ativo').checked) {
+      return;
+    }
+
+    renderizarParticipantesRateioRecorrencia(coletarParticipantesRateioRecorrenciaFront());
+    atualizarCamposRateioRecorrencia();
+  }
+
+  function obterMapaUsuariosElegiveisRecorrenciaFront() {
+    var mapa = {};
+
+    (pacoteRecorrencias.dependencias.usuarios || []).forEach(function(usuario) {
+      if (usuario && usuario.ID_Usuario) {
+        mapa[usuario.ID_Usuario] = true;
+      }
+    });
+
+    return mapa;
+  }
+
+  function obterUsuariosElegiveisRecorrenciaFront() {
+    var mapa = obterMapaUsuariosElegiveisRecorrenciaFront();
+
+    return (pacoteRecorrencias.dependencias.usuarios || []).filter(function(usuario) {
+      return mapa[usuario.ID_Usuario] === true;
+    });
+  }
+
+  function renderizarParticipantesRateioRecorrencia(rateiosExistentes) {
+    var container = document.getElementById('rec_participantes_rateio');
+    var info = document.getElementById('rec_info_rateio');
+    var usuarios = obterUsuariosElegiveisRecorrenciaFront();
+    var modo = document.getElementById('rec_modo_rateio').value;
+    var idLogado = pacoteRecorrencias.usuarioLogado.id || '';
+
+    container.innerHTML = '';
+
+    if (usuarios.length === 0) {
+      info.innerHTML = '<strong>Rateio:</strong> nenhum usuário ativo disponível para participar desta automação.';
+      return;
+    }
+
+    info.innerHTML = '<strong>Rateio:</strong> a automação pode ratear com qualquer usuário ativo. ' +
+      'A conta, o cartão e o projeto continuam com as próprias permissões. ' +
+      'O criador da recorrência deve participar obrigatoriamente.';
+
+    usuarios.sort(function(a, b) {
+      if (a.ID_Usuario === idLogado) return -1;
+      if (b.ID_Usuario === idLogado) return 1;
+      return (a.Nome || '').localeCompare(b.Nome || '');
+    });
+
+    usuarios.forEach(function(usuario) {
+      var rateio = encontrarRateioRecorrenciaPorUsuario(rateiosExistentes, usuario.ID_Usuario);
+      var linha = document.createElement('div');
+      var checked = rateio || usuario.ID_Usuario === idLogado;
+
+      linha.className = 'linha-participante-rateio';
+      linha.innerHTML =
+        '<input type="checkbox" name="participante_rateio_recorrencia" value="' + escaparHtmlRecorrencia(usuario.ID_Usuario) + '"' + (checked ? ' checked' : '') + ' onchange="atualizarCamposRateioRecorrencia()">' +
+        '<label>' + escaparHtmlRecorrencia(usuario.Nome) + '<span class="subtexto">' + escaparHtmlRecorrencia(usuario.Email || 'Participante disponível') + '</span></label>' +
+        '<input type="text" data-tipo="valor" data-usuario="' + escaparHtmlRecorrencia(usuario.ID_Usuario) + '" placeholder="0,00" value="' + (rateio ? formatarNumeroRecorrencia(rateio.Valor_Rateado) : '') + '" oninput="mascaraMoeda(this); atualizarCamposRateioRecorrencia()">' +
+        '<input type="number" data-tipo="percentual" data-usuario="' + escaparHtmlRecorrencia(usuario.ID_Usuario) + '" placeholder="0,00" value="' + (rateio ? (rateio.Percentual || '') : '') + '" oninput="atualizarCamposRateioRecorrencia()">';
+
+      container.appendChild(linha);
+    });
+
+    atualizarCamposRateioRecorrencia();
+  }
+
+  function atualizarCamposRateioRecorrencia() {
+    var modo = document.getElementById('rec_modo_rateio').value;
+    var checkboxes = Array.from(document.querySelectorAll('input[name="participante_rateio_recorrencia"]'));
+    var total = converterTextoMoedaParaNumeroLancamento(document.getElementById('rec_valor').value || 0);
+    var totalCentavos = Math.round(total * 100);
+    var selecionados = checkboxes.filter(function(cb) { return cb.checked; });
+
+    checkboxes.forEach(function(cb) {
+      var inputValor = document.querySelector('input[data-tipo="valor"][data-usuario="' + cb.value + '"]');
+      var inputPerc = document.querySelector('input[data-tipo="percentual"][data-usuario="' + cb.value + '"]');
+      var habilitado = cb.checked;
+
+      inputValor.style.display = modo === 'Percentual' ? 'none' : 'block';
+      inputPerc.style.display = modo === 'Valor' ? 'none' : 'block';
+      inputValor.disabled = !habilitado || modo === 'Igual';
+      inputPerc.disabled = !habilitado || modo === 'Igual';
+    });
+
+    if (modo === 'Igual' && selecionados.length > 0 && totalCentavos > 0) {
+      var base = Math.floor(totalCentavos / selecionados.length);
+      var resto = totalCentavos - (base * selecionados.length);
+
+      selecionados.forEach(function(cb) {
+        var centavos = base;
+        if (resto > 0) {
+          centavos += 1;
+          resto -= 1;
+        }
+
+        document.querySelector('input[data-tipo="valor"][data-usuario="' + cb.value + '"]').value = formatarNumeroRecorrencia(centavos / 100);
+        document.querySelector('input[data-tipo="percentual"][data-usuario="' + cb.value + '"]').value = totalCentavos > 0 ? ((centavos / totalCentavos) * 100).toFixed(2) : '0,00';
+      });
+    }
+  }
+
+  function encontrarRateioRecorrenciaPorUsuario(rateios, idUsuario) {
+    return (rateios || []).find(function(item) {
+      return item.ID_Usuario_Responsavel === idUsuario;
+    }) || null;
+  }
+
+  function coletarParticipantesRateioRecorrenciaFront() {
+    return Array.from(document.querySelectorAll('input[name="participante_rateio_recorrencia"]:checked')).map(function(cb) {
+      var inputValor = document.querySelector('input[data-tipo="valor"][data-usuario="' + cb.value + '"]');
+      var inputPerc = document.querySelector('input[data-tipo="percentual"][data-usuario="' + cb.value + '"]');
+
+      return {
+        ID_Usuario: cb.value,
+        Valor_Rateado: converterTextoMoedaParaNumeroLancamento(inputValor ? inputValor.value : 0),
+        Percentual: parseFloat(inputPerc ? (inputPerc.value || 0) : 0) || 0
+      };
+    });
+  }
+
+  function enviarFormularioRecorrencia(evento) {
+    evento.preventDefault();
+    var modoSalvamento = modoAposSalvarRecorrencia === 'novo' ? 'novo' : 'fechar';
+    atualizarEstadoBotoesSalvarRecorrencia(true);
+
+    var tipo = document.getElementById('rec_tipo').value;
+    var dados = {
+      ID_Recorrencia: document.getElementById('rec_id').value,
+      Descricao: document.getElementById('rec_descricao').value,
+      Tipo: tipo,
+      Valor_Base: converterTextoMoedaParaNumeroLancamento(document.getElementById('rec_valor').value),
+      Data_Inicio: document.getElementById('rec_data_inicio').value,
+      Periodicidade_Tipo: document.getElementById('rec_periodicidade_tipo').value,
+      Intervalo_Dias: document.getElementById('rec_intervalo_dias').value,
+      Modo_Geracao: document.getElementById('rec_modo_geracao').value,
+      Tipo_Origem: document.getElementById('rec_tipo_origem').value,
+      ID_Origem: document.getElementById('rec_origem').value,
+      ID_Destino: tipo === 'Transferência' ? document.getElementById('rec_destino').value : '',
+      ID_Categoria: tipo === 'Transferência' ? '' : document.getElementById('rec_categoria').value,
+      ID_Projeto: document.getElementById('rec_projeto').value,
+      Status_Lancamento: document.getElementById('rec_status_lancamento').value,
+      Rateio_Ativo: document.getElementById('rec_rateio_ativo').checked && tipo !== 'Transferência',
+      Modo_Rateio: document.getElementById('rec_modo_rateio').value,
+      Observacao_Rateio: document.getElementById('rec_observacao_rateio').value,
+      Participantes_Rateio: coletarParticipantesRateioRecorrenciaFront()
+    };
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        atualizarEstadoBotoesSalvarRecorrencia(false);
+        definirModoAposSalvarRecorrencia('fechar');
+
+        if (modoSalvamento === 'novo') {
+          abrirFormularioRecorrencia();
+        } else {
+          fecharFormularioRecorrencia();
+        }
+
+        carregarPacoteRecorrencias();
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(erro) {
+        atualizarEstadoBotoesSalvarRecorrencia(false);
+        definirModoAposSalvarRecorrencia('fechar');
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      .salvarRecorrencia(dados, tokenSessaoRecorrencia);
+  }
+
+  function prepararEdicaoRecorrencia(idRecorrencia) {
+    google.script.run
+      .withSuccessHandler(function(resposta) {
+        var rec = resposta.recorrencia || {};
+        var rateios = resposta.rateios || [];
+        var rateioBase = rateios.length > 0 ? rateios[0] : null;
+        diagnosticoRecorrenciaAtual = resposta.diagnostico || null;
+
+        document.getElementById('container-form-recorrencia').style.display = 'block';
+        document.getElementById('container-lista-recorrencias').style.display = 'none';
+        document.getElementById('rec_id').value = rec.ID_Recorrencia || '';
+        document.getElementById('rec_tipo').value = rec.Tipo || 'Despesa';
+        document.getElementById('rec_periodicidade_tipo').value = rec.Periodicidade_Tipo || 'Mensal';
+        document.getElementById('rec_tipo_origem').value = rec.Tipo_Origem || 'Conta';
+        aoAlterarPeriodicidadeRecorrencia();
+        aoAlterarTipoRecorrencia();
+        document.getElementById('rec_descricao').value = rec.Descricao || '';
+        document.getElementById('rec_valor').value = formatarNumeroRecorrencia(rec.Valor_Base || 0);
+        document.getElementById('rec_data_inicio').value = rec.Data_Inicio || '';
+        document.getElementById('rec_intervalo_dias').value = rec.Intervalo_Dias || '';
+        document.getElementById('rec_modo_geracao').value = rec.Modo_Geracao || 'Manual';
+        document.getElementById('rec_status_lancamento').value = rec.Status_Lancamento || 'Efetivado';
+        document.getElementById('rec_modo_rateio').value = rateioBase && rateioBase.Modo_Rateio ? rateioBase.Modo_Rateio : 'Igual';
+        document.getElementById('rec_observacao_rateio').value = (rateioBase && rateioBase.Observacao) || '';
+        popularProjetosRecorrencia(rec.ID_Projeto || '');
+        popularCategoriasRecorrencia(rec.ID_Categoria || '');
+        atualizarDropdownOrigemRecorrencia(rec.ID_Origem || '');
+        atualizarDropdownDestinoRecorrencia(rec.ID_Destino || '');
+        document.getElementById('rec_projeto').value = rec.ID_Projeto || '';
+        document.getElementById('rec_categoria').value = rec.ID_Categoria || '';
+        document.getElementById('rec_origem').value = rec.ID_Origem || '';
+        document.getElementById('rec_destino').value = rec.ID_Destino || '';
+        document.getElementById('rec_rateio_ativo').checked = rateios.length > 0;
+        alternarRateioRecorrencia(rateios);
+        aplicarDiagnosticoRecorrenciaFront();
+
+        document.getElementById('titulo-form-recorrencia').innerText = rec.Status_Recorrencia === 'Revisão necessária' ? 'Reavaliar Recorrência' : 'Editar Recorrência';
+        focarCampoInicialRecorrencia();
+      })
+      .withFailureHandler(function(erro) {
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      .obterRecorrenciaParaEdicao(idRecorrencia, tokenSessaoRecorrencia);
+  }
+
+  function limparDiagnosticoRecorrenciaFront() {
+    document.getElementById('aviso-revisao-recorrencia').style.display = 'none';
+    document.getElementById('aviso-revisao-recorrencia').innerHTML = '';
+
+    [
+      'rec_categoria',
+      'rec_origem',
+      'rec_destino',
+      'rec_projeto',
+      'rec_data_inicio'
+    ].forEach(function(idCampo) {
+      var campo = document.getElementById(idCampo);
+      if (campo) campo.classList.remove('recorrencia-campo-invalido');
+    });
+
+    [
+      'erro_rec_categoria',
+      'erro_rec_origem',
+      'erro_rec_destino',
+      'erro_rec_projeto',
+      'erro_rec_data_inicio',
+      'erro_rec_rateio'
+    ].forEach(function(idErro) {
+      var erro = document.getElementById(idErro);
+      if (erro) {
+        erro.style.display = 'none';
+        erro.textContent = '';
+      }
+    });
+  }
+
+  function aplicarDiagnosticoRecorrenciaFront() {
+    limparDiagnosticoRecorrenciaFront();
+
+    if (!diagnosticoRecorrenciaAtual) {
+      return;
+    }
+
+    var mensagens = diagnosticoRecorrenciaAtual.mensagensGerais || [];
+    var campos = diagnosticoRecorrenciaAtual.campos || {};
+    var participantes = diagnosticoRecorrenciaAtual.participantesInvalidos || [];
+
+    if (mensagens.length > 0 || Object.keys(campos).length > 0 || participantes.length > 0) {
+      var html = '';
+
+      if (mensagens.length > 0) {
+        html += '<strong>Revisão necessária:</strong> ' + escaparHtmlRecorrencia(mensagens.join(' '));
+      }
+
+      if (participantes.length > 0) {
+        html += '<br><strong>Participantes com problema:</strong> ' + escaparHtmlRecorrencia(participantes.join(', '));
+      }
+
+      document.getElementById('aviso-revisao-recorrencia').style.display = 'block';
+      document.getElementById('aviso-revisao-recorrencia').innerHTML = html;
+    }
+
+    if (campos.ID_Categoria) marcarCampoDiagnosticoRecorrencia('rec_categoria', 'erro_rec_categoria', campos.ID_Categoria);
+    if (campos.ID_Origem) marcarCampoDiagnosticoRecorrencia('rec_origem', 'erro_rec_origem', campos.ID_Origem);
+    if (campos.ID_Destino) marcarCampoDiagnosticoRecorrencia('rec_destino', 'erro_rec_destino', campos.ID_Destino);
+    if (campos.ID_Projeto) marcarCampoDiagnosticoRecorrencia('rec_projeto', 'erro_rec_projeto', campos.ID_Projeto);
+
+    if (participantes.length > 0) {
+      document.getElementById('erro_rec_rateio').style.display = 'block';
+      document.getElementById('erro_rec_rateio').textContent = 'Revise os participantes do rateio: ' + participantes.join(', ') + '.';
+    }
+  }
+
+  function marcarCampoDiagnosticoRecorrencia(idCampo, idErro, mensagem) {
+    var campo = document.getElementById(idCampo);
+    var erro = document.getElementById(idErro);
+
+    if (campo) campo.classList.add('recorrencia-campo-invalido');
+    if (erro) {
+      erro.style.display = 'block';
+      erro.textContent = mensagem;
+    }
+  }
+
+  function abrirGeracaoPontualRecorrencia(idRecorrencia) {
+    google.script.run
+      .withSuccessHandler(function(dados) {
+        recorrenciaEmGeracao = dados || null;
+
+        if (!recorrenciaEmGeracao || !recorrenciaEmGeracao.Data_Prevista) {
+          mostrarNotificacao('Não foi possível determinar a próxima ocorrência pendente.', 'erro');
+          return;
+        }
+
+        document.getElementById('rec_gerar_resumo').textContent =
+          (recorrenciaEmGeracao.Descricao || 'Recorrência') +
+          ' — R$ ' + formatarNumeroRecorrencia(recorrenciaEmGeracao.Valor_Base || 0);
+        document.getElementById('rec_gerar_data_prevista_texto').textContent =
+          'Data prevista do ciclo: ' + formatarDataRecorrenciaFront(recorrenciaEmGeracao.Data_Prevista) + '.';
+        document.getElementById('rec_gerar_data_lancamento').value =
+          recorrenciaEmGeracao.Data_Sugerida || gerarDataHojeRecorrenciaFront();
+
+        var opcaoPrevista = document.querySelector('input[name="rec_gerar_opcao_data"][value="prevista"]');
+        if (opcaoPrevista) opcaoPrevista.checked = true;
+
+        atualizarOpcaoDataGeracaoRecorrencia();
+        document.getElementById('modal-gerar-recorrencia').classList.remove('oculto');
+      })
+      .withFailureHandler(function(erro) {
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      .obterDadosGeracaoPontualRecorrencia(idRecorrencia, tokenSessaoRecorrencia);
+  }
+
+
+  function atualizarOpcaoDataGeracaoRecorrencia() {
+    var selecionada = document.querySelector('input[name="rec_gerar_opcao_data"]:checked');
+    var usarOutra = selecionada && selecionada.value === 'outra';
+    var container = document.getElementById('container-rec-gerar-outra-data');
+    var campo = document.getElementById('rec_gerar_data_lancamento');
+
+    container.style.display = usarOutra ? 'block' : 'none';
+    campo.required = !!usarOutra;
+  }
+
+
+  function fecharModalGerarRecorrencia() {
+    recorrenciaEmGeracao = null;
+    document.getElementById('modal-gerar-recorrencia').classList.add('oculto');
+  }
+
+
+  function confirmarGeracaoPontualRecorrencia() {
+    if (!recorrenciaEmGeracao) {
+      mostrarNotificacao('A recorrência selecionada não está mais disponível.', 'erro');
+      return;
+    }
+
+    var selecionada = document.querySelector('input[name="rec_gerar_opcao_data"]:checked');
+    var usarOutra = selecionada && selecionada.value === 'outra';
+    var dataLancamento = usarOutra
+      ? document.getElementById('rec_gerar_data_lancamento').value
+      : recorrenciaEmGeracao.Data_Prevista;
+
+    if (!dataLancamento) {
+      mostrarNotificacao('Informe a data do lançamento.', 'alerta');
+      return;
+    }
+
+    var botao = document.getElementById('btn_confirmar_gerar_recorrencia');
+    botao.disabled = true;
+    botao.textContent = 'Gerando...';
+
+    google.script.run
+      .withSuccessHandler(function(mensagem) {
+        botao.disabled = false;
+        botao.textContent = 'Gerar lançamento';
+        fecharModalGerarRecorrencia();
+        carregarPacoteRecorrencias();
+        mostrarNotificacao(mensagem, 'sucesso');
+      })
+      .withFailureHandler(function(erro) {
+        botao.disabled = false;
+        botao.textContent = 'Gerar lançamento';
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      .gerarOcorrenciaPontualRecorrencia(
+        recorrenciaEmGeracao.ID_Recorrencia,
+        recorrenciaEmGeracao.Data_Prevista,
+        dataLancamento,
+        tokenSessaoRecorrencia
+      );
+  }
+
+
+  function inativarRecorrenciaFront(idRecorrencia) {
+    confirmarAcao('Deseja inativar esta recorrência? Ela deixará de gerar novos lançamentos.', function() {
+      google.script.run
+        .withSuccessHandler(function(msg) {
+          carregarPacoteRecorrencias();
+          mostrarNotificacao(msg, 'sucesso');
+        })
+        .withFailureHandler(function(erro) {
+          mostrarNotificacao(erro.message, 'erro');
+        })
+        .inativarRecorrencia(idRecorrencia, tokenSessaoRecorrencia);
+    });
+  }
+
+  function abrirReativacaoRecorrencia(idRecorrencia) {
+    recorrenciaEmReativacao = idRecorrencia;
+    document.getElementById('rec_reativar_data').value = gerarDataHojeRecorrenciaFront();
+    document.getElementById('modal-reativar-recorrencia').classList.remove('oculto');
+  }
+
+  function fecharModalReativarRecorrencia() {
+    recorrenciaEmReativacao = '';
+    document.getElementById('modal-reativar-recorrencia').classList.add('oculto');
+  }
+
+  function confirmarReativacaoRecorrencia() {
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        fecharModalReativarRecorrencia();
+        carregarPacoteRecorrencias();
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(erro) {
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      .reativarRecorrencia(recorrenciaEmReativacao, document.getElementById('rec_reativar_data').value, tokenSessaoRecorrencia);
+  }
+
+  function gerarSelecionadasRecorrencia() {
+    var selecoes = Array.from(document.querySelectorAll('input[name="rec_ocorrencia_check"]:checked')).map(function(cb) {
+      return {
+        ID_Recorrencia: cb.getAttribute('data-id'),
+        Data_Ocorrencia: cb.getAttribute('data-data')
+      };
+    });
+
+    if (selecoes.length === 0) {
+      mostrarNotificacao('Selecione pelo menos uma ocorrência manual.', 'alerta');
+      return;
+    }
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        carregarPacoteRecorrencias();
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(erro) {
+        mostrarNotificacao(erro.message, 'erro');
+      })
+      .gerarOcorrenciasManuaisRecorrencia(selecoes, tokenSessaoRecorrencia);
+  }
+
+  function formatarNumeroRecorrencia(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+
+    return numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function formatarDataRecorrenciaFront(valor) {
+    if (!valor) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+      var partes = valor.split('-');
+      return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+    return valor;
+  }
+
+  function gerarDataHojeRecorrenciaFront() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
+  }
+
+  function escaparHtmlRecorrencia(valor) {
+    if (valor === null || valor === undefined) return '';
+
+    return valor.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function converterTextoMoedaParaNumeroLancamento(valor) {
+    if (typeof valor === 'number') return valor;
+    if (!valor) return 0;
+
+    var texto = valor.toString().trim();
+
+    if (texto.indexOf(',') !== -1) {
+      texto = texto.replace(/\./g, '').replace(',', '.');
+    }
+
+    var numero = parseFloat(texto);
+    return isNaN(numero) ? 0 : numero;
+  }
+
+  function encontrarContaDependenciaLancamento(idConta) {
+    return (pacoteRecorrencias.dependencias.contas || []).find(function(conta) {
+      return conta.ID_Conta === idConta;
+    }) || null;
+  }
+
+  function encontrarCartaoDependenciaLancamento(idCartao) {
+    return (pacoteRecorrencias.dependencias.cartoes || []).find(function(cartao) {
+      return cartao.ID_Cartao === idCartao;
+    }) || null;
+  }
+
+  function montarNomeCartaoOrigemLancamento(cartao) {
+    if (!cartao) return 'Cartão';
+
+    var nomeGrupo = cartao.Nome_Grupo || '';
+    var nomeCartao = cartao.Nome_Cartao || 'Cartão';
+    var tipoCartao = cartao.Tipo_Cartao || '';
+
+    if (nomeGrupo && nomeCartao.indexOf(nomeGrupo) === -1) {
+      return nomeGrupo + ' - ' + nomeCartao + (tipoCartao ? ' [' + tipoCartao + ']' : '');
+    }
+
+    return nomeCartao + (tipoCartao ? ' [' + tipoCartao + ']' : '');
+  }
+</script>

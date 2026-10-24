@@ -1,0 +1,2120 @@
+﻿<style>
+  .dashboard-topo {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .dashboard-filtros {
+    display: flex;
+    align-items: end;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .dashboard-filtros .grupo-campo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .dashboard-filtros .grupo-campo label {
+    margin: 0;
+    font-size: 10px;
+    letter-spacing: 0;
+    color: var(--cor-texto-secundario);
+  }
+
+  .dashboard-filtros .grupo-campo input {
+    width: 128px;
+    min-height: 30px;
+    padding: 5px 7px;
+    font-size: 12px;
+  }
+
+  .dashboard-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 30px;
+    padding: 5px 8px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie-secundaria);
+    cursor: pointer;
+  }
+
+  .dashboard-checkbox input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: #4F8CF7;
+  }
+
+  .dashboard-checkbox span {
+    display: block;
+    color: var(--cor-texto-principal);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .dashboard-checkbox small {
+    display: none;
+    margin-top: 1px;
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .dashboard-titulo h2 {
+    margin-bottom: 2px;
+  }
+
+  .dashboard-titulo p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .dashboard-grade {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .dashboard-card {
+    background: var(--cor-superficie);
+    border: var(--borda-suave);
+    border-radius: var(--raio-card);
+    padding: 10px;
+    min-width: 0;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+  }
+
+  .dashboard-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 8px 0;
+    color: var(--cor-texto-principal);
+    font-size: 14px;
+  }
+
+  .dashboard-card h3 .material-symbols-outlined {
+    font-size: 18px;
+    color: #4F8CF7;
+  }
+
+  .dashboard-ajuda {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(79, 140, 247, 0.35);
+    border-radius: 50%;
+    background: transparent;
+    color: #4F8CF7;
+    font: 900 12px/1 Arial, sans-serif;
+    cursor: pointer;
+    text-transform: none;
+  }
+
+  .dashboard-ajuda:hover,
+  .dashboard-ajuda:focus-visible {
+    background: rgba(79, 140, 247, 0.1);
+    border-color: #4F8CF7;
+    outline: none;
+  }
+
+  .dashboard-linha-navegacao {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .dashboard-linha-navegacao:focus-visible {
+    border-radius: 3px;
+    outline: 2px solid rgba(79, 140, 247, 0.45);
+    outline-offset: 2px;
+  }
+
+  .dashboard-cabecalho-com-ajuda,
+  .dashboard-rotulo-com-ajuda,
+  .dashboard-pulso-rotulo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .dashboard-cabecalho-com-ajuda.direita {
+    justify-content: flex-end;
+  }
+
+  .dashboard-cabecalho-com-ajuda .dashboard-ajuda,
+  .dashboard-rotulo-com-ajuda .dashboard-ajuda,
+  .dashboard-pulso-rotulo .dashboard-ajuda {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+    font-size: 11px;
+  }
+
+  .dashboard-card-grande {
+    grid-column: span 6;
+  }
+
+  .dashboard-card-medio {
+    grid-column: span 6;
+  }
+
+  .dashboard-card-largo {
+    grid-column: span 12;
+  }
+
+  .dashboard-card-terco {
+    grid-column: span 4;
+  }
+
+  .dashboard-saude-card {
+    --dashboard-estado-cor: #4F8CF7;
+    position: relative;
+    overflow: hidden;
+    border-top: 4px solid var(--dashboard-estado-cor);
+    background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--dashboard-estado-cor) 12%, var(--cor-superficie)),
+      var(--cor-superficie) 72%
+    );
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .dashboard-saude-card[data-estado="positivo"] {
+    --dashboard-estado-cor: var(--cor-sucesso-texto);
+  }
+
+  .dashboard-saude-card[data-estado="atencao"] {
+    --dashboard-estado-cor: var(--cor-alerta-texto);
+  }
+
+  .dashboard-saude-card[data-estado="negativo"] {
+    --dashboard-estado-cor: var(--cor-erro-texto);
+  }
+
+  .dashboard-saude-card-clicavel {
+    cursor: pointer;
+  }
+
+  .dashboard-saude-card-clicavel:hover {
+    border-color: color-mix(in srgb, var(--dashboard-estado-cor) 62%, transparent);
+    box-shadow: 0 12px 26px color-mix(in srgb, var(--dashboard-estado-cor) 14%, transparent);
+  }
+
+  .dashboard-saude-card-clicavel:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--dashboard-estado-cor) 48%, transparent);
+    outline-offset: 3px;
+  }
+
+  .dashboard-saude-card h3 .material-symbols-outlined {
+    color: var(--dashboard-estado-cor);
+  }
+
+  .dashboard-saude-cabecalho,
+  .dashboard-saude-fluxo-linha,
+  .dashboard-saude-grafico-legenda {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .dashboard-saude-cabecalho {
+    align-items: flex-end;
+    margin: 10px 0 4px;
+  }
+
+  .dashboard-saude-valor {
+    display: block;
+    color: var(--dashboard-estado-cor);
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .dashboard-saude-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--dashboard-estado-cor) 14%, transparent);
+    color: var(--dashboard-estado-cor);
+    font-size: 11px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .dashboard-saude-status::before {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    content: "";
+  }
+
+  .dashboard-saude-contexto,
+  .dashboard-saude-variacao,
+  .dashboard-saude-grafico-legenda {
+    color: var(--cor-texto-secundario);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .dashboard-saude-variacao {
+    margin: 0 0 12px;
+    font-weight: 800;
+  }
+
+  .dashboard-saude-variacao.positivo {
+    color: var(--cor-sucesso-texto);
+  }
+
+  .dashboard-saude-variacao.negativo {
+    color: var(--cor-erro-texto);
+  }
+
+  .dashboard-saude-fluxos {
+    display: grid;
+    gap: 7px;
+    margin-top: 12px;
+  }
+
+  .dashboard-saude-fluxo-identidade {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .dashboard-saude-navegacao {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--cor-texto-principal);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .dashboard-saude-navegacao:focus-visible {
+    border-radius: 3px;
+    outline: 2px solid rgba(79, 140, 247, 0.45);
+    outline-offset: 2px;
+  }
+
+  .dashboard-saude-fluxo-linha > strong {
+    color: var(--cor-texto-principal);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .dashboard-saude-marcador {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    border-radius: 50%;
+  }
+
+  .dashboard-saude-marcador.receita,
+  .dashboard-saude-barra-preenchimento.receita {
+    background: #53B88A;
+  }
+
+  .dashboard-saude-marcador.despesa,
+  .dashboard-saude-barra-preenchimento.despesa {
+    background: #F06B6B;
+  }
+
+  .dashboard-saude-barra {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(127, 127, 127, 0.14);
+  }
+
+  .dashboard-saude-barra-preenchimento {
+    height: 100%;
+    min-width: 0;
+    border-radius: inherit;
+    transition: width 0.25s ease;
+  }
+
+  .dashboard-saude-grafico {
+    width: 100%;
+    height: 92px;
+    margin-top: 8px;
+    overflow: visible;
+  }
+
+  .dashboard-saude-grafico-area {
+    fill: color-mix(in srgb, var(--dashboard-estado-cor) 14%, transparent);
+  }
+
+  .dashboard-saude-grafico-linha {
+    fill: none;
+    stroke: var(--dashboard-estado-cor);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+  }
+
+  .dashboard-saude-grafico-zero {
+    stroke: color-mix(in srgb, var(--cor-texto-secundario) 35%, transparent);
+    stroke-dasharray: 4 4;
+    stroke-width: 1;
+  }
+
+  .dashboard-saude-formula {
+    margin: 9px 0 0;
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .dashboard-subtexto {
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    line-height: 1.32;
+  }
+
+  .dashboard-item:hover,
+  .dashboard-metrica:hover {
+    transform: translateY(-1px);
+    border-color: #4F8CF7;
+  }
+
+  .dashboard-pulso {
+    display: grid;
+    gap: 11px;
+  }
+
+  .dashboard-pulso-linha {
+    display: grid;
+    grid-template-columns: minmax(96px, 0.78fr) minmax(0, 1.8fr) minmax(118px, 0.85fr);
+    gap: 10px;
+    align-items: center;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    min-height: 30px;
+  }
+
+  .dashboard-pulso-linha > span {
+    color: var(--cor-texto-principal);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .dashboard-pulso-linha > strong {
+    justify-self: end;
+    color: var(--cor-texto-principal);
+    font-size: 14px;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .dashboard-barra {
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .dashboard-barra-preenchimento {
+    height: 100%;
+    border-radius: 999px;
+    background: #4F8CF7;
+  }
+
+  .dashboard-barra-preenchimento.receita {
+    background: #53B88A;
+  }
+
+  .dashboard-barra-preenchimento.despesa {
+    background: #F06B6B;
+  }
+
+  .dashboard-barra-preenchimento.transferencia {
+    background: #F0B24B;
+  }
+
+  .dashboard-barra-preenchimento.saldo {
+    background: #4F8CF7;
+  }
+
+  .dashboard-lista {
+    display: grid;
+    gap: 6px;
+  }
+
+  .dashboard-tabela {
+    display: grid;
+    gap: 0;
+  }
+
+  .dashboard-tabela-cabecalho,
+  .dashboard-tabela-linha {
+    display: grid;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .dashboard-tabela-cabecalho {
+    padding: 0 0 5px;
+    border-bottom: var(--borda-suave);
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .dashboard-tabela-linha {
+    width: 100%;
+    text-align: left;
+    border: 0;
+    border-bottom: var(--borda-suave);
+    border-radius: 0;
+    padding: 6px 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  button.dashboard-tabela-linha {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  button.dashboard-tabela-linha:hover {
+    background: rgba(79, 140, 247, 0.06);
+  }
+
+  .dashboard-tabela-resumo div.dashboard-tabela-linha {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .dashboard-tabela-resumo div.dashboard-tabela-linha:hover {
+    background: rgba(79, 140, 247, 0.06);
+  }
+
+  .dashboard-tabela-resumo .dashboard-tabela-cabecalho,
+  .dashboard-tabela-resumo .dashboard-tabela-linha {
+    grid-template-columns: minmax(78px, 0.9fr) minmax(82px, 1fr) minmax(82px, 1fr);
+  }
+
+  .dashboard-tabela-contas .dashboard-tabela-cabecalho,
+  .dashboard-tabela-contas .dashboard-tabela-linha,
+  .dashboard-tabela-cartoes .dashboard-tabela-cabecalho,
+  .dashboard-tabela-cartoes .dashboard-tabela-linha {
+    grid-template-columns: minmax(0, 1.25fr) minmax(82px, 0.85fr) minmax(82px, 0.85fr);
+  }
+
+  .dashboard-tabela-projetos .dashboard-tabela-cabecalho,
+  .dashboard-tabela-projetos .dashboard-tabela-linha {
+    grid-template-columns: minmax(0, 1.45fr) minmax(86px, 0.75fr) minmax(86px, 0.75fr) minmax(86px, 0.75fr);
+  }
+
+  .dashboard-tabela-rotulo strong,
+  .dashboard-tabela-valor strong {
+    display: block;
+    color: var(--cor-texto-principal);
+    font-size: 12px;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-tabela-rotulo span,
+  .dashboard-tabela-valor span {
+    display: block;
+    margin-top: 1px;
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-tabela-valor {
+    text-align: right;
+  }
+
+  .dashboard-tabela-valor.dashboard-negativo strong {
+    color: var(--cor-erro-texto);
+  }
+
+  .dashboard-tabela-valor.dashboard-positivo strong {
+    color: var(--cor-sucesso-texto);
+  }
+
+  .dashboard-item {
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    padding: 7px 9px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(243, 246, 241, 0.92));
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .dashboard-item-topo {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .dashboard-item-identidade {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .dashboard-item-titulo {
+    display: block;
+    color: var(--cor-texto-principal);
+    font-weight: 800;
+    font-size: 13px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-item-apoio {
+    display: block;
+    margin-top: 2px;
+    color: var(--cor-texto-secundario);
+    font-size: 11px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-item strong {
+    color: var(--cor-texto-principal);
+  }
+
+  .dashboard-valor {
+    font-weight: 900;
+    font-size: 13px;
+    color: var(--cor-texto-principal);
+    white-space: nowrap;
+  }
+
+  .dashboard-rateio-item {
+    background: linear-gradient(180deg, rgba(79, 140, 247, 0.06), rgba(255, 255, 255, 0.92));
+  }
+
+  .dashboard-rateio-direcao {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    background: rgba(79, 140, 247, 0.10);
+    color: #2D5FAF;
+    margin-bottom: 4px;
+  }
+
+  .dashboard-rateio-nome {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-progressao {
+    margin-top: 5px;
+  }
+
+  .dashboard-progressao .dashboard-barra {
+    height: 5px;
+  }
+
+  .dashboard-orcamento-lista {
+    display: grid;
+    gap: 0;
+  }
+
+  .dashboard-orcamento-cabecalho,
+  .dashboard-orcamento-linha {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(72px, 0.75fr) minmax(86px, 1fr);
+    gap: 8px;
+    align-items: center;
+  }
+
+  .dashboard-orcamento-cabecalho {
+    padding: 0 0 5px;
+    border-bottom: var(--borda-suave);
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .dashboard-orcamento-linha {
+    width: 100%;
+    text-align: left;
+    border: 0;
+    border-bottom: var(--borda-suave);
+    border-radius: 0;
+    padding: 6px 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    transition: background-color 0.15s ease;
+  }
+
+  .dashboard-orcamento-linha:hover {
+    background: rgba(79, 140, 247, 0.06);
+  }
+
+  .dashboard-orcamento-categoria strong,
+  .dashboard-orcamento-meta strong,
+  .dashboard-orcamento-percentual strong {
+    display: block;
+    color: var(--cor-texto-principal);
+    font-size: 12px;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-orcamento-categoria span,
+  .dashboard-orcamento-meta span,
+  .dashboard-orcamento-percentual span {
+    display: block;
+    margin-top: 1px;
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dashboard-orcamento-uso {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 36px;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .dashboard-orcamento-barra {
+    height: 7px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .dashboard-orcamento-preenchimento {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .dashboard-orcamento-preenchimento.verde {
+    background: #53B88A;
+  }
+
+  .dashboard-orcamento-preenchimento.amarelo {
+    background: #F0B24B;
+  }
+
+  .dashboard-orcamento-preenchimento.vermelho {
+    background: #F06B6B;
+  }
+
+  .dashboard-orcamento-percentual {
+    text-align: right;
+  }
+
+  .dashboard-orcamento-sem-meta {
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    line-height: 1.25;
+    text-align: right;
+  }
+
+  .dashboard-metricas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .dashboard-secao-resumo + .dashboard-secao-resumo,
+  .dashboard-pulso-secao + .dashboard-pulso-secao {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: var(--borda-suave);
+  }
+
+  .dashboard-secao-titulo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .dashboard-metrica {
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    padding: 7px 9px;
+    background: var(--cor-superficie-secundaria);
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .dashboard-metrica span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--cor-texto-secundario);
+    font-size: 11px;
+    margin-bottom: 3px;
+  }
+
+  .dashboard-metrica strong {
+    color: var(--cor-texto-principal);
+    font-size: 15px;
+  }
+
+  .dashboard-vazio {
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    line-height: 1.3;
+    padding: 6px 0;
+  }
+
+  .dashboard-alerta {
+    border-color: rgba(245, 127, 23, 0.35);
+    background: rgba(245, 127, 23, 0.08);
+  }
+
+  .dashboard-negativo {
+    color: var(--cor-erro-texto) !important;
+  }
+
+  .dashboard-positivo {
+    color: var(--cor-sucesso-texto) !important;
+  }
+
+  .dashboard-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(79, 140, 247, 0.12);
+    color: #2D5FAF;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .dashboard-relatorio-patrimonio-modal {
+    width: min(1180px, 96vw);
+    max-width: min(1180px, 96vw);
+    max-height: 92vh;
+    padding: 0;
+    text-align: left;
+  }
+
+  .dashboard-relatorio-patrimonio-modal .modal-contextual-cabecalho h3,
+  .dashboard-relatorio-patrimonio-modal .modal-contextual-cabecalho p {
+    margin: 0;
+  }
+
+  .dashboard-relatorio-patrimonio-modal .modal-contextual-cabecalho p {
+    margin-top: 3px;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+  }
+
+  .dashboard-relatorio-resumo {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .dashboard-relatorio-resumo-item {
+    padding: 10px;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie);
+  }
+
+  .dashboard-relatorio-resumo-item span,
+  .dashboard-relatorio-resumo-item strong {
+    display: block;
+  }
+
+  .dashboard-relatorio-resumo-item span {
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .dashboard-relatorio-resumo-item strong {
+    margin-top: 3px;
+    color: var(--cor-texto-principal);
+    font-size: 17px;
+  }
+
+  .dashboard-relatorio-resumo-item.dashboard-positivo strong {
+    color: var(--cor-sucesso-texto);
+  }
+
+  .dashboard-relatorio-resumo-item.dashboard-negativo strong {
+    color: var(--cor-erro-texto);
+  }
+
+  .dashboard-relatorio-tabela-wrapper {
+    overflow: auto;
+    border: var(--borda-suave);
+    border-radius: var(--raio-campo);
+    background: var(--cor-superficie);
+  }
+
+  .dashboard-relatorio-tabela {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+  }
+
+  .dashboard-relatorio-tabela th,
+  .dashboard-relatorio-tabela td {
+    padding: 9px 10px;
+    border-bottom: var(--borda-suave);
+    color: var(--cor-texto-principal);
+    font-size: 12px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .dashboard-relatorio-tabela th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--cor-superficie-secundaria);
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  .dashboard-relatorio-tabela th:first-child,
+  .dashboard-relatorio-tabela td:first-child,
+  .dashboard-relatorio-tabela th:last-child,
+  .dashboard-relatorio-tabela td:last-child {
+    text-align: left;
+  }
+
+  .dashboard-relatorio-tabela tr.dashboard-relatorio-periodo-selecionado td {
+    background: rgba(79, 140, 247, 0.08);
+  }
+
+  .dashboard-relatorio-tabela tr:last-child td {
+    border-bottom: 0;
+    font-weight: 900;
+  }
+
+  .dashboard-relatorio-composicao {
+    color: var(--cor-texto-secundario) !important;
+    font-size: 10px !important;
+  }
+
+  body.tema-escuro .dashboard-card {
+    box-shadow: none;
+  }
+
+  body.tema-escuro .dashboard-pulso {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  body.tema-escuro .dashboard-chip {
+    color: #AFCBFF;
+    background: rgba(79, 140, 247, 0.16);
+  }
+
+  body.tema-escuro .dashboard-rateio-item {
+    background: rgba(255, 255, 255, 0.035);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  body.tema-escuro .dashboard-rateio-direcao {
+    color: #C7D7FF;
+    background: rgba(79, 140, 247, 0.18);
+  }
+
+  body.tema-escuro .dashboard-rateio-nome,
+  body.tema-escuro .dashboard-rateio-item .dashboard-valor {
+    color: var(--cor-texto-principal);
+  }
+
+  @media (max-width: 980px) {
+    .dashboard-card-grande,
+    .dashboard-card-medio,
+    .dashboard-card-largo,
+    .dashboard-card-terco {
+      grid-column: span 12;
+    }
+
+  }
+
+  @media (max-width: 640px) {
+    .dashboard-topo {
+      margin-bottom: 10px;
+    }
+
+    .dashboard-titulo h2 {
+      font-size: 20px;
+    }
+
+    .dashboard-titulo p {
+      font-size: 12px;
+    }
+
+    .dashboard-grade {
+      gap: 10px;
+    }
+
+    .dashboard-card {
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .dashboard-card h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .dashboard-saude-cabecalho {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .dashboard-saude-valor {
+      font-size: 28px;
+    }
+
+    .dashboard-relatorio-resumo {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-filtros {
+      width: 100%;
+      justify-content: flex-start;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .dashboard-metricas {
+      grid-template-columns: 1fr;
+    }
+
+    .dashboard-item-topo {
+      grid-template-columns: 1fr;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .dashboard-pulso-linha {
+      grid-template-columns: minmax(78px, 0.8fr) minmax(0, 1.35fr) minmax(94px, 0.9fr);
+      gap: 7px;
+      font-size: 12px;
+    }
+
+    .dashboard-pulso-linha > strong {
+      font-size: 12px;
+    }
+
+    .dashboard-tabela-resumo .dashboard-tabela-cabecalho,
+    .dashboard-tabela-resumo .dashboard-tabela-linha,
+    .dashboard-tabela-contas .dashboard-tabela-cabecalho,
+    .dashboard-tabela-contas .dashboard-tabela-linha {
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .dashboard-tabela-resumo .dashboard-tabela-cabecalho,
+    .dashboard-tabela-resumo .dashboard-tabela-linha {
+      grid-template-columns: minmax(70px, 0.9fr) minmax(74px, 1fr) minmax(74px, 1fr);
+    }
+
+    .dashboard-tabela-contas .dashboard-tabela-cabecalho,
+    .dashboard-tabela-contas .dashboard-tabela-linha,
+    .dashboard-tabela-projetos .dashboard-tabela-cabecalho,
+    .dashboard-tabela-projetos .dashboard-tabela-linha,
+    .dashboard-tabela-cartoes .dashboard-tabela-cabecalho,
+    .dashboard-tabela-cartoes .dashboard-tabela-linha {
+      grid-template-columns: minmax(0, 1.1fr) minmax(70px, 0.8fr) minmax(70px, 0.8fr);
+    }
+
+    .dashboard-tabela-projetos .dashboard-tabela-cabecalho,
+    .dashboard-tabela-projetos .dashboard-tabela-linha {
+      grid-template-columns: minmax(0, 1.2fr) minmax(64px, 0.72fr) minmax(64px, 0.72fr) minmax(64px, 0.72fr);
+    }
+
+    .dashboard-orcamento-cabecalho,
+    .dashboard-orcamento-linha {
+      grid-template-columns: minmax(0, 1.15fr) minmax(64px, 0.7fr) minmax(78px, 0.85fr);
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .dashboard-orcamento-uso {
+      grid-template-columns: minmax(0, 1fr) 34px;
+    }
+
+    .dashboard-valor {
+      white-space: normal;
+    }
+
+    .dashboard-tabela-valor strong,
+    .dashboard-orcamento-categoria strong,
+    .dashboard-orcamento-meta strong,
+    .dashboard-orcamento-percentual strong {
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="dashboard-topo">
+  <div class="dashboard-titulo">
+    <h2>Dashboard</h2>
+    <p>Panorama do mês, atalhos para investigar e sinais financeiros importantes.</p>
+  </div>
+  <div id="dashboard_filtros" class="dashboard-filtros" style="display:none;">
+    <div class="grupo-campo" style="margin-bottom:0;">
+      <label for="dashboard_mes">Inicial</label>
+      <input type="month" id="dashboard_mes" onchange="carregarDashboard()">
+    </div>
+    <div class="grupo-campo" style="margin-bottom:0;">
+      <label for="dashboard_mes_final">Final</label>
+      <input type="month" id="dashboard_mes_final" onchange="carregarDashboard()">
+    </div>
+    <label class="dashboard-checkbox" for="dashboard_considerar_historico" title="Inclui o histórico anterior nos demais saldos do Dashboard. O card Patrimônio acumulado sempre considera todo o histórico.">
+      <input type="checkbox" id="dashboard_considerar_historico" checked onchange="carregarDashboard()">
+      <span>Saldo anterior<small>Aplica aos demais saldos; patrimônio sempre acumula.</small></span>
+    </label>
+  </div>
+</div>
+
+<div class="dashboard-grade">
+  <section id="dash_resultado_card" class="dashboard-card dashboard-card-medio dashboard-saude-card" data-estado="atencao">
+    <h3>
+      <span class="material-symbols-outlined">query_stats</span>Resultado projetado do período
+      <button type="button" class="dashboard-ajuda" onclick="mostrarAjudaDashboard(event, 'resultadoPeriodo')" aria-label="Como funciona o card Resultado do período">?</button>
+    </h3>
+    <span class="dashboard-saude-contexto">Quanto deve sobrar considerando tudo que já está previsto</span>
+    <div class="dashboard-saude-cabecalho">
+      <strong id="dash_resultado_valor" class="dashboard-saude-valor" aria-live="polite">R$ 0,00</strong>
+      <span id="dash_resultado_status" class="dashboard-saude-status">Equilíbrio</span>
+    </div>
+    <p id="dash_resultado_variacao" class="dashboard-saude-variacao">Receitas e despesas estão equilibradas.</p>
+    <div class="dashboard-saude-fluxos">
+      <div class="dashboard-saude-fluxo-linha">
+        <span class="dashboard-saude-fluxo-identidade">
+          <span class="dashboard-saude-marcador receita" aria-hidden="true"></span>
+          <button type="button" class="dashboard-saude-navegacao" onclick="abrirComposicaoResultadoDashboard('Receita')">Receitas</button>
+          <button type="button" class="dashboard-ajuda dashboard-ajuda-pequena" onclick="mostrarAjudaDashboard(event, 'receitasSaude')" aria-label="Como são calculadas as receitas">?</button>
+        </span>
+        <strong id="dash_resultado_receitas">R$ 0,00</strong>
+      </div>
+      <div class="dashboard-saude-barra" aria-hidden="true"><div id="dash_resultado_receitas_barra" class="dashboard-saude-barra-preenchimento receita"></div></div>
+      <div class="dashboard-saude-fluxo-linha">
+        <span class="dashboard-saude-fluxo-identidade">
+          <span class="dashboard-saude-marcador despesa" aria-hidden="true"></span>
+          <button type="button" class="dashboard-saude-navegacao" onclick="abrirComposicaoResultadoDashboard('Despesa')">Despesas</button>
+          <button type="button" class="dashboard-ajuda dashboard-ajuda-pequena" onclick="mostrarAjudaDashboard(event, 'despesasSaude')" aria-label="Como são calculadas as despesas">?</button>
+        </span>
+        <strong id="dash_resultado_despesas">R$ 0,00</strong>
+      </div>
+      <div class="dashboard-saude-barra" aria-hidden="true"><div id="dash_resultado_despesas_barra" class="dashboard-saude-barra-preenchimento despesa"></div></div>
+    </div>
+  </section>
+
+  <section id="dash_patrimonio_card" class="dashboard-card dashboard-card-medio dashboard-saude-card dashboard-saude-card-clicavel" data-estado="atencao" role="button" tabindex="0" onclick="abrirRelatorioPatrimonioDashboard()" onkeydown="tratarTeclaRelatorioPatrimonioDashboard(event)" aria-label="Abrir relatório mensal do patrimônio acumulado">
+    <h3>
+      <span class="material-symbols-outlined">account_balance_wallet</span>Patrimônio acumulado
+      <button type="button" class="dashboard-ajuda" onclick="mostrarAjudaDashboard(event, 'patrimonioAcumulado')" aria-label="Como funciona o card Patrimônio acumulado">?</button>
+    </h3>
+    <span class="dashboard-saude-contexto">Quanto você deve acumular até o fim do período</span>
+    <div class="dashboard-saude-cabecalho">
+      <strong id="dash_patrimonio_valor" class="dashboard-saude-valor" aria-live="polite">R$ 0,00</strong>
+      <span id="dash_patrimonio_status" class="dashboard-saude-status">Equilíbrio</span>
+    </div>
+    <p id="dash_patrimonio_variacao" class="dashboard-saude-variacao">Sem variação no período.</p>
+    <svg class="dashboard-saude-grafico" viewBox="0 0 420 92" role="img" aria-labelledby="dash_patrimonio_grafico_titulo dash_patrimonio_grafico_descricao">
+      <title id="dash_patrimonio_grafico_titulo">Evolução do patrimônio no período</title>
+      <desc id="dash_patrimonio_grafico_descricao">Patrimônio sem movimentação no período.</desc>
+      <line id="dash_patrimonio_grafico_zero" class="dashboard-saude-grafico-zero" x1="6" y1="46" x2="414" y2="46" style="display:none;"></line>
+      <path id="dash_patrimonio_grafico_area" class="dashboard-saude-grafico-area" d=""></path>
+      <path id="dash_patrimonio_grafico_linha" class="dashboard-saude-grafico-linha" d=""></path>
+    </svg>
+    <div class="dashboard-saude-grafico-legenda">
+      <span id="dash_patrimonio_data_inicio">Início do período</span>
+      <span id="dash_patrimonio_data_fim">Fim do período</span>
+    </div>
+    <p class="dashboard-saude-formula">Saldo inicial + receitas projetadas − despesas projetadas</p>
+  </section>
+
+  <section class="dashboard-card dashboard-card-largo">
+    <h3><span class="material-symbols-outlined">workspaces</span>Projetos <span class="dashboard-chip" title="Este card sempre mostra todo o histórico e não é afetado pelos filtros globais.">Total histórico</span></h3>
+    <div id="dash_projetos" class="dashboard-tabela dashboard-tabela-projetos"></div>
+  </section>
+
+  <section class="dashboard-card dashboard-card-medio">
+    <h3><span class="material-symbols-outlined">groups</span>Acertos de rateio</h3>
+    <div id="dash_rateios" class="dashboard-lista"></div>
+  </section>
+
+  <section class="dashboard-card dashboard-card-medio">
+    <h3><span class="material-symbols-outlined">priority_high</span>Pendências do sistema</h3>
+    <div id="dash_pendencias" class="dashboard-lista"></div>
+  </section>
+
+  <section class="dashboard-card dashboard-card-terco">
+    <h3><span class="material-symbols-outlined">account_balance</span>Contas</h3>
+    <div id="dash_contas" class="dashboard-lista"></div>
+  </section>
+
+  <section class="dashboard-card dashboard-card-terco">
+    <h3><span class="material-symbols-outlined">credit_card</span>Cartões / Faturas</h3>
+    <div id="dash_cartoes" class="dashboard-lista"></div>
+  </section>
+
+  <section class="dashboard-card dashboard-card-terco">
+    <h3><span class="material-symbols-outlined">savings</span>Orçamento</h3>
+    <div id="dash_orcamento" class="dashboard-orcamento-lista"></div>
+  </section>
+</div>
+
+<div id="modal-relatorio-patrimonio-dashboard" class="modal-overlay oculto" onclick="fecharRelatorioPatrimonioDashboardAoClicarFora(event)">
+  <div class="modal-caixa modal-contextual-caixa dashboard-relatorio-patrimonio-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-relatorio-patrimonio-dashboard">
+    <div class="modal-contextual-cabecalho">
+      <div>
+        <h3 id="titulo-relatorio-patrimonio-dashboard">Evolução mensal do patrimônio</h3>
+        <p id="subtitulo-relatorio-patrimonio-dashboard">Conciliação desde o saldo inicial até o fim do período selecionado.</p>
+      </div>
+      <button type="button" class="btn-secundario" onclick="fecharRelatorioPatrimonioDashboard(event)">Fechar</button>
+    </div>
+    <div id="conteudo-relatorio-patrimonio-dashboard" class="modal-contextual-conteudo"></div>
+  </div>
+</div>
+
+<script>
+  var tokenSessaoDashboard = localStorage.getItem('mukirana_token') || '';
+  var pacoteDashboard = null;
+  var textosAjudaDashboard = {
+    resultadoPeriodo: 'Projeta quanto deve sobrar no período selecionado: receitas menos despesas. Inclui lançamentos efetivados, pendentes e recorrências que ainda não viraram lançamentos. Transferências não entram e rateios não criam valores adicionais. Este card não usa saldo anterior.',
+    patrimonioAcumulado: 'Projeta quanto você terá acumulado desde o início até o fim do período selecionado: saldos iniciais das contas mais receitas menos despesas, incluindo lançamentos efetivados, pendentes e recorrências ainda não geradas. Transferências e rateios não alteram o total. A opção Saldo anterior não desliga o histórico deste card.',
+    receitasSaude: 'Soma receitas efetivadas, pendentes e recorrentes previstas no período em contas ou cartões do usuário. Um rateio não gera receita adicional por si só.',
+    despesasSaude: 'Soma despesas efetivadas, pendentes e recorrentes previstas no período em contas ou cartões do usuário. Um rateio não gera despesa adicional por si só.'
+  };
+
+  inicializarDashboard();
+
+  function mostrarAjudaDashboard(evento, chave) {
+    if (evento) {
+      evento.preventDefault();
+      evento.stopPropagation();
+    }
+
+    var mensagem = textosAjudaDashboard[chave];
+    if (mensagem && typeof mostrarNotificacao === 'function') {
+      mostrarNotificacao(mensagem, 'info');
+    }
+  }
+
+  function inicializarDashboard() {
+    aplicarFiltroGlobalDashboard_();
+    carregarDashboard();
+  }
+
+  function posicionarFiltrosDashboardNoTopbar() {
+    var filtros = document.getElementById('dashboard_filtros');
+    if (!filtros || typeof registrarConteudoTopbarMukirana !== 'function') {
+      return;
+    }
+
+    filtros.classList.add('dashboard-filtros-topbar');
+    registrarConteudoTopbarMukirana(filtros);
+  }
+
+  function carregarDashboard() {
+    var inicioChamada = performance.now();
+    var filtroPeriodo = obterFiltroPeriodoDashboard_();
+
+    google.script.run
+      .withSuccessHandler(function(pacote) {
+        var fimChamada = performance.now();
+        var inicioRenderizacao = performance.now();
+        pacoteDashboard = pacote || {};
+        renderizarDashboard();
+        registrarPerformanceFrontDashboard_(pacoteDashboard._performance, {
+          chamadaMs: Math.round(fimChamada - inicioChamada),
+          renderizacaoMs: Math.round(performance.now() - inicioRenderizacao),
+          contas: (pacoteDashboard.contas || []).length,
+          cartoes: (pacoteDashboard.cartoes || []).length,
+          pendencias: (pacoteDashboard.pendencias || []).length
+        });
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(erro) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao("Erro ao carregar Dashboard: " + erro.message, "erro");
+      })
+      .obterPacoteDashboard(tokenSessaoDashboard, {
+        Mes_Referencia: filtroPeriodo.Mes_Inicial,
+        Mes_Inicial: filtroPeriodo.Mes_Inicial,
+        Mes_Final: filtroPeriodo.Mes_Final,
+        Considerar_Historico_Anterior: filtroPeriodo.Considerar_Historico_Anterior
+      });
+  }
+
+  function obterFiltroPeriodoDashboard_() {
+    if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
+      return obterFiltroPeriodoGlobalMukirana();
+    }
+
+    var campoMes = document.getElementById('dashboard_mes');
+    var campoMesFinal = document.getElementById('dashboard_mes_final');
+    var campoHistorico = document.getElementById('dashboard_considerar_historico');
+    var mesInicial = campoMes && campoMes.value ? campoMes.value : gerarMesAtualDashboard();
+
+    return {
+      Mes_Referencia: mesInicial,
+      Mes_Inicial: mesInicial,
+      Mes_Final: campoMesFinal && campoMesFinal.value ? campoMesFinal.value : '',
+      Considerar_Historico_Anterior: !campoHistorico || campoHistorico.checked
+    };
+  }
+
+  function aplicarFiltroGlobalDashboard_() {
+    var filtro = obterFiltroPeriodoDashboard_();
+    definirValorDashboard('dashboard_mes', filtro.Mes_Inicial || gerarMesAtualDashboard());
+    definirValorDashboard('dashboard_mes_final', filtro.Mes_Final || '');
+    definirMarcadoDashboard('dashboard_considerar_historico', filtro.Considerar_Historico_Anterior !== false);
+  }
+
+  function registrarPerformanceFrontDashboard_(performanceServidor, performanceFront) {
+    if (!window.console || !console.log) {
+      return;
+    }
+
+    console.log('[Mukirana Performance] Dashboard', {
+      servidor: performanceServidor,
+      navegador: performanceFront
+    });
+
+    if (performanceServidor && console.table) {
+      console.table(performanceServidor.etapas || []);
+    }
+  }
+
+  function renderizarDashboard() {
+    renderizarResumoDashboard();
+    renderizarPulsoDashboard();
+    renderizarProjetosDashboard();
+    renderizarContasDashboard();
+    renderizarCartoesDashboard();
+    renderizarOrcamentoDashboard();
+    renderizarRateiosDashboard();
+    renderizarPendenciasDashboard();
+  }
+
+  function abrirComposicaoResultadoDashboard(tipo) {
+    var saude = pacoteDashboard && pacoteDashboard.saudeFinanceira ? pacoteDashboard.saudeFinanceira : {};
+    var resumo = saude.Resultado_Periodo || {};
+    var ehReceita = tipo === 'Receita';
+    var ids = ehReceita ? (resumo.IDs_Receitas || []) : (resumo.IDs_Despesas || []);
+    var rotulo = ehReceita ? 'Receitas' : 'Despesas';
+    var total = ehReceita ? (resumo.Receitas || 0) : (resumo.Despesas || 0);
+    var filtroPeriodo = obterFiltroPeriodoDashboard_();
+    var periodoTexto = filtroPeriodo.Mes_Final
+      ? formatarMesAnoDashboard_(filtroPeriodo.Mes_Inicial) + ' a ' + formatarMesAnoDashboard_(filtroPeriodo.Mes_Final)
+      : formatarMesAnoDashboard_(filtroPeriodo.Mes_Inicial);
+
+    navegarLancamentosDashboard({
+      Tipo: tipo,
+      IDs_Lancamentos: ids.length > 0 ? ids.join(',') : '__sem_lancamentos__',
+      Modo_Contextual: true,
+      Titulo_Contexto: rotulo + ' projetadas do período',
+      Subtitulo_Contexto: periodoTexto + ' · Total de R$ ' + formatarNumeroDashboard(total) + '.',
+      Nome_Contexto: rotulo + ' do resultado projetado',
+      Resumo_Contexto: 'Esta janela mostra exatamente os lançamentos efetivados, pendentes e recorrências previstas que compõem o valor do card.'
+    });
+  }
+
+  function tratarTeclaRelatorioPatrimonioDashboard(evento) {
+    if (!evento || (evento.key !== 'Enter' && evento.key !== ' ')) return;
+    evento.preventDefault();
+    abrirRelatorioPatrimonioDashboard();
+  }
+
+  function abrirRelatorioPatrimonioDashboard() {
+    var overlay = document.getElementById('modal-relatorio-patrimonio-dashboard');
+    if (!overlay) return;
+
+    renderizarRelatorioPatrimonioDashboard_();
+    overlay.classList.remove('oculto');
+
+    if (typeof ativarAcessibilidadeModalMukirana === 'function') {
+      ativarAcessibilidadeModalMukirana(overlay, {
+        aoEsc: function() {
+          fecharRelatorioPatrimonioDashboard();
+        }
+      });
+    }
+  }
+
+  function fecharRelatorioPatrimonioDashboard(evento) {
+    if (evento) {
+      evento.preventDefault();
+      evento.stopPropagation();
+    }
+
+    var overlay = document.getElementById('modal-relatorio-patrimonio-dashboard');
+    if (overlay) overlay.classList.add('oculto');
+    if (typeof desativarAcessibilidadeModalMukirana === 'function') {
+      desativarAcessibilidadeModalMukirana();
+    }
+  }
+
+  function fecharRelatorioPatrimonioDashboardAoClicarFora(evento) {
+    if (evento && evento.target && evento.target.id === 'modal-relatorio-patrimonio-dashboard') {
+      fecharRelatorioPatrimonioDashboard(evento);
+    }
+  }
+
+  function renderizarRelatorioPatrimonioDashboard_() {
+    var saude = pacoteDashboard && pacoteDashboard.saudeFinanceira ? pacoteDashboard.saudeFinanceira : {};
+    var patrimonio = saude.Patrimonio_Acumulado || {};
+    var linhas = patrimonio.Relatorio_Mensal || [];
+    var conteudo = document.getElementById('conteudo-relatorio-patrimonio-dashboard');
+    var subtitulo = document.getElementById('subtitulo-relatorio-patrimonio-dashboard');
+    var filtroPeriodo = obterFiltroPeriodoDashboard_();
+    var periodoTexto = filtroPeriodo.Mes_Final
+      ? formatarMesAnoDashboard_(filtroPeriodo.Mes_Inicial) + ' a ' + formatarMesAnoDashboard_(filtroPeriodo.Mes_Final)
+      : formatarMesAnoDashboard_(filtroPeriodo.Mes_Inicial);
+
+    if (!conteudo) return;
+    if (subtitulo) {
+      subtitulo.textContent = 'Conciliação desde o saldo inicial até ' +
+        formatarDataCurtaSaudeDashboard_(patrimonio.Data_Limite || saude.Data_Limite) +
+        '. Período destacado: ' + periodoTexto + '.';
+    }
+
+    var resumoHtml =
+      '<div class="dashboard-relatorio-resumo">' +
+        montarResumoRelatorioPatrimonioDashboard_('Saldo inicial', patrimonio.Saldo_Inicial_Contas || 0, '') +
+        montarResumoRelatorioPatrimonioDashboard_('Receitas acumuladas', patrimonio.Receitas_Acumuladas || 0, 'dashboard-positivo') +
+        montarResumoRelatorioPatrimonioDashboard_('Despesas acumuladas', patrimonio.Despesas_Acumuladas || 0, 'dashboard-negativo') +
+        montarResumoRelatorioPatrimonioDashboard_('Patrimônio projetado', patrimonio.Total || 0, obterEstadoSaudeDashboard_(patrimonio.Total || 0) === 'negativo' ? 'dashboard-negativo' : 'dashboard-positivo') +
+      '</div>';
+
+    if (linhas.length === 0) {
+      conteudo.innerHTML = resumoHtml + '<div class="dashboard-vazio">Nenhuma movimentação encontrada até o fim do período.</div>';
+      return;
+    }
+
+    var corpo = linhas.map(function(linha) {
+      var classeLinha = linha.No_Periodo_Selecionado === true ? ' class="dashboard-relatorio-periodo-selecionado"' : '';
+      var resultado = parseFloat(linha.Resultado) || 0;
+      var saldoFinal = parseFloat(linha.Saldo_Final) || 0;
+      var composicao = (linha.Total_Lancamentos || 0) + ' lançamento(s)';
+
+      if ((linha.Total_Pendentes || 0) > 0) composicao += ' · ' + linha.Total_Pendentes + ' pendente(s)';
+      if ((linha.Total_Programados || 0) > 0) composicao += ' · ' + linha.Total_Programados + ' recorrência(s)';
+      if (linha.No_Periodo_Selecionado === true) composicao += ' · no filtro';
+
+      return '<tr' + classeLinha + '>' +
+        '<td><strong>' + escaparHtmlDashboard(formatarMesAnoDashboard_(linha.Mes_Referencia)) + '</strong></td>' +
+        '<td>R$ ' + formatarNumeroDashboard(linha.Saldo_Anterior || 0) + '</td>' +
+        '<td class="dashboard-positivo">R$ ' + formatarNumeroDashboard(linha.Receitas || 0) + '</td>' +
+        '<td class="dashboard-negativo">R$ ' + formatarNumeroDashboard(linha.Despesas || 0) + '</td>' +
+        '<td class="' + (resultado < 0 ? 'dashboard-negativo' : (resultado > 0 ? 'dashboard-positivo' : '')) + '">' + formatarMoedaSaudeDashboard_(resultado, true) + '</td>' +
+        '<td class="' + (saldoFinal < 0 ? 'dashboard-negativo' : (saldoFinal > 0 ? 'dashboard-positivo' : '')) + '">R$ ' + formatarNumeroDashboard(saldoFinal) + '</td>' +
+        '<td class="dashboard-relatorio-composicao">' + escaparHtmlDashboard(composicao) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    conteudo.innerHTML = resumoHtml +
+      '<div class="dashboard-relatorio-tabela-wrapper">' +
+        '<table class="dashboard-relatorio-tabela">' +
+          '<thead><tr><th>Mês</th><th>Patrimônio inicial</th><th>Receitas</th><th>Despesas</th><th>Resultado</th><th>Patrimônio final</th><th>Composição</th></tr></thead>' +
+          '<tbody>' + corpo + '</tbody>' +
+        '</table>' +
+      '</div>';
+  }
+
+  function montarResumoRelatorioPatrimonioDashboard_(rotulo, valor, classe) {
+    return '<div class="dashboard-relatorio-resumo-item ' + (classe || '') + '">' +
+      '<span>' + escaparHtmlDashboard(rotulo) + '</span>' +
+      '<strong>R$ ' + formatarNumeroDashboard(valor) + '</strong>' +
+    '</div>';
+  }
+
+  function formatarMesAnoDashboard_(mesReferencia) {
+    var texto = String(mesReferencia || '');
+    var partes = texto.split('-');
+    var meses = ['jan.', 'fev.', 'mar.', 'abr.', 'mai.', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'];
+    var indice = parseInt(partes[1], 10) - 1;
+    return partes.length >= 2 && meses[indice] ? meses[indice] + '/' + partes[0] : texto;
+  }
+
+  function renderizarResumoDashboard() {
+    var saude = pacoteDashboard.saudeFinanceira || {};
+    var resumo = saude.Resultado_Periodo || {};
+    var receitas = parseFloat(resumo.Receitas) || 0;
+    var despesas = parseFloat(resumo.Despesas) || 0;
+    var resultado = parseFloat(resumo.Resultado) || 0;
+    var totalPendentes = parseInt(resumo.Total_Pendentes, 10) || 0;
+    var totalProgramados = parseInt(resumo.Total_Programados, 10) || 0;
+    var maiorFluxo = Math.max(receitas, despesas, 1);
+    var estado = obterEstadoSaudeDashboard_(resultado);
+    var percentualPreservado = receitas > 0 && resultado > 0 ? Math.round((resultado / receitas) * 100) : 0;
+    var textoVariacao = resultado > 0
+      ? percentualPreservado + '% das receitas devem permanecer disponíveis no período.'
+      : resultado < 0
+        ? 'As despesas projetadas superam as receitas em R$ ' + formatarNumeroDashboard(Math.abs(resultado)) + '.'
+        : 'Receitas e despesas projetadas estão equilibradas.';
+    var componentesProjecao = [];
+
+    if (totalPendentes > 0) {
+      componentesProjecao.push(totalPendentes + ' lançamento(s) pendente(s)');
+    }
+
+    if (totalProgramados > 0) {
+      componentesProjecao.push(totalProgramados + ' recorrência(s) prevista(s)');
+    }
+
+    if (componentesProjecao.length > 0) {
+      textoVariacao += ' Inclui ' + componentesProjecao.join(' e ') + '.';
+    }
+
+    definirEstadoCardSaudeDashboard_('dash_resultado_card', estado);
+    definirTextoDashboard('dash_resultado_valor', formatarMoedaSaudeDashboard_(resultado, true));
+    definirTextoDashboard('dash_resultado_status', obterRotuloEstadoResultadoDashboard_(estado));
+    definirTextoDashboard('dash_resultado_receitas', 'R$ ' + formatarNumeroDashboard(receitas));
+    definirTextoDashboard('dash_resultado_despesas', 'R$ ' + formatarNumeroDashboard(despesas));
+    definirTextoDashboard('dash_resultado_variacao', textoVariacao);
+    definirLarguraBarraSaudeDashboard_('dash_resultado_receitas_barra', receitas, maiorFluxo);
+    definirLarguraBarraSaudeDashboard_('dash_resultado_despesas_barra', despesas, maiorFluxo);
+    definirClasseVariacaoSaudeDashboard_('dash_resultado_variacao', resultado);
+  }
+
+  function renderizarPulsoDashboard() {
+    var saude = pacoteDashboard.saudeFinanceira || {};
+    var patrimonio = saude.Patrimonio_Acumulado || {};
+    var evolucao = patrimonio.Evolucao_Periodo || [];
+    var total = parseFloat(patrimonio.Total) || 0;
+    var variacao = parseFloat(patrimonio.Variacao_Periodo) || 0;
+    var estado = obterEstadoSaudeDashboard_(total);
+    var textoVariacao = variacao > 0
+      ? 'Cresceu R$ ' + formatarNumeroDashboard(variacao) + ' no período.'
+      : variacao < 0
+        ? 'Caiu R$ ' + formatarNumeroDashboard(Math.abs(variacao)) + ' no período.'
+        : 'Sem variação no período.';
+
+    definirEstadoCardSaudeDashboard_('dash_patrimonio_card', estado);
+    definirTextoDashboard('dash_patrimonio_valor', formatarMoedaSaudeDashboard_(total, false));
+    definirTextoDashboard('dash_patrimonio_status', obterRotuloEstadoPatrimonioDashboard_(estado));
+    definirTextoDashboard('dash_patrimonio_variacao', textoVariacao);
+    definirClasseVariacaoSaudeDashboard_('dash_patrimonio_variacao', variacao);
+    definirTextoDashboard('dash_patrimonio_data_inicio', formatarDataCurtaSaudeDashboard_(evolucao.length ? evolucao[0].Data : saude.Data_Inicio) || 'Início do período');
+    definirTextoDashboard('dash_patrimonio_data_fim', formatarDataCurtaSaudeDashboard_(patrimonio.Data_Limite || saude.Data_Limite) || 'Fim do período');
+    renderizarGraficoPatrimonioDashboard_(evolucao, total, variacao);
+  }
+
+  function obterEstadoSaudeDashboard_(valor) {
+    var valorCentavos = Math.round((parseFloat(valor) || 0) * 100);
+    return valorCentavos > 0 ? 'positivo' : (valorCentavos < 0 ? 'negativo' : 'atencao');
+  }
+
+  function obterRotuloEstadoResultadoDashboard_(estado) {
+    return estado === 'positivo' ? 'Sobra' : (estado === 'negativo' ? 'Déficit' : 'Equilíbrio');
+  }
+
+  function obterRotuloEstadoPatrimonioDashboard_(estado) {
+    return estado === 'positivo' ? 'Positivo' : (estado === 'negativo' ? 'Negativo' : 'Equilíbrio');
+  }
+
+  function definirEstadoCardSaudeDashboard_(idCard, estado) {
+    var card = document.getElementById(idCard);
+    if (card) card.setAttribute('data-estado', estado);
+  }
+
+  function definirClasseVariacaoSaudeDashboard_(idElemento, valor) {
+    var elemento = document.getElementById(idElemento);
+    if (!elemento) return;
+    elemento.className = 'dashboard-saude-variacao' + (valor > 0 ? ' positivo' : (valor < 0 ? ' negativo' : ''));
+  }
+
+  function definirLarguraBarraSaudeDashboard_(idElemento, valor, maior) {
+    var elemento = document.getElementById(idElemento);
+    if (!elemento) return;
+    var percentual = maior > 0 ? Math.max(0, Math.min(100, Math.round((valor / maior) * 100))) : 0;
+    elemento.style.width = percentual + '%';
+  }
+
+  function formatarMoedaSaudeDashboard_(valor, exibirSinalPositivo) {
+    var numero = parseFloat(valor) || 0;
+    var sinal = numero < 0 ? '− ' : (exibirSinalPositivo && numero > 0 ? '+ ' : '');
+    return sinal + 'R$ ' + formatarNumeroDashboard(Math.abs(numero));
+  }
+
+  function formatarDataCurtaSaudeDashboard_(data) {
+    var texto = String(data || '');
+    var partes = texto.split('-');
+    return partes.length === 3 ? partes[2] + '/' + partes[1] + '/' + partes[0] : '';
+  }
+
+  function renderizarGraficoPatrimonioDashboard_(evolucao, total, variacao) {
+    var pontos = (evolucao || []).map(function(ponto) {
+      return { Data: ponto.Data, Valor: parseFloat(ponto.Valor) || 0 };
+    });
+    var caminhoLinha = document.getElementById('dash_patrimonio_grafico_linha');
+    var caminhoArea = document.getElementById('dash_patrimonio_grafico_area');
+    var linhaZero = document.getElementById('dash_patrimonio_grafico_zero');
+    var descricao = document.getElementById('dash_patrimonio_grafico_descricao');
+    var largura = 420;
+    var altura = 92;
+    var margem = 6;
+
+    if (!caminhoLinha || !caminhoArea || !linhaZero) return;
+    if (pontos.length === 0) pontos = [{ Valor: total }, { Valor: total }];
+    if (pontos.length === 1) pontos.push({ Data: pontos[0].Data, Valor: pontos[0].Valor });
+
+    var valores = pontos.map(function(ponto) { return ponto.Valor; });
+    var minimo = Math.min.apply(null, valores);
+    var maximo = Math.max.apply(null, valores);
+    if (minimo === maximo) {
+      var folga = Math.max(Math.abs(minimo) * 0.1, 1);
+      minimo -= folga;
+      maximo += folga;
+    }
+
+    function coordenadaX(indice) {
+      return margem + ((largura - (margem * 2)) * indice / (pontos.length - 1));
+    }
+
+    function coordenadaY(valor) {
+      return margem + ((altura - (margem * 2)) * (maximo - valor) / (maximo - minimo));
+    }
+
+    var partes = pontos.map(function(ponto, indice) {
+      return (indice === 0 ? 'M' : 'L') + coordenadaX(indice).toFixed(1) + ' ' + coordenadaY(ponto.Valor).toFixed(1);
+    });
+    var linha = partes.join(' ');
+    var baseArea = altura - margem;
+    var area = linha + ' L' + coordenadaX(pontos.length - 1).toFixed(1) + ' ' + baseArea +
+      ' L' + coordenadaX(0).toFixed(1) + ' ' + baseArea + ' Z';
+
+    caminhoLinha.setAttribute('d', linha);
+    caminhoArea.setAttribute('d', area);
+
+    if (minimo <= 0 && maximo >= 0) {
+      var yZero = coordenadaY(0).toFixed(1);
+      linhaZero.setAttribute('y1', yZero);
+      linhaZero.setAttribute('y2', yZero);
+      linhaZero.style.display = '';
+    } else {
+      linhaZero.style.display = 'none';
+    }
+
+    if (descricao) {
+      descricao.textContent = total < 0
+        ? 'Patrimônio negativo' + (variacao < 0 ? ' e em queda no período.' : '.')
+        : variacao > 0
+          ? 'Patrimônio positivo e crescente no período.'
+          : variacao < 0
+            ? 'Patrimônio positivo, mas em queda no período.'
+            : 'Patrimônio estável no período.';
+    }
+  }
+
+  function renderizarProjetosDashboard() {
+    var container = document.getElementById('dash_projetos');
+    var projetos = pacoteDashboard.projetos || [];
+
+    if (!container) {
+      return;
+    }
+
+    container.className = 'dashboard-tabela dashboard-tabela-projetos';
+    container.innerHTML = '';
+
+    if (projetos.length === 0) {
+      container.className = 'dashboard-lista';
+      container.innerHTML = '<div class="dashboard-vazio">Nenhum projeto com movimentação cadastrada.</div>';
+      return;
+    }
+
+    container.innerHTML =
+      '<div class="dashboard-tabela-cabecalho">' +
+        '<span>Projeto</span>' +
+        '<span style="text-align:right;">Receitas</span>' +
+        '<span style="text-align:right;">Despesas</span>' +
+        '<span style="text-align:right;">Saldo</span>' +
+      '</div>';
+
+    projetos.forEach(function(projeto) {
+      var item = document.createElement('button');
+      var receitas = projeto.Receitas || 0;
+      var despesas = projeto.Despesas || 0;
+      var saldo = projeto.Saldo || 0;
+      var classeSaldo = saldo < 0 ? ' dashboard-negativo' : (saldo > 0 ? ' dashboard-positivo' : '');
+      var complemento = [];
+
+      if (projeto.Compartilhado) {
+        complemento.push('Compartilhado');
+      }
+
+      complemento.push('Total histórico');
+      complemento.push((projeto.Quantidade_Lancamentos || 0) + ' lançamento(s)');
+
+      item.type = 'button';
+      item.className = 'dashboard-tabela-linha';
+      item.onclick = function() {
+        navegarLancamentosDashboard({
+          ID_Projeto: projeto.ID_Projeto,
+          Ignorar_Periodo_Global: true,
+          Modo_Contextual: true,
+          Nome_Contexto: projeto.Nome,
+          Resumo_Contexto: 'Todos os lançamentos vinculados a este projeto, sem recorte do filtro global.'
+        });
+      };
+      item.innerHTML =
+        '<div class="dashboard-tabela-rotulo"><strong>' + escaparHtmlDashboard(projeto.Nome || 'Projeto') + '</strong><span>' + escaparHtmlDashboard(complemento.join(' · ')) + '</span></div>' +
+        '<div class="dashboard-tabela-valor dashboard-positivo"><strong>R$ ' + formatarNumeroDashboard(receitas) + '</strong></div>' +
+        '<div class="dashboard-tabela-valor dashboard-negativo"><strong>R$ ' + formatarNumeroDashboard(despesas) + '</strong></div>' +
+        '<div class="dashboard-tabela-valor' + classeSaldo + '"><strong>R$ ' + formatarNumeroDashboard(saldo) + '</strong></div>';
+      container.appendChild(item);
+    });
+  }
+
+  function renderizarContasDashboard() {
+    var container = document.getElementById('dash_contas');
+    var contas = pacoteDashboard.contas || [];
+
+    if (!container) {
+      return;
+    }
+
+    container.className = 'dashboard-lista';
+    container.innerHTML = '';
+
+    if (contas.length === 0) {
+      container.innerHTML = '<div class="dashboard-vazio">Nenhuma conta acessível encontrada.</div>';
+      return;
+    }
+
+    container.classList.remove('dashboard-lista');
+    container.classList.add('dashboard-tabela', 'dashboard-tabela-contas');
+    container.innerHTML =
+      '<div class="dashboard-tabela-cabecalho">' +
+        '<span>Conta</span>' +
+        '<span style="text-align:right;">Saldo</span>' +
+        '<span style="text-align:right;">Prog.</span>' +
+      '</div>';
+
+    contas.forEach(function(conta) {
+      var item = document.createElement('button');
+      var saldo = conta.Saldo_Lancado || 0;
+      var programado = (conta.Saldo_Projetado || 0) - (conta.Saldo_Lancado || 0);
+      var classeSaldo = saldo < 0 ? ' dashboard-negativo' : '';
+      var classeProgramado = programado < 0 ? ' dashboard-negativo' : '';
+      item.type = 'button';
+      item.className = 'dashboard-tabela-linha';
+      item.onclick = function() {
+        navegarLancamentosDashboard({ ID_Conta: conta.ID_Conta });
+      };
+      item.innerHTML =
+        '<div class="dashboard-tabela-rotulo"><strong>' + escaparHtmlDashboard(conta.Nome_Conta) + '</strong><span>' + (conta.Compartilhada ? 'Compartilhada' : 'Individual') + '</span></div>' +
+        '<div class="dashboard-tabela-valor' + classeSaldo + '"><strong>R$ ' + formatarNumeroDashboard(saldo) + '</strong></div>' +
+        '<div class="dashboard-tabela-valor' + classeProgramado + '"><strong>R$ ' + formatarNumeroDashboard(programado) + '</strong></div>';
+      container.appendChild(item);
+    });
+  }
+
+  function renderizarCartoesDashboard() {
+    var container = document.getElementById('dash_cartoes');
+    var cartoes = pacoteDashboard.cartoes || [];
+
+    if (!container) {
+      return;
+    }
+
+    container.className = 'dashboard-lista';
+    container.innerHTML = '';
+
+    if (cartoes.length === 0) {
+      container.innerHTML = '<div class="dashboard-vazio">Nenhuma fatura com movimento no mês.</div>';
+      return;
+    }
+
+    container.classList.remove('dashboard-lista');
+    container.classList.add('dashboard-tabela', 'dashboard-tabela-cartoes');
+    container.innerHTML =
+      '<div class="dashboard-tabela-cabecalho">' +
+        '<span>Fatura</span>' +
+        '<span style="text-align:right;">Aberto</span>' +
+        '<span style="text-align:right;">Pago</span>' +
+      '</div>';
+
+    cartoes.forEach(function(fatura) {
+      var item = document.createElement('button');
+      var aberto = fatura.Valor_Em_Aberto !== undefined ? fatura.Valor_Em_Aberto : fatura.Valor_Fatura;
+      var pago = fatura.Valor_Pago || 0;
+      item.type = 'button';
+      item.className = 'dashboard-tabela-linha';
+      item.onclick = function() {
+        var filtroPeriodo = obterFiltroPeriodoDashboard_();
+        localStorage.setItem('mukirana_fatura_cartao', JSON.stringify({
+          ID_Grupo_Cartao: fatura.ID_Grupo_Cartao,
+          Mes_Referencia: filtroPeriodo.Mes_Inicial,
+          Mes_Inicial: filtroPeriodo.Mes_Inicial,
+          Mes_Final: filtroPeriodo.Mes_Final
+        }));
+        abrirTelaDashboardEmModal('FaturasCartao', {
+          titulo: 'Fatura - ' + (fatura.Nome_Grupo || 'Cartão'),
+          subtitulo: 'Fatura do período selecionado no Dashboard.'
+        });
+      };
+      item.innerHTML =
+        '<div class="dashboard-tabela-rotulo"><strong>' + escaparHtmlDashboard(fatura.Nome_Grupo) + '</strong><span>' + (fatura.Quantidade_Lancamentos || 0) + ' lançamento(s)</span></div>' +
+        '<div class="dashboard-tabela-valor"><strong>R$ ' + formatarNumeroDashboard(aberto) + '</strong></div>' +
+        '<div class="dashboard-tabela-valor"><strong>R$ ' + formatarNumeroDashboard(pago) + '</strong></div>';
+      container.appendChild(item);
+    });
+  }
+
+  function renderizarOrcamentoDashboard() {
+    var container = document.getElementById('dash_orcamento');
+    var itens = pacoteDashboard.orcamento && pacoteDashboard.orcamento.itens ? pacoteDashboard.orcamento.itens : [];
+
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = '';
+
+    if (itens.length === 0) {
+      container.innerHTML = '<div class="dashboard-vazio">Nenhuma despesa categorizada no período selecionado.</div>';
+      return;
+    }
+
+    var cabecalho = document.createElement('div');
+    cabecalho.className = 'dashboard-orcamento-cabecalho';
+    cabecalho.innerHTML =
+      '<span>Categoria / gasto</span>' +
+      '<span>Meta</span>' +
+      '<span>Uso da meta</span>';
+    container.appendChild(cabecalho);
+
+    itens.forEach(function(itemOrcamento) {
+      var item = document.createElement('button');
+      var percentual = itemOrcamento.Percentual_Usado || 0;
+      var largura = Math.min(100, Math.max(0, percentual));
+      var classeCor = obterClasseCorOrcamentoDashboard(percentual);
+      var temOrcamento = itemOrcamento.Tem_Orcamento === true || (itemOrcamento.Valor_Teto || 0) > 0;
+      item.type = 'button';
+      item.className = 'dashboard-orcamento-linha';
+      item.onclick = function() {
+        navegarLancamentosDashboard({
+          Tipo: 'Despesa',
+          ID_Categoria: itemOrcamento.ID_Categoria_Pai || itemOrcamento.ID_Categoria,
+          Modo_Contextual: true,
+          Nome_Contexto: itemOrcamento.Nome_Categoria,
+          Resumo_Contexto: 'Lançamentos de despesa desta categoria pai e suas subcategorias no período selecionado.'
+        });
+      };
+      item.innerHTML =
+        '<div class="dashboard-orcamento-categoria">' +
+          '<strong>' + escaparHtmlDashboard(itemOrcamento.Nome_Categoria) + '</strong>' +
+          '<span>Total: R$ ' + formatarNumeroDashboard(itemOrcamento.Valor_Realizado) + '</span>' +
+          '<span>Real R$ ' + formatarNumeroDashboard(itemOrcamento.Valor_Real || 0) + ' · Prev. R$ ' + formatarNumeroDashboard(itemOrcamento.Valor_Previsto || 0) + '</span>' +
+        '</div>' +
+        '<div class="dashboard-orcamento-meta">' +
+          (temOrcamento
+            ? '<strong>R$ ' + formatarNumeroDashboard(itemOrcamento.Valor_Teto) + '</strong>' +
+              '<span>' + (itemOrcamento.Saldo >= 0 ? 'Sobra ' : 'Passou ') + 'R$ ' + formatarNumeroDashboard(Math.abs(itemOrcamento.Saldo || 0)) + '</span>'
+            : '<strong>-</strong><span>Sem meta</span>') +
+        '</div>' +
+        '<div class="dashboard-orcamento-uso">' +
+          (temOrcamento
+            ? '<div class="dashboard-orcamento-barra">' +
+                '<div class="dashboard-orcamento-preenchimento ' + classeCor + '" style="width:' + largura + '%;"></div>' +
+              '</div>' +
+              '<div class="dashboard-orcamento-percentual"><strong>' + percentual + '%</strong></div>'
+            : '<div class="dashboard-orcamento-sem-meta">Sem barra</div>') +
+        '</div>';
+      container.appendChild(item);
+    });
+  }
+
+  function obterClasseCorOrcamentoDashboard(percentual) {
+    if (percentual >= 100) return 'vermelho';
+    if (percentual >= 70) return 'amarelo';
+    return 'verde';
+  }
+
+  function renderizarRateiosDashboard() {
+    var container = document.getElementById('dash_rateios');
+    var rateios = pacoteDashboard.rateios || [];
+
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = '';
+
+    if (rateios.length === 0) {
+      container.innerHTML = '<div class="dashboard-vazio">Ao final deste período, ninguém paga nada para ninguém.</div>';
+      return;
+    }
+
+    rateios.forEach(function(rateio) {
+      var item = document.createElement('div');
+      item.className = 'dashboard-item dashboard-rateio-item';
+      var descricaoPrincipal = rateio.Tipo === 'Pagar'
+        ? 'Você paga para'
+        : 'Você recebe de';
+      var descricaoSecundaria = rateio.Tipo === 'Pagar'
+        ? 'Acerto esperado ao final do período selecionado.'
+        : 'Valor esperado para você receber ao final do período selecionado.';
+      var idsLancamentos = (rateio.IDs_Lancamentos || []).join(',');
+      var quantidadeProgramada = rateio.Quantidade_Programada || 0;
+      var filtroLancamentosRateio = idsLancamentos || '__sem_lancamentos_reais__';
+      var valorLancado = rateio.Valor_Lancado || 0;
+      var valorProgramado = rateio.Valor_Programado || 0;
+      var complementoProgramado = quantidadeProgramada > 0
+        ? ' Inclui ' + quantidadeProgramada + ' ocorrência(s) programada(s) ainda não convertida(s) em lançamento.'
+        : '';
+      item.onclick = function() {
+        navegarLancamentosDashboard({
+          IDs_Lancamentos: filtroLancamentosRateio,
+          Modo_Contextual: true,
+          Titulo_Contexto: 'Lançamentos do acerto de rateio',
+          Subtitulo_Contexto: 'A tela mostra apenas os lançamentos reais considerados no acerto selecionado.' + complementoProgramado
+        });
+      };
+      item.innerHTML =
+        '<div class="dashboard-rateio-direcao"><span class="material-symbols-outlined" style="font-size:14px;">sync_alt</span>' + escaparHtmlDashboard(descricaoPrincipal) + '</div>' +
+        '<div class="dashboard-item-topo">' +
+          '<div class="dashboard-item-identidade"><span class="dashboard-rateio-nome">' + escaparHtmlDashboard(rateio.Nome_Usuario || 'Usuário') + '</span>' +
+          '<span class="dashboard-item-apoio">' + escaparHtmlDashboard(descricaoSecundaria + complementoProgramado) + '</span>' +
+          '<span class="dashboard-item-apoio">Rateio lançado: R$ ' + formatarNumeroDashboard(valorLancado) + ' · Rateio programado: R$ ' + formatarNumeroDashboard(valorProgramado) + '</span></div>' +
+          '<span class="dashboard-valor">Total: R$ ' + formatarNumeroDashboard(rateio.Valor) + '</span>' +
+        '</div>';
+      container.appendChild(item);
+    });
+  }
+
+  function renderizarPendenciasDashboard() {
+    var container = document.getElementById('dash_pendencias');
+    var pendencias = pacoteDashboard.pendencias || [];
+
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = '';
+
+    if (pendencias.length === 0) {
+      container.innerHTML = '<div class="dashboard-vazio">Nenhuma pendência operacional no período.</div>';
+      return;
+    }
+
+    pendencias.forEach(function(pendencia) {
+      var item = document.createElement('div');
+      item.className = 'dashboard-item dashboard-alerta';
+      item.onclick = function() {
+        if (pendencia.Tela === 'Lancamentos') {
+          navegarLancamentosDashboard({
+            Status: 'Pendente',
+            Titulo_Contexto: 'Lançamentos pendentes',
+            Subtitulo_Contexto: 'Pendências do mês selecionado no Dashboard.'
+          });
+          return;
+        }
+
+        abrirTelaDashboardEmModal(pendencia.Tela, {
+          titulo: pendencia.Tipo || 'Pendência',
+          subtitulo: pendencia.Mensagem || 'Detalhe da pendência selecionada no Dashboard.'
+        });
+      };
+      item.innerHTML =
+        '<div class="dashboard-item-topo">' +
+          '<strong>' + escaparHtmlDashboard(pendencia.Tipo) + '</strong>' +
+          '<span class="dashboard-valor">' + pendencia.Quantidade + '</span>' +
+        '</div>' +
+        '<div class="dashboard-subtexto">' + escaparHtmlDashboard(pendencia.Mensagem) + '</div>';
+      container.appendChild(item);
+    });
+  }
+
+  function navegarLancamentosDashboard(filtrosExtras) {
+    var filtros = filtrosExtras || {};
+    var filtroPeriodo = obterFiltroPeriodoDashboard_();
+    var ignorarPeriodoGlobal = filtros.Ignorar_Periodo_Global === true;
+    filtros.Mes_Referencia = ignorarPeriodoGlobal ? '' : filtroPeriodo.Mes_Inicial;
+    filtros.Mes_Inicial = ignorarPeriodoGlobal ? '' : filtroPeriodo.Mes_Inicial;
+    filtros.Mes_Final = ignorarPeriodoGlobal ? '' : (filtroPeriodo.Mes_Final || '');
+
+    if (typeof abrirLancamentosContextuaisMukirana === 'function') {
+      abrirLancamentosContextuaisMukirana({
+        Mes_Referencia: filtros.Mes_Referencia,
+        Mes_Inicial: filtros.Mes_Inicial,
+        Mes_Final: filtros.Mes_Final,
+        Tipo: filtros.Tipo || '',
+        Status: filtros.Status || '',
+        Texto: filtros.Texto || '',
+        ID_Conta: filtros.ID_Conta || '',
+        ID_Categoria: filtros.ID_Categoria || '',
+        ID_Projeto: filtros.ID_Projeto || '',
+        ID_Grupo_Cartao: filtros.ID_Grupo_Cartao || '',
+        ID_Cartao: filtros.ID_Cartao || '',
+        IDs_Lancamentos: filtros.IDs_Lancamentos || '',
+        Ignorar_Periodo_Global: ignorarPeriodoGlobal,
+        Titulo: filtros.Titulo_Contexto || 'Lançamentos',
+        Subtitulo: filtros.Subtitulo_Contexto || 'Recorte selecionado no Dashboard.',
+        Nome_Contexto: filtros.Nome_Contexto || 'Dashboard',
+        Resumo_Contexto: filtros.Resumo_Contexto || 'Esta janela mostra os lançamentos ligados ao indicador selecionado.'
+      });
+      return;
+    }
+
+    localStorage.setItem('mukirana_filtros_lancamentos', JSON.stringify(filtros));
+    navegarPara('Lancamentos');
+  }
+
+  function abrirTelaDashboardEmModal(nomeTela, opcoes) {
+    if (typeof abrirTelaContextualMukirana !== 'function') {
+      navegarPara(nomeTela);
+      return;
+    }
+
+    var contexto = {
+      Mes_Referencia: obterFiltroPeriodoDashboard_().Mes_Inicial,
+      Mes_Inicial: obterFiltroPeriodoDashboard_().Mes_Inicial,
+      Mes_Final: obterFiltroPeriodoDashboard_().Mes_Final || ''
+    };
+
+    if (nomeTela === 'Contas') {
+      localStorage.setItem('mukirana_filtros_contas', JSON.stringify(contexto));
+    }
+
+    abrirTelaContextualMukirana(nomeTela, {
+      titulo: opcoes && opcoes.titulo ? opcoes.titulo : nomeTela,
+      subtitulo: opcoes && opcoes.subtitulo ? opcoes.subtitulo : 'Contexto aberto a partir do Dashboard.',
+      contexto: contexto,
+      aoAtualizarOrigem: carregarDashboard
+    });
+  }
+
+  if (typeof registrarTelaAtualMukirana === 'function') {
+    registrarTelaAtualMukirana('Dashboard', {
+      atualizarPeriodoGlobal: function() {
+        aplicarFiltroGlobalDashboard_();
+        carregarDashboard();
+      },
+      obterContextoNovoLancamento: function() {
+        var filtroPeriodo = obterFiltroPeriodoDashboard_();
+        var mes = filtroPeriodo.Mes_Inicial || gerarMesAtualDashboard();
+        var mesFinal = filtroPeriodo.Mes_Final || '';
+        return {
+          Mes_Referencia: mes,
+          Mes_Inicial: mes,
+          Mes_Final: mesFinal
+        };
+      }
+    });
+  }
+
+  if (typeof registrarAtualizacaoTelaContextualMukirana === 'function') {
+    registrarAtualizacaoTelaContextualMukirana(carregarDashboard);
+  }
+
+  function definirTextoDashboard(id, texto) {
+    var elemento = document.getElementById(id);
+    if (elemento) elemento.textContent = texto;
+  }
+
+  function definirValorDashboard(id, valor) {
+    var elemento = document.getElementById(id);
+    if (elemento) elemento.value = valor;
+  }
+
+  function definirMarcadoDashboard(id, marcado) {
+    var elemento = document.getElementById(id);
+    if (elemento) elemento.checked = marcado;
+  }
+
+  function definirClasseDashboard(id, classe) {
+    var elemento = document.getElementById(id);
+    if (elemento) elemento.className = classe;
+  }
+
+  function gerarMesAtualDashboard() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  }
+
+  function formatarNumeroDashboard(valor) {
+    var numero = parseFloat(valor);
+    if (isNaN(numero)) numero = 0;
+
+    return numero.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function escaparHtmlDashboard(valor) {
+    if (valor === null || valor === undefined) return '';
+
+    return valor.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+</script>
+

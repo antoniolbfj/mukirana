@@ -1,0 +1,1023 @@
+<style>
+  .barra-contas {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+
+  .info-conta {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: var(--borda-suave);
+    background-color: rgba(25, 118, 210, 0.08);
+    color: var(--cor-texto-principal);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .meta-conta {
+    display: block;
+    margin-top: 4px;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .badge-dono-conta,
+  .badge-compartilhada-conta {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+    margin-left: 6px;
+  }
+
+  .badge-dono-conta {
+    background: #E3F2FD;
+    color: #1976D2;
+  }
+
+  .badge-compartilhada-conta {
+    background: var(--cor-alerta-fundo);
+    color: var(--cor-alerta-texto);
+  }
+
+  .caixa-selecao-usuarios-conta {
+    background-color: rgba(0, 0, 0, 0.02);
+    padding: 15px;
+    border-radius: 8px;
+    border: var(--borda-suave);
+  }
+
+  .texto-sem-acao-conta {
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  .contas-tabela-compacta {
+    table-layout: fixed;
+  }
+
+  .contas-tabela-compacta th,
+  .contas-tabela-compacta td {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    vertical-align: middle;
+  }
+
+  .contas-tabela-compacta th {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .conta-nome-principal {
+    display: block;
+    color: var(--cor-texto-principal);
+    font-weight: 800;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .conta-meta-curta {
+    display: block;
+    margin-top: 2px;
+    color: var(--cor-texto-secundario);
+    font-size: 11px;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .conta-valor-tabela,
+  .conta-acoes-tabela,
+  .conta-status-tabela {
+    white-space: nowrap;
+  }
+
+  .conta-valor-principal {
+    display: block;
+    font-weight: 800;
+    color: var(--cor-texto-principal);
+    line-height: 1.2;
+  }
+
+  .conta-valor-apoio {
+    display: block;
+    margin-top: 2px;
+    color: var(--cor-texto-secundario);
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .linha-recorrencias-conta td {
+    padding-top: 0;
+    background: rgba(79, 140, 247, 0.05);
+    border-top: 0;
+  }
+
+  .conta-fantasmas {
+    display: grid;
+    gap: 4px;
+    padding: 6px 8px;
+    border: 1px dashed rgba(79, 140, 247, 0.34);
+    border-radius: 8px;
+    background: rgba(79, 140, 247, 0.06);
+  }
+
+  .conta-fantasma-linha {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 92px 96px;
+    gap: 8px;
+    align-items: center;
+    color: var(--cor-texto-secundario);
+    font-size: 11px;
+  }
+
+  .conta-fantasma-linha strong {
+    color: var(--cor-texto-principal);
+    font-size: 12px;
+  }
+
+  .conta-fantasma-linha .material-symbols-outlined {
+    font-size: 14px;
+    color: #4F8CF7;
+    vertical-align: -2px;
+  }
+
+  .conta-fantasma-valor {
+    text-align: right;
+    font-weight: 800;
+  }
+
+  .conta-fantasma-valor.entrada {
+    color: var(--cor-sucesso-texto);
+  }
+
+  .conta-fantasma-valor.saida {
+    color: var(--cor-erro-texto);
+  }
+
+  .conta-valor-tabela,
+  .conta-acoes-tabela {
+    text-align: right;
+  }
+
+  .conta-status-tabela {
+    text-align: center;
+  }
+
+  .conta-acoes-tabela .btn-acao {
+    padding: 4px 7px;
+    font-size: 11px;
+  }
+
+  .conta-contextual .info-conta-introdutoria {
+    display: none;
+  }
+
+  body.tema-escuro .caixa-selecao-usuarios-conta {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #444444;
+  }
+</style>
+
+<div class="cabecalho-tela">
+  <h2>Gestão de Contas</h2>
+  <button class="btn-primario" data-topbar-label="+ Nova Conta" onclick="abrirFormularioConta()">+ Nova Conta</button>
+</div>
+
+<div class="info-conta info-conta-introdutoria">
+  As contas representam origens de dinheiro, como bancos e carteira. Uma conta pode ser individual ou compartilhada.
+  Em contas compartilhadas, o dono gerencia o cadastro e os participantes podem lançar receitas/despesas usando essa conta.
+</div>
+
+<div class="cartao" style="margin-bottom: 12px; display:none;">
+  <div class="grupo-campo-duplo">
+    <div class="grupo-campo" style="margin-bottom: 0;">
+      <label for="contas_mes_inicial">Mes inicial</label>
+      <input type="month" id="contas_mes_inicial" onchange="aoAlterarPeriodoConta()">
+    </div>
+    <div class="grupo-campo" style="margin-bottom: 0;">
+      <label for="contas_mes_final">Mes final (opcional)</label>
+      <input type="month" id="contas_mes_final" onchange="aoAlterarPeriodoConta()">
+    </div>
+  </div>
+  <div class="texto-ajuda" style="margin-top: 8px;">
+    O consolidado mostra a movimentacao do periodo fechado e o saldo calculado ate o mes final selecionado.
+  </div>
+</div>
+
+<div class="barra-contas">
+  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--cor-texto-secundario); font-weight: 600;">
+    <input type="checkbox" id="toggle_contas_inativas" onchange="alternarVisaoContasInativas()" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+    Exibir contas inativas
+  </label>
+</div>
+
+<div id="container-form-conta" class="cartao" style="display: none;">
+  <h3 id="titulo-form-conta">Cadastrar Conta</h3>
+  <div class="info-conta" id="info-form-conta">
+    O saldo inicial é usado como ponto de partida para seus cálculos financeiros. Se você alterar esse valor depois de lançar movimentações, os saldos calculados podem mudar.
+  </div>
+
+  <form id="form-conta" onsubmit="enviarFormularioConta(event)">
+    <input type="hidden" id="cta_id_conta" name="ID_Conta">
+
+    <div class="grupo-campo-duplo">
+      <div class="grupo-campo">
+        <label>Nome da Conta</label>
+        <input type="text" id="cta_nome" required placeholder="Ex: Carteira, Nubank, Conta Casal">
+      </div>
+
+      <div class="grupo-campo">
+        <label>Saldo Inicial (R$)</label>
+        <input type="text" inputmode="numeric" id="cta_saldo" oninput="mascaraMoeda(this)" required placeholder="0,00">
+      </div>
+    </div>
+
+    <div class="grupo-campo">
+      <label style="display: flex; flex-direction: row; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
+        <input type="checkbox" id="cta_compartilhada" onchange="alternarCompartilhamentoConta()" style="width: auto; margin: 0;">
+        <span><strong>Conta compartilhada</strong> com outros usuários</span>
+      </label>
+      <div class="texto-ajuda">
+        Participantes poderão usar esta conta em lançamentos e rateios, mas somente o dono altera o cadastro da conta.
+      </div>
+    </div>
+
+    <div class="grupo-campo caixa-selecao-usuarios-conta" id="container-usuarios-conta" style="display: none;">
+      <label style="margin-bottom: 12px; color: var(--cor-texto-principal);">Usuários participantes</label>
+      <div id="lista-checkboxes-usuarios-conta" style="max-height: 170px; overflow-y: auto;"></div>
+    </div>
+
+    <div class="acoes-formulario">
+      <button type="button" class="btn-secundario" onclick="fecharFormularioConta()">Cancelar</button>
+      <button type="button" class="btn-secundario" id="btn-salvar-e-novo-conta" onclick="solicitarSalvarENovaConta()">Salvar + novo</button>
+      <button type="submit" class="btn-primario" id="btn-salvar-conta" onclick="definirModoAposSalvarConta('fechar')">Salvar Dados</button>
+    </div>
+  </form>
+</div>
+
+<div class="cartao" id="container-lista-conta">
+  <div class="lista-linhas-wrap">
+  <table class="tabela-mukirana lista-linhas-mukirana contas-tabela-compacta" id="tabela-contas-html">
+    <thead>
+      <tr>
+        <th>Conta</th>
+        <th style="text-align: right;">Inicial</th>
+        <th style="text-align: right;">Saldo</th>
+        <th style="text-align: right;">Período</th>
+        <th>Status</th>
+        <th style="text-align: right;">Ações</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-tabela-contas"></tbody>
+  </table>
+  </div>
+
+  <div id="estado-vazio-conta" class="estado-vazio">
+    <h3>Nenhuma conta cadastrada</h3>
+    <p>Organize seus saldos cadastrando sua primeira conta bancária ou carteira.</p>
+    <button class="btn-primario" onclick="abrirFormularioConta()">+ Criar Primeira Conta</button>
+  </div>
+</div>
+
+<script>
+  var contasEmMemoria = [];
+  var usuariosCompartilhaveisConta = [];
+  var mostrarContasInativas = false;
+  var tokenSessao = localStorage.getItem('mukirana_token') || '';
+  var idLogadoConta = localStorage.getItem('mukirana_id') || '';
+  var modoAposSalvarConta = 'fechar';
+
+  inicializarTelaContas();
+
+  /**
+   * Inicializa a tela de contas.
+   */
+  function inicializarTelaContas() {
+    var filtrosExternos = obterFiltrosExternosContas();
+    var filtrosGlobais = obterFiltrosPeriodoConta();
+    var emModalContextual = typeof estaEmTelaContextualMukirana === 'function' && estaEmTelaContextualMukirana();
+
+    if (emModalContextual) {
+      document.body.classList.add('conta-contextual');
+    } else {
+      document.body.classList.remove('conta-contextual');
+    }
+
+    var campoMesInicial = document.getElementById('contas_mes_inicial');
+    var campoMesFinal = document.getElementById('contas_mes_final');
+
+    if (campoMesInicial) {
+      campoMesInicial.value = filtrosGlobais.Mes_Inicial || filtrosExternos.Mes_Inicial || filtrosExternos.Mes_Referencia || gerarMesAtualConta();
+    }
+
+    if (campoMesFinal) {
+      campoMesFinal.value = filtrosGlobais.Mes_Final || filtrosExternos.Mes_Final || '';
+    }
+    localStorage.removeItem('mukirana_filtros_contas');
+    carregarUsuariosParaSelecaoConta('', function() {
+      carregarTabelaContas();
+    });
+  }
+
+  function obterFiltrosExternosContas() {
+    var bruto = localStorage.getItem('mukirana_filtros_contas');
+
+    if (!bruto) {
+      return {};
+    }
+
+    try {
+      return JSON.parse(bruto) || {};
+    } catch (erro) {
+      return {};
+    }
+  }
+
+  /**
+   * Abre formulário para criação.
+   */
+  function abrirFormularioConta() {
+    document.getElementById('form-conta').reset();
+    definirModoAposSalvarConta('fechar');
+    document.getElementById('cta_id_conta').value = '';
+    document.getElementById('titulo-form-conta').innerText = 'Cadastrar Conta';
+    document.getElementById('info-form-conta').innerHTML = 'O saldo inicial é usado como ponto de partida para seus cálculos financeiros. Se você alterar esse valor depois de lançar movimentações, os saldos calculados podem mudar.';
+
+    configurarModoEdicaoConta(true);
+    renderizarCheckboxesUsuariosConta([]);
+    alternarCompartilhamentoConta();
+
+    document.getElementById('container-form-conta').style.display = 'block';
+    document.getElementById('container-lista-conta').style.display = 'none';
+  }
+
+  /**
+   * Fecha formulário.
+   */
+  function fecharFormularioConta() {
+    document.getElementById('form-conta').reset();
+    document.getElementById('cta_id_conta').value = '';
+    document.getElementById('titulo-form-conta').innerText = 'Cadastrar Conta';
+    configurarModoEdicaoConta(true);
+    document.getElementById('container-form-conta').style.display = 'none';
+    document.getElementById('container-lista-conta').style.display = 'block';
+  }
+
+  function definirModoAposSalvarConta(modo) {
+    modoAposSalvarConta = modo === 'novo' ? 'novo' : 'fechar';
+  }
+
+  function solicitarSalvarENovaConta() {
+    definirModoAposSalvarConta('novo');
+
+    var formulario = document.getElementById('form-conta');
+
+    if (formulario && typeof formulario.requestSubmit === 'function') {
+      formulario.requestSubmit();
+      return;
+    }
+
+    formulario.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  function atualizarEstadoBotoesSalvarConta(salvando) {
+    var btnSalvar = document.getElementById('btn-salvar-conta');
+    var btnSalvarENovo = document.getElementById('btn-salvar-e-novo-conta');
+
+    if (typeof definirEstadoAcaoTelaMukirana === 'function') {
+      definirEstadoAcaoTelaMukirana(salvando, {
+        escopo: '#form-conta',
+        idsProcessando: ['btn-salvar-conta', 'btn-salvar-e-novo-conta'],
+        textoProcessando: 'Salvando...'
+      });
+      return;
+    }
+
+    btnSalvar.disabled = !!salvando;
+    btnSalvar.innerText = salvando ? 'Salvando...' : 'Salvar Dados';
+    btnSalvarENovo.disabled = !!salvando;
+    btnSalvarENovo.innerText = salvando ? 'Salvando...' : 'Salvar + novo';
+  }
+
+  /**
+   * Alterna visualização de inativas.
+   */
+  function alternarVisaoContasInativas() {
+    mostrarContasInativas = document.getElementById('toggle_contas_inativas').checked;
+    renderizarTabelaContas();
+  }
+
+  /**
+   * Exibe ou oculta seleção de usuários.
+   */
+  function alternarCompartilhamentoConta() {
+    var compartilhada = document.getElementById('cta_compartilhada').checked;
+    document.getElementById('container-usuarios-conta').style.display = compartilhada ? 'block' : 'none';
+  }
+
+  /**
+   * Carrega usuários disponíveis para compartilhamento.
+   *
+   * @param {string} idConta ID da conta em edição ou vazio.
+   * @param {Function} callback Callback opcional.
+   */
+  function carregarUsuariosParaSelecaoConta(idConta, callback) {
+    google.script.run
+      .withSuccessHandler(function(resposta) {
+        resposta = resposta || {};
+        usuariosCompartilhaveisConta = Array.isArray(resposta.usuarios) ? resposta.usuarios : [];
+        renderizarCheckboxesUsuariosConta([]);
+
+        if (typeof callback === 'function') {
+          callback();
+        }
+      })
+      .withFailureHandler(function(erro) {
+        mostrarNotificacao('Erro ao carregar usuários compartilháveis: ' + erro.message, 'erro');
+      })
+      .obterUsuariosCompartilhaveisConta(idConta || '', tokenSessao);
+  }
+
+  /**
+   * Renderiza checkboxes de usuários participantes.
+   *
+   * @param {Array<string>} idsSelecionados IDs selecionados.
+   */
+  function renderizarCheckboxesUsuariosConta(idsSelecionados) {
+    var container = document.getElementById('lista-checkboxes-usuarios-conta');
+    var selecionados = Array.isArray(idsSelecionados) ? idsSelecionados : [];
+
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!usuariosCompartilhaveisConta || usuariosCompartilhaveisConta.length === 0) {
+      container.innerHTML = '<p style="color: var(--cor-texto-secundario); font-size: 14px; margin: 0;">Nenhum outro usuário ativo disponível.</p>';
+      return;
+    }
+
+    usuariosCompartilhaveisConta
+      .slice()
+      .sort(function(a, b) {
+        return (a.nome || '').localeCompare(b.nome || '');
+      })
+      .forEach(function(usuario) {
+        var idCheckbox = 'cb_conta_' + usuario.id;
+        var checked = selecionados.indexOf(usuario.id) !== -1 ? 'checked' : '';
+        var linha = document.createElement('div');
+
+        linha.style.display = 'flex';
+        linha.style.alignItems = 'center';
+        linha.style.marginBottom = '10px';
+        linha.style.gap = '10px';
+
+        linha.innerHTML =
+          '<input type="checkbox" name="user_cb_conta" value="' + escaparAtributoConta(usuario.id) + '" id="' + escaparAtributoConta(idCheckbox) + '" ' + checked + ' style="margin: 0; width: 18px; height: 18px; cursor: pointer;">' +
+          '<label for="' + escaparAtributoConta(idCheckbox) + '" style="margin: 0; font-weight: normal; cursor: pointer; color: var(--cor-texto-principal); line-height: 1.2;">' +
+            '<strong>' + escaparHtmlConta(usuario.nome || 'Usuário') + '</strong>' +
+            '<span style="color: var(--cor-texto-secundario); font-size: 13px; margin-left: 4px;">(' + escaparHtmlConta(usuario.email || '') + ')</span>' +
+          '</label>';
+
+        container.appendChild(linha);
+      });
+  }
+
+  /**
+   * Envia formulário de conta.
+   *
+   * @param {Event} evento Evento de submit.
+   */
+  function enviarFormularioConta(evento) {
+    evento.preventDefault();
+
+    var contaOriginal = obterContaEmEdicao();
+
+    if (contaOriginal && contaOriginal.Pode_Editar !== true) {
+      mostrarNotificacao('Esta conta está disponível apenas para consulta.', 'alerta');
+      return;
+    }
+
+    var saldoNovo = reverterMoeda(document.getElementById('cta_saldo').value);
+
+    if (contaOriginal && saldoInicialFoiAlterado(contaOriginal, saldoNovo)) {
+      confirmarAcao(
+        'Alterar o saldo inicial pode mudar os saldos calculados desta conta. Deseja salvar mesmo assim?',
+        function() {
+          salvarContaComDados(saldoNovo);
+        }
+      );
+      return;
+    }
+
+    salvarContaComDados(saldoNovo);
+  }
+
+  /**
+   * Salva conta.
+   *
+   * @param {number} saldoInicial Saldo normalizado.
+   */
+  function salvarContaComDados(saldoInicial) {
+    var modoSalvamento = modoAposSalvarConta === 'novo' ? 'novo' : 'fechar';
+    var compartilhada = document.getElementById('cta_compartilhada').checked;
+    var selecionados = compartilhada
+      ? Array.from(document.querySelectorAll('input[name="user_cb_conta"]:checked'))
+          .map(function(cb) { return cb.value; })
+          .join(',')
+      : '';
+
+    const dados = {
+      ID_Conta: document.getElementById('cta_id_conta').value,
+      Nome_Conta: document.getElementById('cta_nome').value,
+      Saldo_Inicial: saldoInicial,
+      Compartilhada: compartilhada,
+      Usuarios_Compartilhados: selecionados
+    };
+
+    atualizarEstadoBotoesSalvarConta(true);
+
+    google.script.run
+      .withSuccessHandler(function(msg) {
+        atualizarEstadoBotoesSalvarConta(false);
+        definirModoAposSalvarConta('fechar');
+
+        if (modoSalvamento === 'novo') {
+          abrirFormularioConta();
+        } else {
+          fecharFormularioConta();
+        }
+
+        carregarTabelaContas();
+        if (typeof estaEmTelaContextualMukirana === 'function' &&
+            estaEmTelaContextualMukirana() &&
+            typeof atualizarTelaOrigemExternaContextualMukirana === 'function') {
+          atualizarTelaOrigemExternaContextualMukirana();
+        }
+        mostrarNotificacao(msg, 'sucesso');
+      })
+      .withFailureHandler(function(err) {
+        atualizarEstadoBotoesSalvarConta(false);
+        definirModoAposSalvarConta('fechar');
+        mostrarNotificacao(err.message, 'erro');
+      })
+      .processarSalvarConta(dados, tokenSessao);
+  }
+
+  /**
+   * Carrega tabela.
+   */
+  function carregarTabelaContas() {
+    if (!tokenSessao) {
+      mostrarNotificacao('Sessão expirada. Faça login novamente.', 'erro');
+      return;
+    }
+
+    var filtros = obterFiltrosPeriodoConta();
+
+    google.script.run
+      .withSuccessHandler(function(contas) {
+        contasEmMemoria = Array.isArray(contas) ? contas : [];
+        renderizarTabelaContas();
+        finalizarCarregamentoTelaMukirana();
+      })
+      .withFailureHandler(function(err) {
+        finalizarCarregamentoTelaMukirana();
+        mostrarNotificacao(err.message, 'erro');
+      })
+      .obterListaContas(tokenSessao, filtros);
+  }
+
+  function aoAlterarPeriodoConta() {
+    confirmarCarregamentoHistoricoCompletoConta_(function() {
+      carregarTabelaContas();
+    });
+  }
+
+  function confirmarCarregamentoHistoricoCompletoConta_(callback) {
+    var filtros = obterFiltrosPeriodoConta();
+
+    if (filtros.Mes_Inicial || filtros.Mes_Final) {
+      callback();
+      return;
+    }
+
+    confirmarAcao(
+      'Você deixou o mês inicial e o mês final em branco. A tela vai buscar todo o histórico de contas e lançamentos, o que pode demorar mais. Deseja continuar?',
+      callback
+    );
+  }
+
+  /**
+   * Renderiza tabela.
+   */
+  function renderizarTabelaContas() {
+    const corpo = document.getElementById('corpo-tabela-contas');
+    const tabela = document.getElementById('tabela-contas-html');
+    const vazio = document.getElementById('estado-vazio-conta');
+
+    if (!corpo || !tabela || !vazio) {
+      return;
+    }
+
+    corpo.innerHTML = '';
+
+    let contasFiltradas = contasEmMemoria.slice();
+
+    if (!mostrarContasInativas) {
+      contasFiltradas = contasFiltradas.filter(function(conta) {
+        return conta.Ativa === true;
+      });
+    }
+
+    contasFiltradas.sort(function(a, b) {
+      return (a.Nome_Conta || '').localeCompare(b.Nome_Conta || '');
+    });
+
+    if (contasFiltradas.length === 0) {
+      tabela.style.display = 'none';
+      vazio.style.display = 'block';
+      return;
+    }
+
+    tabela.style.display = 'table';
+    vazio.style.display = 'none';
+
+    contasFiltradas.forEach(function(conta) {
+      const classeLinha = conta.Ativa ? '' : 'linha-inativa';
+      const statusClasse = conta.Ativa ? 'badge-ativo' : 'badge-inativo';
+      const statusTexto = conta.Ativa ? 'Ativa' : 'Inativa';
+      const saldoFormatado = formatarValorConta(conta.Saldo_Inicial);
+      const meta = montarMetaConta(conta);
+      const metaCurta = montarMetaCurtaConta(conta);
+      const consolidado = conta.Consolidado_Periodo || {};
+      const saldoCalculado = consolidado.Saldo_Projetado !== undefined
+        ? consolidado.Saldo_Projetado
+        : (consolidado.Saldo_Lancado !== undefined ? consolidado.Saldo_Lancado : conta.Saldo_Inicial);
+      const resultadoPeriodo = consolidado.Resultado_Periodo_Projetado !== undefined
+        ? consolidado.Resultado_Periodo_Projetado
+        : (consolidado.Resultado_Periodo || 0);
+      const acoes = montarAcoesConta(conta);
+
+      corpo.innerHTML += `
+        <tr class="${classeLinha}">
+          <td data-label="Conta" title="${escaparAtributoConta(meta)}">
+            <span class="conta-nome-principal">${escaparHtmlConta(conta.Nome_Conta)}</span>
+            <span class="conta-meta-curta">${metaCurta}</span>
+          </td>
+          <td data-label="Inicial" class="conta-valor-tabela">${saldoFormatado}</td>
+          <td data-label="Saldo" class="conta-valor-tabela">${montarValorSaldoConta(consolidado, saldoCalculado)}</td>
+          <td data-label="Período" class="conta-valor-tabela">${montarValorPeriodoConta(consolidado, resultadoPeriodo)}</td>
+          <td data-label="Status" class="conta-status-tabela"><span class="${statusClasse}">${statusTexto}</span></td>
+          <td data-label="Ações" class="conta-acoes-tabela">${acoes}</td>
+        </tr>`;
+      corpo.innerHTML += montarLinhasRecorrenciasConta(conta);
+    });
+  }
+
+  function montarValorSaldoConta(consolidado, saldoCalculado) {
+    var saldoLancado = consolidado.Saldo_Lancado;
+    var quantidadeProgramada = consolidado.Quantidade_Recorrencias_Programadas || 0;
+    var html = '<span class="conta-valor-principal">' + formatarValorConta(saldoCalculado) + '</span>';
+
+    if (quantidadeProgramada > 0 && saldoLancado !== undefined) {
+      html += '<span class="conta-valor-apoio">Lançado: ' + formatarValorConta(saldoLancado) + '</span>';
+    }
+
+    return html;
+  }
+
+  function montarValorPeriodoConta(consolidado, resultadoPeriodo) {
+    var resultadoLancado = consolidado.Resultado_Periodo || 0;
+    var quantidadeProgramada = consolidado.Quantidade_Recorrencias_Programadas || 0;
+    var html = '<span class="conta-valor-principal">' + formatarValorConta(resultadoPeriodo) + '</span>';
+
+    if (quantidadeProgramada > 0) {
+      html += '<span class="conta-valor-apoio">Prev.: ' + formatarValorConta(consolidado.Total_Recorrencias_Programadas || 0) + '</span>';
+    } else if (resultadoLancado !== resultadoPeriodo) {
+      html += '<span class="conta-valor-apoio">Lançado: ' + formatarValorConta(resultadoLancado) + '</span>';
+    }
+
+    return html;
+  }
+
+  function montarLinhasRecorrenciasConta(conta) {
+    var consolidado = conta.Consolidado_Periodo || {};
+    var recorrencias = consolidado.Recorrencias_Programadas || [];
+
+    if (recorrencias.length === 0) {
+      return '';
+    }
+
+    var limite = 4;
+    var linhas = recorrencias.slice(0, limite).map(function(recorrencia) {
+      var valor = parseFloat(recorrencia.Valor_Impacto || 0) || 0;
+      var classeValor = valor >= 0 ? 'entrada' : 'saida';
+      return '<div class="conta-fantasma-linha">' +
+        '<strong><span class="material-symbols-outlined">event_repeat</span> ' + escaparHtmlConta(recorrencia.Descricao || 'Recorrência prevista') + '</strong>' +
+        '<span>' + formatarDataConta(recorrencia.Data_Ocorrencia) + '</span>' +
+        '<span class="conta-fantasma-valor ' + classeValor + '">' + formatarValorConta(valor) + '</span>' +
+      '</div>';
+    }).join('');
+
+    if (recorrencias.length > limite) {
+      linhas += '<div class="conta-fantasma-linha"><strong>+' + (recorrencias.length - limite) + ' recorrência(s)</strong><span></span><span class="conta-fantasma-valor">' + formatarValorConta(consolidado.Total_Recorrencias_Programadas || 0) + '</span></div>';
+    }
+
+    return '<tr class="linha-recorrencias-conta"><td colspan="6"><div class="conta-fantasmas">' + linhas + '</div></td></tr>';
+  }
+
+  function montarBadgesConta(conta) {
+    if (conta.Eh_Dono === true) {
+      return '<span class="badge-dono-conta">Sou dono</span>';
+    }
+
+    if (conta.Eh_Compartilhada_Comigo === true) {
+      return '<span class="badge-compartilhada-conta">Compartilhada comigo</span>';
+    }
+
+    return '';
+  }
+
+  function montarMetaConta(conta) {
+    var partes = [];
+    var consolidado = conta.Consolidado_Periodo || null;
+
+    if (conta.Eh_Dono === true) {
+      partes.push('Conta própria. Você gerencia cadastro, status e compartilhamento.');
+    } else {
+      partes.push('Dono: ' + escaparHtmlConta(conta.Nome_Dono || 'Usuário não encontrado') + '. Você pode usar esta conta em lançamentos, mas não alterar o cadastro.');
+    }
+
+    if (conta.Tem_Lancamentos) {
+      partes.push('Possui lançamentos vinculados. Ao inativar, o histórico será preservado.');
+    } else {
+      partes.push('Sem lançamentos vinculados até o momento.');
+    }
+
+    if (consolidado) {
+      partes.push(
+        'Saldo lançado: ' + formatarValorConta(consolidado.Saldo_Lancado || 0) +
+        '. Saldo projetado: ' + formatarValorConta(consolidado.Saldo_Projetado || 0) +
+        '. Resultado projetado do periodo: ' + formatarValorConta(consolidado.Resultado_Periodo_Projetado || consolidado.Resultado_Periodo || 0) +
+        '. Movimentos no periodo: ' + (consolidado.Quantidade_Lancamentos || 0) +
+        '. Recorrências previstas: ' + (consolidado.Quantidade_Recorrencias_Programadas || 0) + '.'
+      );
+    }
+
+    return partes.join(' ');
+  }
+
+  function montarTextoCompartilhamentoConta(conta) {
+    if (conta.Compartilhada === true) {
+      var ids = (conta.Usuarios_Compartilhados || '').split(',').filter(function(id) { return !!id.trim(); });
+      return ids.length > 0
+        ? 'Compartilhada com ' + ids.length + ' participante(s)'
+        : 'Compartilhada sem participantes ativos';
+    }
+
+    return 'Individual';
+  }
+
+  function montarMetaCurtaConta(conta) {
+    var partes = [];
+
+    partes.push(conta.Eh_Dono === true
+      ? 'Própria'
+      : 'Dono: ' + (conta.Nome_Dono || 'Usuário'));
+
+    partes.push(conta.Compartilhada === true ? 'Compartilhada' : 'Individual');
+
+    if (conta.Consolidado_Periodo && conta.Consolidado_Periodo.Quantidade_Lancamentos !== undefined) {
+      partes.push((conta.Consolidado_Periodo.Quantidade_Lancamentos || 0) + ' mov.');
+    }
+
+    if (conta.Consolidado_Periodo && conta.Consolidado_Periodo.Quantidade_Recorrencias_Programadas > 0) {
+      partes.push((conta.Consolidado_Periodo.Quantidade_Recorrencias_Programadas || 0) + ' prev.');
+    }
+
+    return escaparHtmlConta(partes.join(' · '));
+  }
+
+  function montarAcoesConta(conta) {
+    var acoes = '<button class="btn-acao" onclick="abrirLancamentosConta(\'' + escaparAtributoConta(conta.ID_Conta) + '\')">Lançamentos</button>';
+
+    if (conta.Pode_Editar !== true) {
+      return acoes + '<button class="btn-acao" onclick="prepararEdicaoConta(\'' + escaparAtributoConta(conta.ID_Conta) + '\')">Ver</button>';
+    }
+
+    var textoStatus = conta.Ativa ? 'Inativar' : 'Restaurar';
+
+    return acoes +
+      '<button class="btn-acao" onclick="prepararEdicaoConta(\'' + escaparAtributoConta(conta.ID_Conta) + '\')">Editar</button>' +
+      '<button class="btn-acao" onclick="alterarStatusContaFront(\'' + escaparAtributoConta(conta.ID_Conta) + '\')">' + textoStatus + '</button>';
+  }
+
+  /**
+   * Prepara edição ou consulta.
+   *
+   * @param {string} idConta ID da conta.
+   */
+  function prepararEdicaoConta(idConta) {
+    const conta = contasEmMemoria.find(function(item) {
+      return item.ID_Conta === idConta;
+    });
+
+    if (!conta) {
+      mostrarNotificacao('Conta não encontrada na memória da tela.', 'erro');
+      return;
+    }
+
+    document.getElementById('cta_id_conta').value = conta.ID_Conta;
+    document.getElementById('cta_nome').value = conta.Nome_Conta;
+    document.getElementById('cta_saldo').value = formatarMoedaParaInput(conta.Saldo_Inicial);
+    document.getElementById('cta_compartilhada').checked = conta.Compartilhada === true;
+    document.getElementById('titulo-form-conta').innerText = conta.Pode_Editar === true ? 'Editar Conta' : 'Visualizar Conta';
+
+    document.getElementById('info-form-conta').innerHTML = conta.Pode_Editar === true
+      ? (conta.Tem_Lancamentos
+          ? 'Esta conta possui lançamentos vinculados. Alterar o saldo inicial pode mudar saldos calculados e exigirá confirmação.'
+          : 'Esta conta ainda não possui lançamentos vinculados. Você também pode definir se ela será compartilhada.')
+      : 'Esta conta foi compartilhada com você. É possível usá-la em lançamentos, mas apenas o dono altera cadastro, saldo inicial e participantes.';
+
+    configurarModoEdicaoConta(conta.Pode_Editar === true);
+
+    carregarUsuariosParaSelecaoConta(conta.ID_Conta, function() {
+      var idsSelecionados = conta.Usuarios_Compartilhados ? conta.Usuarios_Compartilhados.split(',').map(function(id) { return id.trim(); }) : [];
+      renderizarCheckboxesUsuariosConta(idsSelecionados);
+      alternarCompartilhamentoConta();
+      configurarModoEdicaoConta(conta.Pode_Editar === true);
+
+      document.getElementById('container-form-conta').style.display = 'block';
+      document.getElementById('container-lista-conta').style.display = 'none';
+    });
+  }
+
+  /**
+   * Configura modo edição/consulta.
+   *
+   * @param {boolean} editavel True para edição.
+   */
+  function configurarModoEdicaoConta(editavel) {
+    document.getElementById('cta_nome').disabled = !editavel;
+    document.getElementById('cta_saldo').disabled = !editavel;
+    document.getElementById('cta_compartilhada').disabled = !editavel;
+    document.getElementById('btn-salvar-conta').style.display = editavel ? 'inline-block' : 'none';
+    document.getElementById('btn-salvar-e-novo-conta').style.display = editavel ? 'inline-block' : 'none';
+
+    Array.from(document.querySelectorAll('input[name="user_cb_conta"]')).forEach(function(cb) {
+      cb.disabled = !editavel;
+    });
+  }
+
+  /**
+   * Altera status.
+   *
+   * @param {string} idConta ID da conta.
+   */
+  function alterarStatusContaFront(idConta) {
+    const conta = contasEmMemoria.find(function(item) {
+      return item.ID_Conta === idConta;
+    });
+
+    if (!conta) {
+      mostrarNotificacao('Conta não encontrada na memória da tela.', 'erro');
+      return;
+    }
+
+    if (conta.Pode_Alterar_Status !== true) {
+      mostrarNotificacao('Apenas o dono pode alterar o status desta conta.', 'alerta');
+      return;
+    }
+
+    const mensagem = conta.Ativa
+      ? (conta.Tem_Lancamentos
+          ? 'Esta conta possui lançamentos vinculados. Ela será inativada, mas o histórico será preservado. Deseja continuar?'
+          : 'Esta conta será inativada e poderá ser restaurada depois. Deseja continuar?')
+      : 'Deseja restaurar esta conta para uso em novos lançamentos?';
+
+    confirmarAcao(mensagem, function() {
+      google.script.run
+        .withSuccessHandler(function(msg) {
+          carregarTabelaContas();
+          mostrarNotificacao(msg, 'sucesso');
+        })
+        .withFailureHandler(function(err) {
+          mostrarNotificacao(err.message, 'erro');
+        })
+        .alternarStatusConta(idConta, tokenSessao);
+    });
+  }
+
+  function obterContaEmEdicao() {
+    const idConta = document.getElementById('cta_id_conta').value;
+
+    if (!idConta) return null;
+
+    return contasEmMemoria.find(function(conta) {
+      return conta.ID_Conta === idConta;
+    }) || null;
+  }
+
+  function saldoInicialFoiAlterado(contaOriginal, saldoNovo) {
+    const saldoOriginal = Math.round(parseFloat(contaOriginal.Saldo_Inicial || 0) * 100);
+    const saldoAtual = Math.round(parseFloat(saldoNovo || 0) * 100);
+
+    return saldoOriginal !== saldoAtual;
+  }
+
+  function formatarValorConta(valor) {
+    const numero = parseFloat(valor);
+    const seguro = isNaN(numero) ? 0 : numero;
+
+    return seguro.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  }
+
+  function formatarDataConta(dataTexto) {
+    if (!dataTexto || typeof dataTexto !== 'string') {
+      return '';
+    }
+
+    var partes = dataTexto.split('-');
+    if (partes.length !== 3) {
+      return escaparHtmlConta(dataTexto);
+    }
+
+    return partes[2] + '/' + partes[1] + '/' + partes[0];
+  }
+
+  function escaparHtmlConta(valor) {
+    if (valor === null || valor === undefined) return '';
+
+    return valor.toString()
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escaparAtributoConta(valor) {
+    return escaparHtmlConta(valor);
+  }
+
+  function obterFiltrosPeriodoConta() {
+    if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
+      return obterFiltroPeriodoGlobalMukirana();
+    }
+
+    return {
+      Mes_Inicial: (document.getElementById('contas_mes_inicial') || {}).value || '',
+      Mes_Final: (document.getElementById('contas_mes_final') || {}).value || ''
+    };
+  }
+
+  if (typeof registrarTelaAtualMukirana === 'function') {
+    registrarTelaAtualMukirana('Contas', {
+      atualizarPeriodoGlobal: function() {
+        carregarTabelaContas();
+      },
+      obterContextoNovoLancamento: function() {
+        return obterFiltrosPeriodoConta();
+      }
+    });
+  }
+
+  function gerarMesAtualConta() {
+    var hoje = new Date();
+    return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+  }
+
+  function abrirLancamentosConta(idConta) {
+    if (typeof abrirLancamentosContextuaisMukirana !== 'function') {
+      return;
+    }
+
+    var filtros = obterFiltrosPeriodoConta();
+    var conta = contasEmMemoria.find(function(item) {
+      return item.ID_Conta === idConta;
+    });
+    var nomeConta = conta ? (conta.Nome_Conta || 'Conta') : 'Conta';
+
+    abrirLancamentosContextuaisMukirana({
+      ID_Conta: idConta,
+      Mes_Inicial: filtros.Mes_Inicial,
+      Mes_Final: filtros.Mes_Final,
+      Titulo: 'Lançamentos da conta',
+      Subtitulo: 'Este contexto mostra somente os lançamentos vinculados a esta conta no período fechado.',
+      Nome_Contexto: nomeConta,
+      Resumo_Contexto: 'Você está vendo somente os lançamentos desta conta. Limpar filtros mantém a conta e o período de origem.'
+    });
+  }
+</script>

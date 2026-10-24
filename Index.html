@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mukirana - Gestão Financeira</title>
+  <link id="favicon-mukirana" rel="icon" type="image/png" href="">
+  <link id="apple-touch-icon-mukirana" rel="apple-touch-icon" href="">
+
+  <script>
+    window.onerror = function(msg, url, line) {
+      var tela = document.getElementById('tela-carregamento');
+      if(tela) {
+        tela.style.setProperty('display', 'block', 'important');
+        tela.innerHTML = '<div style="background:#FFEBEE; color:#C62828; padding:20px; border-radius:8px; border:2px solid #C62828; text-align:left;">' +
+          '<h2>🚨 Ocorreu um Erro no Navegador</h2>' +
+          '<p><b>Detalhe:</b> ' + msg + '</p>' +
+          '<p><b>Linha do Código:</b> ' + line + '</p>' +
+          '</div>';
+      }
+      return false;
+    };
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <?!= incluir('Global_Assets'); ?>
+  <?!= incluir('Global_Estilos'); ?>
+</head>
+<body>
+
+  <div id="app-container">
+    <nav id="menu-lateral" style="display: none;">
+      <div class="logo-area">
+        <div class="menu-topo-lateral">
+          <button type="button" class="marca-app-lateral" onclick="navegarPara('Dashboard')" title="Ir para o Dashboard" aria-label="Ir para o Dashboard">
+            <img data-mukirana-logo class="logo-app-imagem" alt="Ícone do Mukirana">
+            <h2>Mukirana</h2>
+          </button>
+          <button
+            type="button"
+            id="botao-tema-sessao"
+            class="botao-tema-sessao"
+            onclick="alternarTemaSessaoMukirana()"
+            aria-label="Alternar tema da sessão"
+            title="Alternar tema desta sessão"
+          >
+            <span id="icone-tema-sessao" class="material-symbols-outlined">dark_mode</span>
+          </button>
+        </div>
+        <div style="text-align: center; margin-top: -15px; margin-bottom: 25px; padding: 0 20px;">
+          <div onclick="abrirMeuPerfil()" style="cursor: pointer; background-color: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; font-size: 14px; color: #E0E0E0; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.2)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'" title="Editar meu perfil">
+            👤 Olá, <br>
+            <strong id="nome-usuario-logado" style="color: #FFFFFF; font-size: 15px; display: block; margin-top: 4px;"></strong>
+            <div style="font-size: 11px; color: #90CAF9; margin-top: 5px; font-weight: bold;">✎ Editar Perfil</div>
+          </div>
+        </div>
+      </div>
+      <ul class="lista-menu">
+        <li><a href="javascript:void(0)" onclick="navegarPara('Dashboard')">📊 Dashboard</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Lancamentos')">Lançamentos</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Contas')">Contas</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Cartoes')">Cartões</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Categorias')">Categorias</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Orcamentos')">Orçamento</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Recorrencias')">Recorrências</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Projetos')">Projetos</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Usuarios')">Usuários</a></li>
+        <li class="item-menu-saida"><a href="javascript:void(0)" onclick="fazerLogout()">Sair do Sistema</a></li>
+      </ul>
+    </nav>
+    <div id="menu-overlay" class="menu-overlay oculto" onclick="fecharMenuLateral()"></div>
+
+    <main id="conteudo-principal">
+      <div id="topbar-app" class="topbar-app" style="display: none;">
+        <button type="button" class="botao-menu" onclick="alternarMenuLateral()" aria-label="Abrir menu">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <button type="button" class="topbar-marca" onclick="navegarPara('Dashboard')" title="Ir para o Dashboard" aria-label="Ir para o Dashboard">
+          <img data-mukirana-logo class="logo-app-imagem" alt="Ícone do Mukirana">
+          <span>Mukirana</span>
+        </button>
+        <div id="topbar-filtro-periodo-global" class="topbar-filtro-periodo-global">
+          <div class="grupo-campo-global">
+            <label for="mk_global_mes_inicial">Inicial</label>
+            <input type="month" id="mk_global_mes_inicial" onchange="alterarFiltroPeriodoGlobalMukirana()">
+          </div>
+          <div class="grupo-campo-global">
+            <label for="mk_global_mes_final">Final</label>
+            <input type="month" id="mk_global_mes_final" onchange="alterarFiltroPeriodoGlobalMukirana()">
+          </div>
+          <label class="topbar-checkbox-global" for="mk_global_saldo_anterior" title="Inclui histórico anterior em saldos e consolidados que suportam esta opção.">
+            <input type="checkbox" id="mk_global_saldo_anterior" checked onchange="alterarFiltroPeriodoGlobalMukirana()">
+            <span>Saldo anterior</span>
+          </label>
+        </div>
+        <div id="topbar-contexto-app" class="topbar-contexto-app"></div>
+      </div>
+      <div id="tela-carregamento" class="mk-carregamento-global" style="display: flex;">
+        <div class="mk-carregamento-card">
+          <div class="mk-carregamento-icone material-symbols-outlined">hourglass_top</div>
+          <h3>Iniciando o Mukirana...</h3>
+          <p id="mk-carregamento-mensagem">Preparando sua experiência financeira.</p>
+          <div class="mk-carregamento-barra">
+            <div id="mk-carregamento-progresso" class="mk-carregamento-progresso" style="width: 0%;"></div>
+          </div>
+          <span id="mk-carregamento-restante">Faltam aproximadamente 100%.</span>
+        </div>
+      </div>
+      <div id="conteudo-tela" style="display: none;"></div>
+    </main>
+  </div>
+
+  <div id="fab-container" class="fab-container" style="display: none;">
+    <ul id="fab-submenu" class="fab-submenu oculto">
+      <li><button type="button" onclick="acaoRapidaMukirana('LancamentosNovo')"><span class="material-symbols-outlined">add_card</span>Novo lançamento</button></li>
+      <li><button type="button" onclick="acaoRapidaMukirana('Lancamentos')"><span class="material-symbols-outlined">receipt_long</span>Lançamentos</button></li>
+      <li><button type="button" onclick="acaoRapidaMukirana('Recorrencias')"><span class="material-symbols-outlined">event_repeat</span>Recorrências</button></li>
+      <li><button type="button" onclick="acaoRapidaMukirana('Orcamentos')"><span class="material-symbols-outlined">savings</span>Orçamento</button></li>
+      <li><button type="button" onclick="acaoRapidaMukirana('Dashboard')"><span class="material-symbols-outlined">dashboard</span>Dashboard</button></li>
+      <li><button type="button" onclick="acaoRapidaMukirana('Logout')" class="fab-acao-saida"><span class="material-symbols-outlined">logout</span>Sair</button></li>
+    </ul>
+    <button id="fab-principal" type="button" class="fab-principal" onclick="alternarFabMukirana(event)" aria-label="Abrir ações rápidas">
+      <span class="material-symbols-outlined">add</span>
+    </button>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  
+  <div id="modal-confirmacao" class="modal-overlay oculto" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-texto">
+    <div class="modal-caixa">
+      <h3 id="modal-titulo">Confirmar Ação</h3>
+      <p id="modal-texto">Você tem certeza?</p>
+      <div class="modal-botoes">
+        <button class="btn-secundario" id="btn-confirmar-nao">Cancelar</button>
+        <button class="btn-primario" id="btn-confirmar-sim">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-tela-contextual" class="modal-overlay oculto" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-contextual" aria-describedby="subtitulo-modal-contextual">
+    <div class="modal-caixa modal-contextual-caixa">
+      <div class="modal-contextual-cabecalho">
+        <div>
+          <h3 id="titulo-modal-contextual" style="margin:0;">Contexto</h3>
+          <p id="subtitulo-modal-contextual" style="margin:4px 0 0 0; color:var(--cor-texto-secundario); font-size:13px;">Visualize e edite sem sair da tela atual.</p>
+        </div>
+        <button type="button" class="btn-secundario" onclick="fecharTelaContextualMukirana(false)">Fechar</button>
+      </div>
+      <div id="conteudo-modal-contextual" class="modal-contextual-conteudo"></div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // IDENTIDADE VISUAL
+    // ==========================================
+    function aplicarIdentidadeVisualMukirana() {
+      if (!window.MUKIRANA_ASSETS) {
+        return;
+      }
+
+      var favicon = document.getElementById('favicon-mukirana');
+      var appleTouchIcon = document.getElementById('apple-touch-icon-mukirana');
+
+      if (favicon) {
+        favicon.href = window.MUKIRANA_ASSETS.appIcon || '';
+      }
+
+      if (appleTouchIcon) {
+        appleTouchIcon.href = window.MUKIRANA_ASSETS.appIcon || '';
+      }
+
+      document.querySelectorAll('[data-mukirana-logo]').forEach(function(imagem) {
+        imagem.src = window.MUKIRANA_ASSETS.appIcon || '';
+      });
+
+      document.querySelectorAll('[data-mukirana-login-img]').forEach(function(imagem) {
+        imagem.src = window.MUKIRANA_ASSETS.loginMascot || '';
+      });
+    }
+
+    // ==========================================
+    // INTERRUPTOR DO MODO ESCURO
+    // ==========================================
+    function obterTemaPreferidoMukirana() {
+      return localStorage.getItem('mukirana_tema') || 'Claro';
+    }
+
+    function obterTemaSessaoMukirana() {
+      return sessionStorage.getItem('mukirana_tema_sessao') || '';
+    }
+
+    function obterTemaAtivoMukirana() {
+      return obterTemaSessaoMukirana() || obterTemaPreferidoMukirana();
+    }
+
+    function aplicarTemaUI(tema) {
+      if (tema === 'Escuro') {
+        document.body.classList.add('tema-escuro');
+      } else {
+        document.body.classList.remove('tema-escuro');
+      }
+
+      atualizarBotaoTemaSessaoMukirana();
+    }
+
+    function aplicarTemaAtualMukirana() {
+      aplicarTemaUI(obterTemaAtivoMukirana());
+    }
+
+    function atualizarBotaoTemaSessaoMukirana() {
+      var botao = document.getElementById('botao-tema-sessao');
+      var icone = document.getElementById('icone-tema-sessao');
+      var temaAtivo = obterTemaAtivoMukirana();
+      var usandoTemaSessao = !!obterTemaSessaoMukirana();
+
+      if (!botao || !icone) {
+        return;
+      }
+
+      icone.textContent = temaAtivo === 'Escuro' ? 'light_mode' : 'dark_mode';
+      botao.setAttribute(
+        'title',
+        usandoTemaSessao
+          ? 'Tema da sessão ativo: ' + temaAtivo + '. Clique para alternar sem mudar sua preferência salva.'
+          : 'Clique para alternar o tema somente nesta sessão.'
+      );
+      botao.setAttribute(
+        'aria-label',
+        temaAtivo === 'Escuro'
+          ? 'Alternar para tema claro apenas nesta sessão'
+          : 'Alternar para tema escuro apenas nesta sessão'
+      );
+      botao.classList.toggle('sessao-personalizada', usandoTemaSessao);
+    }
+
+    function alternarTemaSessaoMukirana() {
+      var temaPreferido = obterTemaPreferidoMukirana();
+      var temaAtual = obterTemaAtivoMukirana();
+      var novoTema = temaAtual === 'Escuro' ? 'Claro' : 'Escuro';
+
+      if (novoTema === temaPreferido) {
+        sessionStorage.removeItem('mukirana_tema_sessao');
+      } else {
+        sessionStorage.setItem('mukirana_tema_sessao', novoTema);
+      }
+
+      aplicarTemaAtualMukirana();
+    }
+
+    function abrirMeuPerfil() {
+      localStorage.setItem('mukirana_acao_pendente', 'meu_perfil');
+      navegarPara('Usuarios');
+    }
+
+    function alternarMenuLateral() {
+      const aberto = document.body.classList.toggle('menu-aberto');
+      const overlay = document.getElementById('menu-overlay');
+
+      if (overlay) {
+        overlay.classList.toggle('oculto', !aberto);
+      }
+    }
+
+    function fecharMenuLateral() {
+      document.body.classList.remove('menu-aberto');
+      const overlay = document.getElementById('menu-overlay');
+      if (overlay) overlay.classList.add('oculto');
+    }
+
+    function alternarFabMukirana(evento) {
+      if (evento) evento.stopPropagation();
+      const submenu = document.getElementById('fab-submenu');
+      const botao = document.getElementById('fab-principal');
+      const aberto = submenu.classList.toggle('oculto') === false;
+
+      botao.classList.toggle('aberto', aberto);
+    }
+
+    function fecharFabMukirana() {
+      const submenu = document.getElementById('fab-submenu');
+      const botao = document.getElementById('fab-principal');
+
+      if (submenu) submenu.classList.add('oculto');
+      if (botao) botao.classList.remove('aberto');
+    }
+
+    function definirFabMukiranaVisivel(visivel) {
+      const fab = document.getElementById('fab-container');
+
+      if (!fab) return;
+
+      if (visivel) {
+        fab.classList.remove('fab-oculto');
+        fab.style.display = localStorage.getItem('mukirana_token') ? 'flex' : 'none';
+        return;
+      }
+
+      fecharFabMukirana();
+      fab.classList.add('fab-oculto');
+      fab.style.display = 'none';
+    }
+
+    function atualizarVisibilidadeFabPorContexto() {
+      const fab = document.getElementById('fab-container');
+      const conteudo = document.getElementById('conteudo-tela');
+
+      if (!fab || !conteudo || !localStorage.getItem('mukirana_token')) {
+        return;
+      }
+
+      const temFormularioAberto = Array.from(conteudo.querySelectorAll('form')).some(function(form) {
+        const estilo = window.getComputedStyle(form);
+        const caixa = form.getBoundingClientRect();
+        return estilo.display !== 'none' &&
+          estilo.visibility !== 'hidden' &&
+          caixa.width > 0 &&
+          caixa.height > 0;
+      });
+      const temModalAberto = Array.from(document.querySelectorAll('.modal-overlay')).some(function(modal) {
+        return !modal.classList.contains('oculto');
+      });
+      const deveOcultar = temFormularioAberto || temModalAberto;
+
+      if (deveOcultar) {
+        fecharFabMukirana();
+      }
+
+      fab.classList.toggle('fab-oculto', deveOcultar);
+    }
+
+    function acaoRapidaMukirana(acao) {
+      fecharFabMukirana();
+
+      if (acao === 'Logout') {
+        fazerLogout();
+        return;
+      }
+
+      if (acao === 'LancamentosNovo') {
+        abrirNovoLancamentoPeloFabMukirana();
+        return;
+      }
+
+      navegarPara(acao);
+    }
+
+    var mkCarregamentoTela = {
+      timer: null,
+      percentual: 0,
+      ativo: false,
+      nomeTela: ''
+    };
+    var mukiranaTelaAtual = {
+      nomeTela: '',
+      obterContextoNovoLancamento: null,
+      abrirNovoLancamento: null,
+      atualizarPeriodoGlobal: null,
+      timerAcaoTopbar: null
+    };
+    var mukiranaTelaContextual = {
+      ativa: false,
+      nomeTela: '',
+      callbackAtualizacao: null,
+      callbackOrigem: null,
+      contexto: null
+    };
+    var mukiranaModalAcessibilidade = {
+      overlayAtivo: null,
+      ultimoFoco: null,
+      manipuladorKeydown: null,
+      manipuladorFocusin: null,
+      aoFechar: null
+    };
+
+    function registrarTelaAtualMukirana(nomeTela, configuracao) {
+      var opcoes = configuracao || {};
+
+      mukiranaTelaAtual.nomeTela = nomeTela || '';
+      mukiranaTelaAtual.obterContextoNovoLancamento = typeof opcoes.obterContextoNovoLancamento === 'function'
+        ? opcoes.obterContextoNovoLancamento
+        : null;
+      mukiranaTelaAtual.abrirNovoLancamento = typeof opcoes.abrirNovoLancamento === 'function'
+        ? opcoes.abrirNovoLancamento
+        : null;
+      mukiranaTelaAtual.atualizarPeriodoGlobal = typeof opcoes.atualizarPeriodoGlobal === 'function'
+        ? opcoes.atualizarPeriodoGlobal
+        : null;
+      agendarAtualizacaoAcaoTopbarMukirana();
+    }
+
+    function limparRegistroTelaAtualMukirana(nomeTelaEsperado) {
+      if (nomeTelaEsperado && mukiranaTelaAtual.nomeTela && mukiranaTelaAtual.nomeTela !== nomeTelaEsperado) {
+        return;
+      }
+
+      mukiranaTelaAtual.nomeTela = '';
+      mukiranaTelaAtual.obterContextoNovoLancamento = null;
+      mukiranaTelaAtual.abrirNovoLancamento = null;
+      mukiranaTelaAtual.atualizarPeriodoGlobal = null;
+      if (mukiranaTelaAtual.timerAcaoTopbar) {
+        clearTimeout(mukiranaTelaAtual.timerAcaoTopbar);
+        mukiranaTelaAtual.timerAcaoTopbar = null;
+      }
+    }
+
+    function gerarMesAtualGlobalMukirana() {
+      var hoje = new Date();
+      return hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
+    }
+
+    function obterFiltroPeriodoGlobalMukirana() {
+      var padrao = {
+        Mes_Referencia: gerarMesAtualGlobalMukirana(),
+        Mes_Inicial: gerarMesAtualGlobalMukirana(),
+        Mes_Final: '',
+        Considerar_Historico_Anterior: true
+      };
+      var bruto = localStorage.getItem('mukirana_filtro_periodo_global');
+
+      if (!bruto) {
+        return padrao;
+      }
+
+      try {
+        var salvo = JSON.parse(bruto) || {};
+        return {
+          Mes_Referencia: salvo.Mes_Inicial || salvo.Mes_Referencia || padrao.Mes_Inicial,
+          Mes_Inicial: salvo.Mes_Inicial || salvo.Mes_Referencia || padrao.Mes_Inicial,
+          Mes_Final: salvo.Mes_Final || '',
+          Considerar_Historico_Anterior: salvo.Considerar_Historico_Anterior !== false
+        };
+      } catch (erro) {
+        return padrao;
+      }
+    }
+
+    function salvarFiltroPeriodoGlobalMukirana(filtro) {
+      var normalizado = {
+        Mes_Referencia: filtro.Mes_Inicial || filtro.Mes_Referencia || gerarMesAtualGlobalMukirana(),
+        Mes_Inicial: filtro.Mes_Inicial || filtro.Mes_Referencia || gerarMesAtualGlobalMukirana(),
+        Mes_Final: filtro.Mes_Final || '',
+        Considerar_Historico_Anterior: filtro.Considerar_Historico_Anterior !== false
+      };
+
+      localStorage.setItem('mukirana_filtro_periodo_global', JSON.stringify(normalizado));
+      return normalizado;
+    }
+
+    function aplicarFiltroPeriodoGlobalMukirana() {
+      var filtro = obterFiltroPeriodoGlobalMukirana();
+      var inicial = document.getElementById('mk_global_mes_inicial');
+      var final = document.getElementById('mk_global_mes_final');
+      var saldoAnterior = document.getElementById('mk_global_saldo_anterior');
+
+      if (inicial) inicial.value = filtro.Mes_Inicial;
+      if (final) final.value = filtro.Mes_Final || '';
+      if (saldoAnterior) saldoAnterior.checked = filtro.Considerar_Historico_Anterior !== false;
+
+      return filtro;
+    }
+
+    function inicializarFiltroPeriodoGlobalMukirana() {
+      salvarFiltroPeriodoGlobalMukirana(obterFiltroPeriodoGlobalMukirana());
+      aplicarFiltroPeriodoGlobalMukirana();
+      definirFiltroPeriodoGlobalVisivelMukirana(true);
+    }
+
+    function definirFiltroPeriodoGlobalVisivelMukirana(visivel) {
+      var filtro = document.getElementById('topbar-filtro-periodo-global');
+      if (filtro) {
+        filtro.style.display = visivel ? 'flex' : 'none';
+      }
+    }
+
+    function alterarFiltroPeriodoGlobalMukirana() {
+      var inicial = document.getElementById('mk_global_mes_inicial');
+      var final = document.getElementById('mk_global_mes_final');
+      var saldoAnterior = document.getElementById('mk_global_saldo_anterior');
+      var filtro = salvarFiltroPeriodoGlobalMukirana({
+        Mes_Inicial: inicial && inicial.value ? inicial.value : gerarMesAtualGlobalMukirana(),
+        Mes_Final: final && final.value ? final.value : '',
+        Considerar_Historico_Anterior: !saldoAnterior || saldoAnterior.checked
+      });
+
+      aplicarFiltroPeriodoGlobalMukirana();
+
+      if (typeof mukiranaTelaAtual.atualizarPeriodoGlobal === 'function') {
+        try {
+          mukiranaTelaAtual.atualizarPeriodoGlobal(filtro);
+        } catch (erro) {
+          if (window.console && console.error) {
+            console.error('Falha ao atualizar tela com filtro global.', erro);
+          }
+        }
+      }
+    }
+
+    function registrarConteudoTopbarMukirana(elemento) {
+      var slot = document.getElementById('topbar-contexto-app');
+      if (!slot || !elemento) {
+        return;
+      }
+
+      slot.innerHTML = '';
+      slot.appendChild(elemento);
+    }
+
+    function limparConteudoTopbarMukirana() {
+      var slot = document.getElementById('topbar-contexto-app');
+      if (!slot) {
+        return;
+      }
+
+      slot.innerHTML = '';
+    }
+
+    function agendarAtualizacaoAcaoTopbarMukirana() {
+      if (mukiranaTelaAtual.timerAcaoTopbar) {
+        clearTimeout(mukiranaTelaAtual.timerAcaoTopbar);
+      }
+
+      mukiranaTelaAtual.timerAcaoTopbar = setTimeout(atualizarAcaoPrincipalTopbarMukirana, 0);
+    }
+
+    function atualizarAcaoPrincipalTopbarMukirana() {
+      var slot = document.getElementById('topbar-contexto-app');
+      var container = document.getElementById('conteudo-tela');
+
+      if (!slot || !container) {
+        return;
+      }
+
+      slot.innerHTML = '';
+
+      var cabecalho = container.querySelector('.cabecalho-tela');
+      if (cabecalho) {
+        cabecalho.classList.remove('cabecalho-com-acao-topbar');
+        Array.from(cabecalho.querySelectorAll('.mk-acao-topbar-origem')).forEach(function(botao) {
+          botao.classList.remove('mk-acao-topbar-origem');
+        });
+      }
+
+      var botaoOrigem = cabecalho ? obterBotaoPrincipalCabecalhoMukirana_(cabecalho) : null;
+
+      if (!botaoOrigem || botaoOrigem.disabled) {
+        return;
+      }
+
+      cabecalho.classList.add('cabecalho-com-acao-topbar');
+      botaoOrigem.classList.add('mk-acao-topbar-origem');
+
+      var botaoTopbar = botaoOrigem.cloneNode(true);
+      var rotuloTopbar = botaoOrigem.getAttribute('data-topbar-label') || (botaoOrigem.textContent || '').trim();
+
+      botaoTopbar.id = botaoOrigem.id ? botaoOrigem.id + '_topbar' : '';
+      botaoTopbar.classList.add('topbar-acao-principal');
+      botaoTopbar.removeAttribute('autofocus');
+      botaoTopbar.textContent = rotuloTopbar;
+      botaoTopbar.onclick = function(evento) {
+        evento.preventDefault();
+        botaoOrigem.click();
+      };
+
+      slot.appendChild(botaoTopbar);
+    }
+
+    function obterBotaoPrincipalCabecalhoMukirana_(cabecalho) {
+      var declarado = cabecalho.querySelector('button[data-topbar-label]');
+
+      if (declarado) {
+        return declarado;
+      }
+
+      var botoes = Array.from(cabecalho.querySelectorAll('button'));
+      return botoes.find(function(botao) {
+        var texto = (botao.getAttribute('aria-label') || botao.textContent || '').trim().toLowerCase();
+        var ehPrimario = botao.classList.contains('btn-primario');
+        var pareceNovo = /\b(novo|nova|criar|adicionar|cadastrar)\b/.test(texto);
+
+        return ehPrimario && pareceNovo;
+      }) || null;
+    }
+
+    function obterContextoNovoLancamentoTelaAtualMukirana() {
+      if (typeof mukiranaTelaAtual.obterContextoNovoLancamento !== 'function') {
+        return {};
+      }
+
+      try {
+        return mukiranaTelaAtual.obterContextoNovoLancamento() || {};
+      } catch (erro) {
+        if (window.console && console.error) {
+          console.error('Falha ao obter o contexto atual para novo lançamento.', erro);
+        }
+      }
+
+      return {};
+    }
+
+    function normalizarContextoFabNovoLancamentoMukirana(contexto) {
+      var origem = contexto || {};
+      var mesInicial = origem.Mes_Inicial || origem.Mes_Referencia || '';
+
+      return {
+        Mes_Referencia: mesInicial,
+        Mes_Inicial: mesInicial,
+        Mes_Final: origem.Mes_Final || '',
+        Tipo: origem.Tipo || '',
+        Status: origem.Status || '',
+        Texto: origem.Texto || '',
+        ID_Conta: origem.ID_Conta || '',
+        ID_Categoria: origem.ID_Categoria || '',
+        ID_Projeto: origem.ID_Projeto || '',
+        Tipo_Origem: origem.Tipo_Origem || '',
+        ID_Grupo_Cartao: origem.ID_Grupo_Cartao || '',
+        ID_Cartao: origem.ID_Cartao || '',
+        Parcelado: origem.Parcelado === true,
+        Modo_Contextual: false,
+        Titulo_Contexto: '',
+        Subtitulo_Contexto: ''
+      };
+    }
+
+    function abrirNovoLancamentoPeloFabMukirana() {
+      var contextoAtual = obterContextoNovoLancamentoTelaAtualMukirana();
+
+      if (mukiranaTelaAtual.nomeTela === 'Lancamentos' && typeof mukiranaTelaAtual.abrirNovoLancamento === 'function') {
+        mukiranaTelaAtual.abrirNovoLancamento(contextoAtual);
+        return;
+      }
+
+      localStorage.setItem(
+        'mukirana_filtros_lancamentos',
+        JSON.stringify(normalizarContextoFabNovoLancamentoMukirana(contextoAtual))
+      );
+      localStorage.setItem('mukirana_acao_pendente', 'novo_lancamento');
+      navegarPara('Lancamentos');
+    }
+
+    function iniciarCarregamentoTelaMukirana(nomeTela) {
+      const carregamento = document.getElementById('tela-carregamento');
+      const container = document.getElementById('conteudo-tela');
+
+      mkCarregamentoTela.ativo = true;
+      mkCarregamentoTela.nomeTela = nomeTela || 'tela';
+      mkCarregamentoTela.percentual = 0;
+
+      if (container) {
+        container.style.display = 'none';
+      }
+
+      if (carregamento) {
+        carregamento.style.setProperty('display', 'flex', 'important');
+      }
+
+      atualizarCarregamentoTelaMukirana('Carregando ' + mkCarregamentoTela.nomeTela + '...', 0);
+      iniciarProgressoEstimadoMukirana();
+    }
+
+    function iniciarProgressoEstimadoMukirana() {
+      if (mkCarregamentoTela.timer) {
+        clearInterval(mkCarregamentoTela.timer);
+      }
+
+      mkCarregamentoTela.timer = setInterval(function() {
+        if (!mkCarregamentoTela.ativo) {
+          clearInterval(mkCarregamentoTela.timer);
+          mkCarregamentoTela.timer = null;
+          return;
+        }
+
+        const incremento = mkCarregamentoTela.percentual < 55 ? 9 : (mkCarregamentoTela.percentual < 82 ? 4 : 1);
+        const novoPercentual = Math.min(92, mkCarregamentoTela.percentual + incremento);
+
+        atualizarCarregamentoTelaMukirana(null, novoPercentual);
+      }, 280);
+    }
+
+    function atualizarCarregamentoTelaMukirana(mensagem, percentualConcluido) {
+      const titulo = document.querySelector('#tela-carregamento h3');
+      const mensagemEl = document.getElementById('mk-carregamento-mensagem');
+      const progresso = document.getElementById('mk-carregamento-progresso');
+      const restante = document.getElementById('mk-carregamento-restante');
+      const concluido = Math.max(0, Math.min(100, Math.round(percentualConcluido || 0)));
+      const faltante = Math.max(0, 100 - concluido);
+
+      mkCarregamentoTela.percentual = concluido;
+
+      if (titulo && mensagem) {
+        titulo.textContent = mensagem;
+      }
+
+      if (mensagemEl) {
+        mensagemEl.textContent = 'Estamos preparando todos os dados antes de exibir a tela.';
+      }
+
+      if (progresso) {
+        progresso.style.width = concluido + '%';
+      }
+
+      if (restante) {
+        restante.textContent = faltante > 0
+          ? 'Faltam aproximadamente ' + faltante + '%.'
+          : 'Pronto para exibir.';
+      }
+    }
+
+    function finalizarCarregamentoTelaMukirana() {
+      const carregamento = document.getElementById('tela-carregamento');
+      const container = document.getElementById('conteudo-tela');
+
+      mkCarregamentoTela.ativo = false;
+      if (mkCarregamentoTela.timer) {
+        clearInterval(mkCarregamentoTela.timer);
+        mkCarregamentoTela.timer = null;
+      }
+
+      atualizarCarregamentoTelaMukirana(null, 100);
+
+      setTimeout(function() {
+        atualizarAcaoPrincipalTopbarMukirana();
+        if (carregamento) carregamento.style.setProperty('display', 'none', 'important');
+        if (container) container.style.display = 'block';
+        atualizarVisibilidadeFabPorContexto();
+      }, 120);
+    }
+
+    function falharCarregamentoTelaMukirana(mensagem) {
+      const container = document.getElementById('conteudo-tela');
+
+      mkCarregamentoTela.ativo = false;
+      if (mkCarregamentoTela.timer) {
+        clearInterval(mkCarregamentoTela.timer);
+        mkCarregamentoTela.timer = null;
+      }
+
+      if (container) {
+        container.style.display = 'block';
+        container.innerHTML = '<div class="cartao"><h3 style="color:var(--cor-erro-texto)">Erro ao carregar tela</h3><p>' + mensagem + '</p></div>';
+      }
+
+      const carregamento = document.getElementById('tela-carregamento');
+      if (carregamento) carregamento.style.setProperty('display', 'none', 'important');
+    }
+
+    function mostrarBalaoAjuda(evento, texto) {
+      if (evento) {
+        evento.preventDefault();
+        evento.stopPropagation();
+      }
+
+      fecharBalaoAjuda();
+
+      const botao = evento && evento.currentTarget ? evento.currentTarget : null;
+      const balao = document.createElement('div');
+      const rect = botao ? botao.getBoundingClientRect() : { left: 20, top: 20, bottom: 20 };
+
+      balao.id = 'balao-ajuda-global';
+      balao.className = 'balao-ajuda';
+      balao.textContent = texto;
+      document.body.appendChild(balao);
+
+      const largura = balao.offsetWidth || 300;
+      const esquerda = Math.min(Math.max(12, rect.left), window.innerWidth - largura - 12);
+      const topo = Math.min(rect.bottom + 8, window.innerHeight - balao.offsetHeight - 12);
+
+      balao.style.left = esquerda + 'px';
+      balao.style.top = topo + 'px';
+
+      setTimeout(function() {
+        document.addEventListener('click', fecharBalaoAjuda, { once: true });
+      }, 0);
+    }
+
+    function fecharBalaoAjuda() {
+      const balao = document.getElementById('balao-ajuda-global');
+      if (balao) balao.remove();
+    }
+
+    function elementoAceitaDigitacaoMukirana(elemento) {
+      if (!elemento) {
+        return false;
+      }
+
+      var tag = (elemento.tagName || '').toUpperCase();
+      if (elemento.isContentEditable) {
+        return true;
+      }
+
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+    }
+
+    function obterElementosFocaveisMukirana(container) {
+      if (!container) {
+        return [];
+      }
+
+      return Array.from(
+        container.querySelectorAll(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter(function(elemento) {
+        return elemento.offsetParent !== null && !elemento.hasAttribute('hidden');
+      });
+    }
+
+    function desativarAcessibilidadeModalMukirana() {
+      if (mukiranaModalAcessibilidade.manipuladorKeydown) {
+        document.removeEventListener('keydown', mukiranaModalAcessibilidade.manipuladorKeydown, true);
+      }
+
+      if (mukiranaModalAcessibilidade.manipuladorFocusin) {
+        document.removeEventListener('focusin', mukiranaModalAcessibilidade.manipuladorFocusin, true);
+      }
+
+      if (typeof mukiranaModalAcessibilidade.aoFechar === 'function') {
+        try {
+          mukiranaModalAcessibilidade.aoFechar();
+        } catch (erro) {
+          if (window.console && console.warn) {
+            console.warn('Falha ao encerrar a acessibilidade modal.', erro);
+          }
+        }
+      }
+
+      var focoAnterior = mukiranaModalAcessibilidade.ultimoFoco;
+
+      mukiranaModalAcessibilidade.overlayAtivo = null;
+      mukiranaModalAcessibilidade.ultimoFoco = null;
+      mukiranaModalAcessibilidade.manipuladorKeydown = null;
+      mukiranaModalAcessibilidade.manipuladorFocusin = null;
+      mukiranaModalAcessibilidade.aoFechar = null;
+
+      if (focoAnterior && typeof focoAnterior.focus === 'function') {
+        setTimeout(function() {
+          focoAnterior.focus();
+        }, 0);
+      }
+    }
+
+    function ativarAcessibilidadeModalMukirana(overlay, opcoes) {
+      if (!overlay) {
+        return;
+      }
+
+      var configuracao = opcoes || {};
+      var caixa = overlay.querySelector('.modal-caixa') || overlay;
+      var elementoInicial = configuracao.elementoInicial || null;
+      var permitirEsc = configuracao.permitirEsc !== false;
+      var aoEsc = typeof configuracao.aoEsc === 'function' ? configuracao.aoEsc : null;
+
+      desativarAcessibilidadeModalMukirana();
+
+      mukiranaModalAcessibilidade.overlayAtivo = overlay;
+      mukiranaModalAcessibilidade.ultimoFoco = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      mukiranaModalAcessibilidade.aoFechar = typeof configuracao.aoFechar === 'function' ? configuracao.aoFechar : null;
+
+      caixa.setAttribute('tabindex', '-1');
+
+      var aplicarFocoInicial = function() {
+        var focaveis = obterElementosFocaveisMukirana(caixa);
+        var destino = elementoInicial || focaveis[0] || caixa;
+        if (destino && typeof destino.focus === 'function') {
+          destino.focus();
+        }
+      };
+
+      var tratarKeydown = function(evento) {
+        if (mukiranaModalAcessibilidade.overlayAtivo !== overlay) {
+          return;
+        }
+
+        if (permitirEsc && evento.key === 'Escape') {
+          evento.preventDefault();
+          if (aoEsc) {
+            aoEsc();
+          }
+          return;
+        }
+
+        if (evento.key !== 'Tab') {
+          return;
+        }
+
+        var focaveis = obterElementosFocaveisMukirana(caixa);
+        if (!focaveis.length) {
+          evento.preventDefault();
+          caixa.focus();
+          return;
+        }
+
+        var primeiro = focaveis[0];
+        var ultimo = focaveis[focaveis.length - 1];
+        var ativo = document.activeElement;
+
+        if (evento.shiftKey && (ativo === primeiro || ativo === caixa)) {
+          evento.preventDefault();
+          ultimo.focus();
+          return;
+        }
+
+        if (!evento.shiftKey && ativo === ultimo) {
+          evento.preventDefault();
+          primeiro.focus();
+        }
+      };
+
+      var tratarFocusin = function(evento) {
+        if (mukiranaModalAcessibilidade.overlayAtivo !== overlay) {
+          return;
+        }
+
+        if (!overlay.contains(evento.target)) {
+          aplicarFocoInicial();
+        }
+      };
+
+      mukiranaModalAcessibilidade.manipuladorKeydown = tratarKeydown;
+      mukiranaModalAcessibilidade.manipuladorFocusin = tratarFocusin;
+
+      document.addEventListener('keydown', tratarKeydown, true);
+      document.addEventListener('focusin', tratarFocusin, true);
+
+      setTimeout(aplicarFocoInicial, 0);
+    }
+
+    function executarAtalhoGlobalMukirana(acao) {
+      if (acao === 'abrir_login') {
+        if (typeof window.abrirModalLoginMukirana === 'function') {
+          window.abrirModalLoginMukirana();
+        }
+        return;
+      }
+
+      if (acao === 'dashboard') {
+        navegarPara('Dashboard');
+        return;
+      }
+
+      if (acao === 'lancamentos') {
+        navegarPara('Lancamentos');
+        return;
+      }
+
+      if (acao === 'novo_lancamento') {
+        abrirNovoLancamentoPeloFabMukirana();
+        return;
+      }
+
+      if (acao === 'recorrencias') {
+        navegarPara('Recorrencias');
+        return;
+      }
+
+      if (acao === 'orcamentos') {
+        navegarPara('Orcamentos');
+        return;
+      }
+
+      if (acao === 'logout') {
+        fazerLogout();
+      }
+    }
+
+    function registrarAtualizacaoTelaContextualMukirana(callback) {
+      if (mukiranaTelaContextual.ativa === true) {
+        mukiranaTelaContextual.callbackAtualizacao = typeof callback === 'function' ? callback : null;
+        return;
+      }
+
+      mukiranaTelaContextual.callbackOrigem = typeof callback === 'function' ? callback : null;
+    }
+
+    function estaEmTelaContextualMukirana() {
+      return mukiranaTelaContextual.ativa === true;
+    }
+
+    function atualizarTelaOrigemContextualMukirana() {
+      atualizarTelaOrigemExternaContextualMukirana();
+
+      if (typeof mukiranaTelaContextual.callbackAtualizacao === 'function') {
+        try {
+          mukiranaTelaContextual.callbackAtualizacao();
+        } catch (erro) {
+          if (window.console && console.error) {
+            console.error('Falha ao atualizar contexto de origem.', erro);
+          }
+        }
+      }
+    }
+
+    function atualizarTelaOrigemExternaContextualMukirana() {
+      if (typeof mukiranaTelaContextual.callbackOrigem === 'function') {
+        try {
+          mukiranaTelaContextual.callbackOrigem();
+        } catch (erroOrigem) {
+          if (window.console && console.error) {
+            console.error('Falha ao atualizar tela de origem.', erroOrigem);
+          }
+        }
+      }
+    }
+
+    function abrirTelaContextualMukirana(nomeTela, opcoes) {
+      const overlay = document.getElementById('modal-tela-contextual');
+      const conteudo = document.getElementById('conteudo-modal-contextual');
+      const titulo = document.getElementById('titulo-modal-contextual');
+      const subtitulo = document.getElementById('subtitulo-modal-contextual');
+      const token = localStorage.getItem('mukirana_token') || '';
+      const configuracao = opcoes || {};
+
+      mukiranaTelaContextual.ativa = true;
+      mukiranaTelaContextual.nomeTela = nomeTela || '';
+      mukiranaTelaContextual.contexto = configuracao.contexto || null;
+      mukiranaTelaContextual.callbackAtualizacao = null;
+      mukiranaTelaContextual.callbackOrigem = typeof configuracao.aoAtualizarOrigem === 'function'
+        ? configuracao.aoAtualizarOrigem
+        : mukiranaTelaContextual.callbackOrigem;
+
+      if (titulo) {
+        titulo.textContent = configuracao.titulo || 'Contexto';
+      }
+
+      if (subtitulo) {
+        subtitulo.textContent = configuracao.subtitulo || 'Visualize e edite sem sair da tela atual.';
+      }
+
+      if (conteudo) {
+        conteudo.innerHTML = '<div class="cartao"><div class="estado-carregando-lancamento" style="display:block;"><div class="indicador-carregamento-lancamento"></div><strong>Carregando contexto...</strong><span>Estamos preparando os dados desta tela.</span></div></div>';
+      }
+
+      if (overlay) {
+        overlay.classList.remove('oculto');
+      }
+      ativarAcessibilidadeModalMukirana(overlay, {
+        aoEsc: function() {
+          fecharTelaContextualMukirana(false);
+        }
+      });
+      atualizarVisibilidadeFabPorContexto();
+
+      google.script.run
+        .withSuccessHandler(function(html) {
+          if (!conteudo) {
+            return;
+          }
+
+          conteudo.innerHTML = html;
+
+          const scripts = conteudo.getElementsByTagName('script');
+          Array.from(scripts).forEach(function(scriptAntigo) {
+            const novoScript = document.createElement('script');
+            novoScript.textContent = scriptAntigo.textContent;
+            document.body.appendChild(novoScript);
+            scriptAntigo.remove();
+          });
+        })
+        .withFailureHandler(function(erro) {
+          if (conteudo) {
+            conteudo.innerHTML = '<div class="cartao"><h3 style="color:var(--cor-erro-texto)">Erro ao carregar contexto</h3><p>' + (erro.message || 'Nao foi possivel abrir esta tela.') + '</p></div>';
+          }
+        })
+        .obterHtmlDaTela(nomeTela, token);
+    }
+
+    function fecharTelaContextualMukirana(recarregarOrigem) {
+      const overlay = document.getElementById('modal-tela-contextual');
+      const conteudo = document.getElementById('conteudo-modal-contextual');
+
+      if (overlay) {
+        overlay.classList.add('oculto');
+      }
+
+      if (conteudo) {
+        conteudo.innerHTML = '';
+      }
+
+      if (recarregarOrigem === true) {
+        atualizarTelaOrigemContextualMukirana();
+      }
+
+      mukiranaTelaContextual.ativa = false;
+      mukiranaTelaContextual.nomeTela = '';
+      mukiranaTelaContextual.contexto = null;
+      mukiranaTelaContextual.callbackAtualizacao = null;
+      desativarAcessibilidadeModalMukirana();
+      atualizarVisibilidadeFabPorContexto();
+    }
+
+    function abrirLancamentosContextuaisMukirana(configuracao) {
+      const contexto = configuracao || {};
+      const filtros = {
+        Mes_Inicial: contexto.Mes_Inicial || contexto.Mes_Referencia || '',
+        Mes_Final: contexto.Mes_Final || '',
+        Mes_Referencia: contexto.Mes_Inicial || contexto.Mes_Referencia || '',
+        Tipo: contexto.Tipo || '',
+        Status: contexto.Status || '',
+        Texto: contexto.Texto || '',
+        ID_Conta: contexto.ID_Conta || '',
+        ID_Categoria: contexto.ID_Categoria || '',
+        ID_Projeto: contexto.ID_Projeto || '',
+        Tipo_Origem: contexto.Tipo_Origem || '',
+        ID_Grupo_Cartao: contexto.ID_Grupo_Cartao || '',
+        ID_Cartao: contexto.ID_Cartao || '',
+        ID_Lancamento: contexto.ID_Lancamento || '',
+        IDs_Lancamentos: contexto.IDs_Lancamentos || '',
+        Ignorar_Periodo_Global: contexto.Ignorar_Periodo_Global === true,
+        Modo_Contextual: true,
+        Titulo_Contexto: contexto.Titulo || '',
+        Subtitulo_Contexto: contexto.Subtitulo || '',
+        Nome_Contexto: contexto.Nome_Contexto || '',
+        Resumo_Contexto: contexto.Resumo_Contexto || ''
+      };
+
+      localStorage.setItem('mukirana_filtros_lancamentos', JSON.stringify(filtros));
+      localStorage.removeItem('mukirana_acao_pendente');
+
+      if (contexto.ID_Lancamento && contexto.Acao === 'Editar') {
+        localStorage.setItem('mukirana_acao_pendente', 'editar_lancamento:' + contexto.ID_Lancamento);
+      } else if (contexto.ID_Lancamento && contexto.Acao === 'Detalhes') {
+        localStorage.setItem('mukirana_acao_pendente', 'detalhes_lancamento:' + contexto.ID_Lancamento);
+      }
+
+      abrirTelaContextualMukirana('Lancamentos', {
+        titulo: contexto.Titulo || 'Lancamentos',
+        subtitulo: contexto.Subtitulo || 'Use os filtros deste contexto para agir com rapidez.',
+        contexto: contexto
+      });
+    }
+
+    function navegarPara(nomeTela) {
+      const container = document.getElementById('conteudo-tela');
+
+      fecharMenuLateral();
+      fecharFabMukirana();
+      fecharBalaoAjuda();
+      definirFabMukiranaVisivel(true);
+      limparRegistroTelaAtualMukirana();
+      limparConteudoTopbarMukirana();
+      
+      window.contasEmMemoria = []; window.categoriasEmMemoria = []; window.usuariosEmMemoria = [];
+
+      container.innerHTML = '';
+      container.style.display = 'none';
+      iniciarCarregamentoTelaMukirana(nomeTela);
+      
+      google.script.run
+        .withSuccessHandler(function(html) {
+          container.style.display = 'none';
+          container.innerHTML = html;
+          
+          const scripts = container.getElementsByTagName('script');
+          Array.from(scripts).forEach(scriptAntigo => {
+            const novoScript = document.createElement('script');
+            novoScript.textContent = scriptAntigo.textContent;
+            document.body.appendChild(novoScript); 
+            scriptAntigo.remove();
+          });
+
+          aplicarIdentidadeVisualMukirana();
+          agendarAtualizacaoAcaoTopbarMukirana();
+
+          setTimeout(function() {
+            if (mkCarregamentoTela.ativo) {
+              finalizarCarregamentoTelaMukirana();
+            }
+            atualizarVisibilidadeFabPorContexto();
+            agendarAtualizacaoAcaoTopbarMukirana();
+          }, 14000);
+        })
+        .withFailureHandler(function(erro) {
+          falharCarregamentoTelaMukirana(erro.message || 'Não foi possível abrir esta tela.');
+        })
+        .obterHtmlDaTela(nomeTela, localStorage.getItem('mukirana_token') || '');
+    }
+
+    function mostrarNotificacao(mensagem, tipo) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const classeTipo = tipo === 'sucesso'
+        ? 'toast-sucesso'
+        : tipo === 'alerta'
+          ? 'toast-alerta'
+          : tipo === 'info'
+            ? 'toast-info'
+            : 'toast-erro';
+      toast.className = 'toast ' + classeTipo;
+      toast.innerText = mensagem;
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      container.appendChild(toast);
+
+      const duracao = tipo === 'sucesso' ? 3500 : (tipo === 'info' ? 10000 : 7000);
+      
+      setTimeout(() => {
+        toast.classList.add('ocultando');
+        toast.addEventListener('animationend', () => toast.remove());
+      }, duracao);
+
+      return toast;
+    }
+
+    function definirEstadoAcaoTelaMukirana(ativo, opcoes) {
+      const configuracao = opcoes || {};
+      const escopo = resolverEscopoAcaoTelaMukirana_(configuracao);
+
+      if (!escopo) {
+        return;
+      }
+
+      if (ativo) {
+        iniciarEstadoAcaoTelaMukirana_(escopo, configuracao);
+        return;
+      }
+
+      finalizarEstadoAcaoTelaMukirana_(escopo);
+    }
+
+    function resolverEscopoAcaoTelaMukirana_(configuracao) {
+      if (configuracao.escopo && typeof configuracao.escopo === 'string') {
+        const escopoPorSeletor = document.querySelector(configuracao.escopo);
+        if (escopoPorSeletor) return escopoPorSeletor;
+      }
+
+      if (configuracao.escopo && configuracao.escopo.nodeType === 1) {
+        return configuracao.escopo;
+      }
+
+      const botao = configuracao.botaoId
+        ? document.getElementById(configuracao.botaoId)
+        : null;
+
+      if (botao) {
+        return botao.closest('form') ||
+          botao.closest('.modal-conteudo') ||
+          botao.closest('.cartao') ||
+          document.getElementById('conteudo-modal-contextual') ||
+          document.getElementById('conteudo-tela');
+      }
+
+      return document.getElementById('conteudo-modal-contextual') ||
+        document.getElementById('conteudo-tela') ||
+        document.body;
+    }
+
+    function iniciarEstadoAcaoTelaMukirana_(escopo, configuracao) {
+      if (escopo.__mkAcaoTelaAtiva) {
+        return;
+      }
+
+      const idsProcessando = configuracao.idsProcessando || (configuracao.botaoId ? [configuracao.botaoId] : []);
+      const textoProcessando = configuracao.textoProcessando || 'Processando...';
+      const botoes = Array.from(escopo.querySelectorAll('button'));
+      const campos = Array.from(escopo.querySelectorAll('input, select, textarea'));
+      const estado = {
+        botoes: [],
+        campos: []
+      };
+
+      botoes.forEach(function(botao) {
+        estado.botoes.push({
+          elemento: botao,
+          disabled: botao.disabled,
+          texto: botao.textContent
+        });
+
+        if (idsProcessando.indexOf(botao.id) >= 0) {
+          botao.textContent = textoProcessando;
+        }
+
+        botao.disabled = true;
+        botao.setAttribute('aria-busy', 'true');
+      });
+
+      campos.forEach(function(campo) {
+        estado.campos.push({
+          elemento: campo,
+          disabled: campo.disabled,
+          readOnly: campo.readOnly
+        });
+
+        if (campo.type === 'hidden') {
+          return;
+        }
+
+        if (campo.tagName === 'INPUT' || campo.tagName === 'TEXTAREA') {
+          campo.readOnly = true;
+        }
+
+        if (
+          campo.tagName === 'SELECT' ||
+          campo.type === 'checkbox' ||
+          campo.type === 'radio' ||
+          campo.type === 'file'
+        ) {
+          campo.disabled = true;
+        }
+      });
+
+      escopo.__mkAcaoTelaAtiva = estado;
+      escopo.classList.add('mk-acao-em-andamento');
+    }
+
+    function finalizarEstadoAcaoTelaMukirana_(escopo) {
+      const estado = escopo.__mkAcaoTelaAtiva;
+
+      if (!estado) {
+        return;
+      }
+
+      estado.botoes.forEach(function(item) {
+        if (!item.elemento || !item.elemento.isConnected) return;
+        item.elemento.disabled = item.disabled;
+        item.elemento.textContent = item.texto;
+        item.elemento.removeAttribute('aria-busy');
+      });
+
+      estado.campos.forEach(function(item) {
+        if (!item.elemento || !item.elemento.isConnected) return;
+        item.elemento.disabled = item.disabled;
+        item.elemento.readOnly = item.readOnly;
+      });
+
+      escopo.classList.remove('mk-acao-em-andamento');
+      escopo.__mkAcaoTelaAtiva = null;
+    }
+
+    function confirmarAcao(mensagem, callbackSim) {
+      const overlay = document.getElementById('modal-confirmacao');
+      const msg = document.getElementById('modal-texto');
+      const btnSim = document.getElementById('btn-confirmar-sim');
+      const btnNao = document.getElementById('btn-confirmar-nao');
+
+      msg.innerText = mensagem;
+      elevarModalConfirmacaoMukirana(overlay);
+      overlay.classList.remove('oculto');
+      atualizarVisibilidadeFabPorContexto();
+
+      btnNao.onclick = () => {
+        overlay.classList.add('oculto');
+        restaurarCamadaModalConfirmacaoMukirana(overlay);
+        desativarAcessibilidadeModalMukirana();
+        atualizarVisibilidadeFabPorContexto();
+      };
+      btnSim.onclick = () => {
+        overlay.classList.add('oculto');
+        restaurarCamadaModalConfirmacaoMukirana(overlay);
+        desativarAcessibilidadeModalMukirana();
+        atualizarVisibilidadeFabPorContexto();
+        if (typeof callbackSim === 'function') callbackSim();
+      };
+
+      ativarAcessibilidadeModalMukirana(overlay, {
+        elementoInicial: btnNao,
+        aoEsc: function() {
+          btnNao.click();
+        }
+      });
+    }
+
+    function elevarModalConfirmacaoMukirana(overlayConfirmacao) {
+      if (!overlayConfirmacao) return;
+
+      const maiorZIndex = Array.from(document.querySelectorAll('.modal-overlay'))
+        .filter(function(modal) {
+          return modal !== overlayConfirmacao && !modal.classList.contains('oculto');
+        })
+        .reduce(function(maior, modal) {
+          const zIndex = parseInt(window.getComputedStyle(modal).zIndex, 10);
+          return isNaN(zIndex) ? maior : Math.max(maior, zIndex);
+        }, 10000);
+
+      overlayConfirmacao.style.zIndex = String(maiorZIndex + 20);
+    }
+
+    function restaurarCamadaModalConfirmacaoMukirana(overlayConfirmacao) {
+      if (!overlayConfirmacao) return;
+      overlayConfirmacao.style.zIndex = '';
+    }
+
+    function verificarSessao() {
+  const token = localStorage.getItem('mukirana_token');
+  const menu = document.getElementById('menu-lateral');
+  const topbar = document.getElementById('topbar-app');
+  const fab = document.getElementById('fab-container');
+
+  if (!token) {
+    document.body.classList.remove('mukirana-com-topbar');
+    menu.style.display = 'none';
+    if (topbar) topbar.style.display = 'none';
+    definirFiltroPeriodoGlobalVisivelMukirana(false);
+    if (fab) fab.style.display = 'none';
+    sessionStorage.removeItem('mukirana_tema_sessao');
+    aplicarTemaUI('Claro');
+    navegarPara('Login');
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(function(sessao) {
+      localStorage.setItem('mukirana_id', sessao.id);
+      localStorage.setItem('mukirana_nome', sessao.nome);
+      localStorage.setItem('mukirana_email', sessao.email);
+      localStorage.setItem('mukirana_papel', sessao.papel);
+      localStorage.setItem('mukirana_tema', sessao.tema);
+
+      document.getElementById('nome-usuario-logado').innerText = sessao.nome;
+      document.body.classList.add('mukirana-com-topbar');
+      menu.style.display = 'block';
+      if (topbar) topbar.style.display = 'flex';
+      if (fab) fab.style.display = 'flex';
+
+      aplicarTemaAtualMukirana();
+      inicializarFiltroPeriodoGlobalMukirana();
+      navegarPara('Dashboard');
+    })
+    .withFailureHandler(function() {
+      localStorage.clear();
+      sessionStorage.removeItem('mukirana_tema_sessao');
+      document.body.classList.remove('mukirana-com-topbar');
+      menu.style.display = 'none';
+      if (topbar) topbar.style.display = 'none';
+      definirFiltroPeriodoGlobalVisivelMukirana(false);
+      if (fab) fab.style.display = 'none';
+      aplicarTemaUI('Claro');
+      navegarPara('Login');
+    })
+    .obterSessaoAtual(token);
+}
+
+    function fazerLogout() {
+  const token = localStorage.getItem('mukirana_token');
+
+  if (token) {
+    google.script.run.encerrarSessao(token);
+  }
+
+  localStorage.clear();
+  sessionStorage.removeItem('mukirana_tema_sessao');
+  verificarSessao();
+}
+
+    window.onload = function() {
+      try {
+        aplicarIdentidadeVisualMukirana();
+        verificarSessao();
+      } catch(e) {
+        window.onerror(e.message, null, "Inicialização");
+      }
+    };
+
+    document.addEventListener('click', function(evento) {
+      const fab = document.getElementById('fab-container');
+
+      if (fab && !fab.contains(evento.target)) {
+        fecharFabMukirana();
+      }
+
+      setTimeout(atualizarVisibilidadeFabPorContexto, 0);
+    });
+
+    document.addEventListener('change', function() {
+      setTimeout(atualizarVisibilidadeFabPorContexto, 0);
+    });
+
+    document.addEventListener('keydown', function(evento) {
+      if (!(evento.altKey && evento.shiftKey) || evento.ctrlKey || evento.metaKey) {
+        return;
+      }
+
+      if (elementoAceitaDigitacaoMukirana(evento.target)) {
+        return;
+      }
+
+      var tecla = (evento.key || '').toLowerCase();
+      var haToken = !!localStorage.getItem('mukirana_token');
+
+      if (!haToken && tecla === 'e') {
+        evento.preventDefault();
+        executarAtalhoGlobalMukirana('abrir_login');
+        return;
+      }
+
+      if (!haToken) {
+        return;
+      }
+
+      var mapa = {
+        d: 'dashboard',
+        l: 'lancamentos',
+        n: 'novo_lancamento',
+        r: 'recorrencias',
+        o: 'orcamentos',
+        s: 'logout'
+      };
+
+      if (!mapa[tecla]) {
+        return;
+      }
+
+      evento.preventDefault();
+      executarAtalhoGlobalMukirana(mapa[tecla]);
+    });
+
+    // ==========================================
+    // FUNÇÕES UTILITÁRIAS GLOBAIS (Disponíveis para todas as telas)
+    // ==========================================
+    
+    function mascaraMoeda(input) {
+      let valor = input.value.replace(/\D/g, '');
+      valor = (valor / 100).toFixed(2) + '';
+      valor = valor.replace(".", ",");
+      valor = valor.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
+      valor = valor.replace(/(\d)(\d{3}),/g, "$1.$2,");
+      input.value = valor;
+    }
+
+    function reverterMoeda(valor) {
+      if (!valor) return 0;
+      let limpo = valor.toString().replace(/\./g, '').replace(',', '.');
+      return parseFloat(limpo) || 0;
+    }
+
+    function formatarMoedaParaInput(valor) {
+      if (!valor) return "0,00";
+      return parseFloat(valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+  </script>
+</body>
+</html>
