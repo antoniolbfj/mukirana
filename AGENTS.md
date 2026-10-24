@@ -9,10 +9,11 @@
 - Distinguir implementação, publicação e homologação. Identificar a implantação de teste e a de produção antes de publicar.
 - Recriar cada tela com uma rota e um menu provisórios para avaliação. Manter a tela atual como acesso principal até a homologação explícita do usuário; só então substituí-la pela nova e remover o menu provisório.
 - Credenciais permanecem nas propriedades privadas do Apps Script ou no ambiente configurado. Não copiar chaves para arquivos versionados nem para HTML.
-- Contas remodelada foi homologada pelo usuário e passa a ser a tela principal; Cartões está implementado no menu provisório Cartões (novo) e aguarda homologação.
+- Contas e Cartões remodelados foram homologados pelo usuário e são os acessos principais; os menus provisórios desses módulos foram retirados. A rota CartoesNovo continua como alias.
 - Revisar a paleta global somente depois de remodelar todas as telas, conforme orientação do usuário. Até lá, preservar a identidade visual disponível e concentrar as rodadas em estrutura, componentes e fluxos.
 
 - No módulo de Cartões, o usuário confirmou que adicionais continuam podendo registrar pagamentos com contas acessíveis; a consulta continua restrita aos movimentos autorizados.
 - Competência das compras registradas é persistida: alterar fechamento não reclassifica histórico; mudanças explícitas de data/origem recalculam a compra afetada.
 
-- Cartões (novo) foi publicado somente em avaliação na versão 35; produção e antigo endereço de Contas permanecem na versão 34. Identificadores e decisão da revisão automática em docs/cartoes-publicacao.json e docs/cartoes-entrega.md. O banco de avaliação é o mesmo banco confirmado, sem duplicação dos dados.
+- Após homologação explícita de Cartões, a produção foi promovida à versão 36, conferida byte a byte com o commit 4659a9b. A versão 35 era somente de avaliação; seus registros permanecem históricos. Ver docs/cartoes-promocao.json.
+- Lançamentos está em fase de protótipo local com dados fictícios, no menu provisório LancamentosPrototipo, somente na implantação de avaliação. Manter o Lançamentos conectado atual na produção. Ver docs/proposta-lancamentos.md e docs/lancamentos-prototipo-publicacao.json.

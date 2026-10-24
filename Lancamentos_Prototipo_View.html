@@ -1,0 +1,20 @@
+<style>
+  body:has(#mk-lancamentos-prototipo) #topbar-filtro-periodo-global,
+  body:has(#mk-lancamentos-prototipo) #fab-container,
+  body:has(#mk-lancamentos-prototipo) #topbar-contexto-app { display: none !important; }
+  #mk-lancamentos-prototipo { margin: -8px; }
+  #mk-lancamentos-prototipo iframe { display: block; width: 100%; height: calc(100dvh - 115px); min-height: 500px; border: 1px solid #e5e8f0; border-radius: 12px; background: #f6f7fb; }
+  #mk-lancamentos-prototipo > p { font-size: 11px; color: var(--cor-texto-secundario, #646d80); margin: 0 4px 12px; line-height: 1.6; }
+</style>
+<section id="mk-lancamentos-prototipo">
+  <p><strong>Protótipo para avaliação.</strong> Dados fictícios e operações simuladas. O período abaixo pertence à demonstração. Para movimentar dados reais, use Lançamentos.</p>
+  <iframe id="mk-lancamentos-demo-frame" title="Protótipo interativo de Lançamentos com dados fictícios" sandbox="allow-scripts allow-forms" referrerpolicy="no-referrer"></iframe>
+</section>
+<script>
+(() => {
+  // O frame tem origem isolada: não recebe sessão, bridge Apps Script ou dados reais.
+  const frame = document.getElementById('mk-lancamentos-demo-frame');
+  frame.srcdoc = <?!= JSON.stringify(incluir_('Lancamentos_Prototipo_Demo')).replace(/</g, '\\u003c') ?>;
+  if (typeof registrarTelaAtualMukirana === 'function') registrarTelaAtualMukirana('LancamentosPrototipo', {});
+})();
+</script>

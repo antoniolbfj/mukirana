@@ -1,6 +1,7 @@
 # Proposta de remodelagem de Cartões
 
-24/10/2026. Proposta aprovada para implementação; conectada no menu provisório, aguardando homologação.
+24/10/2026. Implementação homologada pelo usuário e promovida ao acesso principal
+na produção, versão 36. Menu provisório removido. Registro em [cartoes-promocao.json](cartoes-promocao.json).
 Detalhes em [cartoes-entrega.md](cartoes-entrega.md).
 Base técnica: [estudo de código e banco](estudo-cartoes.md).
 Contas foi homologada e promovida ao acesso principal nesta rodada.

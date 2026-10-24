@@ -59,13 +59,16 @@ homologada e passou a ser o acesso principal **Contas**, sem menu provisório.
 O saldo inicial é um lançamento especial; a migração foi aplicada no Supabase.
 [Entrega de Contas](docs/contas-entrega.md).
 
-Cartões foi implementado no menu provisório **Cartões (novo)**, com duas interfaces
-dedicadas e dados reais. O acesso **Cartões** atual permanece até a homologação.
-[Entrega e testes de Cartões](docs/cartoes-entrega.md). A paleta global será revista após a
-remodelagem das telas.
+Cartões foi homologado e promovido ao acesso principal **Cartões**, com duas
+interfaces dedicadas e dados reais. O menu provisório foi removido.
+[Entrega e testes](docs/cartoes-entrega.md) e [registro da promoção](docs/cartoes-promocao.json).
+A paleta global será revista após a remodelagem das telas.
 
-[Produção com Contas homologada — versão 34](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec).
-O endereço usado anteriormente para avaliar a nova tela também abre a versão 34.
+[Produção com Contas e Cartões homologados — versão 36](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec).
+O endereço antigo de avaliação de Contas permanece na versão 34 e não é a produção.
 
-[Avaliar Cartões (novo) — versão 35](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec).
-Implantação separada para avaliação; produção permanece na versão 34.
+[Avaliar Lançamentos — menu Lançamentos (protótipo)](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec).
+Implantação separada, com dados fictícios e frame isolado. O Lançamentos conectado
+atual continua principal. A prévia não faz chamadas ao banco.
+[Requisitos revistos e roteiro](docs/proposta-lancamentos.md),
+[HTML independente](docs/prototipos/lancamentos.html).

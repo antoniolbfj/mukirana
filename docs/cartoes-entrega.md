@@ -122,3 +122,17 @@ um ao outro ao mesmo tempo. O bloqueio de linhas de usuários foi substituído p
 um bloqueio transacional por titular; o mesmo teste passou com as duas operações
 concluídas, além dos testes de repetição, conflito e reversão de falhas.
 
+## Homologação e promoção
+
+Em 24/10/2026, o usuário declarou **Cartões homologado**. Com essa autorização,
+a produção foi atualizada para a **versão 36**, commit `4659a9b`.
+**Cartões** agora abre a tela homologada; o menu provisório foi retirado e a rota
+`CartoesNovo` permanece como alias para páginas/contextos já abertos.
+Os 61 arquivos imutáveis da versão foram baixados e comparados byte a byte com
+esse commit. Não houve nova alteração no banco nem na paleta.
+[Registro da promoção](cartoes-promocao.json).
+
+O endereço de avaliação passa a ser utilizado para o protótipo de Lançamentos,
+em rodada separada. As informações da versão 35 acima são o histórico de entrega,
+não o estado atual da implantação de produção.
+
