@@ -66,3 +66,6 @@ remodelagem das telas.
 
 [Produção com Contas homologada — versão 34](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec).
 O endereço usado anteriormente para avaliar a nova tela também abre a versão 34.
+
+[Avaliar Cartões (novo) — versão 35](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec).
+Implantação separada para avaliação; produção permanece na versão 34.

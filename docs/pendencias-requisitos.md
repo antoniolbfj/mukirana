@@ -5,7 +5,8 @@ Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
 ## Concluído nesta rodada
 
 - Contas permanece homologada e principal, sem menu provisório.
-- Cartões implementado no menu provisório **Cartões (novo)**, com interfaces próprias
+- Cartões implementado na **implantação de avaliação, versão 35**, no menu provisório
+  **Cartões (novo)**, com interfaces próprias
   para computadores/tablets e smartphones. **Cartões** atual mantido.
 - Cadastro, adicionais, busca/filtros, consulta por competência, navegação real para
   Fatura/Lançamentos, inativação/restauração e Desfazer conectados ao Supabase.
@@ -20,8 +21,9 @@ Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
 
 1. Homologar Cartões (novo) nas duas interfaces, com dados reais: cadastro/adicionais,
    fechamento, valores por competência, previsões e pagamentos como titular/adicional.
-2. Depois da homologação explícita, substituir o acesso principal de Cartões pela
-   nova tela e retirar seu menu provisório.
+2. Depois da homologação explícita, promover a implantação para produção, substituir
+   o acesso principal de Cartões pela nova tela e retirar seu menu provisório.
+   A produção permanece na versão 34 nesta rodada.
 3. Escolher e remodelar as demais telas da base atual, incluindo a UX detalhada de
    Faturas/pagamentos em rodada própria. A tela de Fatura recebeu compatibilidade
    dos cálculos/rótulos, mas ainda não foi remodelada nas duas interfaces dedicadas.

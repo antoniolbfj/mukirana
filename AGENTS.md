@@ -14,3 +14,5 @@
 
 - No módulo de Cartões, o usuário confirmou que adicionais continuam podendo registrar pagamentos com contas acessíveis; a consulta continua restrita aos movimentos autorizados.
 - Competência das compras registradas é persistida: alterar fechamento não reclassifica histórico; mudanças explícitas de data/origem recalculam a compra afetada.
+
+- Cartões (novo) foi publicado somente em avaliação na versão 35; produção e antigo endereço de Contas permanecem na versão 34. Identificadores e decisão da revisão automática em docs/cartoes-publicacao.json e docs/cartoes-entrega.md. O banco de avaliação é o mesmo banco confirmado, sem duplicação dos dados.

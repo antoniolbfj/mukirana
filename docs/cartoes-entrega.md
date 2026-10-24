@@ -52,7 +52,8 @@ o escopo completo autorizado. A remodelagem integral de Faturas/pagamentos é ou
 Supabase `wcczkultokrypdfimbsh`, migração
 `20261024180625_cartoes_v2_atomic_scope`. O arquivo foi iniciado pela CLI e recebeu
 o identificador efetivamente registrado pelo MCP ao aplicar a mesma migração.
-Não é necessário executar SQL manualmente.
+A correção complementar `20261024182639_cartoes_v2_owner_mutex` serializa cada titular
+sem bloquear linhas de usuários usados como adicionais. Não é necessário executar SQL manualmente.
 
 Mantidas as tabelas separadas `grupos_cartoes` e `cartoes`. Gravação de grupo,
 cartão titular e adicionais feita em transação única, com versão esperada e ID da
@@ -62,7 +63,7 @@ Retirar adicional inativa o cartão; recolocar a pessoa restaura o mesmo ID.
 Nomes repetidos por titular ignoram caixa, acentos e espaços excedentes, incluindo
 inativos, em conformidade com a validação anterior.
 
-As gravações pela tela antiga também usam as rotinas atômicas. Gravações legadas
+Na implantação de avaliação, as gravações pela tela antiga também usam as rotinas atômicas. Gravações legadas
 diretas invalidam a versão, para a tela nova detectar conflito. Nenhum fechamento,
 compra, parcela, recorrência, cartão ou pagamento existente foi reclassificado ou
 excluído pela migração. Hashes dentro da transação verificam todos os registros
@@ -85,7 +86,7 @@ diretos: a autorização da sessão própria acontece no backend, não em `auth.
   nome normalizado, IDs estáveis, repetição, conflitos e visibilidade das projeções.
 - Migração exata em PostgreSQL 17 novo com registros legados, preservação de hashes
   e execução dos testes anteriores de Contas.
-- Concorrência real: criação repetida, duas edições, edição/status e nomes concorrentes.
+- Concorrência real: criação repetida, duas edições, edição/status, nomes concorrentes e dois titulares incluindo um ao outro como adicionais.
   Falha forçada ao criar adicional desfaz grupo e cartões juntos.
 - Chromium em computador, tablet e celular usando os templates reais, uma VM das
   funções Apps Script e PostgreSQL efêmero. Pesquisa de usuários não bloqueia a lista;
@@ -103,4 +104,21 @@ no Google com os dados reais permanece com o usuário.
 
 ## Publicação
 
-O identificador da versão e as implantações serão registrados após o push pelo clasp.
+Publicada a **versão 35** na [implantação de avaliação](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec).
+Acesse com a conta Google, entre no Mukirana e abra **Cartões (novo)**.
+A tela atual **Cartões** está disponível na mesma implantação para comparação.
+Os 61 arquivos foram enviados pelo clasp, baixados da versão imutável e conferidos
+byte a byte. Código e migrações enviados ao GitHub. [Identificadores e hashes](cartoes-publicacao.json).
+
+A produção e o endereço usado anteriormente para Contas permanecem na versão 34.
+A revisão automática bloqueou a tentativa de atualizar a implantação de produção,
+pois a rodada foi autorizada para avaliação provisória, e recomendou uma implantação
+separada. A alternativa foi concluída; não foi tentado contornar o bloqueio.
+A promoção da tela/implantação de produção fica para depois da homologação explícita.
+A versão de avaliação usa o mesmo banco confirmado, portanto as gravações nela são reais.
+
+Na conferência final, foi reproduzido um deadlock quando dois titulares incluíam
+um ao outro ao mesmo tempo. O bloqueio de linhas de usuários foi substituído por
+um bloqueio transacional por titular; o mesmo teste passou com as duas operações
+concluídas, além dos testes de repetição, conflito e reversão de falhas.
+
