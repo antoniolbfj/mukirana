@@ -1,5 +1,6 @@
--- Instalação de transferências entre contas próprias.
--- Projeto: thpqielkntwcbdycucfn. Executar uma vez no SQL Editor do Supabase.
+-- STATUS: APLICADO manualmente; instalação e 60 verificações remotas confirmadas em 24/10/2026.
+-- Registro da instalação de transferências entre contas próprias. NÃO EXECUTAR NOVAMENTE.
+-- Projeto: thpqielkntwcbdycucfn. Arquivo preservado como registro da instalação.
 -- Inclui 60 verificações; qualquer falha reverte toda a instalação.
 -- Fixtures são revertidas antes de COMMIT; nenhum e-mail é enviado.
 BEGIN;

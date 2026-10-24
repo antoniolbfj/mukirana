@@ -84,13 +84,18 @@ As verificações adicionais de exclusão estão documentadas na seção acima.
 
 ## Transferências entre contas próprias
 
-A estrutura está preparada em `pending/enable_own_account_transfers.sql`, com
-instalação transacional e 60 verificações. A aplicação remota foi recusada pelo
-conector com `Invalid or expired requestState`; nenhuma migração foi registrada.
-A validação passou em PostgreSQL 17.11 isolado com a estrutura atual do projeto.
+A instalação manual de `pending/enable_own_account_transfers.sql` foi confirmada
+em 24/10/2026. O arquivo permanece como registro aplicado e não deve ser executado
+novamente. A instalação foi feita pelo SQL Editor após falhas técnicas do conector;
+não há entrada correspondente no histórico de migrações MCP.
 
 `transfers` representa uma operação única com origem/destino. A view privada
-`account_movements` deriva duas pontas opostas e reúne os lançamentos anteriores
-para calcular saldos atuais/projetados. Transferências não entram em receitas,
-despesas ou categorias. Contas vinculadas não podem ser excluídas. Consulte
-`../docs/transferencias.md` para regras, validação e instalação pendente.
+`account_movements`, com `security_invoker=true`, deriva duas pontas opostas e
+reúne os lançamentos anteriores para calcular saldos atuais/projetados.
+Transferências não entram em receitas, despesas ou categorias. Contas vinculadas
+não podem ser excluídas. As RPCs estão na revisão 1, restritas a `service_role`.
+
+Passaram 60 verificações de transferências e 48 de lançamentos no Supabase, todas
+com rollback das fixtures e zero usuários de teste restantes. As quatro RPCs foram
+conferidas também pela API REST. Os advisors não apontaram WARN/ERROR. Regras e
+resultados completos estão em `../docs/transferencias.md`.

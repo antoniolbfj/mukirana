@@ -48,16 +48,17 @@ vem do navegador. Não há armazenamento financeiro no localStorage.
 
 ## Instalação e validação
 
-**A instalação remota está pendente.** O conector Supabase retornou duas vezes
-`Invalid or expired requestState`; foi confirmado que a tabela não foi criada e
-nenhuma migração foi registrada. O arquivo
-`supabase/pending/enable_own_account_transfers.sql` instala a estrutura e executa
-as 60 verificações na mesma transação. Qualquer falha reverte toda a instalação.
-Executá-lo uma vez no SQL Editor do projeto `thpqielkntwcbdycucfn`. Não reaplicar
-se a estrutura já tiver sido instalada. O script não envia e-mails e reverte todas
-as fixtures antes do commit. A instalação manual não registra histórico MCP.
+**Instalação remota confirmada em 24/10/2026.** O SQL foi executado manualmente
+no SQL Editor, depois de duas falhas técnicas do conector. A tabela, a view com
+`security_invoker=true` e as RPCs na revisão 1 foram conferidas no Supabase.
+A instalação manual não foi registrada como migração MCP.
 
-A validação foi feita em PostgreSQL 17.11 isolado, sem rede e sem dados reais, com
+O arquivo `supabase/pending/enable_own_account_transfers.sql` foi mantido como
+registro da instalação, com status atualizado. **Não executá-lo novamente.**
+Ele instala a estrutura e executa 60 verificações na mesma transação, revertendo
+toda a instalação em caso de falha e descartando todas as fixtures antes do commit.
+
+A validação inicial foi feita em PostgreSQL 17.11 isolado, sem rede e sem dados reais, com
 a estrutura atual recuperada do catálogo do Supabase. Passaram:
 
 - 60 verificações SQL de transferências, precisão, sessões, propriedade e ACL;
@@ -74,6 +75,19 @@ por `MUKIRANA_TEST_PSQL` como uma lista JSON; não executar esse teste em produ�
 Os scripts SQL anteriores usam configuração local de transação: ao executá-los
 via psql, usar `--single-transaction`.
 
-Após a instalação remota, conferir a revisão por
-`mukirana_transfers_health_check`, executar `supabase/checks/transfers.sql` e os
-advisors no Supabase. As verificações no banco remoto ainda não foram executadas.
+No Supabase, passaram novamente as 60 verificações de transferências e as 48 de
+lançamentos, com zero usuários de teste restantes. Foram confirmadas as quatro
+RPCs pela API REST: health check saudável e consulta/gravação/exclusão sem sessão
+recusadas com `invalid_session` e HTTP 200. Não houve envio de e-mails nem alteração
+de dados financeiros reais.
+
+Os advisors não apontaram WARN/ERROR. Os únicos resultados informativos foram
+[RLS habilitado sem políticas](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy),
+esperado nas tabelas privadas com negação de acesso direto, e
+[índice ainda sem uso](https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index)
+para `transactions_owner_date_idx`, mantido para a paginação por proprietário/data.
+
+A versão 5 já publicada contém o código necessário; nenhuma mudança de código ou
+nova versão é necessária para ativar o banco instalado. A página publicada foi
+conferida novamente, com HTTP 200, módulo de transferências presente e includes
+resolvidos. O status da implantação foi atualizado para indicar banco validado.

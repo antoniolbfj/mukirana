@@ -10,7 +10,7 @@ e-mail e sessões próprias por navegador.
 - Categorias e subcategorias individuais em uma única tabela hierárquica.
 - Receitas e despesas únicas: cadastro, consulta, edição e exclusão.
 - Transferências entre contas próprias: operação completa, edição/exclusão das
-  duas pontas e integração com os saldos (instalação SQL remota pendente).
+  duas pontas e integração com os saldos.
 - Valores em centavos, classificação fixa/variável e datas passadas ou futuras.
 - Filtros de período, natureza, conta, categoria, classificação e descrição.
 - Resultado do período, saldo atual e posição acumulada até o fim do período.
@@ -77,9 +77,10 @@ Os testes de navegador usam uma ponte Apps Script simulada, sem enviar e-mails.
 Os testes SQL em `supabase/checks` exercitam o banco real com dados isolados em
 subtransações revertidas. A entrega de transferências passou em PostgreSQL 17.11 isolado por 60 verificações
 SQL, quatro cenários de concorrência e as 68 verificações SQL anteriores. Também
-passaram 24 grupos de contratos/utilitários e 37 fluxos de interface. A aplicação
-remota do SQL de transferências está pendente devido a uma falha do conector;
-o procedimento está em `docs/transferencias.md`.
+passaram 24 grupos de contratos/utilitários e 37 fluxos de interface. A instalação
+remota do SQL de transferências foi confirmada em 24/10/2026: passaram as 60
+verificações do módulo e as 48 de lançamentos no Supabase, sem fixtures restantes.
+Detalhes estão em `docs/transferencias.md`.
 
 As migrações registradas aqui foram recuperadas do histórico efetivamente aplicado
 no Supabase. As estruturas de autenticação e contas anteriores à primeira migração
