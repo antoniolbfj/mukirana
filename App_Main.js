@@ -64,8 +64,8 @@ function obterHtmlDaTela(nomeTela, tokenSessao) {
     if (nomeTela === 'Usuarios') return incluir_('Usuarios_View');
     // Contas homologada; a rota anterior fica como alias para acessos já abertos.
     if (nomeTela === 'Contas' || nomeTela === 'ContasNova') return HtmlService.createTemplateFromFile('Contas_Nova_View').evaluate().getContent();
-    if (nomeTela === 'Cartoes') return incluir_('Cartoes_View');
-    if (nomeTela === 'CartoesNovo') return HtmlService.createTemplateFromFile('Cartoes_Novo_View').evaluate().getContent();
+    // Cartões homologado; a rota de avaliação permanece como alias.
+    if (nomeTela === 'Cartoes' || nomeTela === 'CartoesNovo') return HtmlService.createTemplateFromFile('Cartoes_Novo_View').evaluate().getContent();
     if (nomeTela === 'Categorias') return incluir_('Categorias_View');
     if (nomeTela === 'Dashboard') return incluir_('Dashboard_View');
     if (nomeTela === 'FaturasCartao') return incluir_('Faturas_Cartao_View');

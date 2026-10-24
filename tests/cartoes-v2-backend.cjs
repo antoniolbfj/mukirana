@@ -21,6 +21,6 @@ assert.deepEqual([...dates],['2026-10-01','2026-10-03']);
 response={groups:[{...group,role:'additional',canEdit:false,limitCents:null,participants:[],registeredCents:'28500',paidCents:null,scheduledPaymentsCents:null,openCents:null,creditCents:null}]};r=c.cartoesNovoListar('ok',{Mes_Inicial:'2026-10'});assert.equal(r.groups[0].paidCents,null);
 response.groups[0].paidCents='1';assert.throws(()=>c.cartoesNovoListar('ok',{Mes_Inicial:'2026-10'}));
 const router=vm.createContext({obterSessaoObrigatoria:()=>({id:uid}),HtmlService:{createTemplateFromFile:n=>({evaluate:()=>({getContent:()=>n})}),createHtmlOutputFromFile:n=>({getContent:()=>n})}});vm.runInContext(fs.readFileSync('App_Main.js','utf8'),router);
-assert.equal(router.obterHtmlDaTela('Cartoes','ok'),'Cartoes_View');assert.equal(router.obterHtmlDaTela('CartoesNovo','ok'),'Cartoes_Novo_View');
-const index=fs.readFileSync('Index.html','utf8');assert(index.includes("navegarPara('CartoesNovo')"));assert(index.includes("navegarPara('Cartoes')"));
+assert.equal(router.obterHtmlDaTela('Cartoes','ok'),'Cartoes_Novo_View');assert.equal(router.obterHtmlDaTela('CartoesNovo','ok'),'Cartoes_Novo_View');
+const index=fs.readFileSync('Index.html','utf8');assert(!index.includes('Cartões (novo)'));assert(index.includes("navegarPara('Cartoes')"));
 console.log('Cartões backend: sessão, ator, DTOs, centavos, filtros, competência, recorrência antiga e rotas: PASS');
