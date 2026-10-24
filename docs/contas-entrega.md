@@ -81,7 +81,7 @@ A validação de navegador usa dados fictícios. A navegação remota autenticad
 na conta Google e a homologação com dados reais devem ser feitas pelo usuário.
 Não foram enviados e-mails nem executadas rotinas de relatórios.
 
-## Publicação
+## Publicação inicial — versão 33
 
 Publicada a **versão 33** em uma nova [implantação de avaliação](https://script.google.com/macros/s/AKfycbxg6KevdfXzs3WucB23XtRzIg_px8HyQZxjqze8Iwtsegit6XFsjmpZUSFQv9qR7LRJ/exec).
 Acesse com a conta Google e abra **Contas (nova)** no menu lateral.
@@ -90,9 +90,9 @@ O código foi enviado ao GitHub (`main`, implementação `0cb85a7`, ajuste final
 `4b32934`) e os 55 arquivos foram enviados pelo clasp. A versão imutável 33 foi
 baixada novamente: todos os arquivos correspondem byte a byte ao código local.
 Hashes e identificadores estão em [contas-publicacao.json](contas-publicacao.json).
-A versão 32 e seu endereço de produção permanecem preservados. A nova implantação
-contém a tela antiga como acesso principal e o menu provisório para avaliação.
-A URL remota exige autenticação Google; a homologação autenticada está pendente.
+Na entrega inicial, a versão 32 permaneceu no endereço de produção, e a versão 33
+trazia o menu provisório para avaliação. O usuário homologou a tela posteriormente;
+a promoção abaixo substitui aquele estado inicial. A URL exige autenticação Google.
 
 O compilador do Apps Script rejeitou literais BigInt na primeira tentativa de
 envio. O backend passou a usar soma decimal textual exata para agregados e números
@@ -106,5 +106,9 @@ O usuário homologou a nova tela e determinou sua permanência como principal.
 O menu **Contas** passa a renderizar as duas interfaces aprovadas; o item
 **Contas (nova)** foi removido. O atalho do saldo inicial nos Lançamentos abre
 **Contas**. A rota anterior continua como alias de compatibilidade para páginas
-já abertas, sem menu público duplicado. Os identificadores da promoção serão
-registrados após a atualização das implantações.
+já abertas, sem menu público duplicado. Promoção publicada na **versão 34**, código `f329b73`, na
+[implantação principal](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec).
+O endereço usado para avaliar a versão 33 também foi atualizado para a versão 34,
+para preservar o acesso que o usuário já utilizava. Os 55 arquivos foram baixados
+da versão imutável 34 e conferidos byte a byte. [Registro da promoção](contas-promocao.json).
+Não houve alteração de banco ou da paleta nesta promoção.

@@ -7,6 +7,7 @@ Supabase `wcczkultokrypdfimbsh`.
 
 - Contas homologada pelo usuário e promovida à rota principal **Contas**.
   Menu provisório removido; edição contextual do saldo inicial usa a rota principal.
+  Versão 34 publicada no endereço principal e no endereço de avaliação anterior.
   Duas interfaces dedicadas e regras de saldo/compartilhamento preservadas.
 - Cartões estudado no código e no catálogo real do Supabase. Comparadas as relações,
   permissões, consultas, gravações, faturas, pagamentos, parcelas e recorrências.

@@ -1,6 +1,6 @@
 # Proposta da nova tela de Contas
 
-Data: 24/10/2026. Estado: proposta aprovada para implementação; tela conectada implementada e aguardando homologação.
+Data: 24/10/2026. Estado: tela conectada homologada pelo usuário e promovida ao acesso principal Contas.
 A entrega e a validação da aplicação estão em [contas-entrega.md](contas-entrega.md).
 
 O usuário definiu simplicidade, rapidez, objetividade e uma experiência limpa.

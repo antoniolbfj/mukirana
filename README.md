@@ -63,3 +63,6 @@ A próxima tela é **Cartões**. Foram concluídos o [estudo técnico](docs/estu
 e a [proposta com prévias](docs/proposta-cartoes.md). Cartões permanece com a tela
 atual enquanto a proposta é avaliada. A paleta global será revista após a
 remodelagem das telas.
+
+[Produção com Contas homologada — versão 34](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec).
+O endereço usado anteriormente para avaliar a nova tela também abre a versão 34.
