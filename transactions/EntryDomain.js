@@ -35,6 +35,7 @@ const EntryDomain_ = Object.freeze({
     const count = standard.summary.count + transfers.summary.count;
     if (!Number.isSafeInteger(count)) throw new Error("Quantidade de lançamentos inválida.");
     return { status: "ok", entries: entries, accounts: standard.accounts, categories: standard.categories,
+      groups: standard.groups || [], renewals: standard.renewals || [],
       today: standard.today, hasMore: standard.hasMore || transfers.hasMore || all.length > filter.limit,
       nextCursor: cursor, summary: { count: count, incomeCents: standard.summary.incomeCents,
         expenseCents: standard.summary.expenseCents, resultCents: standard.summary.resultCents } };

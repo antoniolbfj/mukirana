@@ -1,7 +1,7 @@
 /** RPCs restritas a service_role; identidade e vínculos são revalidados no banco. */
 const TransactionDao_ = Object.freeze({
   list: function (token, f) {
-    return SupabaseDao_.rpc("mukirana_transactions_list", {
+    return SupabaseDao_.rpc("mukirana_transactions_list_series", {
       p_session_token: token, p_start_date: f.startDate, p_end_date: f.endDate,
       p_nature: f.nature, p_account_id: f.accountId, p_category_id: f.categoryId,
       p_classification: f.classification, p_query: f.query,

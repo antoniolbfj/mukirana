@@ -103,3 +103,21 @@ resultados completos estão em `../docs/transferencias.md`.
 A correção v0.4.1 trata Transferência como tipo em Meus lançamentos. A composição
 da consulta é feita no backend com as RPCs existentes e cursores por origem.
 Não modifica schema, funções SQL ou dados registrados e não exige outro script.
+
+## Parcelamentos e recorrências — v0.5.0
+
+A migração `20261024120028_add_installments_and_recurring_transactions.sql` foi
+aplicada e registrada no Supabase. `transaction_groups` fornece vínculo lógico,
+configuração original, controle de versão e renovação única; `transactions` guarda
+cada ocorrência financeira, seu índice e o vínculo de proprietário/conjunto.
+Totais são derivados. Os campos adicionais preservam as movimentações anteriores.
+
+A consulta `mukirana_transactions_list_series` inclui as três modalidades e os
+avisos de renovação. As RPCs de prévia, criação, detalhes, mutação em lote e
+dispensa do aviso estão restritas a service_role e revalidam as sessões próprias.
+A listagem legada continua servindo somente lançamentos únicos para compatibilidade.
+
+`checks/occurrences.sql` passou em 61 verificações no banco remoto com rollback e
+zero fixtures restantes; também passaram as verificações anteriores de lançamentos
+e transferências. Não houve WARN/ERROR nos advisors. Regras e decisões estão em
+`../docs/parcelamentos-recorrencias.md`.

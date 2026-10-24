@@ -10,9 +10,13 @@ const MukiranaTransactions = (() => {
   const all = selector => [...root.querySelectorAll(selector)];
   const F = MukiranaFinance;
   let callbacks = {}, epoch = 0, readId = 0, phase = "loading", busy = false;
-  let entries = [], accounts = [], categories = [], summary = null, hasMore = false, nextCursor = null, today = F.today();
+  let entries = [], accounts = [], categories = [], groups = [], renewals = [], summary = null, hasMore = false, nextCursor = null, today = F.today();
   let edit = null, quick = null, confirmation = null, timer = null, searchTimer = null, toastAction = null;
+  let previewTimer = null, previewId = 0, previewKey = "", previewValue = null, deleteContext = null;
   const errors = {
+    too_many_occurrences: "O conjunto ultrapassa 1.000 ocorrências. Reduza a duração.",
+    already_renewed: "Este conjunto já foi renovado. Atualize a lista.",
+    not_due: "A recorrência ainda não está disponível para renovação. Atualize a lista.",
     invalid_request: "Confira os dados informados.", invalid_account: "A conta não está mais disponível. Recarregue a lista.",
     same_account: "Escolha contas diferentes para origem e destino.",
     invalid_category: "A categoria não está mais disponível. Recarregue a lista.",
@@ -94,7 +98,7 @@ const MukiranaTransactions = (() => {
       if (expired(result)) return;
       if (result.status !== "ok") throw new Error();
       entries = append ? [...entries, ...result.entries.filter(row => !entries.some(old => old.id === row.id && old.kind === row.kind))] : result.entries;
-      accounts = result.accounts; categories = result.categories; summary = result.summary;
+      accounts = result.accounts; categories = result.categories; groups = result.groups || []; renewals = result.renewals || []; summary = result.summary;
       hasMore = result.hasMore; nextCursor = result.nextCursor; today = result.today; phase = "ready"; choices();
     } catch {
       if (generation !== epoch || requestId !== readId) return;
@@ -106,6 +110,7 @@ const MukiranaTransactions = (() => {
     for (const [id, key] of [["income-total","incomeCents"],["expense-total","expenseCents"],["result-total","resultCents"]])
       $(id).textContent = phase === "ready" ? F.money(summary[key]) : "—";
     $("result-count").textContent = phase === "loading" ? "Carregando…" : phase === "error" ? "Consulta indisponível" : `${summary.count} ${summary.count === 1 ? "lançamento" : "lançamentos"}`;
+    renderRenewals();
     const list = $("entry-list"); list.replaceChildren(); list.setAttribute("aria-busy", String(phase === "loading"));
     $("more").hidden = phase !== "ready" || !hasMore;
     $("more").disabled = phase !== "ready" || busy;
@@ -126,7 +131,14 @@ const MukiranaTransactions = (() => {
       const description = node("div", "entry-description", row.description);
       if (row.kind === "opening_balance") description.append(node("small", "", "Saldo inicial da conta"));
       else if (row.kind === "transfer") description.append(node("small", "", "Transferência"));
-      else description.append(node("small", "", row.classification === "fixed" ? "Fixa" : "Variável"));
+      else {
+        description.append(node("small", "", row.classification === "fixed" ? "Fixa" : "Variável"));
+        if (row.groupId) {
+          const group = groups.find(g => g.id === row.groupId);
+          description.append(node("small", "", `${row.modality === "installment" ? "Parcela" : "Recorrência"} ${row.occurrenceIndex}${group ? " de " + group.plannedCount : ""}`));
+          if (group) description.append(node("small", "", `Total do conjunto: ${F.money(group.totalCents)} · ${group.count} ocorrência(s)`));
+        }
+      }
       const account = accounts.find(a => a.id === row.accountId), category = categories.find(c => c.id === row.categoryId);
       const source = accounts.find(a => a.id === row.sourceAccountId), destination = accounts.find(a => a.id === row.destinationAccountId);
       const organization = node("div", "entry-account", row.kind === "transfer" ? "De: " + (source?.name || "Conta") : account?.name || "Conta");
@@ -145,8 +157,9 @@ const MukiranaTransactions = (() => {
     for (const id of ["new-income", "new-expense", "new-transfer"]) $(id).disabled = busy || phase !== "ready";
     $("reload").disabled = busy || phase === "loading";
   }
-  function confirm(title, description, label) {
+  function confirm(title, description, label, context = null) {
     $("confirm-title").textContent = title; $("confirm-description").textContent = description; $("confirm-accept").textContent = label;
+    deleteContext = context; $("delete-scope-field").hidden = !context; $("delete-scope").value = "one"; deleteScopeNote();
     $("confirm").showModal(); $("confirm-cancel").focus();
     return new Promise(resolve => { confirmation = resolve; });
   }
@@ -154,11 +167,57 @@ const MukiranaTransactions = (() => {
   $("confirm-accept").addEventListener("click", () => { if (!busy) closeConfirm(true); });
   $("confirm-cancel").addEventListener("click", () => { if (!busy) closeConfirm(false); });
   $("confirm").addEventListener("cancel", event => { event.preventDefault(); if (!busy) closeConfirm(false); });
+  function deleteScopeNote() {
+    $("delete-scope-note").textContent = deleteContext ? `${deleteContext.scopeCounts[$("delete-scope").value]} ocorrência(s), inclusive fora do período da tela. Os saldos serão recalculados.` : "";
+  }
+  $("delete-scope").addEventListener("change", deleteScopeNote);
   function snapshot() {
     return JSON.stringify([$("description").value,$("amount").value,$("date").value,$("account").value,$("category").value,$("destination").value,
-      root.querySelector('[name="nature"]:checked').value,root.querySelector('[name="classification"]:checked').value]);
+      root.querySelector('[name="nature"]:checked').value,root.querySelector('[name="classification"]:checked').value,$("modality").value,$("frequency").value,$("quantity").value,$("duration").value,$("edit-scope").value,all("#batch-fields input:checked").map(el => el.value)]);
   }
   function futureNote() { $("future-note").hidden = !F.date($("date").value) || $("date").value <= today; }
+  function generation() {
+    return { modality: $("modality").value, amountCents: F.parseAmount($("amount").value), date: $("date").value,
+      series: { frequency: $("frequency").value, quantity: Number($("quantity").value), durationMonths: Number($("duration").value),
+        renewFromId: edit?.renewFrom?.id || null, renewFromVersion: edit?.renewFrom?.version || null } };
+  }
+  async function updatePreview() {
+    clearTimeout(previewTimer);
+    const config = generation(), key = JSON.stringify(config), id = ++previewId, generationEpoch = epoch;
+    previewKey = ""; previewValue = null; $("series-error").hidden = true;
+    if (!edit || edit.version || config.modality === "single" || !config.amountCents || !F.date(config.date) ||
+      (config.modality === "installment" && (!Number.isInteger(config.series.quantity) || config.series.quantity < 1 || config.series.quantity > 1000 || config.amountCents < config.series.quantity)) ||
+      (config.modality === "recurring" && (!Number.isInteger(config.series.durationMonths) || config.series.durationMonths < 1 || config.series.durationMonths > 1200))) {
+      $("series-preview").textContent = "Preencha valor, data inicial e quantidade ou duração para conferir a prévia."; return false;
+    }
+    $("series-preview").textContent = "Calculando ocorrências…";
+    try {
+      const r = await call("transactions.preview", { entry: config });
+      if (generationEpoch !== epoch || id !== previewId || key !== JSON.stringify(generation()) || !edit) return false;
+      if (expired(r)) return false;
+      if (r.status !== "ok") { $("series-preview").textContent = "Prévia indisponível."; $("series-error").textContent = errors[r.status] || errors.unavailable; $("series-error").hidden = false; return false; }
+      previewKey = key; previewValue = r.preview;
+      const p = r.preview;
+      $("series-preview").textContent = `${p.count} ocorrência(s), de ${F.dateLabel(p.firstDate)} a ${F.dateLabel(p.lastDate)}. Total: ${F.money(p.totalCents)}. Primeira: ${F.money(p.firstAmountCents)}${p.firstAmountCents !== p.regularAmountCents ? "; demais: " + F.money(p.regularAmountCents) : " por ocorrência"}.`;
+      return true;
+    } catch {
+      if (generationEpoch === epoch && id === previewId) { $("series-preview").textContent = "Não foi possível consultar a prévia. Tente novamente ao salvar."; }
+      return false;
+    }
+  }
+  function queuePreview() {
+    clearTimeout(previewTimer); previewKey = ""; previewValue = null;
+    if (edit && !edit.version && $("modality").value !== "single") previewTimer = setTimeout(updatePreview,350);
+  }
+  function scopeNote() {
+    const context = edit?.context, scope = $("edit-scope").value;
+    $("batch-fields").hidden = !context || scope === "one";
+    $("scope-note").textContent = context ? `${context.scopeCounts[scope]} ocorrência(s), inclusive fora do período da tela. Somente os campos marcados serão aplicados em lote; o valor informado será o de cada ocorrência.` : "";
+  }
+  function markField(key) {
+    if (edit?.context && key) root.querySelector(`#batch-fields input[value="${key}"]`).checked = true;
+  }
+  $("edit-scope").addEventListener("change",scopeNote);
   function editorType() {
     const nature = root.querySelector('[name="nature"]:checked').value;
     const transfer = nature === "transfer";
@@ -168,34 +227,61 @@ const MukiranaTransactions = (() => {
     $("category").disabled = busy || transfer; $("destination").disabled = busy || !transfer;
     for (const radio of all('[name="nature"]')) radio.disabled = busy || Boolean(edit?.version && ((edit.kind === "transfer") !== (radio.value === "transfer")));
     for (const radio of all('[name="classification"]')) radio.disabled = busy || transfer;
-    $("editor-title").textContent = edit?.version ? "Editar lançamento." : transfer ? "Nova transferência." : nature === "income" ? "Nova receita." : "Nova despesa.";
+    if (transfer) $("modality").value = "single";
+    const modality = $("modality").value, creating = !edit?.version;
+    $("modality-field").hidden = transfer; $("modality").disabled = busy || !creating || Boolean(edit?.renewFrom);
+    $("series-fields").hidden = transfer || !creating || modality === "single";
+    $("quantity-field").hidden = modality !== "installment"; $("duration-field").hidden = modality !== "recurring";
+    $("group-edit").hidden = !edit?.context;
+    $("amount-label").textContent = edit?.context ? "Valor desta ocorrência" : modality === "installment" ? "Valor total" : modality === "recurring" ? "Valor por ocorrência" : "Valor";
+    $("date-label").textContent = creating && modality !== "single" ? "Data inicial" : "Data";
+    $("renew-group").hidden = !edit?.context?.group.canRenew;
+    if (edit?.renewFrom) root.querySelector('[name="nature"][value="transfer"]').disabled = true;
+    scopeNote();
+    $("editor-title").textContent = edit?.renewFrom ? "Renovar recorrência." : edit?.version ? "Editar lançamento." : transfer ? "Nova transferência." : nature === "income" ? "Nova receita." : "Nova despesa.";
   }
-  function openEditor(nature, id = null, kind = "standard") {
+  async function openEditor(nature, id = null, kind = "standard", renewGroupId = null) {
     if (busy || phase !== "ready") return;
-    const row = id ? entries.find(value => value.id === id && value.kind === kind) : null;
+    let row = id ? entries.find(value => value.id === id && value.kind === kind) : null, context = null, seed = row;
     if (id && (!row || row.kind === "opening_balance")) return;
-    $("entry-form").reset(); choices(); $("editor-note").textContent = "";
-    edit = { id: row?.id || crypto.randomUUID(), version: row?.version || 0, kind: row?.kind || "standard", snapshot: "" };
+    if (row?.groupId || renewGroupId) {
+      const generationEpoch = epoch; setBusy(true);
+      try {
+        const r = await call("transactions.group", renewGroupId ? {groupId:renewGroupId} : {id:row.id});
+        if (generationEpoch !== epoch || expired(r)) return;
+        if (r.status !== "ok") { pageError(errors[r.status] || errors.unavailable); return; }
+        context = r; seed = r.entry; row = renewGroupId ? null : seed; nature = seed.nature;
+        if (renewGroupId && !r.group.canRenew) { pageError("Esta recorrência não está mais disponível para renovação. Atualize a lista."); return; }
+      } catch { if (generationEpoch === epoch) pageError(errors.unavailable); return; }
+      finally { if (generationEpoch === epoch) setBusy(false); }
+    }
+    $("entry-form").reset(); choices(); $("editor-note").textContent = renewGroupId ? "Confira a nova duração, as datas e os demais dados antes de gerar as novas ocorrências." : "";
+    edit = { id: row?.id || crypto.randomUUID(), version: row?.version || 0, kind: row?.kind || "standard", original:row,
+      context:renewGroupId ? null : context, renewFrom:renewGroupId ? context.group : null, operationId:crypto.randomUUID(), snapshot:"" };
     root.querySelector(`[name="nature"][value="${nature}"]`).checked = true;
-    root.querySelector(`[name="classification"][value="${row?.classification || "variable"}"]`).checked = true;
-    $("description").value = row?.description || ""; $("amount").value = row ? F.amountInput(row.amountCents) : "";
-    $("date").value = row?.date || today;
-    $("account").value = row?.sourceAccountId || row?.accountId || $("account-filter").value || (accounts.length === 1 ? accounts[0].id : "");
-    $("destination").value = row?.destinationAccountId || "";
+    root.querySelector(`[name="classification"][value="${seed?.classification || "variable"}"]`).checked = true;
+    $("description").value = seed?.description || ""; $("amount").value = seed ? F.amountInput(seed.amountCents) : "";
+    $("date").value = renewGroupId ? context.group.nextDate || today : seed?.date || today;
+    $("account").value = seed?.sourceAccountId || seed?.accountId || $("account-filter").value || (accounts.length === 1 ? accounts[0].id : "");
+    $("destination").value = seed?.destinationAccountId || "";
     const filterCategory = categories.find(c => c.id === $("category-filter").value && !c.systemKey);
-    $("category").value = row?.categoryId || filterCategory?.id || "";
+    $("category").value = seed?.categoryId || filterCategory?.id || "";
+    $("modality").value = renewGroupId ? "recurring" : seed?.modality || "single";
+    $("frequency").value = context?.group.frequency || "monthly"; $("duration").value = context?.group.durationMonths || 12;
+    $("group-info").textContent = context && !renewGroupId ? `${context.group.count} ocorrência(s) existentes de ${context.group.plannedCount} geradas. Total atualizado do conjunto: ${F.money(context.group.totalCents)}. Datas em lote seguem a periodicidade a partir desta ocorrência.` : "";
     for (const field of ["description","amount","date","account","category","destination","form"]) fieldError(field);
-    $("review").hidden = true; editorType(); futureNote(); edit.snapshot = snapshot();
-    $("editor").showModal(); $("description").focus();
+    $("series-error").hidden = true; $("review").hidden = true; previewKey="";previewValue=null;
+    editorType(); futureNote(); edit.snapshot = snapshot();
+    $("editor").showModal(); $("description").focus(); queuePreview();
   }
   for (const radio of all('[name="nature"]')) radio.addEventListener("change", () => {
     for (const field of ["account","category","destination","form"]) fieldError(field);
-    editorType();
+    markField("nature"); editorType(); queuePreview();
   });
   async function closeEditor() {
     if (busy) return;
     if (edit && snapshot() !== edit.snapshot && !(await confirm("Descartar alterações?", "Este lançamento ainda não foi salvo.", "Descartar"))) return;
-    $("editor").close(); edit = null;
+    $("editor").close(); edit = null; ++previewId; clearTimeout(previewTimer);
   }
   $("entry-form").addEventListener("submit", async event => {
     event.preventDefault(); if (!edit || busy) return;
@@ -212,46 +298,96 @@ const MukiranaTransactions = (() => {
     if (transfer && !$("destination").value) failures.push(["destination","Escolha ou crie uma conta de destino."]);
     else if (transfer && $("destination").value === $("account").value) failures.push(["destination","Escolha contas diferentes para origem e destino."]);
     if (failures.length) { for (const [id, message] of failures) fieldError(id,message); $(failures[0][0]).focus(); return; }
-    const generation = epoch;
+    if (!transfer && !edit.version && $("modality").value !== "single" && (previewKey !== JSON.stringify(generation()) || !previewValue)) {
+      const previewEpoch=epoch;setBusy(true);const valid=await updatePreview();
+      if(previewEpoch!==epoch) return;setBusy(false);
+      if (!valid) { fieldError("form","Confira a prévia e os campos da modalidade antes de salvar."); return; }
+    }
+    const generationEpoch = epoch;
     const entry = transfer ? { id:edit.id, version:edit.version, description, amountCents, date, nature,
       sourceAccountId:$("account").value, destinationAccountId:$("destination").value }
       : { id:edit.id, version:edit.version, description, amountCents, date, nature,
         accountId:$("account").value, categoryId:$("category").value,
-        classification:root.querySelector('[name="classification"]:checked').value, modality:"single" };
+        classification:root.querySelector('[name="classification"]:checked').value, modality:$("modality").value };
+    if (!transfer && !edit.version && entry.modality !== "single") entry.series = generation().series;
+    if (edit.context) {
+      const scope = $("edit-scope").value;
+      const fields = scope === "one" ? ["description","amountCents","date","accountId","categoryId","classification","nature"].filter(key => entry[key] !== edit.original[key]) : all("#batch-fields input:checked").map(el => el.value);
+      if (!fields.length) { fieldError("form","Altere ou marque pelo menos um campo para aplicar."); return; }
+      entry.batch = { groupId:edit.context.group.id, groupVersion:edit.context.group.version, operationId:edit.operationId, scope, fields };
+    }
     setBusy(true); $("review").hidden = true;
-    let saved = false;
+    let saved = false, affectedCount = null;
     try {
       const result = await call("transactions.save", { entry });
-      if (generation !== epoch || expired(result)) return;
+      if (generationEpoch !== epoch || expired(result)) return;
       if (result.status !== "saved") {
         fieldError("form",errors[result.status] || errors.unavailable); $("form-error").focus();
         $("review").hidden = !["conflict","not_found","invalid_account","invalid_category"].includes(result.status); return;
       }
-      $("editor").close(); edit = null; saved = true;
+      $("editor").close(); edit = null; saved = true; affectedCount = result.affectedCount; ++previewId; clearTimeout(previewTimer);
     } catch {
-      if (generation === epoch) fieldError("form","A resposta não pôde ser confirmada. Tente salvar novamente ou recarregue a lista para conferir.");
-    } finally { if (generation === epoch) setBusy(false); }
-    if (saved && generation === epoch) {
+      if (generationEpoch === epoch) fieldError("form","A resposta não pôde ser confirmada. Tente salvar novamente ou recarregue a lista para conferir.");
+    } finally { if (generationEpoch === epoch) setBusy(false); }
+    if (saved && generationEpoch === epoch) {
       await load();
       const period = F.period.get(), outside = (period.startDate && date < period.startDate) || (period.endDate && date > period.endDate);
-      notify(outside ? "Lançamento salvo fora do período selecionado." : "Lançamento salvo.", outside ? () => {
+      notify(outside ? "Lançamento salvo fora do período selecionado." : affectedCount == null ? "Lançamento salvo." : `${affectedCount} ocorrência(s) salva(s).`, outside ? () => {
         const month = F.month(date); F.period.set(month.startDate,month.endDate); periodControls(); load();
       } : null);
     }
   });
   $("review").addEventListener("click", () => { if (!busy) { $("editor").close(); edit = null; load(); } });
-  for (const id of ["description","amount","account","category","destination"]) $(id).addEventListener("input", () => fieldError(id));
-  $("date").addEventListener("input", () => { fieldError("date"); futureNote(); });
+  for (const id of ["description","amount","account","category","destination"]) $(id).addEventListener("input", () => {
+    fieldError(id); markField({description:"description",amount:"amountCents",account:"accountId",category:"categoryId"}[id]);
+    if (id === "amount") queuePreview();
+  });
+  $("date").addEventListener("input", () => { fieldError("date"); markField("date"); futureNote(); queuePreview(); });
   for (const id of ["cancel-editor","close-editor"]) $(id).addEventListener("click",closeEditor);
   $("editor").addEventListener("cancel",event => { event.preventDefault(); closeEditor(); });
+  $("modality").addEventListener("change",() => { editorType(); queuePreview(); });
+  for (const id of ["frequency","quantity","duration"]) $(id).addEventListener("input",queuePreview);
+  for (const radio of all('[name="classification"]')) radio.addEventListener("change",() => markField("classification"));
+  $("renew-group").addEventListener("click",async () => {
+    const groupId = edit?.context?.group.id; await closeEditor();
+    if (!edit && groupId) openEditor("expense",null,"standard",groupId);
+  });
+  function renderRenewals() {
+    $("renewals").hidden = phase !== "ready" || !renewals.length; $("renewal-list").replaceChildren();
+    for (const notice of phase === "ready" ? renewals : []) {
+      const item = node("div","info-note"); item.append(node("span","",`${notice.description}: última ocorrência em ${F.dateLabel(notice.date)}.`));
+      const renew = node("button","text-button","Renovar"); renew.disabled=busy;
+      renew.addEventListener("click",()=>openEditor("expense",null,"standard",notice.group.id));
+      const dismiss = node("button","text-button","Dispensar aviso"); dismiss.disabled=busy;
+      dismiss.addEventListener("click",async () => {
+        if (busy) return; const generationEpoch=epoch;setBusy(true);let done=false;
+        try { const r=await call("transactions.dismissRenewal",{id:notice.group.id,version:notice.group.version});
+          if (generationEpoch!==epoch || expired(r)) return;
+          if(r.status!=="dismissed") pageError(errors[r.status] || errors.unavailable); else done=true;
+        } catch { if(generationEpoch===epoch) pageError(errors.unavailable); }
+        finally { if(generationEpoch===epoch) setBusy(false); }
+        if(done && generationEpoch===epoch) load();
+      }); item.append(renew,dismiss);$("renewal-list").append(item);
+    }
+  }
   async function remove(row) {
     if (busy) return;
-    const generation = epoch;
-    const description = row.kind === "opening_balance" ? "O saldo inicial será retirado também do cadastro da conta. A conta será preservada." : row.kind === "transfer" ? "A saída da origem e a entrada no destino serão removidas juntas. Os saldos das duas contas serão recalculados." : "O lançamento será removido e os saldos e totais serão recalculados.";
-    if (!(await confirm(`Excluir “${row.description}”?`,description,"Excluir lançamento")) || generation !== epoch) return;
+    const generation = epoch; let context = null;
+    if (row.groupId) {
+      setBusy(true);
+      try { const r=await call("transactions.group",{id:row.id});
+        if(generation!==epoch || expired(r)) return;
+        if(r.status!=="ok") { pageError(errors[r.status] || errors.unavailable);return; }
+        context=r;row=r.entry;
+      } catch { if(generation===epoch) pageError(errors.unavailable);return; }
+      finally { if(generation===epoch) setBusy(false); }
+    }
+    const description = row.groupId ? "Escolha o alcance da exclusão. As ocorrências abrangidas serão removidas e o total do conjunto será recalculado." : row.kind === "opening_balance" ? "O saldo inicial será retirado também do cadastro da conta. A conta será preservada." : row.kind === "transfer" ? "A saída da origem e a entrada no destino serão removidas juntas. Os saldos das duas contas serão recalculados." : "O lançamento será removido e os saldos e totais serão recalculados.";
+    if (!(await confirm(`Excluir “${row.description}”?`,description,"Excluir lançamento",context)) || generation !== epoch) return;
+    const batch = context ? { groupId:context.group.id,groupVersion:context.group.version,operationId:crypto.randomUUID(),scope:$("delete-scope").value } : null;
     setBusy(true); let deleted = false;
     try {
-      const result = await call("transactions.delete",{ id:row.id,version:row.version,kind:row.kind });
+      const result = await call("transactions.delete",{ id:row.id,version:row.version,kind:row.kind,batch });
       if (generation !== epoch || expired(result)) return;
       if (result.status !== "deleted") { pageError(errors[result.status] || errors.unavailable); return; }
       deleted = true;
@@ -288,7 +424,7 @@ const MukiranaTransactions = (() => {
       const created = kind === "account" ? result.account : result.category;
       if (kind === "account") accounts = accounts.filter(row => row.id !== created.id).concat(created);
       else categories = categories.filter(row => row.id !== created.id).concat(created);
-      choices(); $(target).value = created.id; fieldError(target); $("quick").close(); quick = null;
+      choices(); $(target).value = created.id; markField(target === "account" ? "accountId" : target === "category" ? "categoryId" : ""); fieldError(target); $("quick").close(); quick = null;
       $("editor-note").textContent = kind === "account" ? "Conta criada e selecionada." : "Categoria criada e selecionada.";
     } catch { if (generation === epoch) { $("quick-error").textContent = "A resposta não pôde ser confirmada. Tente novamente."; $("quick-error").hidden = false; } }
     finally { if (generation === epoch) { setBusy(false); if (!quick) $(target).focus(); } }
@@ -332,14 +468,14 @@ const MukiranaTransactions = (() => {
   $("theme").addEventListener("change",() => { const shared=document.getElementById("theme-select"); shared.value=$("theme").value; shared.dispatchEvent(new Event("change")); });
   window.addEventListener("beforeunload",event => { if (busy || (edit && snapshot() !== edit.snapshot)) { event.preventDefault(); event.returnValue=""; } });
   function reset() {
-    ++epoch; ++readId; clearTimeout(timer); clearTimeout(searchTimer);
+    ++epoch; ++readId; ++previewId; clearTimeout(previewTimer); clearTimeout(timer); clearTimeout(searchTimer);
     if (confirmation) closeConfirm(false);
     for (const dialog of all("dialog[open]")) dialog.close();
-    entries=[]; accounts=[]; categories=[]; summary=null; edit=null; quick=null; hasMore=false; nextCursor=null; phase="loading";
+    entries=[]; accounts=[]; categories=[]; groups=[]; renewals=[]; previewKey=""; previewValue=null; deleteContext=null; summary=null; edit=null; quick=null; hasMore=false; nextCursor=null; phase="loading";
     $("entry-form").reset(); $("quick-form").reset(); $("search").value="";
     for (const id of ["nature-filter","class-filter"]) $(id).value="";
     for (const id of ["account-filter","category-filter","account","category","destination","quick-parent"]) $(id).replaceChildren();
-    for (const id of ["toast-text","confirm-title","confirm-description","quick-error","editor-note","account-balance"]) $(id).textContent="";
+    for (const id of ["toast-text","confirm-title","confirm-description","quick-error","editor-note","account-balance","group-info","series-preview","series-error","scope-note","delete-scope-note"]) $(id).textContent="";
     for (const field of ["description","amount","date","account","category","destination","form"]) fieldError(field);
     $("category-filter").disabled=false; $("class-filter").disabled=false;
     $("toast").hidden=true; toastAction=null; pageError(); setBusy(false); render();

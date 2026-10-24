@@ -20,11 +20,13 @@ const TransactionDomain_ = Object.freeze({
   },
   dto: function (row) {
     if (!row || !["standard", "opening_balance"].includes(row.kind)) throw new Error("Tipo de lançamento inválido.");
+    if (!["single", "installment", "recurring"].includes(row.modality) || (row.modality !== "single" && (row.kind !== "standard" || !AuthDomain_.challenge(row.groupId) || !Number.isInteger(row.occurrenceIndex) || row.occurrenceIndex < 1 || row.occurrenceIndex > 1000))) throw new Error("Modalidade de lançamento inválida.");
     const zeroOpening = row.kind === "opening_balance" && row.amountCents === 0;
-    const value = this.input(Object.assign({}, row, { amountCents: zeroOpening ? 1 : row.amountCents }));
+    const value = this.input(Object.assign({}, row, { amountCents: zeroOpening ? 1 : row.amountCents, modality: "single" }));
     if (!value || value.version < 1) throw new Error("Contrato de lançamento inválido.");
     value.amountCents = row.amountCents;
-    value.kind = row.kind;
+    value.kind = row.kind; value.modality = row.modality;
+    if (row.modality !== "single") { value.groupId = row.groupId; value.occurrenceIndex = row.occurrenceIndex; }
     return value;
   },
   filters: function (request) {

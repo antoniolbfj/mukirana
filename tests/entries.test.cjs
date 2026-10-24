@@ -9,7 +9,7 @@ let regularRows=[],transferRows=[],brokenTransfers=false;
 const accounts=[{id:source,name:'Banco',type:'consumption',initialCents:null,openingDate:null,balanceCents:'-25',projectedCents:'-50',version:1},{id:destination,name:'Reserva',type:'investment',initialCents:null,openingDate:null,balanceCents:'25',projectedCents:'50',version:1}];
 function rpc(name,p){
  calls.push({name,args:p});
- if(name==='mukirana_transactions_list'||name==='mukirana_transfers_list'){
+ if(name==='mukirana_transactions_list_series'||name==='mukirana_transfers_list'){
   const tr=name==='mukirana_transfers_list';
   if(tr&&brokenTransfers)return {status:'invalid_session'};
   let rows=(tr?transferRows:regularRows).filter(e=>(!p.p_nature||e.nature===p.p_nature)&&(!p.p_category_id||e.categoryId===p.p_category_id)&&(!p.p_classification||e.classification===p.p_classification)&&(!p.p_account_id||[e.accountId,e.sourceAccountId,e.destinationAccountId].includes(p.p_account_id))&&(!p.p_start_date||e.date>=p.p_start_date)&&(!p.p_end_date||e.date<=p.p_end_date)&&e.description.includes(p.p_query));
@@ -24,7 +24,7 @@ function rpc(name,p){
  throw new Error('RPC inesperada');
 }
 const c=vm.createContext({console,AuthService_:{requireSession(token){if(token!=='valid')throw new Error('AUTH_REQUIRED');}},SupabaseDao_:{rpc}});
-for(const file of ['authentication/AuthDomain.js','accounts/AccountDomain.js','categories/CategoryDomain.js','transactions/TransactionDomain.js','transactions/TransactionDao.js','transactions/TransactionService.js','transfers/TransferDomain.js','transfers/TransferDao.js','transfers/TransferService.js','transactions/EntryDomain.js','transactions/EntryService.js','web/ApiController.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),c);
+for(const file of ['authentication/AuthDomain.js','accounts/AccountDomain.js','categories/CategoryDomain.js','transactions/TransactionDomain.js','transactions/TransactionDao.js','transactions/TransactionService.js','transfers/TransferDomain.js','transfers/TransferDao.js','transfers/TransferService.js','transactions/OccurrenceDomain.js','transactions/OccurrenceDao.js','transactions/OccurrenceService.js','transactions/EntryDomain.js','transactions/EntryService.js','web/ApiController.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),c);
 const run=code=>vm.runInContext(code,c);
 regularRows=[regular(10),regular(11)];transferRows=[transfer(12)];
 let r=run('api({action:"transactions.list",token:"valid",filter:{}})');assert.equal(r.status,'ok');assert.equal(r.entries.length,3);assert.equal(r.entries[0].nature,'transfer');assert.equal(r.summary.count,3);assert.equal(r.summary.resultCents,'1');assert.equal(r.summary.incomeCents,'11');assert.equal(r.accounts[0].balanceCents,'-25');checks++;

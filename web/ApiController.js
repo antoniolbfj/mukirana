@@ -30,7 +30,13 @@ function api(request) {
       case "transactions.save":
         return EntryService_.save(request.token, request.entry);
       case "transactions.delete":
-        return EntryService_.remove(request.token, request.id, request.version, request.kind);
+        return EntryService_.remove(request.token, request.id, request.version, request.kind, request.batch);
+      case "transactions.preview":
+        return OccurrenceService_.preview(request.token, request.entry);
+      case "transactions.group":
+        return OccurrenceService_.get(request.token, request.id, request.groupId);
+      case "transactions.dismissRenewal":
+        return OccurrenceService_.dismiss(request.token, request.id, request.version);
       case "transfers.list":
         return TransferService_.list(request.token, request.filter);
       case "transfers.save":
@@ -39,7 +45,7 @@ function api(request) {
         return TransferService_.remove(request.token, request.id, request.version);
       case "tests.catalog":
         AuthService_.requireSession(request.token);
-        return { status: "ready", version: "0.4.1", scenarios: DiagnosticsService_.catalog() };
+        return { status: "ready", version: "0.5.0", scenarios: DiagnosticsService_.catalog() };
       case "tests.run":
         return DiagnosticsService_.run(request.token, request.id);
       default:

@@ -18,6 +18,8 @@ const TransactionService_ = Object.freeze({
     return { status: "ok", entries: r.entries.map(function (row) { return TransactionDomain_.dto(row); }),
       accounts: r.accounts.map(function (row) { return AccountDomain_.dto(row); }),
       categories: r.categories.map(function (row) { return CategoryDomain_.dto(row); }),
+      groups: (r.groups || []).map(function (row) { return OccurrenceDomain_.group(row); }),
+      renewals: (r.renewals || []).map(function (row) { return OccurrenceDomain_.notice(row); }),
       today: r.today, hasMore: r.hasMore, summary: { count: r.summary.count, incomeCents: r.summary.incomeCents,
         expenseCents: r.summary.expenseCents, resultCents: r.summary.resultCents } };
   },

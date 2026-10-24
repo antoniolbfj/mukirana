@@ -28,13 +28,16 @@ const EntryService_ = Object.freeze({
       const r = TransferService_.save(token, request);
       return r.status === "saved" ? { status: "saved", entry: EntryDomain_.dto(Object.assign({}, r.entry, { kind: "transfer" })) } : r;
     }
+    if (request && request.batch) return OccurrenceService_.update(token, request);
+    if (request && ["installment", "recurring"].includes(request.modality)) return OccurrenceService_.create(token, request);
     return TransactionService_.save(token, request);
   },
-  remove: function (token, id, version, kind) {
+  remove: function (token, id, version, kind, batch) {
     if (kind === "transfer") return TransferService_.remove(token, id, version);
     if (kind != null && !["standard", "opening_balance"].includes(kind)) {
       AuthService_.requireSession(token); return { status: "invalid_request" };
     }
+    if (batch) return OccurrenceService_.remove(token, id, version, batch);
     return TransactionService_.remove(token, id, version);
   },
 });

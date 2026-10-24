@@ -8,7 +8,9 @@ e-mail e sessões próprias por navegador.
 
 - Contas de Consumo, Investimento e Cartão de Crédito, com saldo atual calculado.
 - Categorias e subcategorias individuais em uma única tabela hierárquica.
-- Receitas e despesas únicas: cadastro, consulta, edição e exclusão.
+- Receitas e despesas nas modalidades Único, Parcelado e Recorrente, no mesmo formulário/lista.
+- Geração antecipada, prévia, totais derivados e edição/exclusão individual ou em lote.
+- Recorrências finitas com término exclusivo e aviso interno para renovação.
 - Transferência como tipo de lançamento, junto de receitas e despesas em uma
   lista e um formulário; edição/exclusão das duas pontas e integração com saldos.
 - Valores em centavos, classificação fixa/variável e datas passadas ou futuras.
@@ -23,8 +25,8 @@ e-mail e sessões próprias por navegador.
 - Interface responsiva com temas claro, escuro e sépia; diagnósticos reais de
   leitura disponíveis dentro do aplicativo.
 
-As modalidades parcelada e recorrente e os compartilhamentos serão
-entregues em módulos próprios. O período selecionado é mantido em memória durante
+Histórico/favoritos, compartilhamentos, metas e relatórios continuam em entregas
+posteriores. Parcelamentos e recorrências fazem parte de Meus lançamentos. O período selecionado é mantido em memória durante
 a navegação; preferência de período salva por usuário será uma entrega posterior.
 
 ## Organização
@@ -37,7 +39,9 @@ com os módulos adicionais incluídos por `web/WebController.js`.
 
 As regras de dados e as migrações estão descritas em [supabase/README.md](supabase/README.md).
 As decisões das entregas estão em [docs/lancamentos-unicos.md](docs/lancamentos-unicos.md)
-e [docs/transferencias.md](docs/transferencias.md).
+e [docs/transferencias.md](docs/transferencias.md). A entrega atual está em
+[docs/parcelamentos-recorrencias.md](docs/parcelamentos-recorrencias.md), com o
+restante em [docs/pendencias-requisitos.md](docs/pendencias-requisitos.md).
 
 ## Configuração e publicação
 
@@ -53,8 +57,8 @@ Com o clasp autenticado na conta proprietária:
 
 ```sh
 clasp push
-clasp create-version "Mukirana: transferências"
-clasp create-deployment -V NUMERO_DA_VERSAO -d "Mukirana: transferências"
+clasp create-version "Mukirana v0.5.0: parcelamentos e recorrências"
+clasp create-deployment -V NUMERO_DA_VERSAO -d "Mukirana v0.5.0: parcelamentos e recorrências"
 ```
 
 O manifesto configura execução pela conta responsável pela implantação e acesso
@@ -93,3 +97,10 @@ formulário, a lista, os filtros e as ações. A tela independente foi removida.
 Não há nova instalação SQL: as operações existentes são preservadas. Passaram
 36 grupos de backend (incluindo 30 combinações de paginação mista) e 38 fluxos
 de navegador. Detalhes em `docs/transferencias.md`.
+
+Na v0.5.0, parcelamentos e recorrências estão integrados a Meus lançamentos.
+A migração `20261024120028_add_installments_and_recurring_transactions` foi
+aplicada no Supabase. Passaram 61 verificações novas no banco e as verificações
+anteriores de lançamentos/transferências, cinco cenários concorrentes em banco
+isolado, 50 grupos de backend e 56 fluxos de interface. Limite operacional de
+1.000 ocorrências por geração; o total do conjunto sempre é derivado dos registros.
