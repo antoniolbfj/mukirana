@@ -79,6 +79,15 @@ próprias para computadores/tablets e smartphones. Claro, Escuro e Sépia estão
 
 ## Correção e UX com três temas
 
+Atualização posterior autorizada: o **Painel geral oficial** recebe indicadores
+em semáforo, títulos maiores, card de saldo do rateio com navegação e evolução
+patrimonial em largura inteira, com filtros por conta e visões de três meses,
+semestral e anual. O gráfico usa os movimentos das contas de Investimento, com
+realizado e projeção identificados. Não há migração nesta rodada.
+Ver [entrega](docs/painel-oficial-entrega.md),
+[publicação](docs/painel-oficial-publicacao.json) e
+[pendências vigentes](docs/pendencias-requisitos.md).
+
 [Participações nas categorias e metas](docs/correcao-participacoes-categorias.md),
 [proposta visual](docs/proposta-ux-tres-temas.md),
 [protótipo HTML](docs/prototipos/ux-temas.html),

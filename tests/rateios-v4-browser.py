@@ -36,7 +36,7 @@ with sync_playwright() as p:
    request.fulfill(content_type='text/html; charset=utf-8',body=host)
   page.route('https://mukirana.test/**',route);page.goto('https://mukirana.test/');f=page.frame_locator('#painel-frame');f.locator('#positions .card').first.wait_for()
   assert f.locator('body').get_attribute('data-interface')==('phone' if name=='smartphone' else 'large'),(name,f.locator('body').get_attribute('data-interface'),page.evaluate('navigator.userAgent'),f.locator('body').evaluate('()=>navigator.userAgent'))
-  assert f.locator('#months .card').count()==3;assert f.locator('#positions .card').count()==3
+  assert f.locator('#months .card').count()==3;assert f.locator('#positions [data-position]').count()==3;assert f.locator('#positions [data-rateios]').count()==1
   f.locator('#include-investment').check();page.wait_for_function("document.querySelector('#ln-global-saldo').innerText.includes('Todas as contas')");f.locator('#include-investment').uncheck();page.wait_for_function("document.querySelector('#ln-global-saldo').innerText.includes('Consumo e Crédito')")
   f.locator('[data-position="2"]').click();f.locator('#sheet').wait_for();assert 'Movimento no período' in f.locator('#sheet').inner_text();assert 'Saldo projetado' in f.locator('#sheet').inner_text();f.locator('[data-close]').click()
   f.locator('[data-goal="new"]').click();f.locator('#goal-category').select_option(index=1);f.locator('#goal-amount').fill('2500,00');f.locator('#goal-form button[type="submit"]').click();f.locator('#overlay').wait_for(state='hidden');f.locator('#positions .card').first.wait_for()

@@ -21,11 +21,21 @@ para telas grandes/pequenas, preferência de tema por usuário neste navegador e
 sincronização dos iframes. Não houve reescrita dos fluxos legados. Ver
 [entrega de UX](ux-tres-temas-entrega.md) e [protótipo](prototipos/ux-temas.html).
 
+Refinamento posterior autorizado para o **Painel geral oficial**: semáforo nos
+indicadores, evolução patrimonial em largura inteira com visões 3 meses/semestral/
+anual e filtro por conta de investimento, card de saldo do rateio clicável e títulos
+maiores. Implementação conectada aos contratos existentes, sem migração, preservando
+os três temas e os layouts próprios. Ver [entrega](painel-oficial-entrega.md).
+O registro de publicação desta atualização será `painel-oficial-publicacao.json`;
+o registro v44 acima descreve a rodada anterior.
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
    além das funcionalidades novas de Contas, Lançamentos, Rateios/Acertos, Painel
-   e Metas, em computador/tablet e smartphone. Publicado não significa homologado.
+   e Metas, em computador/tablet e smartphone. Conferir o Painel oficial conectado
+   (semáforo, patrimônio, rateios e títulos) com os dados reais. Sua implementação
+   e promoção foram autorizadas; a homologação de uso continua separada.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

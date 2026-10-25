@@ -53,3 +53,47 @@ Validação: três temas em computador/tablet/smartphone, contraste de texto, fo
 teclado, navegação/reload, sincronização dos iframes, rotação com formulário aberto,
 valores financeiros iguais antes/depois e nenhuma alteração de backend após a
 correção. Publicação e homologação são estados separados.
+
+## Refinamento do protótipo do painel — 25/10/2026
+
+Solicitação posterior: indicadores em semáforo, evolução patrimonial filtrável em
+largura inteira, card de saldo do rateio com navegação e títulos mais destacados.
+O [protótipo interativo](prototipos/ux-temas.html) demonstra esses ajustes.
+Posteriormente o usuário autorizou implementá-los e tornar o painel oficial;
+ver [entrega conectada](painel-oficial-entrega.md) e o registro
+`painel-oficial-publicacao.json`. A v44 descreve a rodada anterior.
+
+- **Semáforo contextual:** resultado positivo/zerado/negativo e evolução
+  crescente/estável/decrescente usam verde/amarelo/vermelho. Nas metas de despesa,
+  a proposta é verde abaixo de 80% do teto, amarelo entre 80% e 100% inclusive e
+  vermelho acima de 100%. Valores e estados escritos acompanham a cor. Os limites
+  são visuais e não bloqueiam lançamentos. Despesas/valores a pagar têm sinal
+  negativo ou rótulo; não tratar um gasto isolado como meta ultrapassada.
+- **Evolução patrimonial:** seção própria com toda a largura útil do painel;
+  considera somente contas de Investimento, com filtro Todas/Reserva/Objetivos
+  no exemplo. Padrão: mês anterior, mês de referência e próximo. Semestral mostra
+  janeiro–junho ou julho–dezembro, conforme o mês de referência; Anual mostra
+  janeiro–dezembro do ano selecionado. O mês final do período global é a referência
+  quando houver um intervalo. Trocar a visão/conta do gráfico não muda o período
+  global nem os outros indicadores.
+- **Leitura do gráfico:** realizado em linha contínua, projeção em tracejado;
+  mês atual identificado como posição até a data de demonstração (25/10/2026).
+  Meses anteriores são posições de fechamento e futuros são projeções fictícias.
+  Botões mensais selecionáveis por toque/teclado e tabela com todos os valores.
+  A diferença compara o último com o primeiro mês visível; inclui aportes e
+  resgates, sem representar rentabilidade. Não há promessa de rendimento.
+- **Saldo do rateio:** card inteiro clicável abre Rateios e acertos. No exemplo,
+  R$ 200 a receber e R$ 100 a pagar geram saldo líquido de R$ 100 a receber.
+  Obrigações entre pessoas diferentes continuam separadas; o saldo é acumulado,
+  independente do período global, e não aumenta o saldo disponível para gastar.
+- **Hierarquia:** títulos de cards com peso e tamanho maiores; computador/tablet
+  têm grade própria e smartphone destaca o mês atual acima dos dois meses vizinhos.
+  Gráfico ocupa toda a largura disponível em ambos os layouts. Claro/Escuro/Sépia
+  mantidos, sem alteração dos estilos compartilhados do aplicativo.
+
+Escopo da fase de prototipação: somente HTML e documentação, com dados fictícios.
+Nenhuma chamada ao banco ou alteração de regra, controller, migração ou implantação.
+A demonstração de consumo/metas/rateios conserva os exemplos de outubro enquanto
+os filtros do patrimônio permitem explorar meses/anos e contas demonstrativas.
+Validação em navegador: nove combinações de tema/dispositivo, filtros 3/6/12 meses,
+virada de ano, semestres, contraste dos três sinais, largura, teclado e navegação.
