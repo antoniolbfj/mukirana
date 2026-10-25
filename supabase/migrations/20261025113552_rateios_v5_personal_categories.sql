@@ -1,0 +1,12 @@
+-- Amplia apenas a leitura autorizada; nenhum dado financeiro é reescrito.
+CREATE OR REPLACE FUNCTION mukirana_rateios.item(l public.lancamentos,p_usuario uuid) RETURNS jsonb LANGUAGE sql STABLE SET search_path='' AS $$
+ SELECT jsonb_build_object('id',l.id_lancamento,'version',l.versao_v3,'description',l.descricao,'type',l.tipo,'date',l.data_ocorrencia,'amountCents',(l.valor_total*100)::numeric(20,0)::text,'author',l.criado_por_id,'financeOwner',mukirana_rateios.financeiro(l),'financeName',(SELECT nome FROM public.usuarios WHERE id_usuario=mukirana_rateios.financeiro(l)),
+ 'group',COALESCE(l.id_conjunto_v3,l.id_grupo_parcela),'mode',CASE WHEN l.id_conjunto_v3 IS NOT NULL THEN (SELECT modalidade FROM mukirana_lancamentos.conjuntos WHERE id=l.id_conjunto_v3) WHEN l.id_grupo_parcela IS NOT NULL THEN 'installment' ELSE 'single' END,
+ 'myCents',COALESCE((SELECT (r.valor_rateado*100)::numeric(20,0)::text FROM public.rateios r WHERE r.id_lancamento=l.id_lancamento AND r.id_usuario_responsavel=p_usuario AND r.status<>'Cancelado'),'0'),'myCategory',(SELECT r.id_categoria_v4 FROM public.rateios r WHERE r.id_lancamento=l.id_lancamento AND r.id_usuario_responsavel=p_usuario AND r.status<>'Cancelado'),
+ 'approval',COALESCE((SELECT s.status FROM mukirana_lancamentos.solicitacoes s WHERE s.ancora=COALESCE(l.id_conjunto_v3,l.id_grupo_parcela,l.id_lancamento)),'legacy'),'linkedSettlement',mukirana_rateios.legado_vinculado(l.id_lancamento),
+ 'shares',COALESCE((SELECT jsonb_agg(jsonb_build_object('id',r.id_usuario_responsavel,'name',u.nome,'cents',(r.valor_rateado*100)::numeric(20,0)::text,'category',CASE WHEN r.id_usuario_responsavel=p_usuario THEN r.id_categoria_v4 ELSE NULL END) ORDER BY u.nome) FROM public.rateios r JOIN public.usuarios u ON u.id_usuario=r.id_usuario_responsavel WHERE r.id_lancamento=l.id_lancamento AND r.status<>'Cancelado'),'[]'::jsonb))
+ ||jsonb_build_object('status',CASE l.status WHEN 'Efetivado' THEN 'done' ELSE 'pending' END,'classification',l.classificacao_v3,'accountType',CASE WHEN l.tipo_origem='Conta' THEN (SELECT c.tipo_conta_v3 FROM public.contas c WHERE c.id_conta=l.id_origem) ELSE (SELECT c.tipo_conta_v3 FROM public.cartoes card JOIN public.contas c ON c.id_grupo_cartao_v3=card.id_grupo_cartao WHERE card.id_cartao=l.id_origem) END);
+$$;
+REVOKE EXECUTE ON FUNCTION mukirana_rateios.item(public.lancamentos,uuid) FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION mukirana_rateios.item(public.lancamentos,uuid) TO service_role;
+NOTIFY pgrst,'reload schema';

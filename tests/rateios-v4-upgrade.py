@@ -10,10 +10,11 @@ if sql("select count(*) from pg_database where datname='"+DB+"'",'postgres').str
 sql('CREATE DATABASE '+DB,'postgres');sql((ROOT/'tests/fixtures/schema-v32.sql').read_text().replace('CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role BYPASSRLS;',''))
 paths=sorted((ROOT/'supabase/migrations').glob('*.sql'));latest=next(p for p in paths if p.name.endswith('_rateios_v4_acertos_dashboard.sql'))
 for p in paths:
- if p!=latest:sql('BEGIN;\n'+p.read_text()+'\nCOMMIT;')
+ if p.name<latest.name:sql('BEGIN;\n'+p.read_text()+'\nCOMMIT;')
 sql((ROOT/'tests/fixtures/cartoes-v2.sql').read_text());sql("insert into categorias(nome,tipo,global) values('Categoria teste','Despesa',true)");sql((ROOT/'tests/fixtures/rateios-v4-upgrade.sql').read_text())
 old=sql("select md5(string_agg(to_jsonb(l)::text,'' order by id_lancamento)) from lancamentos l")
-sql('BEGIN;\n'+latest.read_text()+'\nCOMMIT;')
+for p in paths:
+ if p.name>=latest.name:sql('BEGIN;\n'+p.read_text()+'\nCOMMIT;')
 assert old==sql("select md5(string_agg(to_jsonb(l)::text,'' order by id_lancamento)) from lancamentos l")
 assert sql("select count(*) from acertos_rateios where status='Aguardando_Credor'").strip()=='2'
 assert sql("select count(*) from acertos_rateios a cross join unnest(a.ids_rateios) ref left join rateios r on r.id_rateio=ref where r.id_rateio is null").strip()=='0'
