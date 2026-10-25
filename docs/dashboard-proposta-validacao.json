@@ -1,0 +1,27 @@
+{
+  "connected": false,
+  "data": "fictional_explicitly_labeled",
+  "checks": [
+    {
+      "device": "desktop",
+      "result": "PASS",
+      "externalRequests": 0,
+      "exampleConsumptionResultCents": "450000",
+      "exampleAllAccountsResultCents": "610000"
+    },
+    {
+      "device": "tablet",
+      "result": "PASS",
+      "externalRequests": 0,
+      "exampleConsumptionResultCents": "450000",
+      "exampleAllAccountsResultCents": "610000"
+    },
+    {
+      "device": "smartphone",
+      "result": "PASS",
+      "externalRequests": 0,
+      "exampleConsumptionResultCents": "450000",
+      "exampleAllAccountsResultCents": "610000"
+    }
+  ]
+}

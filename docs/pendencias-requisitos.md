@@ -1,6 +1,6 @@
 # Pendências da base atual — Mukirana
 
-Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
+Atualizado em 25/10/2026. Supabase `wcczkultokrypdfimbsh`.
 
 ## Estado atual
 
@@ -11,11 +11,16 @@ Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
   contextual e aprovações. Migração aplicada e testes concluídos. Detalhes em
   [lancamentos-entrega.md](lancamentos-entrega.md).
 - A versão conectada substitui o protótipo fictício na implantação de avaliação;
-  código e publicação registrados em `lancamentos-publicacao.json`.
+  código inicial na versão 39 em `lancamentos-publicacao.json`; a avaliação vigente
+  é a **versão 40**, registrada em `contas-tipos-publicacao.json`.
 - Contas ampliada no menu **Contas (tipos)**: três tipos, vínculo único ao grupo
   existente, saldos derivados, inicial nos indicadores, exclusão protegida e
   pagamentos como transferências, com testes locais de upgrade/concorrência e
   navegador; migração aplicada e 29 ASSERTs remotos em ROLLBACK. Ver [contas-tipos-entrega.md](contas-tipos-entrega.md).
+
+- Revisão do Dashboard concluída e [proposta visual](proposta-dashboard.md)
+  preparada para computador/tablet e smartphone, com fórmula conciliada e exemplos
+  fictícios identificados. A prévia não altera o Dashboard em produção.
 
 ## Pendências vigentes
 
@@ -25,7 +30,8 @@ Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
    investimento; depois promover a atualização ao acesso principal.
 3. Revisar a proposta e implementar o novo Dashboard com Consumo/Crédito separados
    do patrimônio em Investimento. O painel principal ainda usa a base anterior;
-   validar metas, classificação fixa/variável e acertos sem duplicidade ao integrá-lo.
+   completar a integração de metas de receitas/despesas, classificação fixa/variável,
+   acertos/estornos e detalhamento sem duplicidade, conforme a proposta.
 4. Escolher e remodelar as demais telas, incluindo Faturas/pagamentos em rodada
    própria. Compatibilidade financeira não equivale à remodelagem dessas telas.
 5. Ao concluir a remodelagem de todas as telas, revisar a paleta global.

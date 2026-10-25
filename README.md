@@ -78,4 +78,6 @@ Crédito ligado aos cartões existentes, saldos atuais/projetados e patrimônio
 separados. [Requisitos e testes](docs/contas-tipos-entrega.md). A tela principal
 homologada permanece até a aprovação da atualização.
 
-Próxima etapa: proposta do novo Dashboard, com os contratos financeiros desta base.
+[Proposta do novo Painel geral](docs/proposta-dashboard.md), com os contratos
+financeiros desta base e prévias próprias para computador/tablet e smartphone.
+O Dashboard principal será substituído após a avaliação e implementação conectada.
