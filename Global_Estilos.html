@@ -19,30 +19,30 @@
 
   :root {
     /* Paleta semântica: sucesso, alerta e erro */
-    --cor-sucesso-fundo: #E4F3EA;
-    --cor-sucesso-texto: #2F6D4F;
+    --cor-sucesso-fundo: var(--ux-positive-soft);
+    --cor-sucesso-texto: var(--ux-positive);
 
-    --cor-alerta-fundo: #FFF2CC;
-    --cor-alerta-texto: #8A5A00;
+    --cor-alerta-fundo: var(--ux-warning-soft);
+    --cor-alerta-texto: var(--ux-warning);
 
-    --cor-erro-fundo: #FBE7E3;
-    --cor-erro-texto: #A64032;
+    --cor-erro-fundo: var(--ux-negative-soft);
+    --cor-erro-texto: var(--ux-negative);
 
     /* Cores estruturais */
-    --cor-fundo-app: #EFEBE2;
-    --cor-superficie: #FBF8F1;
-    --cor-superficie-secundaria: #E9EFE8;
-    --cor-texto-principal: #25352E;
-    --cor-texto-secundario: #5F7067;
-    --cor-texto-invertido: #FFFFFF;
+    --cor-fundo-app: var(--ux-canvas);
+    --cor-superficie: var(--ux-surface);
+    --cor-superficie-secundaria: var(--ux-subtle);
+    --cor-texto-principal: var(--ux-ink);
+    --cor-texto-secundario: var(--ux-muted);
+    --cor-texto-invertido: var(--ux-on-primary);
 
     /* Identidade visual Mukirana */
-    --cor-primaria: #3F6F72;
-    --cor-primaria-hover: #31595B;
+    --cor-primaria: var(--ux-primary);
+    --cor-primaria-hover: var(--ux-primary-hover);
 
     /* Bordas, sombras e raios */
-    --borda-suave: 1px solid #D9D2C4;
-    --borda-media: 1px solid #C9C0AE;
+    --borda-suave: 1px solid var(--ux-line);
+    --borda-media: 1px solid var(--ux-line);
     --sombra-suave: 0 4px 10px rgba(48, 43, 34, 0.07);
     --sombra-fab: 0 8px 18px rgba(48, 43, 34, 0.20);
     --raio-card: 12px;
@@ -290,7 +290,7 @@
     width: 14px;
     height: 14px;
     margin: 0;
-    accent-color: #4F8CF7;
+    accent-color: var(--ux-primary);
   }
 
   .material-symbols-outlined {
@@ -385,7 +385,7 @@
   .lista-menu li a {
     display: block;
     padding: 15px 25px;
-    color: #BDBDBD;
+    color: var(--ux-muted);
     text-decoration: none;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
@@ -475,7 +475,7 @@
   .mk-carregamento-progresso {
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(90deg, #2DA66F, #4F8CF7);
+    background: linear-gradient(90deg, var(--ux-positive), var(--ux-primary));
     transition: width 0.28s ease;
   }
 
@@ -596,7 +596,7 @@
   .lista-linhas-wrap .tabela-mukirana.lista-linhas-mukirana td[style*="text-align: right"],
   .lista-linhas-wrap .tabela-mukirana.lista-linhas-mukirana td[data-label="Ações"],
   .lista-linhas-wrap .tabela-mukirana.lista-linhas-mukirana td[data-label="Acoes"] {
-    white-space: normal;
+    var(--ux-surface)-space: normal;
     min-width: max-content;
   }
 
@@ -1039,7 +1039,7 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #2DA66F, #4F8CF7);
+    background: linear-gradient(135deg, var(--ux-positive), var(--ux-primary));
     color: var(--cor-texto-invertido);
     border: none;
     box-shadow: var(--sombra-fab);
@@ -1426,7 +1426,7 @@
   body:not(.tema-escuro) .mensagem-info {
     background-color: #E8EFE8;
     color: var(--cor-texto-principal);
-    border-color: #C9D7C9;
+    border-color: var(--ux-line);
   }
 
   /* =========================================
@@ -1434,16 +1434,16 @@
      ========================================= */
 
   body.tema-escuro {
-    --cor-fundo-app: #171C1B;
-    --cor-superficie: #202725;
-    --cor-superficie-secundaria: #293230;
-    --cor-texto-principal: #EDF3EF;
-    --cor-texto-secundario: #B8C4BE;
-    --cor-texto-invertido: #FFFFFF;
-    --cor-primaria: #314650;
-    --cor-primaria-hover: #3C5864;
-    --borda-suave: 1px solid #384340;
-    --borda-media: 1px solid #45514C;
+    --cor-fundo-app: var(--ux-canvas);
+    --cor-superficie: var(--ux-surface);
+    --cor-superficie-secundaria: var(--ux-subtle);
+    --cor-texto-principal: var(--ux-ink);
+    --cor-texto-secundario: var(--ux-muted);
+    --cor-texto-invertido: var(--ux-on-primary);
+    --cor-primaria: var(--ux-primary);
+    --cor-primaria-hover: var(--ux-primary-hover);
+    --borda-suave: 1px solid var(--ux-line);
+    --borda-media: 1px solid var(--ux-line);
     --sombra-suave: 0 8px 18px rgba(0, 0, 0, 0.34);
     --sombra-fab: 0 10px 24px rgba(0, 0, 0, 0.46);
   }
@@ -1451,22 +1451,22 @@
   body.tema-escuro input,
   body.tema-escuro select,
   body.tema-escuro textarea {
-    background-color: #28312F;
+    background-color: var(--ux-subtle);
     color: var(--cor-texto-principal);
-    border-color: #43504B;
+    border-color: var(--ux-line);
   }
 
   body.tema-escuro input:disabled,
   body.tema-escuro select:disabled,
   body.tema-escuro textarea:disabled {
     background-color: #1D2422;
-    color: #7F8B85;
+    color: var(--ux-muted);
   }
 
   body.tema-escuro .btn-secundario {
     background-color: #2B3432;
     color: var(--cor-texto-principal);
-    border-color: #43504B;
+    border-color: var(--ux-line);
   }
 
   body.tema-escuro .btn-secundario:hover {
@@ -1474,20 +1474,20 @@
   }
 
   body.tema-escuro .btn-acao {
-    background-color: #28312F;
+    background-color: var(--ux-subtle);
     color: var(--cor-texto-principal);
-    border-color: #43504B;
+    border-color: var(--ux-line);
   }
 
   body.tema-escuro .btn-acao:hover {
     background-color: var(--cor-primaria-hover);
-    color: #FFFFFF;
+    color: var(--ux-on-primary);
   }
 
   body.tema-escuro .caixa-informativa,
   body.tema-escuro .caixa-selecao-usuarios {
     background-color: rgba(255, 255, 255, 0.04);
-    border-color: #43504B;
+    border-color: var(--ux-line);
   }
 
   body.tema-escuro .linha-inativa,
@@ -1496,27 +1496,27 @@
   }
 
   body.tema-escuro .lista-linhas-wrap {
-    background: #202725;
-    border-color: #384340;
+    background: var(--ux-surface);
+    border-color: var(--ux-line);
   }
 
   body.tema-escuro .tabela-mukirana {
-    background: #202725;
-    color: #EDF3EF;
+    background: var(--ux-surface);
+    color: var(--ux-ink);
   }
 
   body.tema-escuro .tabela-mukirana th,
   body.tema-escuro .lista-linhas-wrap .tabela-mukirana.lista-linhas-mukirana th {
     background: #2A3331 !important;
-    color: #DDE8E2 !important;
-    border-bottom-color: #46524E !important;
+    color: var(--ux-muted) !important;
+    border-bottom-color: var(--ux-line) !important;
   }
 
   body.tema-escuro .tabela-mukirana td,
   body.tema-escuro .lista-linhas-wrap .tabela-mukirana.lista-linhas-mukirana td {
-    background: #202725;
-    color: #EDF3EF;
-    border-bottom-color: #384340 !important;
+    background: var(--ux-surface);
+    color: var(--ux-ink);
+    border-bottom-color: var(--ux-line) !important;
   }
 
   body.tema-escuro .tabela-mukirana tbody tr:nth-child(even) td {
@@ -1530,13 +1530,13 @@
   body.tema-escuro .tabela-mukirana strong,
   body.tema-escuro .tabela-mukirana .conta-valor-tabela,
   body.tema-escuro .tabela-mukirana .dashboard-valor {
-    color: #F4FAF7;
+    color: var(--ux-muted);
   }
 
   body.tema-escuro .tabela-mukirana .texto-ajuda,
   body.tema-escuro .tabela-mukirana small,
   body.tema-escuro .tabela-mukirana .subtexto {
-    color: #B8C4BE !important;
+    color: var(--ux-muted) !important;
   }
 
   body.tema-escuro .badge-ativo,
@@ -1564,17 +1564,17 @@
 
   body.tema-escuro .mk-login-card {
     background: var(--cor-superficie);
-    border-color: #384340;
+    border-color: var(--ux-line);
   }
 
   body.tema-escuro .mk-login-input {
-    background-color: #28312F;
+    background-color: var(--ux-subtle);
     color: var(--cor-texto-principal);
-    border-color: #43504B;
+    border-color: var(--ux-line);
   }
 
   body.tema-escuro .mk-login-brand {
-    background: #314650;
+    background: var(--ux-primary);
   }
 
   body.tema-escuro .topbar-app {

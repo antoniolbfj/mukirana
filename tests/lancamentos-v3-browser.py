@@ -10,7 +10,7 @@ def server(method,args):
  return json.loads(r.stdout)
 def rendered(name):
  result=server('render',[name]);assert result['ok'],result;return result['result']
-VIEW=rendered('Lancamentos_Novo_View');GLOBAL=rendered('Saldo_Global_Client');STYLE=(ROOT/'Global_Estilos.html').read_text()
+VIEW=rendered('Lancamentos_Novo_View');GLOBAL=rendered('Saldo_Global_Client');STYLE=(ROOT/'Global_Estilos.html').read_text()+rendered('UX_Temas_Styles')+rendered('UX_Temas_Client')
 assert '<?' not in VIEW and '<?' not in GLOBAL
 BOOT=r'''<script>
 const viewSource=VIEW_SOURCE;

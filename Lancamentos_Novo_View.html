@@ -1,5 +1,5 @@
 <style>
-body:has(#ln-live-root) #fab-container{display:none!important}body:has(#ln-live-root) #conteudo-principal{padding-left:0;padding-right:0;padding-bottom:0}#ln-live-root iframe{display:block;width:100%;height:calc(100dvh - var(--ln-topbar-height,90px) - 16px);min-height:220px;border:0;background:#f6f7fb}
+body:has(#ln-live-root) #fab-container{display:none!important}body:has(#ln-live-root) #conteudo-principal{padding-left:0;padding-right:0;padding-bottom:0}#ln-live-root iframe{display:block;width:100%;height:calc(100dvh - var(--ln-topbar-height,90px) - 16px);min-height:220px;border:0;background:var(--ux-canvas)}
 </style>
 <section id="ln-live-root"><iframe id="ln-live-frame" title="Lançamentos" sandbox="allow-scripts allow-forms" referrerpolicy="no-referrer"></iframe></section>
 <script>
@@ -39,7 +39,7 @@ window.addEventListener('message',async event=>{
 const observer=new MutationObserver(()=>{if(!root.isConnected)api.destroy();});const api={editing:false,pendingExit:null,beforeNavigate(next){if(!this.editing)return false;this.pendingExit=next;send({type:'leave'});return true;},destroy(){events.abort();observer.disconnect();unsubscribe();if(contextual)store.setView(mukiranaTelaAtual.nomeTela||'');if(window.MukiranaLancamentosNovo===api)delete window.MukiranaLancamentosNovo;}};observer.observe(document.documentElement,{childList:true,subtree:true});window.MukiranaLancamentosNovo=api;
 const source=<?!= JSON.stringify(HtmlService.createTemplateFromFile('Lancamentos_Novo_App').evaluate().getContent()).replace(/</g, '\\u003c') ?>;
 const ua=navigator.userAgent,handset=/iPhone|iPod|Android.+Mobile/i.test(ua)||navigator.userAgentData?.mobile===true,tablet=!handset&&(/iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)),phone=handset||!tablet&&(matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<768);
-frame.srcdoc=source.replace('<head>','<head><meta name="mukirana-interface" content="'+(phone?'phone':'large')+'">');
+frame.srcdoc=source.replace('<head>','<head><meta name="mukirana-theme" content="'+(window.MukiranaTema?.get()||'claro')+'"><meta name="mukirana-interface" content="'+(phone?'phone':'large')+'">');
 store.setView('Lancamentos');if(!contextual)registrarTelaAtualMukirana('Lancamentos',{atualizarPeriodoGlobal:()=>{},abrirNovoLancamento:()=>send({type:'new'})});
 if(typeof finalizarCarregamentoTelaMukirana==='function')finalizarCarregamentoTelaMukirana();
 })();

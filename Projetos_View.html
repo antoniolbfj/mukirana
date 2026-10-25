@@ -19,7 +19,7 @@
     cursor: pointer;
     border: none;
     background-color: var(--cor-primaria);
-    color: white;
+    color: var(--ux-on-primary);
     transition: 0.2s;
   }
 
@@ -29,7 +29,7 @@
     font-weight: 600;
     cursor: pointer;
     border: none;
-    background-color: #E0E0E0;
+    background-color: var(--ux-subtle);
     color: var(--cor-texto-principal);
     transition: 0.2s;
   }
@@ -47,7 +47,7 @@
 
   .btn-acao:hover {
     background-color: var(--cor-primaria);
-    color: white;
+    color: var(--ux-on-primary);
   }
 
   .cartao {
@@ -85,7 +85,7 @@
     font-size: 16px;
     width: 100%;
     outline: none;
-    background: white;
+    background: var(--ux-surface);
     color: var(--cor-texto-principal);
   }
 
@@ -143,7 +143,7 @@
 
   body.tema-escuro .caixa-selecao-usuarios {
     background-color: rgba(255, 255, 255, 0.05) !important;
-    border-color: #444 !important;
+    border-color: var(--ux-line) !important;
   }
 
   .projeto-periodo {
@@ -808,7 +808,7 @@
       projetosFiltrados.forEach(function(p) {
         const badgeStatus = p.Status ? 'badge-ativo' : 'badge-inativo';
         const txtStatus = p.Status ? 'Em Andamento' : 'Concluído';
-        const txtTeto = p.Orcamento_Teto ? 'R$ ' + parseFloat(p.Orcamento_Teto).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '<span style="color:#9E9E9E">Sem teto</span>';
+        const txtTeto = p.Orcamento_Teto ? 'R$ ' + parseFloat(p.Orcamento_Teto).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '<span style="color:var(--ux-muted)">Sem teto</span>';
         
         // Verifica a propriedade por ID
         const ehDono = (p.Criado_Por && p.Criado_Por.toString().trim() === idLogadoProjeto.toString().trim());
@@ -973,10 +973,10 @@
       const txtStatus = p.Status ? 'Em andamento' : 'Concluido';
       const classeLinha = p.Status ? '' : 'linha-arquivada';
       const bloqueio = (!ehDono && papelLogadoProjeto !== 'Administrador') ? 'disabled title="Apenas o criador pode modificar"' : '';
-      const txtTeto = teto > 0 ? formatarMoedaProjeto(teto) : '<span style="color:#9E9E9E">Sem teto</span>';
+      const txtTeto = teto > 0 ? formatarMoedaProjeto(teto) : '<span style="color:var(--ux-muted)">Sem teto</span>';
       const txtDisponivel = teto > 0
         ? (excedido > 0 ? '<span style="color:#D32F2F; font-weight:700;">Excedido em ' + formatarMoedaProjeto(excedido) + '</span>' : formatarMoedaProjeto(disponivel))
-        : '<span style="color:#9E9E9E">Sem teto</span>';
+        : '<span style="color:var(--ux-muted)">Sem teto</span>';
       const larguraProgresso = teto > 0 ? Math.min(100, Math.max(0, percentual)) : 0;
       const classeProgresso = excedido > 0 ? ' excedido' : '';
       let txtCompartilhado = p.Compartilhado ? 'Sim' : 'Nao';

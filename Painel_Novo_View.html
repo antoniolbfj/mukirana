@@ -1,4 +1,4 @@
-<style>body:has(#painel-live) #fab-container{display:none!important}body:has(#painel-live) #conteudo-principal{padding-left:0;padding-right:0}#painel-live iframe{display:block;width:100%;height:calc(100dvh - var(--ln-topbar-height,90px) - 16px);min-height:220px;border:0;background:#f6f7fb}</style>
+<style>body:has(#painel-live) #fab-container{display:none!important}body:has(#painel-live) #conteudo-principal{padding-left:0;padding-right:0}#painel-live iframe{display:block;width:100%;height:calc(100dvh - var(--ln-topbar-height,90px) - 16px);min-height:220px;border:0;background:var(--ux-canvas)}</style>
 <section id="painel-live"><iframe title="Painel geral" id="painel-frame" sandbox="allow-scripts allow-forms" referrerpolicy="no-referrer"></iframe></section>
 <script>
 (()=>{
@@ -16,7 +16,7 @@ window.addEventListener('message',async e=>{const m=e.data;if(!root.isConnected|
 const observer=new MutationObserver(()=>{if(!root.isConnected){events.abort();observer.disconnect();}});observer.observe(document.documentElement,{childList:true,subtree:true});
 const source=<?!= JSON.stringify(HtmlService.createTemplateFromFile('Painel_Novo_App').evaluate().getContent()).replace(/</g, '\\u003c') ?>;
 const ua=navigator.userAgent,handset=/iPhone|iPod|Android.+Mobile/i.test(ua)||navigator.userAgentData?.mobile===true,tablet=!handset&&(/iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)),phone=handset||!tablet&&(matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<768);
-frame.srcdoc=source.replace('<head>','<head><meta name="mukirana-interface" content="'+(phone?'phone':'large')+'">');
+frame.srcdoc=source.replace('<head>','<head><meta name="mukirana-theme" content="'+(window.MukiranaTema?.get()||'claro')+'"><meta name="mukirana-interface" content="'+(phone?'phone':'large')+'">');
 registrarTelaAtualMukirana('Dashboard',{atualizarPeriodoGlobal:()=>send({type:'refresh'})});finalizarCarregamentoTelaMukirana();
 })();
 </script>

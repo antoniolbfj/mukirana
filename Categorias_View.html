@@ -4,13 +4,13 @@
 
  
 
-  .btn-primario { padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; background-color: var(--cor-primaria); color: white; transition: 0.2s; }
+  .btn-primario { padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; background-color: var(--cor-primaria); color: var(--ux-on-primary); transition: 0.2s; }
 
-  .btn-secundario { padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; background-color: #E0E0E0; color: var(--cor-texto-principal); transition: 0.2s; }
+  .btn-secundario { padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; background-color: var(--ux-subtle); color: var(--cor-texto-principal); transition: 0.2s; }
 
   .btn-acao { padding: 8px 12px; font-size: 14px; background-color: var(--cor-fundo-app); border: var(--borda-suave); border-radius: 8px; cursor: pointer; margin-right: 5px; transition: 0.2s; }
 
-  .btn-acao:hover { background-color: var(--cor-primaria); color: white; }
+  .btn-acao:hover { background-color: var(--cor-primaria); color: var(--ux-on-primary); }
 
 
 
@@ -24,7 +24,7 @@
 
  
 
-  input, select { padding: 14px; border: var(--borda-suave); border-radius: 8px; font-size: 16px; width: 100%; outline: none; background: white; color: var(--cor-texto-principal); }
+  input, select { padding: 14px; border: var(--borda-suave); border-radius: 8px; font-size: 16px; width: 100%; outline: none; background: var(--ux-surface); color: var(--cor-texto-principal); }
 
  
 
@@ -414,7 +414,7 @@
             if (c.ID_Categoria_Pai) {
                const pai = categoriasEmMemoria.find(p => p.ID_Categoria === c.ID_Categoria_Pai);
                if (pai) {
-                 nomeExibicao = `<span style="color: #9E9E9E;">${pai.Nome} &gt; </span> ${nomeExibicao}`;
+                 nomeExibicao = `<span style="color: var(--ux-muted);">${pai.Nome} &gt; </span> ${nomeExibicao}`;
                }
             }
 

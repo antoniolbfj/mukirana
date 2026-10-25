@@ -9,7 +9,7 @@ def backend(method,args):
  return json.loads(p.stdout)
 def render(name):
  r=backend('render',[name]);assert r['ok'],r;return r['result']
-VIEW=render('Contas_Tipos_View');LEDGER=render('Lancamentos_Novo_View');GLOBAL=render('Saldo_Global_Client');STYLE=render('Global_Estilos')
+VIEW=render('Contas_Tipos_View');LEDGER=render('Lancamentos_Novo_View');GLOBAL=render('Saldo_Global_Client');STYLE=render('Global_Estilos')+render('UX_Temas_Styles')+render('UX_Temas_Client')
 BRIDGE='''<script>
 localStorage.setItem('mukirana_token','owner-token');localStorage.setItem('mukirana_id','10000000-1000-4000-8000-100000000001');
 window.mukiranaTelaAtual={nomeTela:'',atualizarPeriodoGlobal:null};window.lostReply=false;

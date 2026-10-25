@@ -14,7 +14,7 @@
     cursor: pointer;
     border: none;
     background-color: var(--cor-primaria);
-    color: white;
+    color: var(--ux-on-primary);
     transition: 0.2s;
   }
 
@@ -24,7 +24,7 @@
     font-weight: 600;
     cursor: pointer;
     border: none;
-    background-color: #E0E0E0;
+    background-color: var(--ux-subtle);
     color: var(--cor-texto-principal);
     transition: 0.2s;
   }
@@ -42,7 +42,7 @@
 
   .btn-acao:hover {
     background-color: var(--cor-primaria);
-    color: white;
+    color: var(--ux-on-primary);
   }
 
   .cartao {
@@ -81,7 +81,7 @@
     font-size: 15px;
     width: 100%;
     outline: none;
-    background: white;
+    background: var(--ux-surface);
     color: var(--cor-texto-principal);
     box-sizing: border-box;
     min-width: 0;
@@ -90,7 +90,7 @@
   input:disabled,
   select:disabled {
     background-color: #F5F5F5;
-    color: #9E9E9E;
+    color: var(--ux-muted);
     cursor: not-allowed;
   }
 
@@ -256,7 +256,8 @@
       </div>
     </div>
 
-    <div class="grupo-campo-duplo">
+    <p class="texto-ajuda">Escolha Claro, Escuro ou Sépia no seletor Tema da barra superior.</p>
+    <div class="grupo-campo-duplo" hidden>
       <div class="grupo-campo">
         <label>Tema Preferido</label>
         <select id="tema_usuario" required>

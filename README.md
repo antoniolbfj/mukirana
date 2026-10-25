@@ -75,4 +75,14 @@ Consumo, Investimento e Crédito ligado aos cartões existentes. Lançamentos us
 R−D±transferências; direitos de rateio ficam separados em A acertar. Acertos são
 registrados pelas próprias pessoas como despesa/receita e vinculados uma única vez.
 Patrimônio usa somente contas de Investimento. Cada tela nova tem estruturas
-próprias para computadores/tablets e smartphones. A paleta global fica para o final.
+próprias para computadores/tablets e smartphones. Claro, Escuro e Sépia estão disponíveis na barra e no menu, com preferência por usuário neste navegador.
+
+## Correção e UX com três temas
+
+[Participações nas categorias e metas](docs/correcao-participacoes-categorias.md),
+[proposta visual](docs/proposta-ux-tres-temas.md),
+[protótipo HTML](docs/prototipos/ux-temas.html),
+[entrega de UX](docs/ux-tres-temas-entrega.md) e
+[publicação e conferência](docs/ux-categorias-publicacao.json).
+A correção funcional precede a etapa visual; os backends permanecem idênticos
+após a correção. Temas não alteram valores, permissões ou formulários preenchidos.

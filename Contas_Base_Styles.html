@@ -1,6 +1,6 @@
 <style>
 .cn-root [hidden]{display: none !important;}
-.cn-root{--ink: #202635; --muted: #646d80; --line: #e5e8f0; --canvas: #f6f7fb; --brand: #5146d9; --soft: #f0eefe; --green: #16745b; --red: #b13b48; --radius: 16px; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--canvas); font-synthesis: none;}
+.cn-root{--ink: var(--ux-ink); --muted: var(--ux-muted); --line: var(--ux-line); --canvas: var(--ux-canvas); --brand: var(--ux-primary); --soft: var(--ux-primary-soft); --green: var(--ux-positive); --red: var(--ux-negative); --radius: 16px; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--canvas); font-synthesis: none;}
 .cn-root *{box-sizing: border-box;}
 .cn-root{margin: 0px;}
 .cn-root button,.cn-root input,.cn-root select{font: inherit;}
@@ -8,51 +8,51 @@
 .cn-root button{cursor: pointer;}
 .cn-root a{color: inherit;}
 .cn-root button:disabled{cursor: default; opacity: 0.6;}
-.cn-root button:focus-visible,.cn-root a:focus-visible,.cn-root summary:focus-visible{outline: rgb(165, 157, 242) solid 3px;}
+.cn-root button:focus-visible,.cn-root a:focus-visible,.cn-root summary:focus-visible{outline: var(--ux-focus) solid 3px;}
 .cn-root button{border: 0px;}
 .cn-root h1,.cn-root h2,.cn-root h3,.cn-root p{margin: 0px;}
 .cn-root button svg,.cn-root summary svg{pointer-events: none;}
 .cn-root svg{width: 20px; height: 20px; fill: none; stroke: currentcolor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;}
 .cn-root small{font-size: 12px;}
 .cn-root .app{display: flex; min-height: 100vh;}
-.cn-root .sidebar{width: 216px; flex-shrink: 0; background: rgb(255, 255, 255); border-right: 1px solid var(--line); padding: 33px 22px; display: flex; flex-direction: column;}
+.cn-root .sidebar{width: 216px; flex-shrink: 0; background: var(--ux-surface); border-right: 1px solid var(--line); padding: 33px 22px; display: flex; flex-direction: column;}
 .cn-root .brand{display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 750; letter-spacing: -0.8px;}
-.cn-root .brand-mark{display: grid; place-items: center; width: 33px; height: 33px; border-radius: 11px; background: var(--brand); color: white; font-weight: 750; font-size: 19px;}
+.cn-root .brand-mark{display: grid; place-items: center; width: 33px; height: 33px; border-radius: 11px; background: var(--brand); color: var(--ux-on-primary); font-weight: 750; font-size: 19px;}
 .cn-root .nav-label{font-size: 10px; letter-spacing: 1.6px; color: var(--muted); margin: 53px 12px 15px; font-weight: 750;}
-.cn-root .nav-item{display: flex; gap: 10px; align-items: center; padding: 13px 12px; border-radius: 11px; background: var(--soft); color: rgb(68, 58, 196); font-size: 14px; font-weight: 650;}
+.cn-root .nav-item{display: flex; gap: 10px; align-items: center; padding: 13px 12px; border-radius: 11px; background: var(--soft); color: var(--ux-primary); font-size: 14px; font-weight: 650;}
 .cn-root .nav-item .tag{margin-left: auto;}
-.cn-root .tag{display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; padding: 4px 6px; background: rgb(255, 255, 255); font-size: 10px; letter-spacing: 0.2px; font-weight: 700;}
+.cn-root .tag{display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; padding: 4px 6px; background: var(--ux-surface); font-size: 10px; letter-spacing: 0.2px; font-weight: 700;}
 .cn-root .sidebar-foot{margin-top: auto; padding: 22px 8px 0px;}
 .cn-root .sidebar-foot p{font-size: 12px; line-height: 1.6; color: var(--muted); margin-top: 10px;}
 .cn-root .tiny-dot{display: inline-block; width: 6px; height: 6px; background: var(--brand); border-radius: 50%; margin-right: 6px;}
 .cn-root .main{max-width: 1200px; width: 100%; padding: 36px 48px 48px; margin: auto;}
 .cn-root .context{display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; color: var(--muted); font-size: 12px;}
-.cn-root .demo{display: inline-flex; align-items: center; gap: 7px; background: rgb(255, 255, 255); border: 1px solid var(--line); border-radius: 30px; padding: 7px 10px; font-size: 11px;}
+.cn-root .demo{display: inline-flex; align-items: center; gap: 7px; background: var(--ux-surface); border: 1px solid var(--line); border-radius: 30px; padding: 7px 10px; font-size: 11px;}
 .cn-root .page-head{display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 27px;}
 .cn-root h1{font-size: 34px; letter-spacing: -1.3px; line-height: 1.15;}
 .cn-root .subtitle{font-size: 14px; color: var(--muted); margin-top: 10px; line-height: 1.5;}
-.cn-root .btn{min-height: 44px; border-radius: 10px; padding: 11px 16px; font-size: 13px; font-weight: 650; display: inline-flex; align-items: center; justify-content: center; gap: 7px; background: rgb(255, 255, 255); border: 1px solid var(--line); white-space: nowrap; color: var(--ink);}
-.cn-root .btn.primary{background: var(--brand); border-color: var(--brand); color: rgb(255, 255, 255); box-shadow: rgba(81, 70, 217, 0.1) 0px 3px 7px;}
+.cn-root .btn{min-height: 44px; border-radius: 10px; padding: 11px 16px; font-size: 13px; font-weight: 650; display: inline-flex; align-items: center; justify-content: center; gap: 7px; background: var(--ux-surface); border: 1px solid var(--line); white-space: nowrap; color: var(--ink);}
+.cn-root .btn.primary{background: var(--brand); border-color: var(--brand); color: var(--ux-on-primary); box-shadow: rgba(81, 70, 217, 0.1) 0px 3px 7px;}
 .cn-root .btn.primary:hover{background: rgb(68, 56, 199);}
 .cn-root .btn.quiet{background: transparent; border-color: transparent; color: var(--brand);}
 .cn-root .btn.danger{color: var(--red);}
-.cn-root .balance-band{border: 1px solid var(--line); border-radius: var(--radius); background: rgb(255, 255, 255); display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 25px; padding: 27px 30px; gap: 24px;}
+.cn-root .balance-band{border: 1px solid var(--line); border-radius: var(--radius); background: var(--ux-surface); display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 25px; padding: 27px 30px; gap: 24px;}
 .cn-root .metric-label{display: flex; gap: 7px; align-items: center; font-size: 12px; color: var(--muted); font-weight: 550;}
 .cn-root .metric-label svg{width: 15px; height: 15px;}
 .cn-root .balance{font-size: 33px; line-height: 1.2; font-weight: 720; letter-spacing: -1.2px; margin: 10px 0px 9px; white-space: nowrap; font-variant-numeric: tabular-nums;}
 .cn-root .balance.secondary{font-size: 27px; margin-top: 13px; letter-spacing: -0.8px; font-weight: 600;}
 .cn-root .metric + .metric{border-left: 1px solid var(--line); padding-left: 31px;}
 .cn-root .metric-caption{font-size: 11px; line-height: 1.5; color: var(--muted);}
-.cn-root .table-card{background: rgb(255, 255, 255); border: 1px solid var(--line); border-radius: var(--radius);}
+.cn-root .table-card{background: var(--ux-surface); border: 1px solid var(--line); border-radius: var(--radius);}
 .cn-root .toolbar{display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid var(--line);}
 .cn-root .search{display: flex; align-items: center; gap: 9px; flex: 1 1 0%; color: var(--muted);}
 .cn-root .search svg{width: 18px; height: 18px;}
 .cn-root .search input{min-width: 0px; width: 100%; border: 0px; color: var(--ink); background: transparent; min-height: 36px; font-size: 13px; outline-offset: 2px;}
 .cn-root .search input::placeholder{color: rgb(133, 140, 155);}
-.cn-root .select{min-height: 38px; border: 1px solid var(--line); background: rgb(255, 255, 255); padding: 8px 28px 8px 10px; border-radius: 8px; font-size: 12px; color: var(--ink); max-width: 160px;}
+.cn-root .select{min-height: 38px; border: 1px solid var(--line); background: var(--ux-surface); padding: 8px 28px 8px 10px; border-radius: 8px; font-size: 12px; color: var(--ink); max-width: 160px;}
 .cn-root .list-head{display: grid; grid-template-columns: 1fr 200px 171px; gap: 15px; padding: 13px 24px; background: rgb(251, 251, 253); font-size: 10px; color: var(--muted); letter-spacing: 0.7px; font-weight: 650; text-transform: uppercase;}
 .cn-root .list-head span:nth-child(2),.cn-root .list-head span:last-child{text-align: right;}
-.cn-root .account-row{display: grid; grid-template-columns: 1fr 200px 171px; gap: 15px; align-items: center; padding: 21px 24px; border-top: 1px solid rgb(238, 240, 245);}
+.cn-root .account-row{display: grid; grid-template-columns: 1fr 200px 171px; gap: 15px; align-items: center; padding: 21px 24px; border-top: 1px solid var(--ux-subtle);}
 .cn-root .account-row:first-child{border-top: 0px;}
 .cn-root .account-name{display: flex; align-items: center; gap: 13px; min-width: 0px;}
 .cn-root .account-icon{width: 42px; height: 42px; border-radius: 12px; background: rgb(237, 240, 254); color: rgb(83, 90, 155); display: grid; place-items: center; flex-shrink: 0;}
@@ -72,8 +72,8 @@
 .cn-root .more summary{list-style: none; cursor: pointer; display: grid; place-items: center; width: 36px; height: 38px; border-radius: 8px; color: var(--muted); font-size: 21px; letter-spacing: 1px;}
 .cn-root .more summary::-webkit-details-marker{display: none;}
 .cn-root .more[open] summary,.cn-root .more summary:hover{background: var(--canvas);}
-.cn-root .menu{position: absolute; right: 0px; top: 42px; z-index: 4; min-width: 175px; border: 1px solid var(--line); border-radius: 11px; background: rgb(255, 255, 255); padding: 6px; box-shadow: rgba(32, 38, 53, 0.1) 0px 12px 38px;}
-.cn-root .menu button{width: 100%; text-align: left; border-radius: 7px; min-height: 40px; padding: 9px 10px; background: rgb(255, 255, 255); color: var(--ink); font-size: 12px;}
+.cn-root .menu{position: absolute; right: 0px; top: 42px; z-index: 4; min-width: 175px; border: 1px solid var(--line); border-radius: 11px; background: var(--ux-surface); padding: 6px; box-shadow: rgba(32, 38, 53, 0.1) 0px 12px 38px;}
+.cn-root .menu button{width: 100%; text-align: left; border-radius: 7px; min-height: 40px; padding: 9px 10px; background: var(--ux-surface); color: var(--ink); font-size: 12px;}
 .cn-root .menu button:hover{background: var(--canvas);}
 .cn-root .menu .danger{color: var(--red);}
 .cn-root .empty{padding: 45px 20px; text-align: center;}
@@ -84,19 +84,19 @@
 .cn-root .hint svg{width: 14px; height: 14px;}
 .cn-root .bottom-note{font-size: 11px; color: var(--muted); line-height: 1.7; margin: 17px 3px;}
 .cn-root .mobile-brand{display: none;}
-.cn-root .overlay{position: fixed; inset: 0px; z-index: 10; background: rgba(32, 38, 53, 0.333); display: flex; justify-content: flex-end;}
+.cn-root .overlay{position: fixed; inset: 0px; z-index: 10; background: var(--ux-overlay); display: flex; justify-content: flex-end;}
 .cn-root .overlay[hidden]{display: none;}
-.cn-root .drawer{width: 490px; max-width: 100%; height: 100%; background: rgb(255, 255, 255); box-shadow: rgba(32, 38, 53, 0.094) -15px 0px 60px; display: flex; flex-direction: column; animation: 0.2s ease-out 0s 1 normal none running cn-enter;}
+.cn-root .drawer{width: 490px; max-width: 100%; height: 100%; background: var(--ux-surface); box-shadow: rgba(32, 38, 53, 0.094) -15px 0px 60px; display: flex; flex-direction: column; animation: 0.2s ease-out 0s 1 normal none running cn-enter;}
 .cn-root .drawer-head{display: flex; align-items: center; justify-content: space-between; padding: 28px 28px 23px; border-bottom: 1px solid var(--line);}
 .cn-root .drawer-head h2{font-size: 22px; letter-spacing: -0.6px;}
 .cn-root .drawer-head p{font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4;}
 .cn-root .icon-button{width: 40px; height: 40px; display: grid; place-items: center; border-radius: 9px; background: var(--canvas); color: var(--muted); flex-shrink: 0;}
 .cn-root .drawer-content{overflow: auto; flex: 1 1 0%; padding: 25px 28px;}
-.cn-root .drawer-footer{padding: 18px 28px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: rgb(255, 255, 255);}
+.cn-root .drawer-footer{padding: 18px 28px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: var(--ux-surface);}
 .cn-root .drawer-footer .btn{flex: 1 1 0%;}
 .cn-root .field{margin-bottom: 22px;}
 .cn-root .field > label{font-size: 12px; font-weight: 650; display: block; margin-bottom: 9px;}
-.cn-root .input{width: 100%; min-height: 46px; border: 1px solid rgb(217, 222, 234); border-radius: 9px; padding: 11px 12px; background: rgb(255, 255, 255); color: var(--ink); font-size: 14px;}
+.cn-root .input{width: 100%; min-height: 46px; border: 1px solid var(--ux-line); border-radius: 9px; padding: 11px 12px; background: var(--ux-surface); color: var(--ink); font-size: 14px;}
 .cn-root .input:focus{border-color: var(--brand); outline: rgba(81, 70, 217, 0.1) solid 3px;}
 .cn-root .help{font-size: 11px; color: var(--muted); line-height: 1.6; margin-top: 8px;}
 .cn-root .option-box{border: 1px solid var(--line); border-radius: 12px; margin-bottom: 16px; overflow: hidden;}
@@ -108,15 +108,15 @@
 .cn-root .option-body[hidden]{display: none;}
 .cn-root .option-body .field:last-child{margin-bottom: 0px;}
 .cn-root .split{display: grid; grid-template-columns: 1fr 1fr; gap: 13px;}
-.cn-root .money-input{display: flex; align-items: center; border: 1px solid rgb(217, 222, 234); border-radius: 9px; padding-left: 12px; overflow: hidden;}
+.cn-root .money-input{display: flex; align-items: center; border: 1px solid var(--ux-line); border-radius: 9px; padding-left: 12px; overflow: hidden;}
 .cn-root .money-input:focus-within{border-color: var(--brand); outline: rgba(81, 70, 217, 0.1) solid 3px;}
 .cn-root .money-input span{font-size: 12px; color: var(--muted);}
 .cn-root .money-input input{border: 0px; width: 100%; min-width: 0px; min-height: 45px; padding: 10px; outline: none; font-size: 15px; color: var(--ink);}
 .cn-root .signs{display: flex; gap: 7px; margin: 10px 0px 17px;}
-.cn-root .signs button{border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: rgb(255, 255, 255); font-size: 11px; color: var(--muted); min-height: 36px;}
+.cn-root .signs button{border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--ux-surface); font-size: 11px; color: var(--muted); min-height: 36px;}
 .cn-root .signs button[aria-pressed="true"]{background: var(--soft); border-color: rgb(201, 194, 252); color: rgb(65, 53, 173);}
 .cn-root .preview{background: rgb(246, 245, 255); border-radius: 8px; padding: 13px; margin-top: 16px; border-left: 3px solid var(--brand);}
-.cn-root .preview .eyebrow{font-size: 9px; font-weight: 750; color: rgb(98, 91, 138); letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 7px;}
+.cn-root .preview .eyebrow{font-size: 9px; font-weight: 750; color: var(--ux-muted); letter-spacing: 0.7px; text-transform: uppercase; margin-bottom: 7px;}
 .cn-root .preview strong{font-size: 12px; line-height: 1.5; display: block; overflow-wrap: anywhere;}
 .cn-root .preview p{font-size: 11px; margin-top: 7px; color: var(--muted); line-height: 1.55;}
 .cn-root .person{display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); padding: 11px; border-radius: 8px; margin-top: 8px; font-size: 12px;}
@@ -133,7 +133,7 @@
 .cn-root .ledger-desc small{font-size: 10px; color: var(--muted); display: block; margin-top: 5px; line-height: 1.55;}
 .cn-root .ledger-row > strong{font-size: 12px; white-space: nowrap; padding-top: 2px;}
 .cn-root .pill{background: rgb(240, 238, 254); color: rgb(81, 70, 188); padding: 3px 6px; border-radius: 5px; font-size: 9px; display: inline-block; margin-top: 7px; font-weight: 650;}
-.cn-root .toast{position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); background: rgb(35, 43, 61); color: rgb(255, 255, 255); border-radius: 11px; padding: 14px 21px; z-index: 20; font-size: 12px; line-height: 1.5; box-shadow: rgba(32, 38, 53, 0.133) 0px 6px 25px; max-width: 90vw;}
+.cn-root .toast{position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); background: rgb(35, 43, 61); color: var(--ux-on-primary); border-radius: 11px; padding: 14px 21px; z-index: 20; font-size: 12px; line-height: 1.5; box-shadow: rgba(32, 38, 53, 0.133) 0px 6px 25px; max-width: 90vw;}
 .cn-root .toast[hidden]{display: none;}
 .cn-root .main{margin: 0px auto;}
 .cn-root .date-control{position: relative;}
@@ -159,8 +159,8 @@
 .cn-root .mobile-brand .brand-mark{width: 25px; height: 25px; font-size: 15px; border-radius: 8px;}
 .cn-root .desktop-context{display: none;}}
 @media (prefers-reduced-motion: reduce){.cn-root *,.cn-root ::before,.cn-root ::after{animation: auto ease 0s 1 normal none running none !important; transition: none !important; scroll-behavior: auto !important;}}
-.cn-root[data-interface="phone"]{background: rgb(246, 247, 251);}
-.cn-root .phone-shell{max-width: 480px; min-height: 100dvh; margin: 0px auto; background: rgb(246, 247, 251);}
+.cn-root[data-interface="phone"]{background: var(--ux-canvas);}
+.cn-root .phone-shell{max-width: 480px; min-height: 100dvh; margin: 0px auto; background: var(--ux-canvas);}
 .cn-root .phone-appbar{display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 14px;}
 .cn-root .phone-brand{display: flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 750; letter-spacing: -0.4px;}
 .cn-root .phone-brand .brand-mark{width: 26px; height: 26px; border-radius: 9px; font-size: 16px;}
@@ -170,7 +170,7 @@
 .cn-root .phone-eyebrow{font-size: 10px; letter-spacing: 1.6px; font-weight: 700; color: var(--muted); margin-bottom: 7px;}
 .cn-root .phone-title-row h1{font-size: 32px; letter-spacing: -1px;}
 .cn-root .phone-count{font-size: 11px; color: var(--muted); padding-bottom: 4px;}
-.cn-root .phone-summary{background: rgb(255, 255, 255); border: 1px solid var(--line); border-radius: 20px; padding: 22px; margin-bottom: 22px;}
+.cn-root .phone-summary{background: var(--ux-surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; margin-bottom: 22px;}
 .cn-root .phone-summary-label{display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px;}
 .cn-root .phone-summary-label span{font-size: 10px; padding-top: 1px;}
 .cn-root .phone-total{font-weight: 750; font-size: 35px; letter-spacing: -1.3px; margin: 12px 0px 21px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere;}
@@ -180,22 +180,22 @@
 .cn-root .phone-forecast strong{font-size: 16px; font-weight: 650; white-space: nowrap;}
 .cn-root .phone-forecast svg{width: 17px; height: 17px; color: var(--brand); display: none;}
 .cn-root .phone-summary-note{font-size: 10px; color: var(--muted); margin-top: 10px; line-height: 1.5;}
-.cn-root .phone-search{display: flex; gap: 10px; align-items: center; min-height: 50px; border: 1px solid var(--line); border-radius: 13px; background: rgb(255, 255, 255); padding: 0px 15px; color: var(--muted);}
+.cn-root .phone-search{display: flex; gap: 10px; align-items: center; min-height: 50px; border: 1px solid var(--line); border-radius: 13px; background: var(--ux-surface); padding: 0px 15px; color: var(--muted);}
 .cn-root .phone-search svg{width: 18px; height: 18px;}
 .cn-root .phone-search input{border: 0px; min-width: 0px; flex: 1 1 0%; font-size: 14px; min-height: 48px; background: transparent; outline-offset: 1px; color: var(--ink);}
 .cn-root .phone-filters{display: flex; gap: 9px; margin: 14px 0px 19px;}
-.cn-root .phone-filters button{flex: 1 1 0%; min-height: 44px; border-radius: 12px; border: 1px solid var(--line); font-size: 12px; font-weight: 600; background: rgb(255, 255, 255); color: var(--muted);}
+.cn-root .phone-filters button{flex: 1 1 0%; min-height: 44px; border-radius: 12px; border: 1px solid var(--line); font-size: 12px; font-weight: 600; background: var(--ux-surface); color: var(--muted);}
 .cn-root .phone-filters button[aria-pressed="true"]{background: var(--soft); color: rgb(66, 54, 186); border-color: rgb(212, 205, 249);}
 .cn-root .phone-accounts{display: grid; gap: 12px;}
-.cn-root .phone-account{border: 1px solid var(--line); background: white; border-radius: 16px; padding: 17px;}
+.cn-root .phone-account{border: 1px solid var(--line); background: var(--ux-surface); border-radius: 16px; padding: 17px;}
 .cn-root .phone-account-header{display: flex; align-items: center; gap: 10px;}
 .cn-root .phone-account-header .account-icon{width: 36px; height: 36px; border-radius: 11px;}
 .cn-root .phone-account-header .account-icon svg{width: 19px; height: 19px;}
 .cn-root .phone-account-title{flex: 1 1 0%; min-width: 0px;}
 .cn-root .phone-account-title h3{font-size: 14px; font-weight: 650; line-height: 1.4; overflow-wrap: anywhere;}
 .cn-root .phone-account-title p{font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4;}
-.cn-root .phone-more{display: grid; place-items: center; min-width: 44px; min-height: 44px; background: rgb(255, 255, 255); border-radius: 10px; color: var(--muted); font-size: 22px; letter-spacing: 1px;}
-.cn-root .phone-open-account{display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 16px 0px 0px; width: 100%; background: rgb(255, 255, 255); text-align: left; color: var(--ink); min-height: 70px;}
+.cn-root .phone-more{display: grid; place-items: center; min-width: 44px; min-height: 44px; background: var(--ux-surface); border-radius: 10px; color: var(--muted); font-size: 22px; letter-spacing: 1px;}
+.cn-root .phone-open-account{display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 16px 0px 0px; width: 100%; background: var(--ux-surface); text-align: left; color: var(--ink); min-height: 70px;}
 .cn-root .phone-open-account > span{min-width: 0px;}
 .cn-root .phone-open-account strong{font-size: 23px; letter-spacing: -0.5px; font-weight: 700; display: block; overflow-wrap: anywhere; font-variant-numeric: tabular-nums;}
 .cn-root .phone-open-account small{font-size: 11px; color: var(--muted); display: block; margin-top: 7px; line-height: 1.5;}
@@ -205,9 +205,9 @@
 .cn-root .phone-list-note{font-size: 10px; line-height: 1.65; color: var(--muted); margin: 17px 3px;}
 .cn-root .phone-create{position: fixed; z-index: 4; bottom: 0px; left: 50%; transform: translateX(-50%); max-width: 480px; width: 100%; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255, 255, 255, 0.98);}
 .cn-root .phone-create .btn{width: 100%; min-height: 50px; font-size: 14px; border-radius: 13px;}
-.cn-root .phone-page{justify-content: center; background: rgba(32, 38, 53, 0.333);}
-.cn-root .phone-editor,.cn-root .phone-history{width: 100%; max-width: 480px; height: 100dvh; background: rgb(255, 255, 255); display: flex; flex-direction: column; min-height: 0px;}
-.cn-root .phone-page-head{display: flex; gap: 11px; align-items: center; padding: 15px 18px; border-bottom: 1px solid var(--line); flex-shrink: 0; min-height: 81px; background: rgb(255, 255, 255);}
+.cn-root .phone-page{justify-content: center; background: var(--ux-overlay);}
+.cn-root .phone-editor,.cn-root .phone-history{width: 100%; max-width: 480px; height: 100dvh; background: var(--ux-surface); display: flex; flex-direction: column; min-height: 0px;}
+.cn-root .phone-page-head{display: flex; gap: 11px; align-items: center; padding: 15px 18px; border-bottom: 1px solid var(--line); flex-shrink: 0; min-height: 81px; background: var(--ux-surface);}
 .cn-root .phone-page-head h2{font-size: 20px; letter-spacing: -0.5px; overflow-wrap: anywhere; line-height: 1.35;}
 .cn-root .phone-page-head p{font-size: 11px; color: var(--muted); margin-top: 5px; line-height: 1.45;}
 .cn-root .phone-back{width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); background: var(--canvas); border-radius: 12px; flex-shrink: 0;}
@@ -225,7 +225,7 @@
 .cn-root .phone-option-toggle strong{font-size: 13px; font-weight: 650; line-height: 1.4;}
 .cn-root .phone-option-toggle small{display: block; font-size: 11px; line-height: 1.5; margin-top: 4px; color: var(--muted);}
 .cn-root .phone-option-toggle > input{appearance: none; position: relative; width: 37px; height: 23px; flex-shrink: 0; border-radius: 30px; background: rgb(223, 227, 236); cursor: pointer; margin: 0px;}
-.cn-root .phone-option-toggle > input::before{content: ""; position: absolute; left: 3px; top: 3px; width: 17px; height: 17px; border-radius: 50%; background: rgb(255, 255, 255); box-shadow: rgba(0, 0, 0, 0.133) 0px 1px 3px;}
+.cn-root .phone-option-toggle > input::before{content: ""; position: absolute; left: 3px; top: 3px; width: 17px; height: 17px; border-radius: 50%; background: var(--ux-surface); box-shadow: rgba(0, 0, 0, 0.133) 0px 1px 3px;}
 .cn-root .phone-option-toggle > input:checked{background: var(--brand);}
 .cn-root .phone-option-toggle > input:checked::before{left: 17px;}
 .cn-root .phone-option-content{padding: 0px 15px 17px;}
@@ -242,12 +242,12 @@
 .cn-root .phone-person:first-of-type{margin-top: 13px;}
 .cn-root .phone-person input{width: 19px; height: 19px; accent-color: var(--brand);}
 .cn-root .phone-avatar{display: grid; place-items: center; width: 30px; height: 30px; background: var(--canvas); border-radius: 50%; font-size: 12px; color: var(--muted);}
-.cn-root .phone-save{border-top: 1px solid var(--line); padding: 13px 20px calc(13px + env(safe-area-inset-bottom)); flex-shrink: 0; background: rgb(255, 255, 255); display: flex; flex-direction: column; gap: 5px;}
+.cn-root .phone-save{border-top: 1px solid var(--line); padding: 13px 20px calc(13px + env(safe-area-inset-bottom)); flex-shrink: 0; background: var(--ux-surface); display: flex; flex-direction: column; gap: 5px;}
 .cn-root .phone-save .btn{width: 100%; min-height: 50px; font-size: 14px; border-radius: 12px;}
 .cn-root .phone-save .btn.quiet{min-height: 42px;}
 .cn-root .phone-history-scroll{flex: 1 1 0%; min-height: 0px; overflow: auto; padding: 23px 20px;}
 .cn-root .phone-history-total{padding: 19px 20px; background: var(--soft); border-radius: 15px; margin-bottom: 27px;}
-.cn-root .phone-history-total p{font-size: 11px; color: rgb(98, 91, 138);}
+.cn-root .phone-history-total p{font-size: 11px; color: var(--ux-muted);}
 .cn-root .phone-history-total strong{display: block; font-size: 31px; font-weight: 700; letter-spacing: -0.8px; margin-top: 11px; overflow-wrap: anywhere;}
 .cn-root .phone-section-title{font-size: 13px; margin-bottom: 7px;}
 .cn-root .phone-history .ledger-row{gap: 10px; padding: 19px 0px;}
@@ -257,11 +257,11 @@
 .cn-root .phone-history .ledger-row > strong{font-size: 12px;}
 .cn-root .phone-history .help{font-size: 11px; line-height: 1.65; margin-top: 20px;}
 .cn-root .phone-sheet-overlay{align-items: flex-end; justify-content: center;}
-.cn-root .phone-actions-sheet{width: 100%; max-width: 480px; max-height: 90dvh; overflow: auto; background: rgb(255, 255, 255); border-radius: 22px 22px 0px 0px; padding: 12px 20px calc(19px + env(safe-area-inset-bottom));}
+.cn-root .phone-actions-sheet{width: 100%; max-width: 480px; max-height: 90dvh; overflow: auto; background: var(--ux-surface); border-radius: 22px 22px 0px 0px; padding: 12px 20px calc(19px + env(safe-area-inset-bottom));}
 .cn-root .phone-sheet-handle{width: 35px; height: 4px; background: rgb(217, 220, 230); border-radius: 4px; margin: 0px auto 21px;}
 .cn-root .phone-actions-sheet h2{font-size: 21px; letter-spacing: -0.5px; overflow-wrap: anywhere;}
 .cn-root .phone-actions-sheet > p{font-size: 12px; color: var(--muted); margin: 7px 0px 19px;}
-.cn-root .phone-actions-sheet button{display: block; width: 100%; min-height: 54px; background: rgb(255, 255, 255); border-top: 1px solid var(--line); text-align: left; font-size: 14px; color: var(--ink);}
+.cn-root .phone-actions-sheet button{display: block; width: 100%; min-height: 54px; background: var(--ux-surface); border-top: 1px solid var(--line); text-align: left; font-size: 14px; color: var(--ink);}
 .cn-root .phone-actions-sheet button.danger{color: var(--red);}
 .cn-root .phone-actions-sheet .phone-sheet-cancel{margin-top: 9px; text-align: center; background: var(--canvas); border-radius: 12px; border: 0px; font-weight: 650; min-height: 49px;}
 .cn-root[data-interface="phone"] .toast{bottom: calc(93px + env(safe-area-inset-bottom)); max-width: 440px; width: calc(100% - 40px); font-size: 12px;}
@@ -283,18 +283,18 @@
 .cn-root .cn-error{color:var(--red);padding:20px;line-height:1.6;font-size:13px}.cn-root .cn-error button{margin-top:12px}
 .cn-root .phone-save .btn{min-height:50px}.cn-root button{touch-action:manipulation}.cn-root .input{font-family:inherit}
 .cn-root :is(h1,h2,h3,strong){color:inherit}.cn-root label{color:var(--muted)}
-.cn-root :is(.input,.select,.money-input input,.search input,.phone-search input){background:#fff;color:var(--ink);font-weight:400}
+.cn-root :is(.input,.select,.money-input input,.search input,.phone-search input){background:var(--ux-surface);color:var(--ink);font-weight:400}
 .cn-root .input{border:1px solid var(--line)}
 body.contas-nova-smartphone #conteudo-principal{padding-left:0;padding-right:0}
 .cn-root .ledger-row>strong{overflow-wrap:anywhere}.cn-root .ledger-row .ledger-desc{min-width:0}
 .cn-root .person{cursor:pointer}.cn-root .drawer-content,.cn-root .phone-form-scroll{scrollbar-gutter:stable}
 body.contas-nova-smartphone #fab-container{display:none!important}
-body.tema-escuro .cn-root{--ink:#e7eaf2;--muted:#b0b9c9;--line:#394454;--canvas:#171e29;--soft:#302b4d}
-body.tema-escuro .cn-root :is(.balance-band,.table-card,.drawer,.drawer-footer,.phone-summary,.phone-account,.phone-more,.phone-open-account,.phone-editor,.phone-history,.phone-save,.phone-page-head,.phone-actions-sheet,.menu,.menu button,.select,.input,.btn,.phone-search,.phone-create,.phone-filters button,.money-input input){background:#222c3a}
-body.tema-escuro .cn-root :is(.phone-shell,.list-head){background:#171e29}
-body.tema-escuro .cn-root :is(.preview,.phone-history-total,.phone-option-icon){background:#302b4d}
-body.tema-escuro .cn-root .btn.primary{background:#5146d9;color:white}
-body.tema-escuro .cn-root :is(.btn.quiet,.phone-open-label,.signs button[aria-pressed=true]){color:#c4bcff}
+body.tema-escuro .cn-root{--ink:#e7eaf2;--muted:#b0b9c9;--line:#394454;--canvas:var(--ux-canvas);--soft:var(--ux-primary-soft)}
+body.tema-escuro .cn-root :is(.balance-band,.table-card,.drawer,.drawer-footer,.phone-summary,.phone-account,.phone-more,.phone-open-account,.phone-editor,.phone-history,.phone-save,.phone-page-head,.phone-actions-sheet,.menu,.menu button,.select,.input,.btn,.phone-search,.phone-create,.phone-filters button,.money-input input){background:var(--ux-ink)}
+body.tema-escuro .cn-root :is(.phone-shell,.list-head){background:var(--ux-canvas)}
+body.tema-escuro .cn-root :is(.preview,.phone-history-total,.phone-option-icon){background:var(--ux-primary-soft)}
+body.tema-escuro .cn-root .btn.primary{background:var(--ux-primary);color:var(--ux-on-primary)}
+body.tema-escuro .cn-root :is(.btn.quiet,.phone-open-label,.signs button[aria-pressed=true]){color:var(--ux-primary)}
 body.tema-escuro .cn-root .negative{color:#ffa2ae}
 
 </style>
