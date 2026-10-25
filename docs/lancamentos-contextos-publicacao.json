@@ -1,0 +1,128 @@
+{
+  "verifiedAt": "2026-10-25T22:22:35.738481+00:00",
+  "status": "published and independently verified",
+  "version": 50,
+  "sourceCommit": "fa4831bee3b68f603372cc562a94111e37b52580",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migrations": [
+    "20261025220931_lancamentos_v9_contextos"
+  ],
+  "financialRecordsRewrittenByMigration": false,
+  "previousIndividualCategoriesPreserved": true,
+  "files": {
+    "fileCount": 74,
+    "byteForByteMatch": true,
+    "extraRemoteFiles": 0,
+    "changedRuntimeFromV48": [
+      "Cartoes_Novo_Controller.js",
+      "Contas_Tipos_Client.html",
+      "Contas_Tipos_Desktop_View.html",
+      "Contas_Tipos_Mobile_View.html",
+      "Faturas_Cartao_View.html",
+      "Index.html",
+      "Lancamentos_Contexto_Controller.js",
+      "Lancamentos_Novo_Client.html",
+      "Lancamentos_Novo_Controller.js",
+      "Lancamentos_Novo_Regras.js",
+      "Lancamentos_Novo_View.html",
+      "Painel_Novo_App.html",
+      "Painel_Novo_Client.html",
+      "Painel_Novo_Controller.js",
+      "Painel_Novo_View.html",
+      "Rateios_Novo_Client.html",
+      "Saldo_Global_Client.html"
+    ]
+  },
+  "deployments": {
+    "production": {
+      "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+      "version": 50,
+      "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "functionalAuthenticatedTest": false
+      }
+    },
+    "evaluation": {
+      "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+      "version": 50,
+      "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "functionalAuthenticatedTest": false
+      }
+    }
+  },
+  "tests": {
+    "backendContextsChecks": 35,
+    "hubBackendChecks": 39,
+    "rateiosRegressionChecks": 63,
+    "accountsAndCardPayments": "PASS",
+    "invoicePaymentsBrowser": [
+      "desktop",
+      "tablet",
+      "smartphone"
+    ],
+    "wealthAndPersonalConsumption": "PASS",
+    "hubInlineBatchDraftRegression": "PASS",
+    "contextsBrowser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "productionFinancialTestRecordsCreated": false,
+    "authenticatedProductionAcceptance": "pending user testing"
+  },
+  "intermediateVersions": [
+    {
+      "version": 49,
+      "sourceCommit": "4c896c252b7aa759b2c004cb6e2f2656b2b1569b",
+      "promotedToProduction": false,
+      "note": "Candidate before mobile history-label visual adjustment"
+    }
+  ]
+}
