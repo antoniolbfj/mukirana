@@ -13,7 +13,7 @@ let initial={};try{initial=JSON.parse(localStorage.getItem('mukirana_filtros_lan
 const nextAction=localStorage.getItem('mukirana_acao_pendente')||'';localStorage.removeItem('mukirana_acao_pendente');
 const sourceContext=contextual?(window.mukiranaTelaContextual?.contexto||initial):initial;
 const invoice=contextual&&!!(sourceContext.ID_Grupo_Cartao||sourceContext.ID_Cartao),invoiceMonth=sourceContext.Mes_Final||sourceContext.Mes_Referencia||sourceContext.Mes_Inicial||store.getPeriod().Mes_Selecionado;
-const contextRequest={period:store.getPeriod(),account:sourceContext.ID_Conta||'',invoice,group:sourceContext.ID_Grupo_Cartao||'',card:sourceContext.ID_Cartao||'',month:invoiceMonth};
+const contextRequest={period:store.getPeriod(),rateiosPeriod:sourceContext.Somente_Rateados===true,account:sourceContext.ID_Conta||'',invoice,group:sourceContext.ID_Grupo_Cartao||'',card:sourceContext.ID_Cartao||'',month:invoiceMonth};
 let localPack=null,localPending=null,firstLoad=true;
 async function loadLocal(force=false){if(!contextual){if(firstLoad||force){firstLoad=false;return store.reload();}return store.load();}if(force)localPack=null;if(localPack)return localPack;if(localPending)return localPending;localPending=store.rpc('lancamentosContextoListar',contextRequest).then(pack=>{localPack=pack;send({type:'package',data:pack});return pack;}).finally(()=>localPending=null);return localPending;}
 const unsubscribe=contextual?()=>{}:store.subscribe(pack=>send({type:'package',data:pack}));

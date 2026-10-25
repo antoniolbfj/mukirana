@@ -10,7 +10,7 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 50**, com mês global/saldo anterior, fatura contextual, rateios na lista e
+**versão 51**, com mês global/saldo anterior, fatura contextual, rateios na lista e
 modal de lançamentos em Contas/Painel. Publicação conferida em
 `lancamentos-contextos-publicacao.json`. A versão48 entregou o hub e a retirada
 de Projetos; a versão47 corrigiu transferências após pagamentos de fatura.
@@ -64,6 +64,12 @@ categoria individual padrão, cadastro preso à fatura aberta, modal de Lançame
 em Contas e Painel, card Saldo das contas e um mês global com histórico opcional.
 Ver [entrega](lancamentos-contextos-entrega.md). Homologação de uso pendente.
 
+O Painel foi reorganizado em cinco linhas conforme a orientação mais recente,
+com Consumo e Patrimônio em cards próprios, sem o antigo card Patrimônio atual.
+O saldo do rateio e sua modal agora respeitam mês/saldo anterior e abatem os
+acertos existentes uma única vez, excluindo períodos futuros do recorte.
+Ver [correção do Painel](painel-periodo-entrega.md). Homologação de uso pendente.
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -75,7 +81,9 @@ Ver [entrega](lancamentos-contextos-entrega.md). Homologação de uso pendente.
    Nesta rodada, conferir todas as contas nos filtros, valor do recorte, edição
    direta, lote, ordenação, visões, rascunho e alinhamento da marca. Conferir o mês
    com/sem saldo anterior, compras pela competência do cartão, inclusão na fatura
-   aberta, rateios/categoria pessoal na lista e modais de Contas/Painel.
+   aberta, rateios/categoria pessoal na lista e modais de Contas/Painel. Validar
+   também a composição do Painel em cinco linhas e o saldo do rateio por mês,
+   com e sem Saldo anterior.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

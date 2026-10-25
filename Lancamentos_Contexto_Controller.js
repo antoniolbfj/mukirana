@@ -19,5 +19,6 @@ function lancamentosContextoListar(token,request){
   const writable=instruments.filter(function(a){return a.active&&a.canUse;});
   r.invoiceContext={group:chosenGroup,month:r.month,origins:writable.map(function(a){return a.id;})};
  }else{data=H.read(user,Object.assign({invoiceCalendar:true},p));if(r.account&&!data.accounts.some(function(a){return a.id===r.account&&a.kind==='Conta';}))throw new Error('Conta não encontrada ou sem acesso.');}
+ if(r.rateiosPeriod===true&&!invoice)data.rateios.scopedSummary=painelNovoResumoRateios_(user,p);
  return {user:{id:user.id,name:user.nome||''},period:invoice?H.period({Mes_Inicial:r.month,Mes_Final:r.month}):p,rows:H.rows(data).filter(function(row){return !r.account||row.account===r.account;}),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:data.favorites,approvals:data.approvals,rateios:data.rateios,invoiceContext:r.invoiceContext||null};
 }

@@ -10,8 +10,10 @@ Mês global com saldo anterior opcional, rateios na própria lista, categoria pe
 padrão e cadastro vinculado à fatura aberta. Contas e Painel abrem Lançamentos em
 modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
 
-Ver [entrega](docs/lancamentos-contextos-entrega.md),
-[publicação](docs/lancamentos-contextos-publicacao.json) e
+O Painel segue cinco linhas e o saldo do rateio respeita o mês/histórico escolhido.
+Ver [correção do Painel](docs/painel-periodo-entrega.md) e
+[entrega anterior](docs/lancamentos-contextos-entrega.md),
+[publicação vigente](docs/painel-periodo-publicacao.json) e
 [pendências vigentes](docs/pendencias-requisitos.md). Homologação de uso permanece
 pendente; os acessos principais foram atualizados por autorização do usuário.
 

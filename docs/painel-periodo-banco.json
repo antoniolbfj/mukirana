@@ -1,0 +1,29 @@
+{
+  "project": "wcczkultokrypdfimbsh",
+  "migration": {
+    "name": "painel_v10_rateios_periodo",
+    "version": "20261025224955"
+  },
+  "financialRecordsRewritten": false,
+  "transactionalHashAssertion": "PASS",
+  "checkedClosedMonths": [
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10"
+  ],
+  "closedMonthsZeroInBothModes": true,
+  "novemberComparedWithExistingDebtAndSettlements": "PASS",
+  "futureMonthsExcludedFromEarlierPeriods": "PASS",
+  "grants": {
+    "anon": false,
+    "service": true,
+    "authenticated": false
+  },
+  "securityAdvisors": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 16
+  }
+}
