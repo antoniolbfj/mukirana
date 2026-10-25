@@ -9,6 +9,8 @@ function lancamentosNovoRegras_() {
     for(let i=x.length-1,j=y.length-1;i>=0||j>=0;i--,j--){let n=Number(x[i]||0)+(same?Number(y[j]||0):-Number(y[j]||0))+carry;if(same){carry=n>=10?1:0;n%=10;}else{carry=n<0?-1:0;if(n<0)n+=10;}out=n+out;}
     if(same&&carry)out=carry+out;out=out.replace(/^0+(?=\d)/,'');return(negative&&out!=='0'?'-':'')+out;
   }
+  function compare(a,b){const d=add(a,negate(b));return d==='0'?0:d[0]==='-'?-1:1;}
+  function multiply(a,n){if(!Number.isSafeInteger(n)||n<0)throw Error('Multiplicador inválido.');let result='0',value=a;while(n){if(n%2)result=add(result,value);n=Math.floor(n/2);if(n)value=add(value,value);}return result;}
   function negate(value){value=String(value);return value==='0'?'0':value[0]==='-'?value.slice(1):'-'+value;}
   function cents(value){return typeof value==='string'&&/^-?(0|[1-9]\d*)$/.test(value)&&value.length<=32;}
   function money(value){if(!cents(String(value)))return '—';const negative=String(value)[0]==='-';let s=negative?String(value).slice(1):String(value);s=s.padStart(3,'0');return(negative?'− ':'')+'R$ '+s.slice(0,-2).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+','+s.slice(-2);}
@@ -36,5 +38,5 @@ function lancamentosNovoRegras_() {
     return {incomeCents:income,expenseCents:expense,transferInCents:incoming,transferOutCents:outgoing,transferCents:transfers,openingCents:opening,resultCents:add(add(income,negate(expense)),transfers),count:rows.length};
   }
   function query(rows,input){const f=clean(input),filtered=rows.filter(r=>matches(r,f));return {rows:filtered,filters:f,options:facets(rows,f),summary:summarize(filtered)};}
-  return {dimensions:dimensions,add:add,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
+  return {dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
 }

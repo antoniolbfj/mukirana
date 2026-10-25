@@ -63,20 +63,16 @@ function obterHtmlDaTela(nomeTela, tokenSessao) {
 
     if (nomeTela === 'Usuarios') return incluir_('Usuarios_View');
     // Contas homologada; a rota anterior fica como alias para acessos já abertos.
-    if (nomeTela === 'ContasTipos') return HtmlService.createTemplateFromFile('Contas_Tipos_View').evaluate().getContent();
-    if (nomeTela === 'Contas' || nomeTela === 'ContasNova') return HtmlService.createTemplateFromFile('Contas_Nova_View').evaluate().getContent();
+    if (nomeTela === 'ContasTipos' || nomeTela === 'Contas' || nomeTela === 'ContasNova') return HtmlService.createTemplateFromFile('Contas_Tipos_View').evaluate().getContent();
     // Cartões homologado; a rota de avaliação permanece como alias.
     if (nomeTela === 'Cartoes' || nomeTela === 'CartoesNovo') return HtmlService.createTemplateFromFile('Cartoes_Novo_View').evaluate().getContent();
     if (nomeTela === 'Categorias') return incluir_('Categorias_View');
-    if (nomeTela === 'Dashboard') return incluir_('Dashboard_View');
+    if (nomeTela === 'Dashboard' || nomeTela === 'Orcamentos') return HtmlService.createTemplateFromFile('Painel_Novo_View').evaluate().getContent();
     if (nomeTela === 'FaturasCartao') return incluir_('Faturas_Cartao_View');
-    if (nomeTela === 'Orcamentos') return incluir_('Orcamentos_View');
     if (nomeTela === 'Recorrencias') return incluir_('Recorrencias_View');
     if (nomeTela === 'Login') return incluir_('Login_View');
     if (nomeTela === 'Projetos') return incluir_('Projetos_View');
-    if (nomeTela === 'Lancamentos') return incluir_('Lancamentos_View');
-    if (nomeTela === 'LancamentosNovo') return HtmlService.createTemplateFromFile('Lancamentos_Novo_View').evaluate().getContent();
-    if (nomeTela === 'LancamentosPrototipo') return HtmlService.createTemplateFromFile('Lancamentos_Prototipo_View').evaluate().getContent();
+    if (nomeTela === 'Lancamentos' || nomeTela === 'LancamentosNovo' || nomeTela === 'LancamentosPrototipo' || nomeTela === 'Rateios') return HtmlService.createTemplateFromFile('Lancamentos_Novo_View').evaluate().getContent();
 
     return "<div style='padding: 30px;'><h2>Em construção: " + nomeTela + "</h2></div>";
 

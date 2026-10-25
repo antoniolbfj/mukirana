@@ -6,7 +6,8 @@ const LancamentosNovo_ = {
   rpc: function(name,args){
     try{return supabaseRpc_(name,args);}catch(e){
       const messages={conflict:'Os dados foram alterados. Atualize a lista e revise antes de tentar novamente.',forbidden:'Você não tem permissão para essa operação.',invalid_request:'Confira os campos do lançamento.',invalid_category:'Escolha uma categoria acessível.',invalid_period:'Confira os meses selecionados.',invalid_shares:'As partes devem ser positivas e somar exatamente o total.',invalid_reason:'Informe o motivo da rejeição.',protected_opening:'Ajuste o saldo inicial no cadastro da conta.',duplicate_name:'Já existe um cadastro com este nome neste nível.',invoice_account:'Use uma conta de Consumo como origem do pagamento.',invoice_limit:'O pagamento ultrapassa o saldo em aberto da fatura. Revise o valor ou o mês selecionado.',settled:'Este lançamento já participa de um acerto. Regularize o acerto antes de alterá-lo.'};
-      const match=String(e&&e.message||e).match(/(?:LN|CN):([a-z_]+)/);throw new Error(match&&messages[match[1]]||'Não foi possível concluir a operação. Tente novamente.');
+      messages.linked_settlement='Este rateio está vinculado a um acerto histórico e está protegido.';
+      const match=String(e&&e.message||e).match(/(?:RT|LN|CN):([a-z_]+)/);throw new Error(match&&messages[match[1]]||'Não foi possível concluir a operação. Tente novamente.');
     }
   },
   period: function(f){
@@ -17,7 +18,7 @@ const LancamentosNovo_ = {
     const d=end?new Date(end+'-01T12:00:00Z'):null;if(d){d.setUTCMonth(d.getUTCMonth()+1);d.setUTCDate(0);}
     return {start:start||'',end:end||'',first:start?start+'-01':null,last:d?d.toISOString().slice(0,10):null};
   },
-  read: function(user,period){const data=this.rpc('rpc_lancamentos_listar_v3',{p_usuario:user.id,p_inicio:period.first,p_fim:period.last});if(!data||!Array.isArray(data.entries)||!Array.isArray(data.accounts))throw new Error('Não foi possível carregar os lançamentos.');if(period.includeProjections!==false)this.projections(data,Object.assign({occurrenceDates:true},period));return data;},
+  read: function(user,period){const data=this.rpc('rpc_lancamentos_listar_v3',{p_usuario:user.id,p_inicio:period.first,p_fim:period.last});if(!data||!Array.isArray(data.entries)||!Array.isArray(data.accounts))throw new Error('Não foi possível carregar os lançamentos.');if(period.includeProjections!==false)this.projections(data,Object.assign({occurrenceDates:true},period));data.viewer=user.id;return data;},
   projections: function(data,period){
     const accounts={};data.accounts.forEach(function(a){accounts[a.id]=a;});const generated={};(data.legacyGenerated||[]).forEach(function(k){generated[k]=true;});
     const limit=new Date(ContasNova_.today().slice(0,7)+'-01T12:00:00Z');limit.setUTCMonth(limit.getUTCMonth()+1);limit.setUTCDate(0);const end=period.last||limit.toISOString().slice(0,10);
@@ -48,15 +49,16 @@ const LancamentosNovo_ = {
     data.entries.forEach(function(e){
       if(!core.cents(e.amountCents)||!ContasNova_.date(e.date))throw new Error('Resposta financeira inválida.');
       if(e.type==='transfer'){
-        if(accounts[e.origin])append(e,e.origin,core.negate(e.amountCents),'out',accounts[e.origin].name,'');
-        if(accounts[e.destination])append(e,e.destination,e.amountCents,'in',accounts[e.destination].name,'');
+        if(accounts[e.origin]&&(!data.viewer||accounts[e.origin].owner===data.viewer))append(e,e.origin,core.negate(e.amountCents),'out',accounts[e.origin].name,'');
+        if(accounts[e.destination]&&(!data.viewer||accounts[e.destination].owner===data.viewer))append(e,e.destination,e.amountCents,'in',accounts[e.destination].name,'');
       }else{
-        const a=accounts[e.origin],logical=a&&accounts[a.ledgerAccount]||a,origin=logical?logical.id:'history:'+e.origin;let movement=e;if(e.opening)movement=Object.assign({},e,{type:e.amountCents.charAt(0)==='-'?'expense':'income',amountCents:e.amountCents.replace(/^-/, '')});append(movement,origin,e.type==='expense'?core.negate(e.amountCents):e.amountCents,'entry',logical?logical.name:'Origem histórica',e.special|| (e.opening?'opening':''));
+        if(data.viewer&&e.financeOwner&&e.financeOwner!==data.viewer)return;
+        const a=accounts[e.origin],logical=a&&accounts[a.ledgerAccount]||a,origin=logical?logical.id:'history:'+e.origin;if(data.viewer&&logical&&logical.owner!==data.viewer)return;let movement=e;if(e.opening)movement=Object.assign({},e,{type:e.amountCents.charAt(0)==='-'?'expense':'income',amountCents:e.amountCents.replace(/^-/, '')});append(movement,origin,e.type==='expense'?core.negate(e.amountCents):e.amountCents,'entry',logical?logical.name:'Origem histórica',e.special|| (e.opening?'opening':''));
       }
     });
     (data.payments||[]).forEach(function(p){
       const e={id:'invoice:'+p.id,description:'Pagamento da fatura '+p.groupName,type:'transfer',date:p.date,competence:p.competence,origin:p.origin,destination:'invoice:'+p.group,amountCents:p.amountCents,status:p.status,mode:'single',canEdit:false};
-      if(accounts[p.origin])append(e,p.origin,core.negate(p.amountCents),'out',accounts[p.origin].name,'invoice');
+      if(accounts[p.origin]&&(!data.viewer||accounts[p.origin].owner===data.viewer))append(e,p.origin,core.negate(p.amountCents),'out',accounts[p.origin].name,'invoice');
       if(p.canSeeDestination)append(e,'invoice:'+p.group,p.amountCents,'in','Fatura '+p.groupName,'invoice');
     });
     result.sort(function(a,b){return b.date.localeCompare(a.date)||a.key.localeCompare(b.key);});return result;
@@ -96,7 +98,7 @@ const LancamentosNovo_ = {
 };
 function lancamentosNovoListar(token,filters){
   const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();const period=LancamentosNovo_.period(filters),data=LancamentosNovo_.read(user,period);
-  return {user:{id:user.id,name:user.nome||''},period:period,rows:LancamentosNovo_.rows(data),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:data.favorites,approvals:data.approvals};
+  return {user:{id:user.id,name:user.nome||''},period:period,rows:LancamentosNovo_.rows(data),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:data.favorites,approvals:data.approvals,rateios:data.rateios};
 }
 function lancamentosNovoConsultar(token,period,filters){
   const data=lancamentosNovoListar(token,period),core=LancamentosNovo_.core();if(!core.valid(data.rows,filters))throw new Error('Essa combinação de filtros não possui lançamentos. Revise a seleção.');return core.query(data.rows,filters);
@@ -157,6 +159,6 @@ function lancamentosNovoCadastroRapido(token,request){
   return LancamentosNovo_.rpc('rpc_lancamentos_gravar_v3',{p_usuario:user.id,p_operacao:r.operationId,p_request:r,p_changes:{action:r.action,id:r.id,name:r.name.trim(),type:r.kind,parent:r.parent||null}});
 }
 function lancamentosNovoDecidir(token,request){
-  const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();const r=request||{};if(!LancamentosNovo_.uuid(r.id)||typeof r.approve!=='boolean'||r.approve&&!LancamentosNovo_.uuid(r.category)||!r.approve&&(typeof r.reason!=='string'||!r.reason.trim()||r.reason.length>500))throw new Error('Confira a decisão e a categoria ou justificativa.');
+  const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();const r=request||{};if(!LancamentosNovo_.uuid(r.id)||typeof r.approve!=='boolean'||r.category!=null&&r.category!==''&&!LancamentosNovo_.uuid(r.category)||!r.approve&&(typeof r.reason!=='string'||!r.reason.trim()||r.reason.length>500))throw new Error('Confira a decisão e a categoria ou justificativa.');
   return LancamentosNovo_.rpc('rpc_lancamentos_decidir_v3',{p_usuario:user.id,p_solicitacao:r.id,p_aprovar:r.approve,p_categoria:r.approve?r.category:null,p_motivo:r.approve?null:r.reason.trim()});
 }

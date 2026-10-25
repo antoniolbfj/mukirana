@@ -1,0 +1,57 @@
+-- Verificação transacional: identidades fictícias, nenhum registro persiste.
+BEGIN;
+SET LOCAL ROLE service_role;
+DO $$
+DECLARE owner_id uuid:=gen_random_uuid();debtor_id uuid:=gen_random_uuid();third_id uuid:=gen_random_uuid();bank_owner uuid:=gen_random_uuid();bank_debtor uuid:=gen_random_uuid();entry_id uuid:=gen_random_uuid();cat_owner uuid:=gen_random_uuid();cat_debtor uuid:=gen_random_uuid();today date:=(now() AT TIME ZONE 'America/Sao_Paulo')::date;root_id uuid:=gen_random_uuid();op uuid:=gen_random_uuid();req jsonb;result jsonb;context jsonb;before_n integer;root2 uuid:=gen_random_uuid();newcat uuid:=gen_random_uuid();childcat uuid:=gen_random_uuid();
+BEGIN
+ INSERT INTO public.usuarios(id_usuario,nome,email) VALUES(owner_id,'Verificação credor',owner_id||'@example.invalid'),(debtor_id,'Verificação devedor',debtor_id||'@example.invalid'),(third_id,'Verificação terceiro',third_id||'@example.invalid');
+ INSERT INTO public.contas(id_conta,id_usuario,nome_conta) VALUES(bank_owner,owner_id,'Verificação credor'),(bank_debtor,debtor_id,'Verificação devedor');
+ INSERT INTO public.categorias(id_categoria,nome,tipo,criado_por) VALUES(cat_owner,'Categoria credor','Despesa',owner_id),(cat_debtor,'Categoria devedor','Despesa',debtor_id);
+ INSERT INTO public.lancamentos(id_lancamento,tipo,descricao,valor_total,data_ocorrencia,mes_referencia,tipo_origem,id_origem,status,criado_por_id,id_categoria) VALUES(entry_id,'Despesa','Verificação rateio v4',300,today,date_trunc('month',today)::date,'Conta',bank_owner,'Efetivado',owner_id,cat_owner);
+ INSERT INTO public.rateios(id_lancamento,id_usuario_responsavel,id_usuario_credor,valor_rateado,status,criado_por_id) VALUES(entry_id,owner_id,owner_id,100,'Pendente',owner_id),(entry_id,debtor_id,owner_id,100,'Pendente',owner_id),(entry_id,third_id,owner_id,100,'Pendente',owner_id);
+ ASSERT mukirana_rateios.saldo(owner_id,debtor_id,NULL)=100,'Dívida original';
+ ASSERT mukirana_rateios.saldo(debtor_id,owner_id,NULL)=-100,'Simetria bilateral';
+ context:=public.rpc_rateios_contexto_v4(debtor_id,NULL,NULL);
+ ASSERT jsonb_array_length(context->'items')=1,'Participante consulta original';
+ ASSERT (context->'items'->0->>'financeOwner')::uuid=owner_id,'Responsável financeiro';
+ ASSERT position(bank_owner::text IN context::text)=0,'Conta alheia oculta';
+ ASSERT position(cat_owner::text IN context::text)=0,'Categoria alheia oculta';
+ ASSERT jsonb_array_length(public.rpc_lancamentos_listar_v3(debtor_id,NULL,NULL)->'entries')=0,'Sem despesa automática para participante';
+ PERFORM public.rpc_rateios_mutar_v4(debtor_id,gen_random_uuid(),jsonb_build_object('action','category','id',entry_id,'category',cat_debtor));
+ ASSERT (SELECT id_categoria_v4=cat_debtor FROM public.rateios WHERE id_lancamento=entry_id AND id_usuario_responsavel=debtor_id),'Categoria própria persistente';
+ ASSERT position(cat_debtor::text IN public.rpc_rateios_contexto_v4(owner_id,NULL,NULL)::text)=0,'Categoria privada';
+ SELECT count(*) INTO before_n FROM public.lancamentos;
+ req:=jsonb_build_object('action','settle','id',root_id,'version',0,'side','pay','other',owner_id,'amountCents','5000','date',today,'account',bank_debtor,'entryId',gen_random_uuid());
+ result:=public.rpc_rateios_mutar_v4(debtor_id,op,req);
+ ASSERT mukirana_rateios.saldo(owner_id,debtor_id,NULL)=50,'Reserva do pagamento';
+ ASSERT (SELECT count(*) FROM public.lancamentos)=before_n+1,'Apenas despesa própria';
+ ASSERT public.rpc_rateios_mutar_v4(debtor_id,op,req)=result,'Repetição idempotente';
+ ASSERT (SELECT count(*) FROM public.lancamentos)=before_n+1,'Sem duplicidade no retry';
+ result:=public.rpc_rateios_mutar_v4(owner_id,gen_random_uuid(),jsonb_build_object('action','settle','id',root_id,'version',(result->'settlement'->>'version')::integer,'side','receive','other',debtor_id,'amountCents','5000','date',today,'account',bank_owner,'entryId',gen_random_uuid()));
+ ASSERT mukirana_rateios.saldo(owner_id,debtor_id,NULL)=50,'Receita não abate dívida outra vez';
+ ASSERT (SELECT count(*) FROM public.lancamentos)=before_n+2,'Receita somente após ação do dono';
+ ASSERT position(bank_debtor::text IN result::text)=0,'Acerto não expõe conta do outro';
+ result:=public.rpc_rateios_mutar_v4(owner_id,gen_random_uuid(),jsonb_build_object('action','settle','id',root2,'version',0,'side','receive','other',debtor_id,'amountCents','5000','date',today,'account',bank_owner,'entryId',gen_random_uuid()));
+ ASSERT mukirana_rateios.saldo(owner_id,debtor_id,NULL)=0,'Recebedor pode iniciar';
+ ASSERT NOT (result->'settlement'->>'otherRegistered')::boolean,'Sem lançamento automático do devedor';
+ PERFORM public.rpc_rateios_mutar_v4(debtor_id,gen_random_uuid(),jsonb_build_object('action','settle','id',root2,'version',(result->'settlement'->>'version')::integer,'side','pay','other',owner_id,'amountCents','5000','date',today,'account',bank_debtor,'entryId',gen_random_uuid()));
+ ASSERT mukirana_rateios.saldo(owner_id,debtor_id,NULL)=0,'Complemento usa mesmo acerto';
+ BEGIN
+  PERFORM public.rpc_rateios_mutar_v4(debtor_id,gen_random_uuid(),req||jsonb_build_object('id',gen_random_uuid(),'entryId',gen_random_uuid(),'amountCents','1'));
+  RAISE EXCEPTION 'Esperava limite';
+ EXCEPTION WHEN raise_exception THEN IF SQLERRM<>'RT:debt_limit' THEN RAISE;END IF;END;
+ ASSERT mukirana_rateios.saldo(owner_id,third_id,NULL)=100,'Sem compensação com terceiro';
+ ASSERT NOT has_function_privilege('anon','public.rpc_rateios_mutar_v4(uuid,uuid,jsonb)','EXECUTE'),'RPC anônima bloqueada';
+ ASSERT NOT has_function_privilege('authenticated','public.rpc_rateios_contexto_v4(uuid,date,date)','EXECUTE'),'Sem identidade escolhida pelo cliente';
+ ASSERT NOT has_schema_privilege('anon','mukirana_rateios','USAGE'),'Schema privado';
+ ASSERT has_function_privilege('service_role','public.rpc_rateios_contexto_v4(uuid,date,date)','EXECUTE'),'Gateway autenticado';
+ INSERT INTO public.categorias(id_categoria,nome,tipo,criado_por) VALUES(newcat,'Meta principal','Despesa',owner_id);
+ INSERT INTO public.categorias(id_categoria,nome,tipo,criado_por,id_categoria_pai) VALUES(childcat,'Meta filha','Despesa',owner_id,newcat);
+ PERFORM public.rpc_rateios_mutar_v4(owner_id,gen_random_uuid(),jsonb_build_object('action','goal','category',childcat,'amountCents','10000'));
+ ASSERT (SELECT valor_teto=100 AND automatica_v4 FROM public.orcamentos WHERE id_usuario=owner_id AND id_categoria=newcat),'Principal automática';
+ PERFORM public.rpc_rateios_mutar_v4(owner_id,gen_random_uuid(),jsonb_build_object('action','goals','goals',jsonb_build_array(jsonb_build_object('category',newcat,'amountCents','5000'),jsonb_build_object('category',childcat,'amountCents','4000'))));
+ ASSERT (SELECT valor_teto=50 AND NOT automatica_v4 FROM public.orcamentos WHERE id_usuario=owner_id AND id_categoria=newcat),'Edição atômica da família';
+ ASSERT (SELECT valor_teto=40 FROM public.orcamentos WHERE id_usuario=owner_id AND id_categoria=childcat),'Subteto atualizado';
+END $$;
+ROLLBACK;
+SELECT jsonb_build_object('verification','rateios-v4','assertions',28,'persistedTestRows',0,'result','PASS') result;

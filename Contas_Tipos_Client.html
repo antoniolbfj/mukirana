@@ -4,8 +4,9 @@
   if (window.MukiranaContasTipos) window.MukiranaContasTipos.destroy();
   const root = document.getElementById('cn-root'); if (!root) return;
   const ua = navigator.userAgent || '';
-  const tablet = /iPad|Tablet|Android(?!.*Mobile)/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const phone = !tablet && (navigator.userAgentData?.mobile || /iPhone|iPod|Android.+Mobile/i.test(ua) ||
+  const handset=/iPhone|iPod|Android.+Mobile/i.test(ua);
+  const tablet = !handset && (/iPad|Tablet|Android(?!.*Mobile)/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+  const phone = handset || !tablet && (navigator.userAgentData?.mobile || /iPhone|iPod|Android.+Mobile/i.test(ua) ||
     (matchMedia('(pointer:coarse)').matches && Math.min(screen.width || innerWidth,screen.height || innerHeight) < 768));
   root.dataset.interface = phone ? 'phone' : 'large';
   root.querySelector('#cn-mount').append(root.querySelector(phone ? '#cn-phone-template' : '#cn-large-template').content.cloneNode(true));
@@ -20,6 +21,7 @@
   const dateText = value => value ? value.split('-').reverse().join('/') : '';
   const briefDate = value => value ? new Date(value+'T12:00:00Z').toLocaleDateString('pt-BR',{day:'numeric',month:'short',timeZone:'UTC'}).replace('.','') : '';
   const icon = shared => shared ? '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6m3 9v-3a6 6 0 0 0-2-4"/></svg>' : '<svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5M4 10h16M6 10v8m6-8v8m6-8v8M3 20h18"/></svg>';
+  if(window.MukiranaContasContext){$('type-filter').value=window.MukiranaContasContext;window.MukiranaContasContext=null;}
   let alive=true, accounts=[], info=null, epoch=0, forecastState='loading', deltas={}, periodDeltas={}, draft=null, busy=false;
   let sign=1, lastFocus=null, activeOverlay=null, actionId=null, toastTimer=null, searchTimer=null;
   let historyId=null, historyCursor=null, historyRows=[], historyEpoch=0, historyBusy=false, userEpoch=0, people=[];
@@ -242,7 +244,7 @@
     if(window.MukiranaContasTipos===api){document.body.classList.remove('contas-nova-smartphone');document.body.style.overflow='';delete window.MukiranaContasTipos;}
   }
   const api={destroy,refresh:reload};window.MukiranaContasTipos=api;
-  if(typeof registrarTelaAtualMukirana==='function')registrarTelaAtualMukirana('ContasTipos',{atualizarPeriodoGlobal:reload,obterContextoNovoLancamento:filters});
+  if(typeof registrarTelaAtualMukirana==='function')registrarTelaAtualMukirana('Contas',{atualizarPeriodoGlobal:reload,obterContextoNovoLancamento:filters});
   reload();
 })();
 </script>

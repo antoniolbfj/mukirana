@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright
 import json, re
 ROOT=Path(__file__).resolve().parents[1]
-HTML=(ROOT/'Lancamentos_Prototipo_Demo.html').read_text()
-WRAPPER=(ROOT/'Lancamentos_Prototipo_View.html').read_text()
+HTML=(ROOT/'docs/archive/telas-anteriores-v40/Lancamentos_Prototipo_Demo.html').read_text()
+WRAPPER=(ROOT/'docs/archive/telas-anteriores-v40/Lancamentos_Prototipo_View.html').read_text()
 OUT=Path('/workspace/work/lancamentos-prototipo');OUT.mkdir(parents=True,exist_ok=True)
 RESULTS=[]
 

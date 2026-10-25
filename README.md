@@ -54,33 +54,25 @@ Detalhes da preparação e limites da validação estão em
 
 ## Remodelagem das telas
 
-Contas possui duas interfaces próprias (computadores/tablets e smartphones), foi
-homologada e passou a ser o acesso principal **Contas**, sem menu provisório.
-O saldo inicial é um lançamento especial; a migração foi aplicada no Supabase.
-[Entrega de Contas](docs/contas-entrega.md).
+Os acessos principais passam a ser Painel geral, Lançamentos, Contas, Cartões,
+Rateios e acertos e Metas, conforme autorização mais recente do usuário para
+promover as novas interfaces e retirar as antigas. As demais telas da versão 1
+continuam disponíveis até suas rodadas de revisão. Não há menus provisórios
+concorrentes. A homologação dos recursos novos continua separada da publicação.
 
-Cartões foi homologado e promovido ao acesso principal **Cartões**, com duas
-interfaces dedicadas e dados reais. O menu provisório foi removido.
-[Entrega e testes](docs/cartoes-entrega.md) e [registro da promoção](docs/cartoes-promocao.json).
-A paleta global será revista após a remodelagem das telas.
+[Entrega da rodada: comportamento, banco e testes](docs/rateios-painel-entrega.md).
+[Registro de publicação e hashes da versão](docs/rateios-painel-publicacao.json).
+[Pendências vigentes](docs/pendencias-requisitos.md).
 
-[Produção com Contas e Cartões homologados — versão 36](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec).
-O endereço antigo de avaliação de Contas permanece na versão 34 e não é a produção.
+[Produção](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec)
+e [avaliação](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec)
+conservam seus endereços. As interfaces antigas estão em
+`docs/archive/telas-anteriores-v40`, excluídas do push ao Apps Script. O protótipo
+fictício permanece somente como documento histórico.
 
-[Avaliar Lançamentos — menu Lançamentos (novo)](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec).
-Implementação conectada, com interfaces dedicadas, período/saldo globais e fórmula
-única R−D±transferências. A tela principal atual permanece até homologação.
-[Entrega e verificação](docs/lancamentos-entrega.md). O protótipo independente
-permanece como histórico em `docs/prototipos/lancamentos.html`.
-
-Contas ampliada para avaliação no menu **Contas (tipos)**: Consumo, Investimento e
-Crédito ligado aos cartões existentes, saldos atuais/projetados e patrimônio
-separados. [Requisitos e testes](docs/contas-tipos-entrega.md). A tela principal
-homologada permanece até a aprovação da atualização.
-
-[Proposta do novo Painel geral](docs/proposta-dashboard.md), com os contratos
-financeiros desta base e prévias próprias para computador/tablet e smartphone.
-O Dashboard principal será substituído após a avaliação e implementação conectada.
-
-[Proposta de Rateios e acertos](docs/proposta-rateios.md), incluídos na rodada do
-Dashboard, com levantamento do que já existe e da integração ainda pendente.
+Contas e Cartões anteriores foram homologados. A ampliação de Contas inclui
+Consumo, Investimento e Crédito ligado aos cartões existentes. Lançamentos usa
+R−D±transferências; direitos de rateio ficam separados em A acertar. Acertos são
+registrados pelas próprias pessoas como despesa/receita e vinculados uma única vez.
+Patrimônio usa somente contas de Investimento. Cada tela nova tem estruturas
+próprias para computadores/tablets e smartphones. A paleta global fica para o final.

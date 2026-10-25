@@ -37,9 +37,9 @@ console.log('Exact decimal sum for Apps Script, including aggregates beyond safe
 // Homologação: a rota principal e os acessos contextuais abrem a tela aprovada.
 const router = vm.createContext({obterSessaoObrigatoria:()=>({id}),HtmlService:{createTemplateFromFile:n=>({evaluate:()=>({getContent:()=>n})})}});
 vm.runInContext(fs.readFileSync('App_Main.js','utf8'),router);
-assert.equal(router.obterHtmlDaTela('Contas','valid'),'Contas_Nova_View');
-assert.equal(router.obterHtmlDaTela('ContasNova','valid'),'Contas_Nova_View');
+assert.equal(router.obterHtmlDaTela('Contas','valid'),'Contas_Tipos_View');
+assert.equal(router.obterHtmlDaTela('ContasNova','valid'),'Contas_Tipos_View');
 assert.equal((fs.readFileSync('Index.html','utf8').match(/onclick="navegarPara\('Contas'\)"/g)||[]).length,1);
 assert.equal(fs.readFileSync('Index.html','utf8').includes('Contas (nova)'),false);
-assert.equal(fs.readFileSync('Lancamentos_View.html','utf8').includes("navegarPara('ContasNova')"),false);
+assert.equal(fs.readFileSync('Lancamentos_Novo_Client.html','utf8').includes("navegarPara('ContasNova')"),false);
 console.log('Approved Accounts promoted to main route, single menu and compatible alias: PASS');

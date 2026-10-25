@@ -56,17 +56,20 @@
           </div>
         </div>
       </div>
+      <style>.lista-menu .menu-group{padding:18px 20px 4px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}</style>
       <ul class="lista-menu">
-        <li><a href="javascript:void(0)" onclick="navegarPara('Dashboard')">📊 Dashboard</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Dashboard')">Painel geral</a></li>
+        <li class="menu-group" aria-hidden="true">Movimentações</li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Lancamentos')">Lançamentos</a></li>
-        <li><a href="javascript:void(0)" onclick="navegarPara('ContasTipos')">Contas (tipos) <span style="font-size:10px;opacity:.8">AVALIAÇÃO</span></a></li>
-        <li><a href="javascript:void(0)" onclick="navegarPara('LancamentosNovo')">Lançamentos (novo) <span style="font-size:10px;opacity:.8">AVALIAÇÃO</span></a></li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Contas')">Contas</a></li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Cartoes')">Cartões</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Rateios')">Rateios e acertos</a></li>
+        <li class="menu-group" aria-hidden="true">Organização</li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Categorias')">Categorias</a></li>
-        <li><a href="javascript:void(0)" onclick="navegarPara('Orcamentos')">Orçamento</a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('Orcamentos')">Metas</a></li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Recorrencias')">Recorrências</a></li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Projetos')">Projetos</a></li>
+        <li class="menu-group" aria-hidden="true">Administração</li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Usuarios')">Usuários</a></li>
         <li class="item-menu-saida"><a href="javascript:void(0)" onclick="fazerLogout()">Sair do Sistema</a></li>
       </ul>
@@ -1070,6 +1073,7 @@
     }
 
     function fecharTelaContextualMukirana(recarregarOrigem) {
+      if(window.MukiranaLancamentosNovo?.beforeNavigate(()=>fecharTelaContextualMukirana(recarregarOrigem)))return;
       const overlay = document.getElementById('modal-tela-contextual');
       const conteudo = document.getElementById('conteudo-modal-contextual');
 
@@ -1135,6 +1139,8 @@
     }
 
     function navegarPara(nomeTela) {
+      if(nomeTela==='Orcamentos')window.MukiranaPainelContext={goals:true};
+      if(nomeTela==='Rateios')window.MukiranaLancamentosContext={rateios:true};
       if (window.MukiranaLancamentosNovo && window.MukiranaLancamentosNovo.beforeNavigate(function(){ navegarPara(nomeTela); })) return;
       const container = document.getElementById('conteudo-tela');
 

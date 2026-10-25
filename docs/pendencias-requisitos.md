@@ -4,51 +4,48 @@ Atualizado em 25/10/2026. Supabase `wcczkultokrypdfimbsh`.
 
 ## Estado atual
 
-- Contas e Cartões homologados e principais na produção versão 36.
-- Lançamentos conectado implementado no menu provisório **Lançamentos (novo)**,
-  com interfaces próprias, fórmula única R−D±transferências, filtros dependentes,
-  período/saldo globais, rascunho explícito, geração finita, favoritos, cadastro
-  contextual e aprovações. Migração aplicada e testes concluídos. Detalhes em
-  [lancamentos-entrega.md](lancamentos-entrega.md).
-- A versão conectada substitui o protótipo fictício na implantação de avaliação;
-  código inicial na versão 39 em `lancamentos-publicacao.json`; a avaliação vigente
-  é a **versão 40**, registrada em `contas-tipos-publicacao.json`.
-- Contas ampliada no menu **Contas (tipos)**: três tipos, vínculo único ao grupo
-  existente, saldos derivados, inicial nos indicadores, exclusão protegida e
-  pagamentos de fatura como transferências, com testes locais de upgrade/concorrência e
-  navegador; migração aplicada e 29 ASSERTs remotos em ROLLBACK. Ver [contas-tipos-entrega.md](contas-tipos-entrega.md).
+Contas e Cartões remodelados foram homologados. A rodada atual promove a ampliação
+de Contas, Lançamentos conectado, Rateios/Acertos, Painel geral e Metas aos acessos
+principais, conforme autorização expressa para organizar menus e retirar telas
+antigas. Publicação e versão estão em `rateios-painel-publicacao.json`.
+Isso identifica implantação; não atribui homologação às funções novas.
 
-- Revisão do Dashboard concluída e [proposta visual](proposta-dashboard.md)
-  preparada para computador/tablet e smartphone, com fórmula conciliada e exemplos
-  fictícios identificados. A prévia não altera o Dashboard em produção.
-
-- Rateios incluídos na rodada com o Dashboard. Revisados documento, código e banco:
-  942 participações/471 lançamentos e 3 acertos preservados. A avaliação tem base de
-  divisão/aprovações, mas o módulo completo ainda é parcial. Ver [proposta de Rateios](proposta-rateios.md).
-- Regra confirmada: gasto de R$ 300 rateado continua R$ 300 no saldo financeiro;
-  R$ 200 a receber aparecem separadamente em A acertar até os pagamentos.
-- Acertos são pagamentos/recebimentos do saldo total ou parcial, com lançamentos
-  especiais de despesa/receita feitos pelos respectivos usuários. Não quitar
-  despesa por despesa nem abater duas vezes pelas duas pontas do mesmo acerto.
+Implementados: fórmula única R−D±transferências; período/saldo globais; filtros
+dependentes; rascunho explícito; parcelamentos/recorrências finitas; três tipos de
+contas e crédito vinculado aos cartões; responsável financeiro correto; rateios
+com categoria privada persistente, revisão e reaprovação por conjunto; convites;
+acertos agregados parciais em ambas as direções; limite concorrente e repetição
+segura; patrimônio separado; painel conectado e metas mensais hierárquicas.
+Ver [entrega e verificações](rateios-painel-entrega.md).
 
 ## Pendências vigentes
 
-1. Homologar Lançamentos conectado em computador/tablet e smartphone; depois
-   promover ao acesso principal e retirar o menu provisório.
-2. Homologar Contas (tipos), incluindo a classificação das contas antigas de
-   investimento; depois promover a atualização ao acesso principal.
-3. Completar Rateios em Lançamentos: categoria individual persistente, visão
-   autorizada do participante, divisão/alcances, reaprovações e proteção dos IDs
-   vinculados a acertos; distinguir autoria e responsável financeiro em adicionais.
-4. Completar acertos bilaterais: parciais, confirmação/recusa, limites concorrentes,
-   antecipações registradas e ações Pagar/Receber como despesa/receita especiais,
-   registradas por cada usuário e vinculadas a um único abatimento, preservando os legados.
-5. Avaliar e implementar o Dashboard com A acertar e Consumo/Crédito separados
-   do patrimônio em Investimento; integrar metas, classificações e estornos sem duplicidade.
-6. Remodelar as demais telas, incluindo Faturas/pagamentos em rodada própria.
-7. Revisar a paleta global depois da remodelagem de todas as telas.
+1. **Homologação:** avaliar as funcionalidades novas de Contas, Lançamentos,
+   Rateios/Acertos, Painel e Metas em computador/tablet e smartphone. Os acessos já
+   são principais por autorização do usuário; não aguardam outra promoção de menu.
+2. **Classificação do histórico:** identificar quais contas antigas são de
+   Investimento e revisar registros sem classificação fixa/variável e categorias
+   pessoais pendentes. Não inferir pelo nome ou por ser recorrente/parcelado.
+3. **Estornos e análises complementares:** desenhar correção/estorno explícito de
+   acertos com ambas as pontas registradas, sem apagar a movimentação alheia;
+   aprofundar devoluções e a análise comparativa de receitas/despesas fixas e
+   variáveis (IND-05). O painel já sinaliza classificação insuficiente e calcula
+   comprometimento quando há base completa; não entrega ainda todas essas análises.
+4. **Relatórios configuráveis (REL-01 a REL-04):** concluir motor de campos,
+   dimensões, agrupamentos e cálculos, apresentação interativa e exportações em PDF
+   e planilha, usando a mesma consolidação e respeitando a privacidade. Não foi
+   implementado como parte deste painel enxuto.
+5. **Demais telas e requisitos da versão 1:** revisar e remodelar Faturas e seus
+   pagamentos, Categorias, Recorrências legadas, Projetos e Usuários/autenticação,
+   confrontando cada rotina existente com o documento vigente. São módulos
+   existentes; a ausência de remodelagem não significa ausência funcional.
+6. **Paleta global:** revisar após a remodelagem das demais telas.
 
-O backlog anterior ao reinício permanece arquivado. Os demais módulos existentes
-na versão 1 não são considerados ausentes sem uma revisão de seus requisitos.
-As recorrências antigas conservam seu gerador e interface de manutenção; a nova
-recorrência finita usa conjuntos próprios, evitando geração duplicada.
+As decisões posteriores do usuário substituem os modos participação/caixa e o
+acerto tratado como transferência: cada pessoa registra sua própria despesa/receita
+especial, e as pontas do mesmo acerto abatem a dívida uma única vez. Pagamentos de
+fatura existentes preservam sua natureza e não ganham movimentos duplicados.
+
+O backlog anterior ao reinício permanece arquivado. As recorrências antigas
+conservam seu gerador e manutenção; as novas finitas usam conjuntos próprios,
+com deduplicação das previsões históricas.

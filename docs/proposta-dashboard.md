@@ -1,5 +1,7 @@
 # Proposta do novo Painel geral
 
+> Proposta aprovada e implementada nesta rodada. Estado vigente, testes e publicação: [entrega conectada](rateios-painel-entrega.md). As descrições de menus provisórios e análises somente de leitura abaixo registram a fase da proposta.
+
 Base: documento v0.1 e decisões posteriores, especialmente a fórmula única
 Receitas − Despesas ± Transferências. Contas já oferece Consumo, Investimento e
 Crédito vinculado aos cartões existentes. Esta é uma proposta para avaliação;

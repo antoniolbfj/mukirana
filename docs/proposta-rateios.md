@@ -1,5 +1,7 @@
 # Proposta de implementação de Rateios nesta rodada
 
+> Proposta aprovada e implementada nesta rodada. Estado vigente, testes e publicação: [entrega conectada](rateios-painel-entrega.md). As descrições de menus provisórios e análises somente de leitura abaixo registram a fase da proposta.
+
 Revisão em 25/10/2026 do documento v0.1 (RAT-01 a RAT-13, APR-01 a APR-05,
 ACE-01 a ACE-09, CAT-09 e regras de geração). Comparação com o código vigente,
 a avaliação v40 e a estrutura real do Supabase `wcczkultokrypdfimbsh`.

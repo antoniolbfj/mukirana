@@ -3,8 +3,8 @@
  'use strict';
  if(window.MukiranaCartoesNovo)window.MukiranaCartoesNovo.destroy();
  const root=document.getElementById('ct-root');if(!root)return;
- const ua=navigator.userAgent||'',tablet=/iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
- const phone=!tablet&&(navigator.userAgentData?.mobile||/iPhone|iPod|Android.+Mobile/i.test(ua)||(matchMedia('(pointer:coarse)').matches&&Math.min(screen.width||innerWidth,screen.height||innerHeight)<768));
+ const ua=navigator.userAgent||'',handset=/iPhone|iPod|Android.+Mobile/i.test(ua),tablet=!handset&&(/iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1));
+ const phone=handset||!tablet&&(navigator.userAgentData?.mobile||/iPhone|iPod|Android.+Mobile/i.test(ua)||(matchMedia('(pointer:coarse)').matches&&Math.min(screen.width||innerWidth,screen.height||innerHeight)<768));
  root.classList.toggle('phone',phone);root.dataset.interface=phone?'phone':'large';
  root.querySelector('#ct-mount').append(root.querySelector(phone?'#ct-phone-template':'#ct-large-template').content.cloneNode(true));
  document.body.classList.toggle('cartoes-novo-smartphone',phone);
@@ -110,7 +110,7 @@
  const observer=new MutationObserver(()=>{if(!root.isConnected)destroy();});observer.observe(root.parentNode,{childList:true});
  function destroy(){if(!alive)return;alive=false;epoch++;detailEpoch++;editorEpoch++;usersEpoch++;clearTimeout(userTimer);clearTimeout(toastTimer);events.abort();observer.disconnect();if(window.MukiranaCartoesNovo===api){document.body.classList.remove('cartoes-novo-smartphone');document.body.style.overflow=overlay?oldOverflow:document.body.style.overflow;delete window.MukiranaCartoesNovo;}}
  const api={destroy,refresh:reload};window.MukiranaCartoesNovo=api;
- if(typeof registrarTelaAtualMukirana==='function')registrarTelaAtualMukirana('CartoesNovo',{atualizarPeriodoGlobal:reload,obterContextoNovoLancamento:filters});
+ if(typeof registrarTelaAtualMukirana==='function')registrarTelaAtualMukirana('Cartoes',{atualizarPeriodoGlobal:reload,obterContextoNovoLancamento:filters});
  reload();
 })();
 </script>
