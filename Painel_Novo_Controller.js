@@ -4,10 +4,11 @@ function painelNovoListar(token,filters){
  const months=[-1,0,1].map(function(n){return P.shiftMonth(reference,n);});
  const calendarEnd=P.monthEnd(months[2]),queryEnd=[end||'',calendarEnd,reference.slice(0,4)+'-12-31',today].sort().pop();
  const data=H.read(u,{first:null,last:queryEnd}),allRows=H.rows(data),personalRows=P.participations(data,u.id,allRows,C),analysisRows=personalRows.filter(function(r){return (!start||r.date>=start)&&r.date<=(end||calendarEnd);}),rows=allRows.filter(function(r){return (!start||r.date>=start)&&r.date<=(end||calendarEnd);}),calendarRows=allRows.filter(function(r){return r.date>=months[0]+'-01'&&r.date<=calendarEnd;});
+ const rateiosSummary=painelNovoResumoRateios_(u,p),calendarRateios={};months.forEach(function(month){calendarRateios[month]=month===reference?rateiosSummary:painelNovoResumoRateios_(u,H.period({Mes_Referencia:month}));});
  const positions=contasTiposListar(token,filters),forecast={deltas:{},periodDeltas:{}};
  allRows.filter(function(r){return r.special==='projection'&&r.date<=(end||ContasNova_.today());}).forEach(function(r){forecast.deltas[r.account]=C.add(forecast.deltas[r.account]||'0',r.signedCents);if(!start||r.date>=start)forecast.periodDeltas[r.account]=C.add(forecast.periodDeltas[r.account]||'0',r.signedCents);});
 
- return {user:{id:u.id,name:u.nome||''},period:p,today:today,rows:rows,analysisRows:analysisRows,calendarRows:calendarRows,months:months,accounts:data.accounts,categories:data.categories,rateios:data.rateios,rateiosSummary:painelNovoResumoRateios_(u,p),goals:RateiosNovo_.rpc('rpc_painel_metas_v4',{p_usuario:u.id}),positions:positions.accounts.filter(function(a){return a.ownerId===u.id;}),forecast:forecast,wealth:P.wealth(data.accounts.filter(function(a){return a.owner===u.id&&a.type==='Investimento';}),allRows,today,reference,C)};
+ return {user:{id:u.id,name:u.nome||''},period:p,today:today,rows:rows,analysisRows:analysisRows,calendarRows:calendarRows,months:months,accounts:data.accounts,categories:data.categories,rateios:data.rateios,rateiosSummary:rateiosSummary,calendarRateios:calendarRateios,goals:RateiosNovo_.rpc('rpc_painel_metas_v4',{p_usuario:u.id}),positions:positions.accounts.filter(function(a){return a.ownerId===u.id;}),forecast:forecast,wealth:P.wealth(data.accounts.filter(function(a){return a.owner===u.id&&a.type==='Investimento';}),allRows,today,reference,C)};
 }
 /** Recorte de consulta, separado dos limites operacionais que incluem o futuro. */
 function painelNovoResumoRateios_(user,period){return RateiosNovo_.rpc('rpc_painel_rateios_periodo_v10',{p_usuario:user.id,p_inicio:period.first,p_fim:period.last||painelNovoRegras_().monthEnd(ContasNova_.today().slice(0,7))});}
@@ -39,7 +40,7 @@ function painelNovoRegras_(){
  function compute(pack,includeInvestment,C){
   const accounts=new Map(pack.accounts.map(a=>[a.id,a])),cats=new Map(pack.categories.map(c=>[c.id,c]));
   const scope=rows=>rows.filter(r=>includeInvestment||accounts.get(r.account)?.type!=='Investimento');
-  const rows=scope(pack.rows),summary=C.summarize(rows),months=pack.months.map(month=>({month,...C.summarize(scope(pack.calendarRows.filter(r=>r.date.slice(0,7)===month)))}));
+  const rows=scope(pack.rows),summary=C.availability(C.summarize(rows),pack.rateiosSummary?.balances||[],pack.rateios?.settlements,pack.period.end?monthEnd(pack.period.end):null),months=pack.months.map(month=>({month,...C.availability(C.summarize(scope(pack.calendarRows.filter(r=>r.date.slice(0,7)===month))),pack.calendarRateios?.[month]?.balances||[],pack.rateios?.settlements,monthEnd(month))}));
   const analysisRows=(pack.analysisRows||pack.rows.filter(r=>r.special!=='settlement')).filter(r=>includeInvestment||(r.accountType||accounts.get(r.account)?.type)!=='Investimento');
   const consumption=C.summarize(analysisRows);
   const totals=new Map(),root=id=>{let c=cats.get(id),seen=new Set();while(c?.parent&&!seen.has(c.parent)){seen.add(c.parent);c=cats.get(c.parent)||c;}return c?.id||id||'uncategorized';};

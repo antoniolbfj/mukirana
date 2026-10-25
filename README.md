@@ -10,10 +10,14 @@ Mês global com saldo anterior opcional, rateios na própria lista, categoria pe
 padrão e cadastro vinculado à fatura aberta. Contas e Painel abrem Lançamentos em
 modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
 
-O Painel segue cinco linhas e o saldo do rateio respeita o mês/histórico escolhido.
-Ver [correção do Painel](docs/painel-periodo-entrega.md) e
+O Painel segue cinco linhas e o saldo devedor do rateio respeita o fim do mês
+escolhido. **Ainda posso gastar** agora desconta os compromissos de rateio,
+sem repetir o desconto quando o pagamento é registrado. As subcategorias
+começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v53.
+Ver [disponibilidade e teclado](docs/disponivel-rateios-entrega.md),
+[correção do Painel](docs/painel-periodo-entrega.md) e
 [entrega anterior](docs/lancamentos-contextos-entrega.md),
-[publicação vigente](docs/painel-periodo-publicacao.json) e
+[publicação vigente](docs/disponivel-rateios-publicacao.json) e
 [pendências vigentes](docs/pendencias-requisitos.md). Homologação de uso permanece
 pendente; os acessos principais foram atualizados por autorização do usuário.
 
@@ -95,7 +99,7 @@ próprias para computadores/tablets e smartphones. Claro, Escuro e Sépia estão
 Entrega posterior concluída: rateios históricos de **julho a outubro/2026**
 conciliados com os movimentos existentes, com reconhecimento especial dos antigos,
 exclusão dos novos duplicados e ajustes de quitação sem movimento bancário.
-Produção e avaliação vigentes: **versão46**. Ver
+Publicada na **versão46** (registro histórico). Ver
 [conciliação](docs/conciliacao-rateios-entrega.md) e
 [publicação](docs/conciliacao-rateios-publicacao.json).
 

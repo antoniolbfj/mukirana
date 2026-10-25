@@ -39,6 +39,14 @@ function lancamentosNovoRegras_() {
     const transfers=add(incoming,negate(outgoing));
     return {incomeCents:income,expenseCents:expense,transferInCents:incoming,transferOutCents:outgoing,transferCents:transfers,openingCents:opening,resultCents:add(add(income,negate(expense)),transfers),count:rows.length};
   }
+  // Capacidade de gasto: caixa do recorte menos obrigações ainda sem saída própria.
+  function availability(summary,balances,settlements,end){
+    let payable='0',receivable='0',pendingPayments='0';
+    for(const b of balances||[]){const value=String(b.balanceCents);if(!cents(value))throw Error('Saldo de rateio inválido.');if(compare(value,'0')<0)payable=add(payable,negate(value));else receivable=add(receivable,value);}
+    for(const s of settlements||[]){if(s.side!=='pay'||s.mode==='adjustment'||!['Aguardando_Credor','Efetivado'].includes(s.status))continue;const effective=s.date||s.otherDate;if(!effective||(end&&effective>end))continue;if(s.ownRegistered&&s.date&&(!end||s.date<=end))continue;const amount=String(s.amountCents);if(!cents(amount)||compare(amount,'0')<0)throw Error('Acerto inválido.');pendingPayments=add(pendingPayments,amount);}
+    const reserved=add(payable,pendingPayments);return Object.assign({},summary,{cashResultCents:summary.resultCents,rateioPayableCents:payable,rateioReceivableCents:receivable,pendingSettlementCents:pendingPayments,reservedCents:reserved,availableCents:add(summary.resultCents,negate(reserved))});
+  }
+  function categoryLabel(category,categories){if(!category)return '';if(!category.parent)return category.name;const parent=(categories||[]).find(c=>c.id===category.parent);return category.name+(parent?' (subcategoria de '+parent.name+')':' (subcategoria)');}
   function query(rows,input){const f=clean(input),filtered=windowRows(rows,f).filter(r=>matches(r,f));return {rows:filtered,filters:f,options:facets(rows,f),summary:summarize(filtered)};}
-  return {windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
+  return {availability:availability,categoryLabel:categoryLabel,windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
 }

@@ -1,0 +1,73 @@
+{
+  "status": "ready for publication",
+  "version": 53,
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migrations": [],
+  "financialRowsRewritten": false,
+  "checks": {
+    "pureRules": 19,
+    "backendIntegration": 14,
+    "rateiosRegressionChecks": 63,
+    "wealthPersonalConsumptionAccountsAndSignals": "PASS",
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "productionReadOnlyReview": "PASS - paid history and outstanding month reviewed",
+    "productionFinancialTestEntriesCreated": false,
+    "authenticatedUserAcceptance": "pending"
+  },
+  "changedRuntimeFromV52": [
+    "Lancamentos_Hub_Client.html",
+    "Lancamentos_Novo_Client.html",
+    "Lancamentos_Novo_Controller.js",
+    "Lancamentos_Novo_Regras.js",
+    "Painel_Novo_Client.html",
+    "Painel_Novo_Controller.js",
+    "Rateios_Novo_Client.html",
+    "Saldo_Global_Client.html"
+  ]
+}

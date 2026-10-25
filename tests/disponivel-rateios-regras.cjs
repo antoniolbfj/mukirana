@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),{ctx}=require('./lancamentos-v3-gateway.cjs'),C=ctx.lancamentosNovoRegras_();let checks=0;const eq=(a,b)=>{assert.equal(a,b);checks++;};
+const cash=n=>C.summarize([{type:'income',signedCents:n,special:''}]),at=(n,balances=[],settlements=[])=>C.availability(cash(n),balances.map(balanceCents=>({balanceCents})),settlements,'2026-10-31');
+eq(at('100000',['-20000']).availableCents,'80000');eq(at('95000',['-15000']).availableCents,'80000');eq(at('80000',['0']).availableCents,'80000');
+eq(at('-30000',['20000']).availableCents,'-30000');eq(at('100000',['10000','-20000']).availableCents,'80000');eq(at('100000',['10000','-20000']).rateioReceivableCents,'10000');
+const pending={side:'pay',mode:'settlement',status:'Efetivado',amountCents:'10000',date:null,otherDate:'2026-10-10',ownRegistered:false,otherRegistered:true};
+eq(at('100000',['0'],[pending]).availableCents,'90000');eq(at('100000',['0'],[pending]).pendingSettlementCents,'10000');
+eq(at('90000',['0'],[{...pending,date:'2026-10-10',ownRegistered:true}]).availableCents,'90000');
+eq(at('100000',['-10000'],[{...pending,date:'2026-11-02',ownRegistered:true}]).reservedCents,'10000');
+eq(at('100000',[],[{...pending,otherDate:'2026-11-01'}]).availableCents,'100000');eq(at('100000',[],[{...pending,mode:'adjustment'}]).availableCents,'100000');
+eq(at('100000',[],[{...pending,status:'Rejeitado'}]).reservedCents,'0');eq(at('100000',[],[{...pending,status:'Cancelado'}]).reservedCents,'0');eq(at('100000',[],[{...pending,side:'receive'}]).reservedCents,'0');
+eq(at('999999999999999999',['-123456789012345']).availableCents,'999876543210987654');
+const cats=[{id:'food',name:'Alimentação',parent:null},{id:'child',name:'Restaurante',parent:'food'}];eq(C.categoryLabel(cats[1],cats),'Restaurante (subcategoria de Alimentação)');eq(C.categoryLabel(cats[0],cats),'Alimentação');eq(C.categoryLabel({...cats[1],parent:'private'},cats),'Restaurante (subcategoria)');
+console.log(JSON.stringify({checks,result:'PASS',coverage:'unpaid debt, partial/full payment, no anticipation of receivables, pending payer leg, future/rejected/adjustment, exact cents and keyboard-first category labels'}));

@@ -111,7 +111,7 @@ const LancamentosNovo_ = {
 };
 function lancamentosNovoListar(token,filters){
   const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();const period=LancamentosNovo_.period(filters),data=LancamentosNovo_.read(user,Object.assign({invoiceCalendar:true},period));
-  return {user:{id:user.id,name:user.nome||''},period:period,rows:LancamentosNovo_.rows(data),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:data.favorites,approvals:data.approvals,rateios:data.rateios};
+  return {user:{id:user.id,name:user.nome||''},period:period,rows:LancamentosNovo_.rows(data),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:data.favorites,approvals:data.approvals,rateios:data.rateios,rateiosSummary:painelNovoResumoRateios_(user,period)};
 }
 function lancamentosNovoConsultar(token,period,filters){
   const data=lancamentosNovoListar(token,period),core=LancamentosNovo_.core();return core.query(data.rows,filters);

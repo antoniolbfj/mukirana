@@ -10,9 +10,11 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 52**, com mês global/saldo anterior, fatura contextual, rateios na lista e
-modal de lançamentos em Contas/Painel. Publicação conferida em
-`painel-periodo-publicacao.json`. A versão48 entregou o hub e a retirada
+**versão 53**, com reserva dos compromissos de rateio no disponível, seletores de
+subcategoria acessíveis pelo teclado e os recursos anteriores de mês global,
+fatura contextual e modais. Publicação conferida em
+`disponivel-rateios-publicacao.json`. A versão52 reorganizou o Painel e corrigiu
+o saldo devedor até o mês. A versão48 entregou o hub e a retirada
 de Projetos; a versão47 corrigiu transferências após pagamentos de fatura.
 A versão46 acrescentou a identificação dos ajustes históricos de rateio. Registros anteriores:
 `painel-oficial-publicacao.json` e `conciliacao-rateios-publicacao.json`;
@@ -20,8 +22,12 @@ A versão46 acrescentou a identificação dos ajustes históricos de rateio. Reg
 
 Categorias e metas agora usam a participação pessoal, com a categoria privada de
 cada pessoa, independente do acerto. Não somam o original rateado e a própria parte,
-nem contam o acerto como novo consumo. A barra global mantém R−D±transferências e
-as contas mantêm seus movimentos reais. Ver [correção](correcao-participacoes-categorias.md).
+nem contam o acerto como novo consumo. O resultado dos lançamentos mantém
+R−D±transferências e as contas mantêm seus movimentos reais. A disponibilidade
+geral desconta os compromissos de rateio ainda a pagar, sem antecipar recebíveis
+nem descontar novamente pagamentos registrados. Ver
+[disponibilidade](disponivel-rateios-entrega.md) e
+[categorias](correcao-participacoes-categorias.md).
 
 UX modernizada nas telas principais, com paleta comum nas legadas, layouts próprios
 para telas grandes/pequenas, preferência de tema por usuário neste navegador e
@@ -71,6 +77,13 @@ acertos existentes uma única vez, inclusive antecipações, excluindo obrigaç�
 futuras do recorte. A checkbox define o histórico de lançamentos exibido.
 Ver [correção do Painel](painel-periodo-entrega.md). Homologação de uso pendente.
 
+A rodada atual corrige **Ainda posso gastar**: desconta a posição de rateios a
+pagar até o mês global e mantém reservado o acerto recebido pela outra pessoa
+enquanto faltar a própria saída. A barra e os cards mensais compartilham a regra;
+filtros da lista exibem Resultado do recorte com disponibilidade geral no detalhe.
+As subcategorias começam pelo nome, com a categoria mãe ao final, permitindo
+busca nativa pelo teclado. Ver [entrega](disponivel-rateios-entrega.md).
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -84,7 +97,9 @@ Ver [correção do Painel](painel-periodo-entrega.md). Homologação de uso pend
    com/sem saldo anterior, compras pela competência do cartão, inclusão na fatura
    aberta, rateios/categoria pessoal na lista e modais de Contas/Painel. Validar
    também a composição do Painel em cinco linhas e o saldo do rateio por mês,
-   com e sem Saldo anterior.
+   com e sem Saldo anterior. Validar a dedução dos rateios no disponível,
+   pagamentos parciais/totais sem nova dedução, recebimento iniciado pela outra
+   pessoa, resultado dos filtros e seleção de subcategorias pelo teclado.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.
