@@ -1,7 +1,7 @@
 /** Regras puras compartilhadas entre Apps Script e navegador via Function.toString(). */
 function lancamentosNovoRegras_() {
   'use strict';
-  const dimensions = ['type','account','category','mode','status'];
+  const dimensions = ['type','account','category','mode','status','sharing'];
   function add(a,b) {
     a=String(a);b=String(b);let negative=a[0]==='-',same=negative===(b[0]==='-');
     let x=negative?a.slice(1):a,y=b[0]==='-'?b.slice(1):b,out='',carry=0;
@@ -20,8 +20,9 @@ function lancamentosNovoRegras_() {
     if(f.search&&String(row.searchText||row.description||'').toLocaleLowerCase('pt-BR').indexOf(f.search)<0)return false;
     return true;
   }
-  function facets(rows,input){const f=clean(input),result={};for(const key of dimensions){const values={};for(const row of rows)if(matches(row,f,key)){const value=String(row[key]||'');if(value)values[value]=true;if(key==='category')for(const parent of row.categoryPath||[])if(parent)values[parent]=true;}result[key]=Object.keys(values);}return result;}
-  function valid(rows,input){const f=clean(input);if(!dimensions.some(k=>f[k]))return true;return rows.some(row=>matches(row,f));}
+  function windowRows(rows,input){const account=input&&input.account;return rows.filter(function(r){return account&&r.billingAccount===account?r.inInvoicePeriod!==false:r.inPeriod!==false;});}
+  function facets(rows,input){const f=clean(input),result={};rows=windowRows(rows,f);for(const key of dimensions){const values={};for(const row of rows)if(matches(row,f,key)){const value=String(row[key]||'');if(value)values[value]=true;if(key==='category')for(const parent of row.categoryPath||[])if(parent)values[parent]=true;}result[key]=Object.keys(values);}return result;}
+  function valid(rows,input){const f=clean(input);if(!dimensions.some(k=>f[k]))return true;return windowRows(rows,f).some(row=>matches(row,f));}
   function normalize(rows,input,changed){const f=clean(input),cleared=[];if(!changed||changed==='search'||valid(rows,f))return {filters:f,cleared:cleared};
     // Conta é sempre selecionável, inclusive sem movimentos. Recargas não apagam o recorte.
     const order=dimensions.filter(k=>k!=='account'&&k!==changed);
@@ -38,6 +39,6 @@ function lancamentosNovoRegras_() {
     const transfers=add(incoming,negate(outgoing));
     return {incomeCents:income,expenseCents:expense,transferInCents:incoming,transferOutCents:outgoing,transferCents:transfers,openingCents:opening,resultCents:add(add(income,negate(expense)),transfers),count:rows.length};
   }
-  function query(rows,input){const f=clean(input),filtered=rows.filter(r=>matches(r,f));return {rows:filtered,filters:f,options:facets(rows,f),summary:summarize(filtered)};}
-  return {dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
+  function query(rows,input){const f=clean(input),filtered=windowRows(rows,f).filter(r=>matches(r,f));return {rows:filtered,filters:f,options:facets(rows,f),summary:summarize(filtered)};}
+  return {windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
 }

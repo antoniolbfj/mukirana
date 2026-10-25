@@ -1,5 +1,5 @@
 <style>
-body:has(#ln-live-root) #fab-container{display:none!important}body:has(#ln-live-root) #conteudo-principal{padding-left:0;padding-right:0;padding-bottom:0}#ln-live-root iframe{display:block;width:100%;height:calc(100dvh - var(--ln-topbar-height,90px) - 16px);min-height:220px;border:0;background:var(--ux-canvas)}
+#modal-tela-contextual #ln-live-root iframe{height:calc(90dvh - 85px);min-height:250px}body:has(#ln-live-root) #fab-container{display:none!important}body:has(#ln-live-root) #conteudo-principal{padding-left:0;padding-right:0;padding-bottom:0}#ln-live-root iframe{display:block;width:100%;height:calc(100dvh - var(--ln-topbar-height,90px) - 16px);min-height:220px;border:0;background:var(--ux-canvas)}
 </style>
 <section id="ln-live-root"><iframe id="ln-live-frame" title="Lançamentos" sandbox="allow-scripts allow-forms" referrerpolicy="no-referrer"></iframe></section>
 <script>
@@ -9,34 +9,39 @@ const root=document.getElementById('ln-live-root'),frame=document.getElementById
 const contextual=typeof estaEmTelaContextualMukirana==='function'&&estaEmTelaContextualMukirana();
 const methods={save:'lancamentosNovoSalvar',detail:'lancamentosNovoDetalhar',action:'lancamentosNovoAcao',quick:'lancamentosNovoCadastroRapido',decide:'lancamentosNovoDecidir',hub:'lancamentosHubAtualizar',rateio:'rateiosNovoMutar',candidates:'rateiosNovoCandidatos'};
 function send(message){if(root.isConnected)frame.contentWindow?.postMessage({channel:'mk-lancamentos-live',...message},'*');}
-const unsubscribe=store.subscribe(pack=>send({type:'package',data:pack}));
+let initial={};try{initial=JSON.parse(localStorage.getItem('mukirana_filtros_lancamentos'))||{};}catch{}localStorage.removeItem('mukirana_filtros_lancamentos');
+const nextAction=localStorage.getItem('mukirana_acao_pendente')||'';localStorage.removeItem('mukirana_acao_pendente');
+const sourceContext=contextual?(window.mukiranaTelaContextual?.contexto||initial):initial;
+const invoice=contextual&&!!(sourceContext.ID_Grupo_Cartao||sourceContext.ID_Cartao),invoiceMonth=sourceContext.Mes_Final||sourceContext.Mes_Referencia||sourceContext.Mes_Inicial||store.getPeriod().Mes_Selecionado;
+const contextRequest={period:store.getPeriod(),account:sourceContext.ID_Conta||'',invoice,group:sourceContext.ID_Grupo_Cartao||'',card:sourceContext.ID_Cartao||'',month:invoiceMonth};
+let localPack=null,localPending=null,firstLoad=true;
+async function loadLocal(force=false){if(!contextual){if(firstLoad||force){firstLoad=false;return store.reload();}return store.load();}if(force)localPack=null;if(localPack)return localPack;if(localPending)return localPending;localPending=store.rpc('lancamentosContextoListar',contextRequest).then(pack=>{localPack=pack;send({type:'package',data:pack});return pack;}).finally(()=>localPending=null);return localPending;}
+const unsubscribe=contextual?()=>{}:store.subscribe(pack=>send({type:'package',data:pack}));
 window.addEventListener('message',async event=>{
  const message=event.data;if(!root.isConnected||event.source!==frame.contentWindow||message?.channel!=='mk-lancamentos-live'||!Number.isSafeInteger(message.requestId))return;
  const reply={requestId:message.requestId,ok:false};try{
-  if(message.type==='load')reply.data=await store.load();
+  if(message.type==='load')reply.data=await loadLocal();
   else if(message.type==='context'){
-   let previous={};try{previous=JSON.parse(localStorage.getItem('mukirana_filtros_lancamentos'))||{};}catch{}localStorage.removeItem('mukirana_filtros_lancamentos');
-   const next=localStorage.getItem('mukirana_acao_pendente')||'';localStorage.removeItem('mukirana_acao_pendente');
-   const pack=await store.load(),card=previous.ID_Cartao?pack.accounts.find(a=>a.id===previous.ID_Cartao):null,group=previous.ID_Grupo_Cartao?pack.accounts.find(a=>a.linkedGroup===previous.ID_Grupo_Cartao):null,context={filters:{account:previous.ID_Conta||card?.ledgerAccount||group?.id||'',category:previous.ID_Categoria||'',project:previous.ID_Projeto||'',type:({Receita:'income',Despesa:'expense',Transferência:'transfer'})[previous.Tipo]||'',search:previous.Texto||''},action:next,origin:previous.ID_Cartao||previous.ID_Conta||'',entry:previous.ID_Lancamento||''};
-   reply.data={...context,...(window.MukiranaLancamentosContext||{})};window.MukiranaLancamentosContext=null;
+   const previous=initial,pack=await loadLocal(),card=previous.ID_Cartao?pack.accounts.find(a=>a.id===previous.ID_Cartao):null,group=previous.ID_Grupo_Cartao?pack.accounts.find(a=>a.linkedGroup===previous.ID_Grupo_Cartao):null;
+   reply.data={filters:{account:previous.ID_Conta||card?.ledgerAccount||group?.id||'',category:previous.ID_Categoria||'',type:({Receita:'income',Despesa:'expense',Transferência:'transfer'})[previous.Tipo]||'',sharing:previous.Somente_Rateados?'shared':'',search:previous.Texto||''},action:nextAction,origin:previous.ID_Cartao||previous.ID_Conta||'',entry:previous.ID_Lancamento||'',invoiceContext:pack.invoiceContext||null,lockedAccount:contextual?previous.ID_Conta||'':'',...(window.MukiranaLancamentosContext||{}),rateios:previous.Somente_Rateados===true||window.MukiranaLancamentosContext?.rateios===true};window.MukiranaLancamentosContext=null;
   }else if(message.type==='views-load'||message.type==='views-save'){
-   const pack=await store.load(),key='mukirana-v8:'+pack.user.id+':ledger-views';
+   const pack=await loadLocal(),key='mukirana-v8:'+pack.user.id+':ledger-views';
    if(message.type==='views-load'){try{reply.data=JSON.parse(localStorage.getItem(key))||[];}catch{reply.data=[];}}
    else{const value=message.value;if(!Array.isArray(value)||value.length>20||JSON.stringify(value).length>50000)throw Error('Confira as visões salvas.');localStorage.setItem(key,JSON.stringify(value));reply.data=true;}
   }else if(message.type==='investment'){store.setInvestment(message.value===true);reply.data=true;}
-  else if(message.type==='reload')reply.data=await store.reload();
-  else if(message.type==='filters'){store.setFilters(message.value||{});reply.data=true;}
+  else if(message.type==='reload')reply.data=await loadLocal(true);
+  else if(message.type==='filters'){if(!contextual)store.setFilters(message.value||{});reply.data=true;}
   else if(message.type==='draft-load'||message.type==='draft-save'){
-   const pack=await store.load(),key='mukirana-v3:'+pack.user.id+':lancamentos-draft';
+   const pack=await loadLocal(),key='mukirana-v3:'+pack.user.id+':lancamentos-draft';
    if(message.type==='draft-load'){try{reply.data=JSON.parse(localStorage.getItem(key));}catch{reply.data=null;}}
    else {if(message.value===null)localStorage.removeItem(key);else{const text=JSON.stringify(message.value);if(text.length>300000)throw Error('O rascunho é muito grande.');localStorage.setItem(key,text);}reply.data=true;}
   }else if(message.type==='navigate'){
    const allowed=['Contas','ContasTipos','Cartoes','FaturasCartao','Recorrencias','Lancamentos'];if(!allowed.includes(message.value?.route))throw Error('Destino inválido.');
    if(message.value.route==='FaturasCartao'&&message.value.group){const period=store.getPeriod();localStorage.setItem('mukirana_fatura_cartao',JSON.stringify({ID_Grupo_Cartao:message.value.group,Mes_Inicial:period.Mes_Inicial,Mes_Final:period.Mes_Final,Retorno_Tela:'LancamentosNovo'}));}
-   navegarPara(message.value.route);reply.data=true;
+   if(contextual)fecharTelaContextualMukirana(false);navegarPara(message.value.route);reply.data=true;
   }else if(message.type==='editing'){api.editing=message.value?.active===true;reply.data=true;}
   else if(message.type==='leave-ok'){api.editing=false;const next=api.pendingExit;api.pendingExit=null;if(next)next();reply.data=true;}
-  else if(methods[message.type]){reply.data=await store.rpc(methods[message.type],message.value);if(!['detail','candidates'].includes(message.type)){await store.reload();if(contextual&&typeof atualizarTelaOrigemExternaContextualMukirana==='function')atualizarTelaOrigemExternaContextualMukirana();}}
+  else if(methods[message.type]){reply.data=await store.rpc(methods[message.type],message.value);if(!['detail','candidates'].includes(message.type)){await store.reload();if(contextual)await loadLocal(true);if(contextual&&typeof atualizarTelaOrigemExternaContextualMukirana==='function')atualizarTelaOrigemExternaContextualMukirana();}}
   else return;reply.ok=true;
  }catch(error){reply.error=error.message||'Não foi possível concluir.';}send(reply);
 },{signal:events.signal});
@@ -44,7 +49,7 @@ const observer=new MutationObserver(()=>{if(!root.isConnected)api.destroy();});c
 const source=<?!= JSON.stringify(HtmlService.createTemplateFromFile('Lancamentos_Novo_App').evaluate().getContent()).replace(/</g, '\\u003c') ?>;
 const ua=navigator.userAgent,handset=/iPhone|iPod|Android.+Mobile/i.test(ua)||navigator.userAgentData?.mobile===true,tablet=!handset&&(/iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)),phone=handset||!tablet&&(matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<768);
 frame.srcdoc=source.replace('<head>','<head><meta name="mukirana-theme" content="'+(window.MukiranaTema?.get()||'claro')+'"><meta name="mukirana-interface" content="'+(phone?'phone':'large')+'">');
-store.setView('Lancamentos');if(!contextual)registrarTelaAtualMukirana('Lancamentos',{atualizarPeriodoGlobal:()=>{},abrirNovoLancamento:()=>send({type:'new'})});
+if(!contextual)store.setView('Lancamentos');if(!contextual)registrarTelaAtualMukirana('Lancamentos',{atualizarPeriodoGlobal:()=>{},abrirNovoLancamento:()=>send({type:'new'})});
 if(typeof finalizarCarregamentoTelaMukirana==='function')finalizarCarregamentoTelaMukirana();
 })();
 </script>

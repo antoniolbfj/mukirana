@@ -195,11 +195,8 @@
     }catch(e){if(alive&&mine===historyEpoch){historyBusy=false;$('ledger-error').textContent=errorText(e);$('load-more').hidden=false;$('load-more').disabled=false;$('load-more').textContent='Tentar novamente';}}
   }
   function openHistory(id) {
-    const a=accounts.find(x=>x.id===id);if(!a)return;historyId=id;historyRows=[];historyCursor=null;historyEpoch++;historyBusy=false;
-    $('ledger-title').textContent=a.name;$('ledger-subtitle').textContent=a.type+(a.linkedGroup?' · Compras e pagamentos de Cartões':'');$('ledger-balance').textContent=money(a.currentCents);$('ledger-date-label').textContent='Saldo atual · efetivados até '+dateText(info.today);
-    $('edit-from-ledger').hidden=!a.canEdit;$('ledger-notice').textContent=a.canEdit?'Ajuste o saldo inicial pelo cadastro da conta.':'O proprietário gerencia o cadastro e o saldo inicial.';
-    $('ledger-events').innerHTML='';$('ledger-error').textContent='';$('load-more').hidden=true;$('load-more').textContent='Carregar mais';openOverlay('ledger');
-    $('ledger-overlay').querySelector('[data-close]').focus();loadHistory();
+    const a=accounts.find(x=>x.id===id);if(!a)return;
+    abrirLancamentosContextuaisMukirana({...filters(),ID_Conta:a.id,Titulo:a.name,Subtitulo:'Consulte e registre lançamentos sem sair de Contas.'});
   }
   function confirmation(title,message,id,callback,blocked=false,label='Excluir conta') {
     confirmAction=callback;confirmId=id;$('confirm-title').textContent=title;$('confirm-message').textContent=message;$('confirm-error').textContent='';$('confirm-submit').textContent=label;$('confirm-submit').hidden=blocked;$('confirm-rename').hidden=!blocked;$('confirm-submit').disabled=false;openOverlay('confirm');(blocked?$('confirm-rename'):$('confirm-submit')).focus();
@@ -228,8 +225,7 @@
   listen($('open-cards'),'click',()=>{closeOverlay('editor');if(typeof navegarPara==='function')navegarPara('Cartoes');});
   listen($('confirm-submit'),'click',async()=>{if(confirmBusy||!confirmAction)return;confirmBusy=true;$('confirm-submit').disabled=true;try{await confirmAction();}catch(e){if(alive){$('confirm-error').textContent=errorText(e);$('confirm-rename').hidden=false;}}finally{confirmBusy=false;if(alive)$('confirm-submit').disabled=false;}});
   listen($('confirm-rename'),'click',()=>{const id=confirmId;closeOverlay('confirm');openEditor(id);});
-  listen($('account-form'),'submit',save);listen($('load-more'),'click',loadHistory);
-  listen($('edit-from-ledger'),'click',()=>{const id=historyId;closeOverlay('ledger');openEditor(id);});
+  listen($('account-form'),'submit',save);
   all('[data-close]').forEach(b=>listen(b,'click',()=>{if(!confirmBusy)closeOverlay(b.dataset.close);}));
   all('.overlay').forEach(o=>listen(o,'click',e=>{if(e.target===o&&!confirmBusy)closeOverlay(o.id.slice(3).split('-')[0]);}));
   listen(document,'click',e=>all('details.more[open]').forEach(d=>{if(!d.contains(e.target))d.open=false;}));
@@ -245,6 +241,7 @@
   }
   const api={destroy,refresh:reload};window.MukiranaContasTipos=api;
   if(typeof registrarTelaAtualMukirana==='function')registrarTelaAtualMukirana('Contas',{atualizarPeriodoGlobal:reload,obterContextoNovoLancamento:filters});
+  if(typeof registrarAtualizacaoTelaContextualMukirana==='function')registrarAtualizacaoTelaContextualMukirana(reload);
   reload();
 })();
 </script>

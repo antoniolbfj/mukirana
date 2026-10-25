@@ -1,0 +1,28 @@
+{
+  "counts": {
+    "contas": 24,
+    "acertos": 13,
+    "rateios": 942,
+    "pagamentos": 26,
+    "lancamentos": 1132
+  },
+  "grants": {
+    "anon": false,
+    "service_role": true,
+    "authenticated": false
+  },
+  "migration": {
+    "name": "lancamentos_v9_contextos",
+    "version": "20261025220931"
+  },
+  "gravar_md5": "bd5b54147681c0e239ee86d154b1c139",
+  "novemberNubankCount": 34,
+  "project": "wcczkultokrypdfimbsh",
+  "financialRowsRewritten": false,
+  "transactionalHashAssertion": "PASS",
+  "securityAdvisors": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 16
+  }
+}

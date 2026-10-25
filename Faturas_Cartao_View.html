@@ -492,7 +492,7 @@
 <div class="cartao">
   <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
     <h3 style="margin:0;">Subtotal por Cart&atilde;o</h3>
-    <button type="button" class="btn-secundario" onclick="abrirLancamentosDaFatura()">Ver lançamentos deste período</button>
+    <button type="button" class="btn-primario" onclick="novoLancamentoNestaFaturaCartao()">＋ Lançar nesta fatura</button><button type="button" class="btn-secundario" onclick="abrirLancamentosDaFatura()">Ver lançamentos deste período</button>
   </div>
   <div id="fatura_subtotais" class="fatura-subtotais"></div>
 </div>
@@ -567,9 +567,9 @@
         obterContextoNovoLancamento: function() {
           var periodo = obterPeriodoGlobalFaturaCartao_();
           return {
-            Mes_Referencia: periodo.Mes_Inicial || '',
-            Mes_Inicial: periodo.Mes_Inicial || '',
-            Mes_Final: periodo.Mes_Final || '',
+            Mes_Referencia: periodo.Mes_Final || periodo.Mes_Inicial || '',
+            Mes_Inicial: periodo.Mes_Final || periodo.Mes_Inicial || '',
+            Mes_Final: periodo.Mes_Final || periodo.Mes_Inicial || '',
             ID_Grupo_Cartao: parametrosFaturaCartao.ID_Grupo_Cartao || ''
           };
         },
@@ -591,7 +591,7 @@
     if (typeof obterFiltroPeriodoGlobalMukirana === 'function') {
       var periodo = obterFiltroPeriodoGlobalMukirana() || {};
       return {
-        Mes_Inicial: periodo.Mes_Inicial || periodo.Mes_Referencia || '',
+        Mes_Inicial: periodo.Mes_Selecionado ? periodo.Mes_Inicial : periodo.Mes_Inicial || periodo.Mes_Referencia || '',
         Mes_Final: periodo.Mes_Final || ''
       };
     }
@@ -1214,6 +1214,7 @@
     google.script.run
       .withSuccessHandler(function(msg) {
         limparSelecaoFaturaCartao(false);
+        window.MukiranaLancamentosStore?.reload().catch(function() {});
         carregarFaturaCartao();
         if (typeof estaEmTelaContextualMukirana === 'function' &&
             estaEmTelaContextualMukirana() &&
@@ -1279,6 +1280,10 @@
     });
   }
 
+  function novoLancamentoNestaFaturaCartao(){
+    const p=obterPeriodoGlobalFaturaCartao_(),month=p.Mes_Final||p.Mes_Inicial||gerarMesAtualFaturaCartao();
+    abrirLancamentosContextuaisMukirana({ID_Grupo_Cartao:parametrosFaturaCartao.ID_Grupo_Cartao,Mes_Inicial:month,Mes_Final:month,Fatura_Exclusiva:true,Acao:'Novo',Titulo:'Lançamento nesta fatura',Subtitulo:'O cartão e o mês desta fatura são preservados ao salvar.'});
+  }
   function abrirLancamentosDaFatura() {
     var periodo = obterPeriodoGlobalFaturaCartao_();
     var mesInicial = periodo.Mes_Inicial || '';

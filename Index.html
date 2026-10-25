@@ -88,15 +88,11 @@
         </button>
         <div id="topbar-filtro-periodo-global" class="topbar-filtro-periodo-global">
           <div class="grupo-campo-global">
-            <label for="mk_global_mes_inicial">Inicial</label>
-            <input type="month" id="mk_global_mes_inicial" onchange="alterarFiltroPeriodoGlobalMukirana()">
+            <label for="mk_global_mes">Mês</label>
+            <input type="month" id="mk_global_mes" required onchange="alterarFiltroPeriodoGlobalMukirana()">
           </div>
-          <div class="grupo-campo-global">
-            <label for="mk_global_mes_final">Final</label>
-            <input type="month" id="mk_global_mes_final" onchange="alterarFiltroPeriodoGlobalMukirana()">
-          </div>
-          <label class="topbar-checkbox-global" for="mk_global_saldo_anterior" title="Inclui histórico anterior em saldos e consolidados que suportam esta opção.">
-            <input type="checkbox" id="mk_global_saldo_anterior" checked onchange="alterarFiltroPeriodoGlobalMukirana()">
+          <label class="topbar-checkbox-global" for="mk_global_saldo_anterior" title="Exibe todos os lançamentos até o fim do mês escolhido.">
+            <input type="checkbox" id="mk_global_saldo_anterior" onchange="alterarFiltroPeriodoGlobalMukirana()">
             <span>Saldo anterior</span>
           </label>
         </div>
@@ -644,6 +640,7 @@
         return;
       }
 
+      if(mukiranaTelaAtual.nomeTela==='FaturasCartao'){abrirLancamentosContextuaisMukirana({...contextoAtual,Acao:'Novo',Fatura_Exclusiva:true,Titulo:'Lançamentos da fatura'});return;}
       localStorage.setItem(
         'mukirana_filtros_lancamentos',
         JSON.stringify(normalizarContextoFabNovoLancamentoMukirana(contextoAtual))
@@ -1122,6 +1119,8 @@
         IDs_Lancamentos: contexto.IDs_Lancamentos || '',
         Ignorar_Periodo_Global: contexto.Ignorar_Periodo_Global === true,
         Modo_Contextual: true,
+        Fatura_Exclusiva: contexto.Fatura_Exclusiva === true,
+        Somente_Rateados: contexto.Somente_Rateados === true,
         Titulo_Contexto: contexto.Titulo || '',
         Subtitulo_Contexto: contexto.Subtitulo || '',
         Nome_Contexto: contexto.Nome_Contexto || '',
@@ -1131,6 +1130,7 @@
       localStorage.setItem('mukirana_filtros_lancamentos', JSON.stringify(filtros));
       localStorage.removeItem('mukirana_acao_pendente');
 
+      if(contexto.Acao==='Novo')localStorage.setItem('mukirana_acao_pendente','novo_lancamento');
       if (contexto.ID_Lancamento && contexto.Acao === 'Editar') {
         localStorage.setItem('mukirana_acao_pendente', 'editar_lancamento:' + contexto.ID_Lancamento);
       } else if (contexto.ID_Lancamento && contexto.Acao === 'Detalhes') {

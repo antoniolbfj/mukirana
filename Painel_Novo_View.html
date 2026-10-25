@@ -8,8 +8,9 @@ window.addEventListener('message',async e=>{const m=e.data;if(!root.isConnected|
  if(m.type==='load')result=await store.rpc('painelNovoListar',store.getPeriod());
  else if(m.type==='state'){result={investment:store.getInvestment(),goals:window.MukiranaPainelContext?.goals===true};window.MukiranaPainelContext=null;}
  else if(m.type==='investment'){store.setInvestment(m.value===true);result=true;}
- else if(m.type==='month'){if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(m.value))throw Error('Mês inválido.');salvarFiltroPeriodoGlobalMukirana({Mes_Inicial:m.value,Mes_Final:m.value});aplicarFiltroPeriodoGlobalMukirana();await store.reload();result=true;send({type:'refresh'});}
+ else if(m.type==='month'){if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(m.value))throw Error('Mês inválido.');salvarFiltroPeriodoGlobalMukirana({Mes_Selecionado:m.value,Considerar_Historico_Anterior:store.getPeriod().Considerar_Historico_Anterior});aplicarFiltroPeriodoGlobalMukirana();await store.reload();result=true;send({type:'refresh'});}
  else if(m.type==='goal'){result=await store.rpc('rateiosNovoMutar',m.value);await store.reload();}
+ else if(m.type==='navigate'&&m.value?.rateios===true){abrirLancamentosContextuaisMukirana({...store.getPeriod(),Somente_Rateados:true,Titulo:'Rateios e acertos',Subtitulo:'Lançamentos rateados e acertos, sem sair do painel.'});result=true;}
  else if(m.type==='navigate'){if(!['Lancamentos','Contas'].includes(m.value?.route))throw Error('Destino inválido.');window.MukiranaLancamentosContext={rateios:m.value.rateios===true,filters:m.value.filters||{}};if(m.value.type)window.MukiranaContasContext=m.value.type;navegarPara(m.value.route);result=true;}
  else return;send({requestId:m.requestId,ok:true,data:result});
  }catch(err){send({requestId:m.requestId,ok:false,error:err.message||'Não foi possível carregar.'});}},{signal:events.signal});
@@ -17,6 +18,7 @@ const observer=new MutationObserver(()=>{if(!root.isConnected){events.abort();ob
 const source=<?!= JSON.stringify(HtmlService.createTemplateFromFile('Painel_Novo_App').evaluate().getContent()).replace(/</g, '\\u003c') ?>;
 const ua=navigator.userAgent,handset=/iPhone|iPod|Android.+Mobile/i.test(ua)||navigator.userAgentData?.mobile===true,tablet=!handset&&(/iPad|Tablet|Android(?!.*Mobile)/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)),phone=handset||!tablet&&(matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<768);
 frame.srcdoc=source.replace('<head>','<head><meta name="mukirana-theme" content="'+(window.MukiranaTema?.get()||'claro')+'"><meta name="mukirana-interface" content="'+(phone?'phone':'large')+'">');
+if(typeof registrarAtualizacaoTelaContextualMukirana==='function')registrarAtualizacaoTelaContextualMukirana(()=>send({type:'refresh'}));
 registrarTelaAtualMukirana('Dashboard',{atualizarPeriodoGlobal:()=>send({type:'refresh'})});finalizarCarregamentoTelaMukirana();
 })();
 </script>

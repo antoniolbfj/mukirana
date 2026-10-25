@@ -3,6 +3,7 @@ const CartoesNovo_ = Object.freeze({
   uuid: function(v) { return ContasNova_.uuid(v); },
   cents: function(v) { return ContasNova_.cents(v); },
   period: function(filters) {
+    if(filters&&filters.Mes_Selecionado!==undefined){const p=LancamentosNovo_.period(filters);return {start:p.start||null,end:p.end||null,multi:!p.start||p.start!==p.end,today:ContasNova_.today()};}
     const f=filters||{},today=ContasNova_.today(),current=today.slice(0,7);
     const valid=function(v){return typeof v==='string'&&/^[1-9]\d{3}-(0[1-9]|1[0-2])$/.test(v);};
     const supplied=Object.prototype.hasOwnProperty.call(f,'Mes_Inicial')||Object.prototype.hasOwnProperty.call(f,'Mes_Referencia');

@@ -22,7 +22,7 @@ if(require.main===module){try{
   const method=process.argv[2],args=JSON.parse(process.argv[3]||'[]');
   if(method==='render')process.stdout.write(JSON.stringify({ok:true,result:render(args[0])}));
   else{
-    if(!/^(?:obterPacoteFaturaCartao|registrarPagamentoFaturaCartao|atualizarPagamentoFaturaCartao|excluirPagamentoFaturaCartao|lancamentosNovo(?:Listar|Consultar|Detalhar))$/.test(method))throw Error('Método inválido');
+    if(!/^(?:obterPacoteFaturaCartao|registrarPagamentoFaturaCartao|atualizarPagamentoFaturaCartao|excluirPagamentoFaturaCartao|lancamentosContextoListar|lancamentosHubAtualizar|lancamentosNovo(?:Listar|Consultar|Detalhar|Salvar|Acao|CadastroRapido|Decidir)|contasTipos(?:Listar|Previsoes|Salvar|Status|Excluir)|contasNovaUsuarios|rateiosNovo(?:Mutar|Candidatos)|painelNovoListar)$/.test(method))throw Error('Método inválido');
     process.stdout.write(JSON.stringify({ok:true,result:ctx[method](...args)}));
   }
 }catch(e){process.stdout.write(JSON.stringify({ok:false,error:e.stack}));process.exitCode=1;}}

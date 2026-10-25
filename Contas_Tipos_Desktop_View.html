@@ -47,13 +47,7 @@
     </section>
   </div>
 
-  <div class="overlay" id="cn-ledger-overlay" hidden>
-    <section class="drawer" role="dialog" aria-modal="true" aria-labelledby="cn-ledger-title">
-      <header class="drawer-head"><div><h2 id="cn-ledger-title">Lançamentos</h2><p id="cn-ledger-subtitle"></p></div><button type="button" class="icon-button" data-close="ledger" aria-label="Fechar lançamentos"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
-      <div class="drawer-content"><div class="ledger-total"><div class="metric-label" id="cn-ledger-date-label"></div><p class="balance" id="cn-ledger-balance"></p><p class="help">Saldo atual inclui somente movimentos efetivados até hoje.</p></div><div id="cn-ledger-events"></div><p id="cn-ledger-error" class="help"></p><button class="btn quiet" id="cn-load-more" type="button" hidden>Carregar mais</button><p class="help" style="margin-top:20px" id="cn-ledger-notice"></p></div>
-      <footer class="drawer-footer"><button type="button" class="btn" data-close="ledger">Fechar</button><button type="button" class="btn primary" id="cn-edit-from-ledger">Editar conta</button></footer>
-    </section>
-  </div>
+
   <div class="toast" id="cn-toast" role="status" hidden></div>
 
 <div class="overlay" id="cn-confirm-overlay" hidden><section class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="cn-confirm-title"><h2 id="cn-confirm-title"></h2><p id="cn-confirm-message" class="help"></p><p class="form-error" id="cn-confirm-error" role="alert"></p><div class="confirm-actions"><button class="btn" data-close="confirm" type="button">Voltar</button><button id="cn-confirm-rename" class="btn" type="button" hidden>Renomear conta</button><button id="cn-confirm-submit" class="btn danger" type="button">Excluir conta</button></div></section></div>

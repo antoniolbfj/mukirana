@@ -10,9 +10,10 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 48**, com Lançamentos central e retirada de Projetos. Publicação
-conferida em `lancamentos-hub-publicacao.json`. A versão47 corrigiu a atualização
-automática das transferências após pagamentos de fatura.
+**versão 49**, com mês global/saldo anterior, fatura contextual, rateios na lista e
+modal de lançamentos em Contas/Painel. Publicação conferida em
+`lancamentos-contextos-publicacao.json`. A versão48 entregou o hub e a retirada
+de Projetos; a versão47 corrigiu transferências após pagamentos de fatura.
 A versão46 acrescentou a identificação dos ajustes históricos de rateio. Registros anteriores:
 `painel-oficial-publicacao.json` e `conciliacao-rateios-publicacao.json`;
 `ux-categorias-publicacao.json` preserva a entrega anterior.
@@ -58,6 +59,11 @@ categorias/subcategorias. Ver [entrega](lancamentos-hub-entrega.md). Produção 
 avaliação publicadas na versão48, com 73 fontes idênticas ao commit `be295b5`.
 Ver `lancamentos-hub-publicacao.json`; homologação de uso permanece pendente.
 
+A rodada atual centraliza os rateios na lista, inclui participações sem novo caixa,
+categoria individual padrão, cadastro preso à fatura aberta, modal de Lançamentos
+em Contas e Painel, card Saldo das contas e um mês global com histórico opcional.
+Ver [entrega](lancamentos-contextos-entrega.md). Homologação de uso pendente.
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -67,7 +73,9 @@ Ver `lancamentos-hub-publicacao.json`; homologação de uso permanece pendente.
    e promoção foram autorizadas; a homologação de uso continua separada.
    Validar também pagamentos de fatura e a atualização imediata de Lançamentos.
    Nesta rodada, conferir todas as contas nos filtros, valor do recorte, edição
-   direta, lote, ordenação, visões, rascunho e alinhamento da marca.
+   direta, lote, ordenação, visões, rascunho e alinhamento da marca. Conferir o mês
+   com/sem saldo anterior, compras pela competência do cartão, inclusão na fatura
+   aberta, rateios/categoria pessoal na lista e modais de Contas/Painel.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

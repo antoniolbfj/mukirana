@@ -12,13 +12,19 @@ const LancamentosNovo_ = {
   },
   period: function(f){
     f=f||{};const month=ContasNova_.today().slice(0,7),valid=function(v){return typeof v==='string'&&/^\d{4}-(0[1-9]|1[0-2])$/.test(v)&&v>='0001-01';};
+    if(f.Mes_Selecionado!==undefined){if(!valid(f.Mes_Selecionado))throw new Error('Escolha um mês válido.');f={Mes_Inicial:f.Considerar_Historico_Anterior===true?'':f.Mes_Selecionado,Mes_Final:f.Mes_Selecionado};}
     let start=f.Mes_Inicial!==undefined?f.Mes_Inicial:f.Mes_Referencia!==undefined?f.Mes_Referencia:month,end=f.Mes_Final!==undefined?f.Mes_Final:start;
     if((start&&!valid(start))||(end&&!valid(end)))throw new Error('Confira os meses selecionados.');
     if(start&&!end)end=month;if(start&&end&&start>end)throw new Error('O mês inicial deve ser anterior ou igual ao final.');
     const d=end?new Date(end+'-01T12:00:00Z'):null;if(d){d.setUTCMonth(d.getUTCMonth()+1);d.setUTCDate(0);}
     return {start:start||'',end:end||'',first:start?start+'-01':null,last:d?d.toISOString().slice(0,10):null};
   },
-  read: function(user,period){const data=this.rpc('rpc_lancamentos_listar_v3',{p_usuario:user.id,p_inicio:period.first,p_fim:period.last});if(!data||!Array.isArray(data.entries)||!Array.isArray(data.accounts))throw new Error('Não foi possível carregar os lançamentos.');if(period.includeProjections!==false)this.projections(data,Object.assign({occurrenceDates:true},period));data.viewer=user.id;return data;},
+  read: function(user,period){const data=this.rpc('rpc_lancamentos_listar_v3',{p_usuario:user.id,p_inicio:period.invoiceCalendar?null:period.first,p_fim:period.invoiceCalendar?null:period.last});if(!data||!Array.isArray(data.entries)||!Array.isArray(data.accounts))throw new Error('Não foi possível carregar os lançamentos.');if(period.invoiceCalendar)data.entries=data.entries.filter(function(e){return ((!period.first||e.date>=period.first)&&(!period.last||e.date<=period.last))||((e.sourceKind==='Cartão'||e.special==='invoice-payment')&&(!period.first||e.competence>=period.first.slice(0,7))&&(!period.last||e.competence<=period.last.slice(0,7)));});data.period=period;if(period.includeProjections!==false)this.projections(data,Object.assign({occurrenceDates:true},period));data.viewer=user.id;this.defaults(data);return data;},
+  defaults: function(data){
+    const categories={};(data.categories||[]).forEach(function(c){categories[c.id]=true;});
+    const entries={};data.entries.forEach(function(e){entries[e.id]=e;const mine=(e.shares||[]).find(function(p){return p.id===data.viewer;});if(mine&&e.displayCategory==null&&categories[e.category]){e.displayCategory=e.category;e.myCategory=e.category;mine.category=e.category;}e.sharing=(e.shares||[]).length?'shared':'unshared';});
+    (data.rateios&&data.rateios.items||[]).forEach(function(item){if(!item.myCategory&&categories[entries[item.id]&&entries[item.id].category])item.myCategory=entries[item.id].category;});
+  },
   projections: function(data,period){
     const accounts={};data.accounts.forEach(function(a){accounts[a.id]=a;});const generated={};(data.legacyGenerated||[]).forEach(function(k){generated[k]=true;});
     const limit=new Date(ContasNova_.today().slice(0,7)+'-01T12:00:00Z');limit.setUTCMonth(limit.getUTCMonth()+1);limit.setUTCDate(0);const end=period.last||limit.toISOString().slice(0,10);
@@ -32,7 +38,7 @@ const LancamentosNovo_ = {
         const d=new Date(initial);if(r.frequency==='Mensal'){const anchor=d.getUTCDate();d.setUTCDate(1);d.setUTCMonth(d.getUTCMonth()+index);const last=new Date(d);last.setUTCMonth(last.getUTCMonth()+1);last.setUTCDate(0);d.setUTCDate(Math.min(anchor,last.getUTCDate()));}else d.setUTCDate(d.getUTCDate()+index*step);
         const date=d.toISOString().slice(0,10);if(date>end)break;if(generated[r.id+':'+date])continue;
         const comp=new Date(d);comp.setUTCDate(1);if(source.kind==='Cartão'&&d.getUTCDate()>source.closing)comp.setUTCMonth(comp.getUTCMonth()+1);const reference=source.kind==='Cartão'&&!period.occurrenceDates?comp.toISOString().slice(0,10):date;
-        if((period.first&&reference<period.first)||(period.last&&reference>period.last))continue;
+        if((period.first&&reference<period.first)||(period.last&&reference>period.last)){if(!period.invoiceCalendar||source.kind!=='Cartão'||(period.first&&comp.toISOString().slice(0,10)<period.first)||(period.last&&comp.toISOString().slice(0,10)>period.last))continue;}
         data.entries.push({id:'projection:'+r.id+':'+date,version:0,description:r.description,type:r.type,amountCents:r.amountCents,date:date,competence:comp.toISOString().slice(0,7),sourceKind:r.sourceKind,origin:r.origin,destination:r.destination,category:r.category,project:r.project,author:r.author,status:'pending',classification:null,group:r.id,index:0,mode:'recurring',canEdit:false,opening:false,shares:[],special:'projection'});
         if(data.entries.length>25000)throw new Error('O período tem muitos lançamentos. Selecione um intervalo menor.');
       }
@@ -45,7 +51,8 @@ const LancamentosNovo_ = {
     function append(e,account,signed,suffix,name,special){
       const displayCategory=e.displayCategory!==undefined?e.displayCategory:e.category;
       const cat=categories[displayCategory],proj=projects[e.project];
-      result.push({key:e.id+':'+suffix,entryId:e.id,type:e.type,description:e.description,date:e.date,competence:e.competence,account:account,accountName:name,origin:e.origin,destination:e.destination,category:displayCategory||'',categoryName:cat?cat.name:'',categoryPath:categoryPath(displayCategory),project:e.project||'',projectName:proj?proj.name:'',mode:e.mode||'single',status:e.status,amountCents:e.amountCents,signedCents:signed,classification:e.classification||'',group:e.group||'',index:e.index||0,version:e.version||0,canEdit:e.canEdit===true,canCategorize:e.canCategorize===true,special:special||'',side:suffix,searchText:[e.description,name,cat&&cat.name,proj&&proj.name].filter(Boolean).join(' ')});
+      const p=data.period||{},inPeriod=(!p.first||e.date>=p.first)&&(!p.last||e.date<=p.last),credit=accounts[account]&&accounts[account].linkedGroup&&(e.sourceKind==='Cartão'||e.special==='invoice-payment'&&suffix==='in')?account:null,inInvoice=(!p.first||e.competence>=p.first.slice(0,7))&&(!p.last||e.competence<=p.last.slice(0,7));
+      result.push({inPeriod:inPeriod,billingAccount:credit,inInvoicePeriod:inInvoice,sharing:(e.shares||[]).length?'shared':'unshared',key:e.id+':'+suffix,entryId:e.id,type:e.type,description:e.description,date:e.date,competence:e.competence,account:account,accountName:name,origin:e.origin,destination:e.destination,category:displayCategory||'',categoryName:cat?cat.name:'',categoryPath:categoryPath(displayCategory),project:e.project||'',projectName:proj?proj.name:'',mode:e.mode||'single',status:e.status,amountCents:e.amountCents,signedCents:signed,classification:e.classification||'',group:e.group||'',index:e.index||0,version:e.version||0,canEdit:e.canEdit===true,canCategorize:e.canCategorize===true,special:special||'',side:suffix,searchText:[e.description,name,cat&&cat.name,proj&&proj.name].filter(Boolean).join(' ')});
     }
     data.entries.forEach(function(e){
       if(!core.cents(e.amountCents)||!ContasNova_.date(e.date))throw new Error('Resposta financeira inválida.');
@@ -53,9 +60,14 @@ const LancamentosNovo_ = {
         if(accounts[e.origin]&&(!data.viewer||accounts[e.origin].owner===data.viewer))append(e,e.origin,core.negate(e.amountCents),'out',accounts[e.origin].name,'');
         if(accounts[e.destination]&&(!data.viewer||accounts[e.destination].owner===data.viewer))append(e,e.destination,e.amountCents,'in',accounts[e.destination].name,'');
       }else{
-        if(data.viewer&&e.financeOwner&&e.financeOwner!==data.viewer)return;
+        if(data.viewer&&e.financeOwner&&e.financeOwner!==data.viewer){if(data.invoiceContext&&e.sourceKind==='Cartão'&&!(e.shares||[]).some(function(p){return p.id===data.viewer;})){const instrument=accounts[e.origin];append(e,instrument&&instrument.ledgerAccount||e.origin,'0','card-view',instrument?instrument.name:'Cartão adicional','card-observation');}return;}
         const a=accounts[e.origin],logical=a&&accounts[a.ledgerAccount]||a,origin=logical?logical.id:'history:'+e.origin;if(data.viewer&&logical&&logical.owner!==data.viewer)return;let movement=e;if(e.opening)movement=Object.assign({},e,{type:e.amountCents.charAt(0)==='-'?'expense':'income',amountCents:e.amountCents.replace(/^-/, '')});append(movement,origin,e.type==='expense'?core.negate(e.amountCents):e.amountCents,'entry',logical?logical.name:'Origem histórica',e.special|| (e.opening?'opening':''));
       }
+    });
+    const visible={};result.forEach(function(r){visible[r.entryId]=true;});
+    (data.rateios&&data.rateios.items||[]).forEach(function(item){
+      if(visible[item.id]||item.myCents==='0')return;const e=data.entries.find(function(x){return x.id===item.id;});if(!e)return;
+      append(Object.assign({},e,{displayCategory:item.myCategory,amountCents:item.myCents,canEdit:false}),'participation:'+item.financeOwner,'0','participation','Rateio · '+item.financeName,'participation');
     });
     (data.payments||[]).forEach(function(p){
       const e={id:'invoice:'+p.id,description:'Pagamento da fatura '+p.groupName,type:'transfer',date:p.date,competence:p.competence,origin:p.origin,destination:'invoice:'+p.group,amountCents:p.amountCents,status:p.status,mode:'single',canEdit:false};
@@ -66,7 +78,7 @@ const LancamentosNovo_ = {
   },
   request: function(r){
     r=r||{};if(!this.uuid(r.operationId))throw new Error('Operação inválida. Atualize a tela.');
-    const keys=['operationId','action','id','version','scope','description','type','amountCents','date','origin','destination','category','classification','mode','frequency','quantity','duration','status','project','favorite','name','parent','kind','approvalId','approve','reason','renewFrom','invoiceMonth'];const clean={};
+    const keys=['operationId','action','id','version','scope','description','type','amountCents','date','origin','destination','category','classification','mode','frequency','quantity','duration','status','project','favorite','name','parent','kind','approvalId','approve','reason','renewFrom','invoiceMonth','invoiceGroup'];const clean={};
     keys.forEach(function(k){if(r[k]!==undefined)clean[k]=r[k];});
     if(r.shares!==undefined){if(!Array.isArray(r.shares)||r.shares.length>100)throw new Error('Confira os participantes.');clean.shares=r.shares.map(function(p){return {id:p.id,cents:p.cents};});}
     if(r.selected!==undefined){if(!Array.isArray(r.selected)||r.selected.length>6000)throw new Error('Seleção inválida.');clean.selected=r.selected.map(function(p){return{id:p.id,version:p.version};});}
@@ -98,7 +110,7 @@ const LancamentosNovo_ = {
   childId: function(id,index){if(index===0)return id;const hex=id.replace(/-/g,'').slice(0,24)+((parseInt(id.replace(/-/g,'').slice(24),16)+index)>>>0).toString(16).padStart(8,'0');return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20);}
 };
 function lancamentosNovoListar(token,filters){
-  const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();const period=LancamentosNovo_.period(filters),data=LancamentosNovo_.read(user,period);
+  const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();const period=LancamentosNovo_.period(filters),data=LancamentosNovo_.read(user,Object.assign({invoiceCalendar:true},period));
   return {user:{id:user.id,name:user.nome||''},period:period,rows:LancamentosNovo_.rows(data),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:data.favorites,approvals:data.approvals,rateios:data.rateios};
 }
 function lancamentosNovoConsultar(token,period,filters){
@@ -144,7 +156,8 @@ function lancamentosNovoSalvar(token,request){
     changes.rows.push({id:editing?e.id:helper.childId(r.id,i),version:editing?e.version:0,description:r.description.trim(),type:r.type,amountCents:editing?r.amountCents:e.amountCents,date:date,sourceKind:source.kind,origin:r.origin,destination:r.type==='transfer'?r.destination:null,category:r.type==='transfer'?null:r.category,project:editing?e.project||null:null,classification:r.classification,status:editing?(e.id===original.id?r.status:e.status):i===0?r.status:'pending',index:i+1,shares:portions});
   });
   if(r.favorite)changes.favorite={description:r.description.trim(),type:r.type,origin:r.origin,category:r.category,classification:r.classification};
-  return helper.rpc('rpc_lancamentos_gravar_v3',{p_usuario:user.id,p_operacao:r.operationId,p_request:r,p_changes:changes});
+  if(r.invoiceGroup&&(!helper.uuid(r.invoiceGroup)||r.version!==0||r.mode!=='single'||source.kind!=='Cartão'||source.group!==r.invoiceGroup))throw new Error('Escolha um cartão desta fatura. Use um lançamento único neste contexto.');
+  return helper.rpc(r.invoiceGroup?'rpc_lancamentos_fatura_v9':'rpc_lancamentos_gravar_v3',{p_usuario:user.id,p_operacao:r.operationId,p_request:r,p_changes:changes});
 }
 function lancamentosNovoAcao(token,request){
   const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();const r=LancamentosNovo_.request(request),h=LancamentosNovo_;
