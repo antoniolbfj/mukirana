@@ -62,7 +62,7 @@ function obterHtmlDaTela(nomeTela, tokenSessao) {
     }
 
     if (nomeTela === 'Usuarios') return incluir_('Usuarios_View');
-    // Contas homologada; a rota anterior fica como alias para acessos já abertos.
+    // Contas com tipos; nomes anteriores são aliases, sem carregar interfaces arquivadas.
     if (nomeTela === 'ContasTipos' || nomeTela === 'Contas' || nomeTela === 'ContasNova') return HtmlService.createTemplateFromFile('Contas_Tipos_View').evaluate().getContent();
     // Cartões homologado; a rota de avaliação permanece como alias.
     if (nomeTela === 'Cartoes' || nomeTela === 'CartoesNovo') return HtmlService.createTemplateFromFile('Cartoes_Novo_View').evaluate().getContent();
