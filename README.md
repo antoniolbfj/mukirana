@@ -79,7 +79,7 @@ próprias para computadores/tablets e smartphones. Claro, Escuro e Sépia estão
 
 ## Correção e UX com três temas
 
-Atualização posterior autorizada: o **Painel geral oficial** recebe indicadores
+Publicado em produção e avaliação na **versão45**: o **Painel geral oficial** recebe indicadores
 em semáforo, títulos maiores, card de saldo do rateio com navegação e evolução
 patrimonial em largura inteira, com filtros por conta e visões de três meses,
 semestral e anual. O gráfico usa os movimentos das contas de Investimento, com

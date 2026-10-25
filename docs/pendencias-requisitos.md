@@ -8,8 +8,10 @@ Contas e Cartões remodelados foram homologados anteriormente. As novas telas s�
 principais por autorização expressa; os acessos antigos foram arquivados. A rodada
 de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categorização
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
-Claro/Escuro/Sépia e componentes comuns, preservando as regras da correção. Produção e avaliação vigentes: **versão 44**. O
-registro definitivo desta rodada é `ux-categorias-publicacao.json`.
+Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
+O Painel oficial refinado foi publicado depois. Produção e avaliação vigentes:
+**versão 45**. Registro definitivo: `painel-oficial-publicacao.json`; o arquivo
+`ux-categorias-publicacao.json` preserva a entrega anterior.
 
 Categorias e metas agora usam a participação pessoal, com a categoria privada de
 cada pessoa, independente do acerto. Não somam o original rateado e a própria parte,
@@ -26,8 +28,8 @@ indicadores, evolução patrimonial em largura inteira com visões 3 meses/semes
 anual e filtro por conta de investimento, card de saldo do rateio clicável e títulos
 maiores. Implementação conectada aos contratos existentes, sem migração, preservando
 os três temas e os layouts próprios. Ver [entrega](painel-oficial-entrega.md).
-O registro de publicação desta atualização será `painel-oficial-publicacao.json`;
-o registro v44 acima descreve a rodada anterior.
+Publicado e conferido na versão45, com 72 fontes idênticas ao commit `29d680a`.
+Ver `painel-oficial-publicacao.json`; homologação de uso permanece pendente.
 
 ## Pendências vigentes
 

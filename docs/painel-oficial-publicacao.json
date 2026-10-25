@@ -1,0 +1,131 @@
+{
+  "verifiedAt": "2026-10-25T14:59:52.535137+00:00",
+  "status": "published and verified",
+  "version": 45,
+  "scriptId": "1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd",
+  "sourceCommit": "29d680a40ba6455cbc679ac1c6c7498d036f5e01",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "databaseWrites": false,
+  "migrations": [],
+  "officialRoute": "Dashboard",
+  "officialPanelAuthorized": true,
+  "fileCount": 72,
+  "immutableSources": "painel-oficial-fontes-v45.json",
+  "byteForByteMatch": true,
+  "other69RuntimeFilesUnchangedFromV44": true,
+  "features": {
+    "numericSignals": [
+      "green",
+      "yellow",
+      "red"
+    ],
+    "wealthViews": [
+      "previous/current/next month",
+      "calendar half-year",
+      "calendar year"
+    ],
+    "wealthReference": "last global month, current month when empty",
+    "wealthScope": "own Investment accounts, including inactive history",
+    "wealthFilterChangesGlobalPeriod": false,
+    "wealthFilterDoesRpc": false,
+    "actual": "effective movements through month end; current month through today",
+    "projected": "registered movements and existing recurrence projections; no assumed returns",
+    "rateioCard": "aggregate net and separate payable/receivable; opens existing Rateios screen",
+    "themes": [
+      "Claro",
+      "Escuro",
+      "Sépia"
+    ],
+    "dedicatedInterfaces": [
+      "desktop/tablet",
+      "smartphone"
+    ]
+  },
+  "checks": {
+    "wealthRules": "PASS",
+    "wealthIntegrationReconciledWithAccounts": "PASS",
+    "personalCategoryUnit": "PASS",
+    "personalCategoryIntegration": "PASS",
+    "panelPreviousRules": "PASS",
+    "rateiosBackendAssertions": 60,
+    "syntaxAllJsHtml": "PASS",
+    "whitespace": "PASS",
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS",
+        "checks": "3/6/12 meses; contas e posição real; projeções; saldo/período preservados sem RPC nos filtros; gráfico largo; rateio por teclado; contraste; nomes; navegação; detalhes; rotação; sem overflow/erros JS"
+      }
+    ],
+    "directAppVisualCombinations": 9,
+    "browserCaptureLimitation": "opaque iframe painting is intermittent in headless Chromium; direct real App captures also checked"
+  },
+  "homologation": "pending user validation",
+  "production": {
+    "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "version": 45,
+    "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec",
+    "http": {
+      "httpStatus": 200,
+      "finalHost": "accounts.google.com"
+    }
+  },
+  "evaluation": {
+    "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "version": 45,
+    "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
+    "http": {
+      "httpStatus": 200,
+      "finalHost": "accounts.google.com"
+    }
+  }
+}

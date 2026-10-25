@@ -4,6 +4,11 @@ Autorização de 25/10/2026: implementar o protótipo refinado e tornar o painel
 oficial. O acesso existente **Painel geral**, que também abre após o login,
 recebe esta atualização. Mantidos o endereço de produção e os demais módulos.
 
+**Publicado em produção e avaliação na versão45**, com 72 fontes idênticas ao
+commit `29d680a`, conferidas por clonagem da versão imutável. Somente os três
+arquivos de runtime do Painel diferem da v44. Publicação autorizada e concluída;
+homologação de uso ainda pendente.
+
 ## Comportamento
 
 - Títulos maiores e mais destacados, três temas e estruturas próprias para
@@ -79,5 +84,14 @@ Verificações reproduzíveis:
 
 Os testes de navegador usam os controllers reais com PostgreSQL fictício. A
 homologação com dados e conta Google reais continua sendo uma etapa de uso.
-Versão, commit, implantações e conferência das fontes serão registrados em
-`painel-oficial-publicacao.json` após a publicação.
+Versão, commit, implantações e conferência das fontes estão registrados em
+`painel-oficial-publicacao.json` e `painel-oficial-fontes-v45.json`.
+
+As nove combinações de dispositivo/tema passaram, com conferência visual adicional
+do App diretamente em navegador. A captura da moldura com iframe opaco apresenta
+falhas intermitentes de pintura no Chromium headless; os controles e valores
+foram conferidos no iframe, e as imagens complementares usam o App real com o
+mesmo backend fictício. O teste de teclado mantém Enter pressionado até concluir
+a navegação, soltando-o na tela de destino, para evitar a corrida da automação
+ao remover o iframe durante o evento. Nenhuma adaptação de produto foi feita
+somente para esses testes.
