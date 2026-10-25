@@ -15,7 +15,7 @@ Atualizado em 25/10/2026. Supabase `wcczkultokrypdfimbsh`.
   é a **versão 40**, registrada em `contas-tipos-publicacao.json`.
 - Contas ampliada no menu **Contas (tipos)**: três tipos, vínculo único ao grupo
   existente, saldos derivados, inicial nos indicadores, exclusão protegida e
-  pagamentos como transferências, com testes locais de upgrade/concorrência e
+  pagamentos de fatura como transferências, com testes locais de upgrade/concorrência e
   navegador; migração aplicada e 29 ASSERTs remotos em ROLLBACK. Ver [contas-tipos-entrega.md](contas-tipos-entrega.md).
 
 - Revisão do Dashboard concluída e [proposta visual](proposta-dashboard.md)
@@ -27,6 +27,9 @@ Atualizado em 25/10/2026. Supabase `wcczkultokrypdfimbsh`.
   divisão/aprovações, mas o módulo completo ainda é parcial. Ver [proposta de Rateios](proposta-rateios.md).
 - Regra confirmada: gasto de R$ 300 rateado continua R$ 300 no saldo financeiro;
   R$ 200 a receber aparecem separadamente em A acertar até os pagamentos.
+- Acertos são pagamentos/recebimentos do saldo total ou parcial, com lançamentos
+  especiais de despesa/receita feitos pelos respectivos usuários. Não quitar
+  despesa por despesa nem abater duas vezes pelas duas pontas do mesmo acerto.
 
 ## Pendências vigentes
 
@@ -38,7 +41,8 @@ Atualizado em 25/10/2026. Supabase `wcczkultokrypdfimbsh`.
    autorizada do participante, divisão/alcances, reaprovações e proteção dos IDs
    vinculados a acertos; distinguir autoria e responsável financeiro em adicionais.
 4. Completar acertos bilaterais: parciais, confirmação/recusa, limites concorrentes,
-   antecipações registradas e projeção como transferência, preservando os legados.
+   antecipações registradas e ações Pagar/Receber como despesa/receita especiais,
+   registradas por cada usuário e vinculadas a um único abatimento, preservando os legados.
 5. Avaliar e implementar o Dashboard com A acertar e Consumo/Crédito separados
    do patrimônio em Investimento; integrar metas, classificações e estornos sem duplicidade.
 6. Remodelar as demais telas, incluindo Faturas/pagamentos em rodada própria.

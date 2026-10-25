@@ -12,14 +12,16 @@ pessoas, o resultado/Ainda posso gastar considera os **R$ 300 pagos**. Os **R$ 2
 a receber** ficam em **A acertar**, separados. A participação de R$ 100 permanece
 visível no detalhe, sem gerar outro lançamento na conta dos participantes.
 
-| Momento, considerando apenas esse exemplo | Despesa do pagador | Transferências recebidas | Resultado | A receber |
+| Momento, considerando apenas esse exemplo | Despesa original | Receitas de acerto do pagador original | Resultado | A receber |
 | --- | ---: | ---: | ---: | ---: |
 | Após o pagamento original | R$ 300 | R$ 0 | −R$ 300 | R$ 200 |
 | Após um acerto de R$ 100 confirmado | R$ 300 | R$ 100 | −R$ 200 | R$ 100 |
 | Após os dois acertos confirmados | R$ 300 | R$ 200 | −R$ 100 | R$ 0 |
 
 Para o outro participante, a obrigação de R$ 100 não altera sua conta até pagar.
-Ao pagar, haverá uma transferência de saída, sem uma segunda despesa do original.
+Ao pagar, o próprio participante registra uma **Despesa — Acerto de rateio**.
+Quem recebe registra uma **Receita — Acerto de rateio** na sua própria conta.
+Ambos os registros pertencem ao mesmo acerto, que abate a dívida uma única vez.
 A fórmula única continua Receitas − Despesas + transferências recebidas − enviadas.
 Sem alternância Minha participação/Fluxo de caixa. Direitos a receber não são
 tratados como dinheiro disponível, e dívidas não viram movimentações bancárias
@@ -113,19 +115,47 @@ Recorrências virtuais ainda não geradas não autorizam pagamentos. O filtro me
 do Dashboard não redefine o saldo bilateral: o bloco informa que é acumulado, e o
 detalhe distingue vencido/atual, futuro registrado e em confirmação.
 
+**O pagamento quita o saldo, sem selecionar despesas.** Cada acerto tem uma
+identificação comum às duas pessoas e pode ser total ou parcial:
+
+`Saldo devedor restante = saldo a pagar − valor do acerto`
+
 ```mermaid
 flowchart LR
-  A[Devedor registra pagamento] --> B[Saída na própria conta e reserva na dívida]
-  B --> C[Credor revisa]
-  C -->|Aprova e escolhe conta| D[Entrada registrada e acerto efetivado]
-  C -->|Recusa com motivo| E[Dívida restaurada; saída permanece para correção]
+  A[Pagar rateio] --> B[Usuário registra sua despesa]
+  C[Receber rateio] --> D[Usuário registra sua receita]
+  B --> E[Acerto identificado entre as duas pessoas]
+  D --> E
+  E --> F[Um único abatimento do saldo devedor]
 ```
 
-O devedor informa valor e a própria conta; não escolhe nem descobre a conta do credor.
-A saída e a reserva provisória são atômicas. O credor escolhe sua conta e confirma;
-a entrada nasce nessa confirmação, sem novo lançamento de receita/despesa comum.
-Repetir um pedido após perda de resposta não duplica saída, entrada ou reserva.
-Pagamentos simultâneos não podem ultrapassar a dívida, considerando os já em confirmação.
+**Pagar rateio:** o usuário informa a pessoa, o valor e a própria conta, e registra
+sua despesa especial. O sistema não cria a receita nem escolhe a conta do outro.
+Se o recebimento ainda precisar de confirmação, o pagamento fica identificado
+como em confirmação, com redução provisória para impedir quitação acima da dívida.
+
+**Receber rateio:** o usuário informa de quem recebeu, o valor e a própria conta,
+e registra sua receita especial. Pode vincular um pagamento já informado pela
+outra pessoa ou iniciar o acerto pelo recebimento efetivamente ocorrido, sem
+exigir que o pagador tenha feito seu lançamento primeiro. Registrar a própria
+receita é a confirmação financeira do recebedor.
+
+Quando a outra pessoa registrar sua ponta posteriormente, deve usar o **mesmo
+acerto**. O novo registro altera somente sua própria conta e não reduz a dívida
+outra vez. A interface apresenta os acertos pendentes de vínculo; valores/data
+iguais, sozinhos, não autorizam juntar pagamentos distintos automaticamente.
+
+Essa definição atualiza ACE-02/03/09 onde previam apenas transferência especial
+iniciada pelo devedor: as naturezas financeiras agora são despesa e receita de
+acerto, criadas pelos respectivos usuários. A criação do rateio por si só não
+cria essas despesas/receitas posteriores. O saldo principal reconhece cada
+lançamento financeiro uma única vez, na conta e natureza de seu dono.
+
+Repetir um pedido após perda de resposta não duplica lançamento nem abatimento.
+Dois lados associados ao mesmo acerto não são dois pagamentos. Pagamentos
+simultâneos respeitam o saldo disponível, incluindo os que estão em confirmação.
+Uma recusa de pagamento informado restaura a dívida conforme o fluxo de revisão,
+mas não apaga a despesa já registrada na conta do pagador; ele trata sua correção.
 
 Preservar compatibilidade com pagamento já existente e com a opção legada vinculada
 a pagamento de fatura. Nesses casos, reconhecer o registro financeiro existente:
@@ -151,10 +181,11 @@ a regularizar, com nova aprovação, em vez de remover e recriar registros vincu
 - **acertos_rateios:** conservar os três acertos e seus vínculos; completar versão,
   motivo de recusa, operação idempotente e estado Rejeitado. O esquema atual aceita
   somente Aguardando_Credor/Efetivado/Cancelado, portanto precisa de migração aditiva, harmonizando também as restrições de estado.
-- **Lançamentos/Contas:** reconhecer as pontas de acerto como transferências
-  especiais na projeção financeira, inclusive nos registros legados; não criar
-  destinos fictícios nem copiar movimentos entre contas privadas. Cada pessoa só
-  acessa a sua ponta e os detalhes do acerto a que tem direito.
+- **Lançamentos/Contas:** oferecer as ações Pagar/Receber rateio para registrar
+  despesa/receita com identificação especial de acerto. Reaproveitar movimentos
+  legados compatíveis, sem duplicar entradas/saídas; não criar destinos fictícios
+  nem lançar automaticamente na conta alheia. Cada pessoa registra sua própria
+  ponta e ambas se ligam ao mesmo acerto, com um único abatimento da dívida.
 - **Consultas:** saldo derivado de obrigações e acertos, sem total manual paralelo.
   Não descontar ao mesmo tempo o pagamento e uma marca de rateio Acertado.
 
@@ -184,7 +215,7 @@ necessários. Elegibilidade para convidar não equivale a direito de consultar f
    de aprovação; não marcar todos como aprovados nem disparar convites retroativos.
 2. Completar rateio no lançamento, detalhes para o destinatário, categoria individual,
    estados e nova aprovação por conjunto. Manter menus de avaliação e as duas UIs.
-3. Completar acertos bilaterais, reservas, confirmação/recusa e proteção concorrente,
+3. Completar acertos bilaterais, registro de pagamento/recebimento, confirmação/recusa e proteção concorrente,
    preservando as pontas financeiras legadas. Corrigir o resumo antigo que só soma
    participações do período e não lê a liquidação efetiva dos acertos.
 4. Integrar o Dashboard a esses mesmos serviços e às regras confirmadas, com a linha

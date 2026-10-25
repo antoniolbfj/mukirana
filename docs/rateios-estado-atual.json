@@ -21,7 +21,15 @@
     "originalExpenseCents": "30000",
     "initialReceivableCents": "20000",
     "initialFinancialResultCents": "-30000",
-    "resultAfterBothReimbursementsCents": "-10000"
+    "resultAfterBothReimbursementsCents": "-10000",
+    "settlementEntries": {
+      "payer": "user_created_special_expense",
+      "recipient": "user_created_special_income",
+      "canStartFrom": "payment_or_receipt",
+      "debtReduction": "once_per_settlement",
+      "allocationToIndividualExpenses": false,
+      "automaticCounterpartyEntry": false
+    }
   },
   "implementationStatus": "partial_proposal_only"
 }

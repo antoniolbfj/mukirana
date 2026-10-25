@@ -111,7 +111,8 @@ e resultado do período em uma apresentação que exige explicações extensas.
 Não basta redesenhar o HTML e conservar esses cálculos.
 
 Antes da implantação conectada, conciliar os registros legados de acerto pelos IDs
-existentes, evitando apresentar liquidação como nova receita/despesa. Devoluções e
+existentes, vinculando cada despesa/receita de acerto uma única vez ao evento
+correspondente, conforme a definição atual dos usuários. Devoluções e
 estornos precisam seguir o vínculo/natureza registrados; não inferir estorno pelo
 texto da descrição. Validar o tratamento com exemplos reais autorizados e testes
 revertidos, preservando os registros originais.
@@ -147,8 +148,10 @@ e intervalos relativos. A prévia não grava preferências nem movimentações.
 A [proposta de Rateios](proposta-rateios.md) detalha a implementação integrada.
 Decisão confirmada: despesa de R$ 300 paga e dividida por três continua como R$ 300
 no resultado financeiro; os R$ 200 a receber aparecem em A acertar. Quando recebidos,
-entram como transferências e o efeito líquido desse exemplo passa a −R$ 100, sem
-criar receita ou despesa novamente. A participação individual fica no detalhe.
+o próprio recebedor registra receitas especiais de acerto, e o efeito líquido
+desse exemplo passa a −R$ 100. Os pagadores registram suas próprias despesas
+especiais. Cada par de registros compartilha o mesmo acerto e abate a dívida uma
+única vez. A participação individual fica no detalhe.
 A acertar é bilateral e acumulado; o período global não apaga dívidas anteriores.
 Sua integração deve concluir leitura autorizada, categoria individual, aprovações
 e liquidação dos acertos antes da entrega do Dashboard conectado.
