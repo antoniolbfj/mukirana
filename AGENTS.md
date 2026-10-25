@@ -27,3 +27,6 @@
 - Depois desta entrega, o usuário pediu revisão e proposta de Dashboard enxuto: Consumo+Crédito no operacional, Investimento no patrimônio. Preservar fórmula única, período global, privacidade e interfaces próprias; não substituir o painel antes da avaliação da proposta.
 
 - Avaliação vigente: versão 40, 75 arquivos idênticos ao commit 9eb26ae; produção permanece 36. Ver docs/contas-tipos-publicacao.json. A proposta do Dashboard está em docs/proposta-dashboard.md e docs/prototipos/painel.html (dados fictícios, sem backend); ainda não foi implementada como painel conectado.
+
+- Rateios incluídos pelo usuário na rodada de Dashboard. Proposta em docs/proposta-rateios.md; ainda parcial na avaliação v40. Decisão confirmada: pagando R$ 300 divididos por três, Ainda posso gastar considera R$ 300; R$ 200 a receber ficam separados em A acertar. Não antecipar direitos/obrigações no saldo financeiro nem voltar aos modos participação/fluxo.
+- Antes de completar rateios, preservar IDs referenciados pelos acertos e distinguir autoria de responsabilidade financeira em cartões adicionais. Categoria individual deve persistir fora das decisões temporárias; não presumir aprovação dos legados. A análise desta rodada é somente leitura do banco.

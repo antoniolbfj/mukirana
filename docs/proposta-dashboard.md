@@ -27,8 +27,8 @@ o Dashboard conectado ainda não foi substituído.
    em Investimento. Cada número leva às contas que o compõem. Investimento traz
    também o movimento líquido dentro do período; sua projeção fica no detalhe.
 4. **Dois blocos de análise:** Para onde foi, com barras horizontais por categoria,
-   e Metas, mostrando primeiro excessos e objetivos não atingidos. Uma linha de
-   pendências só aparece quando existe algo que exige ação, com acesso direto.
+   e Metas, mostrando primeiro excessos e objetivos não atingidos. Uma linha compacta de **A acertar** mostra a receber, a pagar e aprovações
+   pendentes quando houver algo relevante, com acesso direto ao extrato por pessoa.
 
 Projetos, listas completas de contas, todas as faturas e tabelas de rateio ficam
 nos respectivos módulos, acessíveis pelo detalhe. Não ocupar a abertura com oito
@@ -141,3 +141,14 @@ continua para a rodada final.
 A navegação mensal da prévia é demonstrativa. Na implementação conectada será
 reutilizado o período global existente, com mês inicial/final, preferência explícita
 e intervalos relativos. A prévia não grava preferências nem movimentações.
+
+## Rateios incluídos nesta rodada
+
+A [proposta de Rateios](proposta-rateios.md) detalha a implementação integrada.
+Decisão confirmada: despesa de R$ 300 paga e dividida por três continua como R$ 300
+no resultado financeiro; os R$ 200 a receber aparecem em A acertar. Quando recebidos,
+entram como transferências e o efeito líquido desse exemplo passa a −R$ 100, sem
+criar receita ou despesa novamente. A participação individual fica no detalhe.
+A acertar é bilateral e acumulado; o período global não apaga dívidas anteriores.
+Sua integração deve concluir leitura autorizada, categoria individual, aprovações
+e liquidação dos acertos antes da entrega do Dashboard conectado.

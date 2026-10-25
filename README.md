@@ -81,3 +81,6 @@ homologada permanece até a aprovação da atualização.
 [Proposta do novo Painel geral](docs/proposta-dashboard.md), com os contratos
 financeiros desta base e prévias próprias para computador/tablet e smartphone.
 O Dashboard principal será substituído após a avaliação e implementação conectada.
+
+[Proposta de Rateios e acertos](docs/proposta-rateios.md), incluídos na rodada do
+Dashboard, com levantamento do que já existe e da integração ainda pendente.

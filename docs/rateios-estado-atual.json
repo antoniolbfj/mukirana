@@ -1,0 +1,27 @@
+{
+  "reviewDate": "2026-10-25",
+  "projectRef": "wcczkultokrypdfimbsh",
+  "evaluationVersion": 40,
+  "productionVersion": 36,
+  "readOnlyDatabaseReview": true,
+  "rateios": 942,
+  "ratedEntries": 471,
+  "allSharesSumToEntryAmount": true,
+  "entriesWithAuthorShare": 471,
+  "settlements": {
+    "total": 3,
+    "waitingCreditorWithoutReceiptLeg": 2,
+    "completedWithBothLegs": 1,
+    "referencedShareIds": 258,
+    "unresolvedShareReferences": 0
+  },
+  "approvalRequestsV3": 0,
+  "approvalDecisionsV3": 0,
+  "confirmedFinancialRule": {
+    "originalExpenseCents": "30000",
+    "initialReceivableCents": "20000",
+    "initialFinancialResultCents": "-30000",
+    "resultAfterBothReimbursementsCents": "-10000"
+  },
+  "implementationStatus": "partial_proposal_only"
+}

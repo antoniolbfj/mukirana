@@ -22,8 +22,10 @@ Rascunhos são isolados por usuário. Não há salvamento automático.
 - Edição individual/do ponto em diante/do conjunto; exclusão individual, próxima,
   anterior ou integral. Geração e rateios gravados numa única transação.
 - Histórico pessoal e favoritos sem reutilizar valor; cadastro contextual real.
-- Aprovações individuais de rateios, categoria própria, motivo da recusa e nova
-  solicitação após mudanças. Exclusão compartilhada aguarda os participantes.
+- Base de aprovações individuais de rateios, escolha de categoria na decisão,
+  motivo da recusa e nova solicitação após mudanças. Exclusão compartilhada aguarda
+  os participantes. A persistência da categoria por participação, a leitura do
+  destinatário e a liquidação completa são parciais; ver [proposta de Rateios](proposta-rateios.md).
 - Renovação como novo conjunto com vínculo ao anterior, sem alterar o original.
 - Compras mantêm a competência persistida. Pagamentos de fatura aparecem como
   transferência, sem nova despesa. Acesso adicional continua limitado.
