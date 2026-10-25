@@ -67,8 +67,11 @@ A paleta global será revista após a remodelagem das telas.
 [Produção com Contas e Cartões homologados — versão 36](https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec).
 O endereço antigo de avaliação de Contas permanece na versão 34 e não é a produção.
 
-[Avaliar Lançamentos — menu Lançamentos (protótipo)](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec).
-Implantação separada na versão 38, com dados fictícios e frame isolado. O Lançamentos conectado
-atual continua principal. A prévia não faz chamadas ao banco.
-[Requisitos revistos e roteiro](docs/proposta-lancamentos.md),
-[HTML independente](docs/prototipos/lancamentos.html).
+[Avaliar Lançamentos — menu Lançamentos (novo)](https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec).
+Implementação conectada, com interfaces dedicadas, período/saldo globais e fórmula
+única R−D±transferências. A tela principal atual permanece até homologação.
+[Entrega e verificação](docs/lancamentos-entrega.md). O protótipo independente
+permanece como histórico em `docs/prototipos/lancamentos.html`.
+
+Próxima rodada autorizada: completar os tipos de Contas e vincular Crédito aos
+cartões existentes antes de desenhar o novo Dashboard.

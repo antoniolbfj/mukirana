@@ -4,43 +4,32 @@ Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
 
 ## Estado atual
 
-- Contas permanece homologada e principal, sem menu provisório.
-- Cartões **homologado** e promovido ao acesso principal na **produção, versão 36**.
-  Menu provisório retirado; interfaces próprias para computadores/tablets e smartphones.
-- Cadastro, adicionais, busca/filtros, consulta por competência, navegação real para
-  Fatura/Lançamentos, inativação/restauração e Desfazer conectados ao Supabase.
-- Gravação atômica, versão concorrente, repetição segura, IDs/histórico preservados e
-  competência histórica persistida. Resumo coerente com Fatura: registrado/pago/
-  programado/previsto separados e visão parcial identificada para o adicional.
-- Usuário confirmou: adicional continua registrando pagamentos com contas acessíveis.
-- Migração aplicada e conferida; testes de banco, concorrência, backend e navegador
-  concluídos. Detalhes em [cartoes-entrega.md](cartoes-entrega.md).
-- Requisitos de Lançamentos revistos no documento v0.1 e conciliados com as decisões
-  posteriores e a base homologada. Protótipo HTML/CSS/JavaScript com dados fictícios
-  e duas interfaces na **avaliação, versão 38**, menu **Lançamentos (protótipo)**.
-  Ver [proposta-lancamentos.md](proposta-lancamentos.md).
-- Refinamento do protótipo: saldo/período na barra global entre telas fictícias,
-  filtros exclusivamente mensais, preferência explícita, saída com descarte ou
-  salvamento real do rascunho no navegador, painel compacto em telas maiores.
+- Contas e Cartões homologados e principais na produção versão 36.
+- Lançamentos conectado implementado no menu provisório **Lançamentos (novo)**,
+  com interfaces próprias, fórmula única R−D±transferências, filtros dependentes,
+  período/saldo globais, rascunho explícito, geração finita, favoritos, cadastro
+  contextual e aprovações. Migração aplicada e testes concluídos. Detalhes em
+  [lancamentos-entrega.md](lancamentos-entrega.md).
+- A versão conectada substitui o protótipo fictício na implantação de avaliação;
+  código e publicação registrados em `lancamentos-publicacao.json`.
+- Próxima etapa autorizada: completar Contas com os tipos Consumo, Investimento
+  e Cartão de Crédito. O usuário confirmou vínculo aos cartões existentes.
 
 ## Pendências vigentes
 
-1. Avaliar e aprovar o protótipo de Lançamentos em computador/tablet e smartphone,
-   incluindo barra global mensal, rascunho, painel compacto, geração, rateios e alcances.
-2. Após aprovação, implementar Lançamentos conectado no menu provisório: adaptar
-   os contratos existentes e completar diferenças de modalidade, geração finita,
-   histórico/favoritos, cadastro contextual, aprovações e filtro global. Validar
-   migração dos conjuntos atuais e regras de acesso/centavos/concorrência antes de
-   substituir a tela em produção. O protótipo desta rodada não conclui esses requisitos.
-   Conciliar a fórmula definitiva de Ainda posso gastar e integrar saldo/período
-   ao componente global real de todas as telas; o valor atual é demonstrativo.
-3. Homologar a implementação conectada nas duas interfaces; só então promovê-la a
-   principal e retirar o menu provisório de Lançamentos.
-4. Escolher e remodelar as demais telas da base atual, incluindo Faturas/pagamentos
-   em rodada própria. Compatibilidade de cálculos não equivale à remodelagem completa.
-5. Ao concluir a remodelagem das telas, revisar e unificar a paleta de cores do sistema.
+1. Homologar Lançamentos conectado em computador/tablet e smartphone; depois
+   promover ao acesso principal e retirar o menu provisório.
+2. Completar Contas conforme CON-01 a CON-11: tipos, vínculo de crédito, saldo
+   inicial nos indicadores, exclusão de contas vazias e mudança retroativa de
+   classificação. Preparar saldos atuais/projetados, patrimônio de investimentos
+   e movimento do período conforme SAL-01 a SAL-05. Publicar para homologação.
+3. Desenhar o novo Dashboard após a atualização de Contas; o painel ainda é o da
+   base em produção. Nenhum Dashboard novo foi declarado concluído.
+4. Escolher e remodelar as demais telas, incluindo Faturas/pagamentos em rodada
+   própria. Compatibilidade financeira não equivale à remodelagem dessas telas.
+5. Ao concluir a remodelagem de todas as telas, revisar a paleta global.
 
-O backlog anterior ao reinício permanece arquivado; os requisitos de Lançamentos
-foram retomados por pedido expresso nesta rodada, sem declarar ausentes os demais
-módulos que já existem na base de produção. Diferenças do saldo inicial e das
-recorrências antigas estão identificadas na proposta.
+O backlog anterior ao reinício permanece arquivado. Os demais módulos existentes
+na versão 1 não são considerados ausentes sem uma revisão de seus requisitos.
+As recorrências antigas conservam seu gerador e interface de manutenção; a nova
+recorrência finita usa conjuntos próprios, evitando geração duplicada.

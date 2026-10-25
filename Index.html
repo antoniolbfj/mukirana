@@ -59,7 +59,7 @@
       <ul class="lista-menu">
         <li><a href="javascript:void(0)" onclick="navegarPara('Dashboard')">📊 Dashboard</a></li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Lancamentos')">Lançamentos</a></li>
-        <li><a href="javascript:void(0)" onclick="navegarPara('LancamentosPrototipo')">Lançamentos (protótipo) <span style="font-size:10px;opacity:.8">AVALIAÇÃO</span></a></li>
+        <li><a href="javascript:void(0)" onclick="navegarPara('LancamentosNovo')">Lançamentos (novo) <span style="font-size:10px;opacity:.8">AVALIAÇÃO</span></a></li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Contas')">Contas</a></li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Cartoes')">Cartões</a></li>
         <li><a href="javascript:void(0)" onclick="navegarPara('Categorias')">Categorias</a></li>
@@ -379,6 +379,7 @@
       var opcoes = configuracao || {};
 
       mukiranaTelaAtual.nomeTela = nomeTela || '';
+      if (window.MukiranaLancamentosStore) window.MukiranaLancamentosStore.setView(nomeTela);
       mukiranaTelaAtual.obterContextoNovoLancamento = typeof opcoes.obterContextoNovoLancamento === 'function'
         ? opcoes.obterContextoNovoLancamento
         : null;
@@ -397,6 +398,7 @@
       }
 
       mukiranaTelaAtual.nomeTela = '';
+      if (window.MukiranaLancamentosStore) window.MukiranaLancamentosStore.setView('');
       mukiranaTelaAtual.obterContextoNovoLancamento = null;
       mukiranaTelaAtual.abrirNovoLancamento = null;
       mukiranaTelaAtual.atualizarPeriodoGlobal = null;
@@ -627,7 +629,7 @@
     function abrirNovoLancamentoPeloFabMukirana() {
       var contextoAtual = obterContextoNovoLancamentoTelaAtualMukirana();
 
-      if (mukiranaTelaAtual.nomeTela === 'Lancamentos' && typeof mukiranaTelaAtual.abrirNovoLancamento === 'function') {
+      if (['Lancamentos','LancamentosNovo'].indexOf(mukiranaTelaAtual.nomeTela)>=0 && typeof mukiranaTelaAtual.abrirNovoLancamento === 'function') {
         mukiranaTelaAtual.abrirNovoLancamento(contextoAtual);
         return;
       }
@@ -1132,6 +1134,7 @@
     }
 
     function navegarPara(nomeTela) {
+      if (window.MukiranaLancamentosNovo && window.MukiranaLancamentosNovo.beforeNavigate(function(){ navegarPara(nomeTela); })) return;
       const container = document.getElementById('conteudo-tela');
 
       fecharMenuLateral();
@@ -1139,6 +1142,7 @@
       fecharBalaoAjuda();
       definirFabMukiranaVisivel(true);
       limparRegistroTelaAtualMukirana();
+      if (window.MukiranaLancamentosStore) window.MukiranaLancamentosStore.setView(nomeTela);
       limparConteudoTopbarMukirana();
 
       window.contasEmMemoria = []; window.categoriasEmMemoria = []; window.usuariosEmMemoria = [];
@@ -1418,7 +1422,10 @@
       navegarPara('Dashboard');
     })
     .withFailureHandler(function() {
-      localStorage.clear();
+      const salvosExplicitos = Object.keys(localStorage).filter(function(chave){ return /^mukirana-v3:[0-9a-f-]{36}:(period-preference|lancamentos-draft)$/i.test(chave); }).map(function(chave){ return [chave, localStorage.getItem(chave)]; });
+  Object.keys(sessionStorage).filter(function(chave){ return /^mukirana-v3:/.test(chave); }).forEach(function(chave){ sessionStorage.removeItem(chave); });
+  localStorage.clear();
+  salvosExplicitos.forEach(function(item){ localStorage.setItem(item[0], item[1]); });
       sessionStorage.removeItem('mukirana_tema_sessao');
       document.body.classList.remove('mukirana-com-topbar');
       menu.style.display = 'none';
@@ -1432,13 +1439,17 @@
 }
 
     function fazerLogout() {
+  if (window.MukiranaLancamentosNovo && window.MukiranaLancamentosNovo.beforeNavigate(function(){ fazerLogout(); })) return;
   const token = localStorage.getItem('mukirana_token');
 
   if (token) {
     google.script.run.encerrarSessao(token);
   }
 
+  const salvosExplicitos = Object.keys(localStorage).filter(function(chave){ return /^mukirana-v3:[0-9a-f-]{36}:(period-preference|lancamentos-draft)$/i.test(chave); }).map(function(chave){ return [chave, localStorage.getItem(chave)]; });
+  Object.keys(sessionStorage).filter(function(chave){ return /^mukirana-v3:/.test(chave); }).forEach(function(chave){ sessionStorage.removeItem(chave); });
   localStorage.clear();
+  salvosExplicitos.forEach(function(item){ localStorage.setItem(item[0], item[1]); });
   sessionStorage.removeItem('mukirana_tema_sessao');
   verificarSessao();
 }
@@ -1529,5 +1540,6 @@
       return parseFloat(valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
   </script>
+  <?!= HtmlService.createTemplateFromFile('Saldo_Global_Client').evaluate().getContent(); ?>
 </body>
 </html>

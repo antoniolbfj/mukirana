@@ -1,0 +1,37 @@
+<style>
+body:has(#ln-live-root) #fab-container{display:none!important}body:has(#ln-live-root) #conteudo-principal{padding-left:0;padding-right:0;padding-bottom:0}#ln-live-root iframe{display:block;width:100%;height:calc(100dvh - var(--ln-topbar-height,90px) - 16px);min-height:220px;border:0;background:#f6f7fb}
+</style>
+<section id="ln-live-root"><iframe id="ln-live-frame" title="Lançamentos" sandbox="allow-scripts allow-forms" referrerpolicy="no-referrer"></iframe></section>
+<script>
+(() => {
+if(window.MukiranaLancamentosNovo)window.MukiranaLancamentosNovo.destroy();
+const root=document.getElementById('ln-live-root'),frame=document.getElementById('ln-live-frame'),events=new AbortController(),store=window.MukiranaLancamentosStore;
+const methods={save:'lancamentosNovoSalvar',detail:'lancamentosNovoDetalhar',action:'lancamentosNovoAcao',quick:'lancamentosNovoCadastroRapido',decide:'lancamentosNovoDecidir'};
+function send(message){if(root.isConnected)frame.contentWindow?.postMessage({channel:'mk-lancamentos-live',...message},'*');}
+const unsubscribe=store.subscribe(pack=>send({type:'package',data:pack}));
+window.addEventListener('message',async event=>{
+ const message=event.data;if(!root.isConnected||event.source!==frame.contentWindow||message?.channel!=='mk-lancamentos-live'||!Number.isSafeInteger(message.requestId))return;
+ const reply={requestId:message.requestId,ok:false};try{
+  if(message.type==='load')reply.data=await store.load();
+  else if(message.type==='reload')reply.data=await store.reload();
+  else if(message.type==='filters'){store.setFilters(message.value||{});reply.data=true;}
+  else if(message.type==='draft-load'||message.type==='draft-save'){
+   const pack=await store.load(),key='mukirana-v3:'+pack.user.id+':lancamentos-draft';
+   if(message.type==='draft-load'){try{reply.data=JSON.parse(localStorage.getItem(key));}catch{reply.data=null;}}
+   else {if(message.value===null)localStorage.removeItem(key);else{const text=JSON.stringify(message.value);if(text.length>300000)throw Error('O rascunho é muito grande.');localStorage.setItem(key,text);}reply.data=true;}
+  }else if(message.type==='navigate'){
+   const allowed=['Contas','Cartoes','FaturasCartao','Recorrencias','Lancamentos'];if(!allowed.includes(message.value?.route))throw Error('Destino inválido.');
+   if(message.value.route==='FaturasCartao'&&message.value.group){const period=store.getPeriod();localStorage.setItem('mukirana_fatura_cartao',JSON.stringify({ID_Grupo_Cartao:message.value.group,Mes_Inicial:period.Mes_Inicial,Mes_Final:period.Mes_Final,Retorno_Tela:'LancamentosNovo'}));}
+   navegarPara(message.value.route);reply.data=true;
+  }else if(message.type==='editing'){api.editing=message.value?.active===true;reply.data=true;}
+  else if(message.type==='leave-ok'){api.editing=false;const next=api.pendingExit;api.pendingExit=null;if(next)next();reply.data=true;}
+  else if(methods[message.type]){reply.data=await store.rpc(methods[message.type],message.value);if(message.type!=='detail')await store.reload();}
+  else return;reply.ok=true;
+ }catch(error){reply.error=error.message||'Não foi possível concluir.';}send(reply);
+},{signal:events.signal});
+const observer=new MutationObserver(()=>{if(!root.isConnected)api.destroy();});const api={editing:false,pendingExit:null,beforeNavigate(next){if(!this.editing)return false;this.pendingExit=next;send({type:'leave'});return true;},destroy(){events.abort();observer.disconnect();unsubscribe();store.setView('');if(window.MukiranaLancamentosNovo===api)delete window.MukiranaLancamentosNovo;}};observer.observe(document.documentElement,{childList:true,subtree:true});window.MukiranaLancamentosNovo=api;
+frame.srcdoc=<?!= JSON.stringify(HtmlService.createTemplateFromFile('Lancamentos_Novo_App').evaluate().getContent()).replace(/</g, '\\u003c') ?>;
+store.setView('LancamentosNovo');registrarTelaAtualMukirana('LancamentosNovo',{atualizarPeriodoGlobal:()=>{},abrirNovoLancamento:()=>send({type:'new'})});
+if(typeof finalizarCarregamentoTelaMukirana==='function')finalizarCarregamentoTelaMukirana();
+})();
+</script>

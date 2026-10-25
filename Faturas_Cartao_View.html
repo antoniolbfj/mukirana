@@ -556,7 +556,7 @@
   inicializarFaturaCartao();
 
   function voltarAosCartoesDaFatura() {
-    navegarPara(parametrosFaturaCartao.Retorno_Tela === 'CartoesNovo' ? 'CartoesNovo' : 'Cartoes');
+    navegarPara(parametrosFaturaCartao.Retorno_Tela === 'LancamentosNovo' ? 'LancamentosNovo' : parametrosFaturaCartao.Retorno_Tela === 'CartoesNovo' ? 'CartoesNovo' : 'Cartoes');
   }
 
   function inicializarFaturaCartao() {
