@@ -14,16 +14,19 @@ const payment=settle('12000','2026-07-31');eq(balance('2026-07'),'0');
 ctx.rateiosNovoMutar('owner-token',{action:'settle',id:payment.id,operationId:id(),entryId:id(),version:payment.version,side:'receive',other,amountCents:'12000',date:'2026-08-02',account:bank});eq(balance('2026-07'),'0');eq(balance('2026-08'),'0');
 create('expense','20000','2026-11-10');create('expense','40000','2026-12-10');
 for(const month of ['2026-06','2026-07','2026-08','2026-09','2026-10']){eq(balance(month),'0');eq(balance(month,true),'0');}
-eq(balance('2026-11'),'10000');eq(balance('2026-11',true),'10000');eq(balance('2026-12'),'20000');eq(balance('2026-12',true),'30000');eq(balance('2026-11',false,other),'-10000');
+eq(balance('2026-11'),'10000');eq(balance('2026-11',true),'10000');eq(balance('2026-12'),'30000');eq(balance('2026-12',true),'30000');eq(summary('2026-12').balances.find(b=>b.id===other).movementCents,'20000');eq(balance('2026-11',false,other),'-10000');
 const nov=summary('2026-11').balances.find(b=>b.id===other);eq(nov.obligationsCents,'10000');eq(nov.settlementsCents,'0');
 const jul=summary('2026-07').balances.find(b=>b.id===other);eq(jul.obligationsCents,'12000');eq(jul.settlementsCents,'-12000');
 // Parcial, rejeição e nova quitação: um acerto rejeitado não reduz a dívida.
 create('expense','10000','2026-09-02');const partial=settle('2000','2026-09-10');eq(balance('2026-09'),'3000');
 ctx.rateiosNovoMutar('owner-token',{action:'settle-reject',id:partial.id,version:partial.version,operationId:id(),reason:'Correção de teste local'});eq(balance('2026-09'),'5000');settle('5000','2026-09-30');eq(balance('2026-09'),'0');eq(balance('2026-10',true),'0');
+// Pagar antes do mês da obrigação não pode recriar a dívida no card mensal.
+const advance=settle('1000','2026-10-24');eq(balance('2026-11',false,other),'-9000');eq(balance('2026-11',true,other),'-9000');eq(summary('2026-11',false,other).balances[0].movementCents,'-10000');
+ctx.rateiosNovoMutar('other-token',{action:'settle-remove',id:advance.id,version:advance.version,operationId:id()});eq(balance('2026-10',false,other),'0');eq(balance('2026-11',false,other),'-10000');
 const C=vm.runInContext('lancamentosNovoRegras_()',ctx),P=vm.runInContext('painelNovoRegras_()',ctx),count=sql('SELECT count(*) FROM lancamentos');
 const october=ctx.painelNovoListar('other-token',{Mes_Selecionado:'2026-10',Considerar_Historico_Anterior:false}),octCalc=P.compute(october,false,C);eq(octCalc.payableCents,'0');eq(octCalc.receivableCents,'0');
 const november=ctx.painelNovoListar('other-token',{Mes_Selecionado:'2026-11',Considerar_Historico_Anterior:false});eq(P.compute(november,false,C).payableCents,'10000');ok(november.rateios.balances.some(b=>b.balanceCents==='-30000'));eq(november.rateiosSummary.end,'2026-11-30');
-const december=ctx.painelNovoListar('other-token',{Mes_Selecionado:'2026-12',Considerar_Historico_Anterior:false}),decHistory=ctx.painelNovoListar('other-token',{Mes_Selecionado:'2026-12',Considerar_Historico_Anterior:true});eq(P.compute(december,false,C).payableCents,'20000');eq(P.compute(decHistory,false,C).payableCents,'30000');eq(count,sql('SELECT count(*) FROM lancamentos'));
+const december=ctx.painelNovoListar('other-token',{Mes_Selecionado:'2026-12',Considerar_Historico_Anterior:false}),decHistory=ctx.painelNovoListar('other-token',{Mes_Selecionado:'2026-12',Considerar_Historico_Anterior:true});eq(P.compute(december,false,C).payableCents,'30000');eq(P.compute(decHistory,false,C).payableCents,'30000');eq(count,sql('SELECT count(*) FROM lancamentos'));
 const modal=ctx.lancamentosContextoListar('other-token',{rateiosPeriod:true,period:{Mes_Selecionado:'2026-10',Considerar_Historico_Anterior:false}});eq(modal.rateios.scopedSummary.balances[0].balanceCents,'0');
 eq(sql("SELECT has_function_privilege('anon','public.rpc_painel_rateios_periodo_v10(uuid,date,date)','execute')"),'f');eq(sql("SELECT has_function_privilege('authenticated','public.rpc_painel_rateios_periodo_v10(uuid,date,date)','execute')"),'f');
 assert.throws(()=>rpc('rpc_painel_rateios_periodo_v10',{p_usuario:other,p_inicio:'2026-11-01',p_fim:'2026-10-31'}),/invalid_request/);checks++;

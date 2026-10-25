@@ -31,9 +31,11 @@ receitas rateadas e inclui acertos ativos, inclusive ajustes históricos sem cai
 Uma despesa de pagamento e a receita correspondente pertencem ao mesmo acerto e
 não abatem a obrigação duas vezes. Acertos rejeitados/cancelados não reduzem a dívida.
 
-Sem Saldo anterior, o card mostra o resultado do mês. Com a checkbox marcada,
-mostra o acumulado até o fim desse mês. Meses posteriores ficam fora dos dois
-recortes. A modal de rateios aberta pelo Painel recebe o mesmo resumo; os limites
+O saldo devedor é a posição até o fim do mês escolhido, incluindo os acertos
+anteriores e pagamentos antecipados. A checkbox define quais lançamentos a modal
+mostra: apenas o mês ou todo o histórico até ele. O movimento do recorte permanece
+separado da posição de dívida; não se atribui o pagamento a despesas específicas.
+Meses posteriores ficam fora do saldo exibido. A modal de rateios aberta pelo Painel recebe o mesmo resumo; os limites
 operacionais do backend para registrar acertos agregados permanecem preservados.
 
 A verificação de leitura na base vigente confirmou junho a outubro/2026 zerados
@@ -47,8 +49,8 @@ EXECUTE apenas para service_role e identidade derivada da sessão na API do app.
 
 ## Verificação
 
-- 41 verificações com PostgreSQL fictício: despesas/receitas, fechamento quitado,
-  mês versus histórico, parcela do futuro excluída, duas pontas de um acerto,
+- 47 verificações com PostgreSQL fictício: despesas/receitas, fechamento quitado,
+  posição versus movimento do mês/histórico, futuro excluído e pagamento antecipado, duas pontas de um acerto,
   pagamento parcial, rejeição, Painel/modal consistentes, permissões e leitura
   sem gravação de movimentos.
 - 63 regressões de Rateios e regressões de patrimônio, participação por categoria,

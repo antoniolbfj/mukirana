@@ -10,7 +10,7 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 51**, com mês global/saldo anterior, fatura contextual, rateios na lista e
+**versão 52**, com mês global/saldo anterior, fatura contextual, rateios na lista e
 modal de lançamentos em Contas/Painel. Publicação conferida em
 `lancamentos-contextos-publicacao.json`. A versão48 entregou o hub e a retirada
 de Projetos; a versão47 corrigiu transferências após pagamentos de fatura.
@@ -66,8 +66,9 @@ Ver [entrega](lancamentos-contextos-entrega.md). Homologação de uso pendente.
 
 O Painel foi reorganizado em cinco linhas conforme a orientação mais recente,
 com Consumo e Patrimônio em cards próprios, sem o antigo card Patrimônio atual.
-O saldo do rateio e sua modal agora respeitam mês/saldo anterior e abatem os
-acertos existentes uma única vez, excluindo períodos futuros do recorte.
+O saldo devedor do rateio e sua modal agora respeitam o fim do mês e abatem os
+acertos existentes uma única vez, inclusive antecipações, excluindo obrigações
+futuras do recorte. A checkbox define o histórico de lançamentos exibido.
 Ver [correção do Painel](painel-periodo-entrega.md). Homologação de uso pendente.
 
 ## Pendências vigentes

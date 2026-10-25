@@ -1,9 +1,5 @@
 {
   "project": "wcczkultokrypdfimbsh",
-  "migration": {
-    "name": "painel_v10_rateios_periodo",
-    "version": "20261025224955"
-  },
   "financialRecordsRewritten": false,
   "transactionalHashAssertion": "PASS",
   "checkedClosedMonths": [
@@ -25,5 +21,17 @@
     "errors": 0,
     "warnings": 0,
     "info": 16
-  }
+  },
+  "migrations": [
+    {
+      "name": "painel_v10_rateios_periodo",
+      "version": "20261025224955"
+    },
+    {
+      "version": "20261025230510",
+      "name": "painel_v10_saldo_devedor"
+    }
+  ],
+  "stockPositionIncludesPrepayments": true,
+  "writeRpcUnchanged": true
 }

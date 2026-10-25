@@ -32,7 +32,7 @@ with sync_playwright() as p:
    assert f.locator('.chart-section').evaluate('(e)=>Math.abs(e.offsetWidth-document.getElementById("balances").offsetWidth)<2')
    # O calendário muda; o card deixa de exibir todos os meses futuros somados.
    month=page.locator('#mk_global_mes');month.fill('2026-11');month.dispatch_event('change');expect(rate).to_contain_text('100,00');expect(f.locator('.rateio-card')).to_contain_text(re.compile('nov'))
-   month.fill('2026-12');month.dispatch_event('change');expect(rate).to_contain_text('200,00');page.locator('#mk_global_saldo_anterior').check();expect(rate).to_contain_text('300,00')
+   month.fill('2026-12');month.dispatch_event('change');expect(rate).to_contain_text('300,00');page.locator('#mk_global_saldo_anterior').check();expect(rate).to_contain_text('300,00')
    page.locator('#mk_global_saldo_anterior').uncheck();month.fill('2026-10');month.dispatch_event('change');expect(rate).to_contain_text('0,00')
    # Filtros do gráfico continuam locais ao gráfico.
    old_period=page.evaluate('obterFiltroPeriodoGlobalMukirana()');f.locator('[data-chart-mode=year]').click();assert f.locator('[data-wealth-month]').count()==12;assert page.evaluate('obterFiltroPeriodoGlobalMukirana()')==old_period
