@@ -1,7 +1,7 @@
 /** Regras puras compartilhadas entre Apps Script e navegador via Function.toString(). */
 function lancamentosNovoRegras_() {
   'use strict';
-  const dimensions = ['type','account','category','project','mode','status'];
+  const dimensions = ['type','account','category','mode','status'];
   function add(a,b) {
     a=String(a);b=String(b);let negative=a[0]==='-',same=negative===(b[0]==='-');
     let x=negative?a.slice(1):a,y=b[0]==='-'?b.slice(1):b,out='',carry=0;
@@ -22,8 +22,9 @@ function lancamentosNovoRegras_() {
   }
   function facets(rows,input){const f=clean(input),result={};for(const key of dimensions){const values={};for(const row of rows)if(matches(row,f,key)){const value=String(row[key]||'');if(value)values[value]=true;if(key==='category')for(const parent of row.categoryPath||[])if(parent)values[parent]=true;}result[key]=Object.keys(values);}return result;}
   function valid(rows,input){const f=clean(input);if(!dimensions.some(k=>f[k]))return true;return rows.some(row=>matches(row,f));}
-  function normalize(rows,input,changed){const f=clean(input),cleared=[];if(valid(rows,f))return {filters:f,cleared:cleared};
-    const order=dimensions.filter(k=>k!==changed).concat(changed&&dimensions.indexOf(changed)>=0?[changed]:[]);
+  function normalize(rows,input,changed){const f=clean(input),cleared=[];if(!changed||changed==='search'||valid(rows,f))return {filters:f,cleared:cleared};
+    // Conta é sempre selecionável, inclusive sem movimentos. Recargas não apagam o recorte.
+    const order=dimensions.filter(k=>k!=='account'&&k!==changed);
     for(const key of order){if(f[key]){f[key]='';cleared.push(key);if(valid(rows,f))break;}}
     return {filters:f,cleared:cleared};
   }

@@ -4,7 +4,7 @@ const leg=(id,type,account,value,patch={})=>({key:id+account,entryId:id,type,acc
 const legs=[leg('salary','income','bankA',100000),leg('food','expense','bankA',-20000),leg('transfer','transfer','bankA',-30000),leg('transfer','transfer','bankB',30000),leg('onlyIncome','income','bankC',5000)];
 assert.equal(C.summarize(legs).resultCents,'85000');assert.equal(C.query(legs,{account:'bankA'}).summary.resultCents,'50000');assert.equal(C.query(legs,{account:'bankB'}).summary.resultCents,'30000');
 assert.equal(C.query(legs,{type:'transfer'}).summary.resultCents,'0');
-assert.deepEqual([...C.facets(legs,{type:'expense'}).account],['bankA']);assert(!C.valid(legs,{type:'expense',account:'bankC'}));assert.equal(C.normalize(legs,{type:'expense',account:'bankC'},'type').filters.account,'');
+assert.deepEqual([...C.facets(legs,{type:'expense'}).account],['bankA']);assert(!C.valid(legs,{type:'expense',account:'bankC'}));assert.equal(C.normalize(legs,{type:'expense',account:'bankC'},'type').filters.account,'bankC');
 assert.equal(C.summarize([leg('big','income','A','999999999999999999'),leg('tiny','expense','A','-1')]).resultCents,'999999999999999998');
 for(const method of ['lancamentosNovoListar','lancamentosNovoConsultar','lancamentosNovoDetalhar','lancamentosNovoSalvar','lancamentosNovoAcao','lancamentosNovoCadastroRapido','lancamentosNovoDecidir'])assert.throws(()=>ctx[method]('expired',{}));
 let pack=ctx.lancamentosNovoListar('owner-token',{Mes_Inicial:'2026-10',Mes_Final:'2026-10'});assert(!JSON.stringify(pack).includes('senha_pin'));assert(pack.rows.every(r=>typeof r.signedCents==='string'));

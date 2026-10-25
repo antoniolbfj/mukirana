@@ -408,18 +408,14 @@
       </div>
     </div>
 
-    <div class="grupo-campo-duplo">
+    <div>
       <div class="grupo-campo" id="container-rec-categoria">
         <label for="rec_categoria">Categoria</label>
         <select id="rec_categoria" required></select>
         <div id="erro_rec_categoria" class="recorrencia-campo-alerta" style="display:none;"></div>
       </div>
 
-      <div class="grupo-campo">
-        <label for="rec_projeto">Projeto / Centro de custo</label>
-        <select id="rec_projeto"></select>
-        <div id="erro_rec_projeto" class="recorrencia-campo-alerta" style="display:none;"></div>
-      </div>
+      <input type="hidden" id="rec_projeto"><span id="erro_rec_projeto" hidden></span>
     </div>
 
     <div class="grupo-campo-triplo">
@@ -544,7 +540,6 @@
         <th>Valor</th>
         <th>Modo</th>
         <th>Origem</th>
-        <th>Projeto</th>
         <th>Rateio</th>
         <th>Status</th>
         <th style="text-align:right;">Ações</th>
@@ -747,7 +742,7 @@
       if (grupo !== grupoAtual) {
         var trGrupo = document.createElement('tr');
         trGrupo.className = 'recorrencia-grupo-linha';
-        trGrupo.innerHTML = '<td colspan="11">' + escaparHtmlRecorrencia(grupo) + '</td>';
+        trGrupo.innerHTML = '<td colspan="10">' + escaparHtmlRecorrencia(grupo) + '</td>';
         corpo.appendChild(trGrupo);
         grupoAtual = grupo;
       }
@@ -765,7 +760,6 @@
         '<td data-label="Valor">R$ ' + formatarNumeroRecorrencia(item.Valor_Base) + '</td>' +
         '<td data-label="Modo"><span class="badge-adicional">' + escaparHtmlRecorrencia(item.Modo_Geracao) + '</span></td>' +
         '<td data-label="Origem">' + escaparHtmlRecorrencia(item.Nome_Origem_Visualizacao) + '</td>' +
-        '<td data-label="Projeto">' + escaparHtmlRecorrencia(item.Nome_Projeto_Visualizacao || '') + '</td>' +
         '<td data-label="Rateio">' + escaparHtmlRecorrencia(item.Resumo_Rateio) + '</td>' +
         '<td data-label="Status">' + statusHtml + '</td>' +
         '<td data-label="Ações" style="text-align:right;">' + montarAcoesRecorrenciaFront(item) + '</td>';
@@ -1114,26 +1108,9 @@
     }
   }
 
+  // Campo oculto preserva a referência histórica ao editar uma regra antiga.
   function popularProjetosRecorrencia(idSelecionado) {
-    var select = document.getElementById('rec_projeto');
-    var projetos = (pacoteRecorrencias.dependencias.projetos || []).slice();
-
-    select.innerHTML = '<option value="">Nenhum</option>';
-
-    projetos.sort(function(a, b) {
-      return (a.Nome || '').localeCompare(b.Nome || '');
-    });
-
-    projetos.forEach(function(projeto) {
-      var opt = document.createElement('option');
-      opt.value = projeto.ID_Projeto;
-      opt.textContent = projeto.Nome;
-      select.appendChild(opt);
-    });
-
-    if (idSelecionado) {
-      select.value = idSelecionado;
-    }
+    document.getElementById('rec_projeto').value = idSelecionado || '';
   }
 
   function atualizarDropdownOrigemRecorrencia(idSelecionado) {
@@ -1289,7 +1266,7 @@
     }
 
     info.innerHTML = '<strong>Rateio:</strong> a automação pode ratear com qualquer usuário ativo. ' +
-      'A conta, o cartão e o projeto continuam com as próprias permissões. ' +
+      'A conta e o cartão continuam com as próprias permissões. ' +
       'O criador da recorrência deve participar obrigatoriamente.';
 
     usuarios.sort(function(a, b) {

@@ -2,7 +2,7 @@
  * Modulo: Recorrencias_Controller.gs
  * Responsabilidade:
  * - Controlar o cadastro de automacoes recorrentes.
- * - Validar compatibilidade com contas, cartoes, projetos e rateios.
+ * - Validar compatibilidade com contas, cartoes e rateios.
  * - Gerar lancamentos manuais e automaticos sem alterar o historico ja criado.
  */
 
@@ -946,7 +946,7 @@ function montarRecorrenciaParaSalvarController_(dados, contexto, existente) {
     ID_Origem: normalizarTextoRecorrenciaController_(dados.ID_Origem),
     ID_Destino: tipo === "Transferência" ? normalizarTextoRecorrenciaController_(dados.ID_Destino) : "",
     ID_Categoria: tipo === "Transferência" ? "" : normalizarTextoRecorrenciaController_(dados.ID_Categoria),
-    ID_Projeto: normalizarTextoRecorrenciaController_(dados.ID_Projeto),
+    ID_Projeto: existente ? normalizarTextoRecorrenciaController_(existente.ID_Projeto) : "",
     Status_Lancamento: normalizarStatusLancamentoRecorrenciaController_(dados.Status_Lancamento),
     Observacao: "",
     Info_Bloqueio: "",
@@ -1061,15 +1061,8 @@ function validarChavesRecorrenciaController_(recorrencia, contexto, existente) {
     }
   }
 
-  if (recorrencia.ID_Projeto) {
-    const projeto = (contexto.projetosAcessiveis || []).find(function(item) {
-      return normalizarTextoLancamento_(item.ID_Projeto) === recorrencia.ID_Projeto;
-    });
+  // A referência histórica de projeto não restringe mais esta operação.
 
-    if (!projeto) {
-      throw new Error("Projeto invalido, concluido ou inacessivel.");
-    }
-  }
 
   if (existente && normalizarTextoRecorrenciaController_(existente.Tipo) !== recorrencia.Tipo) {
     throw new Error("Nao e permitido mudar o tipo da recorrencia. Inative a atual e cadastre uma nova automacao.");
@@ -1192,15 +1185,8 @@ function diagnosticarRecorrenciaController_(recorrencia, contexto, rateios) {
     }
   }
 
-  if (recorrencia.ID_Projeto) {
-    const projeto = (contexto.projetosAcessiveis || []).find(function(item) {
-      return normalizarTextoLancamento_(item.ID_Projeto) === recorrencia.ID_Projeto;
-    });
+  // A referência histórica de projeto não restringe mais esta operação.
 
-    if (!projeto) {
-      campos.ID_Projeto = "O projeto vinculado nao esta mais acessivel ou foi concluido.";
-    }
-  }
 
   if (participantesNormalizados.length > 0 && recorrencia.Tipo !== "Transferência") {
     try {

@@ -7,7 +7,7 @@ body:has(#ln-live-root) #fab-container{display:none!important}body:has(#ln-live-
 if(window.MukiranaLancamentosNovo)window.MukiranaLancamentosNovo.destroy();
 const root=document.getElementById('ln-live-root'),frame=document.getElementById('ln-live-frame'),events=new AbortController(),store=window.MukiranaLancamentosStore;
 const contextual=typeof estaEmTelaContextualMukirana==='function'&&estaEmTelaContextualMukirana();
-const methods={save:'lancamentosNovoSalvar',detail:'lancamentosNovoDetalhar',action:'lancamentosNovoAcao',quick:'lancamentosNovoCadastroRapido',decide:'lancamentosNovoDecidir',rateio:'rateiosNovoMutar',candidates:'rateiosNovoCandidatos'};
+const methods={save:'lancamentosNovoSalvar',detail:'lancamentosNovoDetalhar',action:'lancamentosNovoAcao',quick:'lancamentosNovoCadastroRapido',decide:'lancamentosNovoDecidir',hub:'lancamentosHubAtualizar',rateio:'rateiosNovoMutar',candidates:'rateiosNovoCandidatos'};
 function send(message){if(root.isConnected)frame.contentWindow?.postMessage({channel:'mk-lancamentos-live',...message},'*');}
 const unsubscribe=store.subscribe(pack=>send({type:'package',data:pack}));
 window.addEventListener('message',async event=>{
@@ -17,8 +17,12 @@ window.addEventListener('message',async event=>{
   else if(message.type==='context'){
    let previous={};try{previous=JSON.parse(localStorage.getItem('mukirana_filtros_lancamentos'))||{};}catch{}localStorage.removeItem('mukirana_filtros_lancamentos');
    const next=localStorage.getItem('mukirana_acao_pendente')||'';localStorage.removeItem('mukirana_acao_pendente');
-   const pack=await store.load(),card=pack.accounts.find(a=>a.id===previous.ID_Cartao),group=pack.accounts.find(a=>a.linkedGroup===previous.ID_Grupo_Cartao),context={filters:{account:previous.ID_Conta||card?.ledgerAccount||group?.id||'',category:previous.ID_Categoria||'',project:previous.ID_Projeto||'',type:({Receita:'income',Despesa:'expense',Transferência:'transfer'})[previous.Tipo]||'',search:previous.Texto||''},action:next,origin:previous.ID_Cartao||previous.ID_Conta||'',entry:previous.ID_Lancamento||''};
+   const pack=await store.load(),card=previous.ID_Cartao?pack.accounts.find(a=>a.id===previous.ID_Cartao):null,group=previous.ID_Grupo_Cartao?pack.accounts.find(a=>a.linkedGroup===previous.ID_Grupo_Cartao):null,context={filters:{account:previous.ID_Conta||card?.ledgerAccount||group?.id||'',category:previous.ID_Categoria||'',project:previous.ID_Projeto||'',type:({Receita:'income',Despesa:'expense',Transferência:'transfer'})[previous.Tipo]||'',search:previous.Texto||''},action:next,origin:previous.ID_Cartao||previous.ID_Conta||'',entry:previous.ID_Lancamento||''};
    reply.data={...context,...(window.MukiranaLancamentosContext||{})};window.MukiranaLancamentosContext=null;
+  }else if(message.type==='views-load'||message.type==='views-save'){
+   const pack=await store.load(),key='mukirana-v8:'+pack.user.id+':ledger-views';
+   if(message.type==='views-load'){try{reply.data=JSON.parse(localStorage.getItem(key))||[];}catch{reply.data=[];}}
+   else{const value=message.value;if(!Array.isArray(value)||value.length>20||JSON.stringify(value).length>50000)throw Error('Confira as visões salvas.');localStorage.setItem(key,JSON.stringify(value));reply.data=true;}
   }else if(message.type==='investment'){store.setInvestment(message.value===true);reply.data=true;}
   else if(message.type==='reload')reply.data=await store.reload();
   else if(message.type==='filters'){store.setFilters(message.value||{});reply.data=true;}

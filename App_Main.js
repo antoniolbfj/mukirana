@@ -71,7 +71,7 @@ function obterHtmlDaTela(nomeTela, tokenSessao) {
     if (nomeTela === 'FaturasCartao') return incluir_('Faturas_Cartao_View');
     if (nomeTela === 'Recorrencias') return incluir_('Recorrencias_View');
     if (nomeTela === 'Login') return incluir_('Login_View');
-    if (nomeTela === 'Projetos') return incluir_('Projetos_View');
+    if (nomeTela === 'Projetos') return incluir_('Categorias_View');
     if (nomeTela === 'Lancamentos' || nomeTela === 'LancamentosNovo' || nomeTela === 'LancamentosPrototipo' || nomeTela === 'Rateios') return HtmlService.createTemplateFromFile('Lancamentos_Novo_View').evaluate().getContent();
 
     return "<div style='padding: 30px;'><h2>Em construção: " + nomeTela + "</h2></div>";

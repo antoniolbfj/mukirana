@@ -1,0 +1,30 @@
+{
+  "verifiedAt": "2026-10-25T18:57:38.238Z",
+  "project": "wcczkultokrypdfimbsh",
+  "migrations": [
+    "20261025184541_lancamentos_v8_hub_metadata",
+    "20261025185217_lancamentos_v8_retired_projects"
+  ],
+  "noFinancialDataRewritten": true,
+  "preservationHashesAssertedInsideBothTransactions": true,
+  "readVerification": {
+    "entries": 1093,
+    "shares": 942,
+    "payments": 25,
+    "historical_projects": 4,
+    "original_entries_preserved": true,
+    "account_catalog_preserved": true,
+    "anon_blocked": true,
+    "client_role_blocked": true,
+    "security_invoker": true
+  },
+  "writeVerification": {
+    "write_function_hash": "bd5b54147681c0e239ee86d154b1c139",
+    "security_definer": false,
+    "anon_can_call": false,
+    "client_can_call": false
+  },
+  "securityWarnings": 0,
+  "securityErrors": 0,
+  "existingRlsInfo": 16
+}

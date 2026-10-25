@@ -43,8 +43,9 @@ const LancamentosNovo_ = {
     data.accounts.forEach(function(a){accounts[a.id]=a;});data.categories.forEach(function(c){categories[c.id]=c;});data.projects.forEach(function(p){projects[p.id]=p;});
     function categoryPath(id){let seen={},path=[],c=categories[id];while(c&&c.parent&&!seen[c.parent]){seen[c.parent]=true;path.push(c.parent);c=categories[c.parent];}return path;}
     function append(e,account,signed,suffix,name,special){
-      const cat=categories[e.category],proj=projects[e.project];
-      result.push({key:e.id+':'+suffix,entryId:e.id,type:e.type,description:e.description,date:e.date,competence:e.competence,account:account,accountName:name,origin:e.origin,destination:e.destination,category:e.category||'',categoryName:cat?cat.name:'',categoryPath:categoryPath(e.category),project:e.project||'',projectName:proj?proj.name:'',mode:e.mode||'single',status:e.status,amountCents:e.amountCents,signedCents:signed,classification:e.classification||'',group:e.group||'',index:e.index||0,version:e.version||0,canEdit:e.canEdit===true,special:special||'',side:suffix,searchText:[e.description,name,cat&&cat.name,proj&&proj.name].filter(Boolean).join(' ')});
+      const displayCategory=e.displayCategory!==undefined?e.displayCategory:e.category;
+      const cat=categories[displayCategory],proj=projects[e.project];
+      result.push({key:e.id+':'+suffix,entryId:e.id,type:e.type,description:e.description,date:e.date,competence:e.competence,account:account,accountName:name,origin:e.origin,destination:e.destination,category:displayCategory||'',categoryName:cat?cat.name:'',categoryPath:categoryPath(displayCategory),project:e.project||'',projectName:proj?proj.name:'',mode:e.mode||'single',status:e.status,amountCents:e.amountCents,signedCents:signed,classification:e.classification||'',group:e.group||'',index:e.index||0,version:e.version||0,canEdit:e.canEdit===true,canCategorize:e.canCategorize===true,special:special||'',side:suffix,searchText:[e.description,name,cat&&cat.name,proj&&proj.name].filter(Boolean).join(' ')});
     }
     data.entries.forEach(function(e){
       if(!core.cents(e.amountCents)||!ContasNova_.date(e.date))throw new Error('Resposta financeira inválida.');
@@ -101,7 +102,7 @@ function lancamentosNovoListar(token,filters){
   return {user:{id:user.id,name:user.nome||''},period:period,rows:LancamentosNovo_.rows(data),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:data.favorites,approvals:data.approvals,rateios:data.rateios};
 }
 function lancamentosNovoConsultar(token,period,filters){
-  const data=lancamentosNovoListar(token,period),core=LancamentosNovo_.core();if(!core.valid(data.rows,filters))throw new Error('Essa combinação de filtros não possui lançamentos. Revise a seleção.');return core.query(data.rows,filters);
+  const data=lancamentosNovoListar(token,period),core=LancamentosNovo_.core();return core.query(data.rows,filters);
 }
 function lancamentosNovoDetalhar(token,id){
   const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();if(!LancamentosNovo_.uuid(id))throw new Error('Lançamento inválido.');
@@ -140,7 +141,7 @@ function lancamentosNovoSalvar(token,request){
     const editing=!!original,date=editing?(e.id===original.id?r.date:(r.date===original.date?e.date:new Date(new Date(e.date+'T12:00:00Z').getTime()+new Date(r.date+'T12:00:00Z').getTime()-new Date(original.date+'T12:00:00Z').getTime()).toISOString().slice(0,10))):e.date;
     let portions=shares;
     if(!editing&&r.mode==='installment'&&shares.length){if(shares.some(function(p){return Number(p.cents)<schedule.length;}))throw new Error('Cada pessoa precisa ter R$ 0,01 em cada parcela.');portions=helper.portions(Number(e.amountCents),remaining,schedule.length-i-1);remaining=remaining.map(function(p){return{id:p.id,cents:String(Number(p.cents)-Number(portions.find(function(x){return x.id===p.id;}).cents))};});}
-    changes.rows.push({id:editing?e.id:helper.childId(r.id,i),version:editing?e.version:0,description:r.description.trim(),type:r.type,amountCents:editing?r.amountCents:e.amountCents,date:date,sourceKind:source.kind,origin:r.origin,destination:r.type==='transfer'?r.destination:null,category:r.type==='transfer'?null:r.category,project:r.project||null,classification:r.classification,status:editing?(e.id===original.id?r.status:e.status):i===0?r.status:'pending',index:i+1,shares:portions});
+    changes.rows.push({id:editing?e.id:helper.childId(r.id,i),version:editing?e.version:0,description:r.description.trim(),type:r.type,amountCents:editing?r.amountCents:e.amountCents,date:date,sourceKind:source.kind,origin:r.origin,destination:r.type==='transfer'?r.destination:null,category:r.type==='transfer'?null:r.category,project:editing?e.project||null:null,classification:r.classification,status:editing?(e.id===original.id?r.status:e.status):i===0?r.status:'pending',index:i+1,shares:portions});
   });
   if(r.favorite)changes.favorite={description:r.description.trim(),type:r.type,origin:r.origin,category:r.category,classification:r.classification};
   return helper.rpc('rpc_lancamentos_gravar_v3',{p_usuario:user.id,p_operacao:r.operationId,p_request:r,p_changes:changes});

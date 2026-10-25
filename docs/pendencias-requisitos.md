@@ -48,6 +48,14 @@ entrada da conta do cartão sem recarregar o navegador. Os pagamentos existentes
 já tinham esse vínculo; nenhuma migração ou duplicação é necessária. Ver
 [correção das faturas](faturas-transferencias-entrega.md).
 
+A rodada seguinte implementa **Lançamentos como hub**: catálogo completo de contas,
+Investimento disponível, valor do período/filtros atualizado ao gravar, lote de
+categoria e fixa/variável, edição na linha/cartão, ordenação, visões salvas e
+atalhos contextuais. Corrigidos o contexto de abertura e o alinhamento da marca.
+**Projetos foi descontinuado**, com histórico preservado e organização por
+categorias/subcategorias. Ver [entrega](lancamentos-hub-entrega.md). Implantação
+em conferência; o registro definitivo será `lancamentos-hub-publicacao.json`.
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -56,6 +64,8 @@ já tinham esse vínculo; nenhuma migração ou duplicação é necessária. Ver
    (semáforo, patrimônio, rateios e títulos) com os dados reais. Sua implementação
    e promoção foram autorizadas; a homologação de uso continua separada.
    Validar também pagamentos de fatura e a atualização imediata de Lançamentos.
+   Nesta rodada, conferir todas as contas nos filtros, valor do recorte, edição
+   direta, lote, ordenação, visões, rascunho e alinhamento da marca.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.
@@ -69,13 +79,12 @@ já tinham esse vínculo; nenhuma migração ou duplicação é necessária. Ver
    agrupamentos e cálculos, apresentação interativa, PDF e planilha com os mesmos
    resultados e limites de privacidade.
 5. **Revisões específicas dos módulos legados:** conferir requisitos e aprimorar
-   fluxos de Faturas/pagamentos, Categorias, Recorrências antigas, Projetos e
-   Usuários/autenticação, sem presumir que funcionalidades existentes estejam
+   fluxos de Faturas/pagamentos, Categorias, Recorrências antigas, Usuários/autenticação, sem presumir que funcionalidades existentes estejam
    ausentes. As telas já acompanham os temas; refinamentos próprios de interação
    continuam sujeitos às próximas rodadas e à homologação.
    A atualização do cache após pagamentos de fatura foi corrigida nesta rodada.
 
-A paleta global com os três temas foi implementada nesta rodada, conforme a nova
+A paleta global com os três temas já foi implementada, conforme a nova
 autorização do usuário, e deixa de ser uma pendência de implementação. Ajustes de
 UX apontados na homologação continuam possíveis. Preferência Sépia é visual e
 local ao navegador; não modifica o cadastro de temas do banco.
