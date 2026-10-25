@@ -31,6 +31,12 @@ os três temas e os layouts próprios. Ver [entrega](painel-oficial-entrega.md).
 Publicado e conferido na versão45, com 72 fontes idênticas ao commit `29d680a`.
 Ver `painel-oficial-publicacao.json`; homologação de uso permanece pendente.
 
+Análise posterior dos rateios manuais concluída somente em leitura: 11 movimentos
+históricos relevantes e três receitas recentes para conferência; sete receitas
+antigas sem vínculo. Preservados os dados e a implantação v45. A atualização
+depende da conciliação dos vínculos e das diferenças encontradas. Ver
+[análise do legado](analise-rateios-legados.md).
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -38,17 +44,22 @@ Ver `painel-oficial-publicacao.json`; homologação de uso permanece pendente.
    e Metas, em computador/tablet e smartphone. Conferir o Painel oficial conectado
    (semáforo, patrimônio, rateios e títulos) com os dados reais. Sua implementação
    e promoção foram autorizadas; a homologação de uso continua separada.
-2. **Classificar o histórico:** identificar contas antigas de Investimento;
+2. **Conciliar os rateios manuais antigos:** validar o mapa de recebimentos e
+   pagamentos, resolver diferenças e a eventual sobreposição com receitas novas;
+   reaproveitar os lançamentos existentes e tratar explicitamente os registros
+   confirmados como repetidos, sem duplicar movimentos ou a quitação. Análise
+   concluída, nenhuma atualização aplicada.
+3. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.
-3. **Estornos e análises complementares:** fluxo explícito de correção/estorno de
+4. **Estornos e análises complementares:** fluxo explícito de correção/estorno de
    acertos com ambas as pontas registradas; aprofundar devoluções e análises de
    receitas/despesas fixas e variáveis (IND-05). O painel já calcula comprometimento
    com base suficiente e sinaliza registros sem classificação.
-4. **Relatórios configuráveis (REL-01 a REL-04):** motor de campos, dimensões,
+5. **Relatórios configuráveis (REL-01 a REL-04):** motor de campos, dimensões,
    agrupamentos e cálculos, apresentação interativa, PDF e planilha com os mesmos
    resultados e limites de privacidade.
-5. **Revisões específicas dos módulos legados:** conferir requisitos e aprimorar
+6. **Revisões específicas dos módulos legados:** conferir requisitos e aprimorar
    fluxos de Faturas/pagamentos, Categorias, Recorrências antigas, Projetos e
    Usuários/autenticação, sem presumir que funcionalidades existentes estejam
    ausentes. As telas já acompanham os temas; refinamentos próprios de interação
