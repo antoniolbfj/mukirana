@@ -1,0 +1,114 @@
+{
+  "status": "published and independently verified",
+  "verifiedAt": "2026-10-25T23:11:47.662009+00:00",
+  "version": 52,
+  "sourceCommit": "52d180a2b8789d466ecff793f23512ae2c063a1f",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migrations": [
+    "20261025224955_painel_v10_rateios_periodo",
+    "20261025230510_painel_v10_saldo_devedor"
+  ],
+  "financialRowsRewritten": false,
+  "stockBalanceThroughSelectedMonth": true,
+  "prepaymentsIncluded": true,
+  "monthlyMovementSeparated": true,
+  "files": {
+    "fileCount": 74,
+    "byteForByteMatch": true,
+    "extraRemoteFiles": 0,
+    "changedRuntimeFromV50": [
+      "Lancamentos_Contexto_Controller.js",
+      "Lancamentos_Novo_View.html",
+      "Painel_Novo_App.html",
+      "Painel_Novo_Client.html",
+      "Painel_Novo_Controller.js",
+      "Rateios_Novo_Client.html",
+      "Saldo_Global_Client.html"
+    ]
+  },
+  "deployments": {
+    "production": {
+      "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+      "version": 52,
+      "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "authenticatedFunctionalTest": false
+      }
+    },
+    "evaluation": {
+      "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+      "version": 52,
+      "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "authenticatedFunctionalTest": false
+      }
+    }
+  },
+  "checks": {
+    "backendPeriodChecks": 47,
+    "rateiosRegressionChecks": 63,
+    "wealthAndPersonalConsumption": "PASS",
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "realClosedMonthsZero": "June through October 2026, month/history inputs",
+    "novemberReconciled": "PASS",
+    "productionFinancialTestEntriesCreated": false,
+    "authenticatedUserAcceptance": "pending"
+  },
+  "intermediateVersions": [
+    {
+      "version": 51,
+      "sourceCommit": "d64b0e4483143d70bc9964babcb77a70707a60a9",
+      "promotedToProduction": false
+    }
+  ]
+}
