@@ -17,6 +17,7 @@ with sync_playwright() as p:
    opts={'viewport':{'width':w,'height':h},'locale':'pt-BR'}
    if ua:opts.update(user_agent=ua,has_touch=True)
    context=browser.new_context(**opts);context.expose_binding('rpcBackend',lambda source,payload:backend(payload['method'],payload['args']));page=context.new_page();page.set_default_timeout(12000);page.clock.set_fixed_time(datetime(2026,10,25,12,tzinfo=timezone.utc));errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.route('https://mukirana.test/**',lambda r:r.fulfill(body=HOST,content_type='text/html; charset=utf-8'));page.goto('https://mukirana.test/');page.evaluate('navegarPara("Dashboard")');page.evaluate('(v)=>MukiranaTema.choose(v)',theme)
+   label=page.locator('.topbar-checkbox-global');span=label.locator('span');lb=label.bounding_box();sb=span.bounding_box();assert sb['x']>=lb['x'] and sb['x']+sb['width']<=lb['x']+lb['width']+1
    f=page.frame_locator('#painel-frame');f.locator('.rateio-card').wait_for();rate=f.locator('.rateio-card .metric');expect(rate).to_contain_text('0,00');assert f.locator('[data-position]').count()==3
    assert f.locator('#balances .card-title').all_text_contents()==['Saldo × Contas · Consumo','Patrimônio']
    assert f.locator('#positions .card-title').all_text_contents()==['Saldo dos Cartões','Saldo × Rateio']
@@ -36,7 +37,7 @@ with sync_playwright() as p:
    # Filtros do gráfico continuam locais ao gráfico.
    old_period=page.evaluate('obterFiltroPeriodoGlobalMukirana()');f.locator('[data-chart-mode=year]').click();assert f.locator('[data-wealth-month]').count()==12;assert page.evaluate('obterFiltroPeriodoGlobalMukirana()')==old_period
    f.locator('[data-chart-mode=half]').click();assert f.locator('[data-wealth-month]').count()==6;f.locator('[data-chart-mode=three]').click();assert f.locator('[data-wealth-month]').count()==3
-   f.locator('body').evaluate("()=>window.scrollTo({top:0,left:0,behavior:'instant'})");page.screenshot(path=str(OUT/(device+'-'+theme+'-painel.png')),full_page=True)
+   f.locator('h1').scroll_into_view_if_needed();f.locator('h1').evaluate('(e)=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');page.screenshot(path=str(OUT/(device+'-'+theme+'-painel.png')),full_page=True)
    f.locator('[data-rateios]').first.click();ledger=page.frame_locator('#ln-live-frame');ledger.locator('#rt-workspace').wait_for();expect(ledger.locator('#rt-workspace .rt-value')).to_contain_text('0,00');assert ledger.locator('#rt-workspace [data-rt-pay]').count()==0;assert page.locator('#painel-frame').count()==1
    page.locator('.modal-contextual-cabecalho button').click();page.wait_for_function("getComputedStyle(document.getElementById('modal-tela-contextual')).opacity==='0'");expect(rate).to_contain_text('0,00')
    assert not errors,errors;assert page.evaluate('document.documentElement.scrollWidth<=innerWidth');assert not f.locator('body').evaluate('(e)=>e.scrollWidth>innerWidth'),(device,theme,'iframe overflow')
