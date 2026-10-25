@@ -62,7 +62,7 @@ with sync_playwright() as p:
   new(f,'UI_TRF_'+suffix,'50,00','transfer');f.locator('#entry-account').select_option(a);f.locator('#entry-destination').select_option(b);save(f)
   f.locator('#search').fill('UI_TRF_'+suffix);f.locator('[data-key]').first.wait_for();assert f.locator('[data-key]').count()==2;expect_balance(page,'0,00')
   filter_open(f);f.locator('[data-filter="account"]').select_option(a);expect_balance(page,'50,00');assert '−' in page.locator('#ln-global-saldo strong').inner_text();assert f.locator('[data-key]').count()==1
-  f.locator('[data-filter="account"]').select_option(b);expect_balance(page,'50,00');assert '−' not in page.locator('#ln-global-saldo strong').inner_text()
+  f.locator('[data-filter="account"]').select_option(b);page.wait_for_function("document.querySelector('#ln-global-saldo strong')?.textContent.includes('50,00')&&!document.querySelector('#ln-global-saldo strong').textContent.includes('−')");assert '−' not in page.locator('#ln-global-saldo strong').inner_text()
   f.locator('[data-action="clear-filters"]').click();filter_open(f);f.locator('[data-filter="type"]').select_option('expense')
   options=f.locator('[data-filter="account"] option').evaluate_all('(options)=>options.map(o=>o.value)');assert a in options and b not in options,options
   f.locator('[data-filter="account"]').select_option(a);expect_balance(page,'100,00')

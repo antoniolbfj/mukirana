@@ -1,3 +1,7 @@
+> Registro histórico do protótipo. As decisões posteriores de fórmula única,
+> filtros dependentes e saldo inicial prevalecem. Veja [a entrega conectada](lancamentos-entrega.md)
+> e [a atualização de Contas](contas-tipos-entrega.md).
+
 # Lançamentos — requisitos revistos e protótipo
 
 24/10/2026. Protótipo para avaliação; não é implementação conectada.

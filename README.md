@@ -73,5 +73,9 @@ Implementação conectada, com interfaces dedicadas, período/saldo globais e f�
 [Entrega e verificação](docs/lancamentos-entrega.md). O protótipo independente
 permanece como histórico em `docs/prototipos/lancamentos.html`.
 
-Próxima rodada autorizada: completar os tipos de Contas e vincular Crédito aos
-cartões existentes antes de desenhar o novo Dashboard.
+Contas ampliada para avaliação no menu **Contas (tipos)**: Consumo, Investimento e
+Crédito ligado aos cartões existentes, saldos atuais/projetados e patrimônio
+separados. [Requisitos e testes](docs/contas-tipos-entrega.md). A tela principal
+homologada permanece até a aprovação da atualização.
+
+Próxima etapa: proposta do novo Dashboard, com os contratos financeiros desta base.

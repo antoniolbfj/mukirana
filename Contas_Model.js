@@ -137,7 +137,7 @@ function alterarStatusContaModel_(linhaPlanilha, novoStatus) {
 function listarContasSupabaseModel_() {
   const contas = supabaseSelecionar_(
     "contas",
-    "select=id_conta,id_usuario,nome_conta,saldo_inicial,saldo_inicial_data,versao,ativa,compartilhada&order=nome_conta.asc"
+    "select=id_conta,id_usuario,nome_conta,saldo_inicial,saldo_inicial_data,versao,tipo_conta_v3,id_grupo_cartao_v3,ativa,compartilhada&order=nome_conta.asc"
   );
   const compartilhamentos = supabaseSelecionar_(
     "contas_compartilhamentos",
@@ -161,6 +161,8 @@ function listarContasSupabaseModel_() {
       ID_Conta: item.id_conta || "",
       ID_Usuario: item.id_usuario || "",
       Nome_Conta: item.nome_conta || "",
+      Tipo_Conta: item.tipo_conta_v3 || 'Consumo',
+      ID_Grupo_Cartao_V3: item.id_grupo_cartao_v3 || '',
       Saldo_Inicial: normalizarNumeroContaModel_(item.saldo_inicial),
       Data_Saldo_Inicial: item.saldo_inicial_data || '',
       Versao: item.versao,

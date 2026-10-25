@@ -1,0 +1,63 @@
+<div id="cn-app" class="phone-shell">
+
+  <main class="phone-main">
+    <div class="phone-title-row"><div><p class="phone-eyebrow">SEU DINHEIRO</p><h1>Contas</h1></div><span class="phone-count" id="cn-list-count"></span></div>
+    <section class="phone-summary" aria-label="Resumo das contas da lista">
+      <p class="phone-summary-label"><span id="cn-current-label">Disponível em Consumo</span><span id="cn-asof-date"></span></p><p id="cn-total-current" class="phone-total"></p>
+      <div class="phone-forecast"><div><span id="cn-forecast-label">Projetado</span><strong id="cn-total-forecast"></strong></div><svg viewBox="0 0 24 24"><path d="m5 15 5-5 4 4 5-8M15 6h4v4"/></svg></div>
+      <p class="phone-summary-note" id="cn-total-change"></p>
+    </section>
+    <section class="phone-type-summary" aria-label="Investimentos e crédito"><article><p>Investimentos</p><strong id="cn-investment-current"></strong><small id="cn-investment-period"></small></article><article><p>Crédito</p><strong id="cn-credit-current"></strong><small id="cn-credit-forecast"></small></article></section>
+    <label class="phone-search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="cn-search" type="search" placeholder="Buscar uma conta" aria-label="Buscar conta pelo nome ou proprietário"></label>
+    <input id="cn-status" type="hidden" value="active">
+    <div class="phone-filters" role="group" aria-label="Filtrar contas por status"><button data-status="active" aria-pressed="true">Ativas</button><button data-status="all" aria-pressed="false">Todas</button><button data-status="inactive" aria-pressed="false">Inativas</button></div>
+    <label class="type-filter">Tipo<select id="cn-type-filter" class="select" aria-label="Filtrar por tipo de conta"><option value="">Todos os tipos</option><option>Consumo</option><option>Investimento</option><option>Cartão de Crédito</option></select></label>
+    <section id="cn-account-list" class="phone-accounts" aria-label="Contas" aria-live="polite"></section>
+    <p class="phone-list-note">Totais das contas da lista. Atual: somente efetivados até hoje. Crédito negativo representa dívida. Só o dono altera o cadastro.</p>
+  </main>
+  <footer class="phone-create"><button id="cn-new-account" class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova conta</button></footer>
+</div>
+
+<div class="overlay phone-page" id="cn-editor-overlay" hidden>
+  <section class="phone-editor" role="dialog" aria-modal="true" aria-labelledby="cn-editor-title">
+    <header class="phone-page-head"><button class="phone-back" type="button" data-close="editor" aria-label="Voltar para contas"><svg viewBox="0 0 24 24"><path d="m14 6-6 6 6 6"/></svg></button><div><h2 id="cn-editor-title">Nova conta</h2><p id="cn-editor-subtitle">O essencial primeiro.</p></div></header>
+    <form id="cn-account-form" class="phone-form">
+      <div class="phone-form-scroll">
+        <div class="field"><label for="cn-account-name">Como você chama essa conta?</label><input id="cn-account-name" class="input" maxlength="160" required autocomplete="off" placeholder="Ex.: Carteira"></div>
+        <div class="field"><label for="cn-account-type">Tipo da conta</label><select id="cn-account-type" class="input"><option>Consumo</option><option>Investimento</option><option>Cartão de Crédito</option></select><p id="cn-type-help" class="help"></p></div>
+          <div id="cn-credit-link" class="option-box" hidden><p class="help">O cartão já tem uma conta vinculada. Selecione para usar o mesmo cadastro e histórico.</p><label for="cn-existing-credit">Cartão existente</label><select class="input" id="cn-existing-credit"></select><button class="btn" type="button" id="cn-use-credit">Usar cartão existente</button><button class="btn quiet" type="button" id="cn-open-cards">Gerenciar cartões</button></div>
+          <label id="cn-type-warning" class="type-warning" hidden><input id="cn-type-ack" type="checkbox"><span>Entendo que o novo tipo será aplicado a todo o histórico e mudará indicadores e relatórios. O vínculo de Cartões será preservado.</span></label>
+          <section class="phone-option">
+          <label class="phone-option-toggle"><span class="phone-option-icon"><svg viewBox="0 0 24 24"><path d="M5 20V4m0 1h13l-3 4 3 4H5"/></svg></span><span><strong>Saldo inicial</strong><small>O dinheiro que a conta já tinha.</small></span><input id="cn-has-opening" type="checkbox"></label>
+          <div id="cn-opening-fields" class="phone-option-content" hidden>
+            <div class="field"><label for="cn-opening-amount">Quanto havia na conta?</label><div class="money-input"><span>R$</span><input id="cn-opening-amount" inputmode="decimal" autocomplete="off" placeholder="0,00"></div></div>
+            <div class="signs" role="group" aria-label="Sinal do saldo inicial"><button type="button" data-sign="1" aria-pressed="true">+ Positivo</button><button type="button" data-sign="-1" aria-pressed="false">− Negativo</button></div>
+            <div class="field"><label for="cn-opening-date">Em qual data?</label><div class="date-control"><input id="cn-opening-date" class="input" type="date"><span id="cn-opening-date-display" class="date-display" aria-hidden="true"></span></div></div>
+            <div class="preview" id="cn-opening-preview" aria-live="polite"><div class="eyebrow">Lançamento que será criado</div><strong id="cn-opening-description"></strong><p id="cn-opening-preview-value"></p><p>Compõe o saldo e os indicadores: positivo como receita; negativo como despesa.</p></div>
+          </div>
+        </section>
+        <section class="phone-option">
+          <label class="phone-option-toggle"><span class="phone-option-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6m3 9v-3a6 6 0 0 0-2-4"/></svg></span><span><strong>Compartilhar conta</strong><small>Escolha quem também pode usar.</small></span><input id="cn-shared" type="checkbox"></label>
+          <div id="cn-sharing-fields" class="phone-option-content" hidden><p class="help">Você continua responsável pelo cadastro.</p><label for="cn-user-search" class="help">Buscar participante por nome ou e-mail</label><input id="cn-user-search" class="input user-search" type="search" placeholder="Digite pelo menos 2 caracteres" autocomplete="off"><p id="cn-users-status" class="help"></p><div id="cn-users-list"></div></div>
+        </section>
+        <p class="help" id="cn-edit-note" hidden></p><p class="form-error" id="cn-form-error" role="alert"></p>
+      </div>
+      <footer class="phone-save"><button id="cn-save-account" class="btn primary" type="submit">Criar conta</button></footer>
+    </form>
+  </section>
+</div>
+
+<div class="overlay phone-page" id="cn-ledger-overlay" hidden>
+  <section class="phone-history" role="dialog" aria-modal="true" aria-labelledby="cn-ledger-title">
+    <header class="phone-page-head"><button class="phone-back" type="button" data-close="ledger" aria-label="Voltar para contas"><svg viewBox="0 0 24 24"><path d="m14 6-6 6 6 6"/></svg></button><div><h2 id="cn-ledger-title"></h2><p id="cn-ledger-subtitle"></p></div></header>
+    <div class="phone-history-scroll"><section class="phone-history-total"><p id="cn-ledger-date-label"></p><strong id="cn-ledger-balance"></strong></section><h3 class="phone-section-title">Lançamentos</h3><div id="cn-ledger-events"></div><p id="cn-ledger-error" class="help"></p><button class="btn quiet" id="cn-load-more" type="button" hidden>Carregar mais</button><p class="help" id="cn-ledger-notice"></p></div>
+    <footer class="phone-save"><button class="btn" type="button" id="cn-edit-from-ledger">Editar conta</button><button class="btn quiet" type="button" data-close="ledger">Voltar para contas</button></footer>
+  </section>
+</div>
+
+<div class="overlay phone-sheet-overlay" id="cn-actions-overlay" hidden>
+  <section class="phone-actions-sheet" role="dialog" aria-modal="true" aria-labelledby="cn-actions-title"><div class="phone-sheet-handle" aria-hidden="true"></div><h2 id="cn-actions-title"></h2><p>Ações da conta</p><div id="cn-phone-account-actions"></div><button class="phone-sheet-cancel" type="button" data-close="actions">Fechar</button></section>
+</div>
+<div class="toast" id="cn-toast" role="status" hidden></div>
+
+<div class="overlay" id="cn-confirm-overlay" hidden><section class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="cn-confirm-title"><h2 id="cn-confirm-title"></h2><p id="cn-confirm-message" class="help"></p><p class="form-error" id="cn-confirm-error" role="alert"></p><div class="confirm-actions"><button class="btn" data-close="confirm" type="button">Voltar</button><button id="cn-confirm-rename" class="btn" type="button" hidden>Renomear conta</button><button id="cn-confirm-submit" class="btn danger" type="button">Excluir conta</button></div></section></div>

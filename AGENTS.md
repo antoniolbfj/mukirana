@@ -21,3 +21,7 @@
 - Ao sair do formulário, oferecer somente “Sair” (descartar) ou “Sair e salvar rascunho”. Não guardar rascunho automaticamente. Retomada e preferência mensal são isoladas por usuário no navegador.
 - Painel lateral em telas maiores usa campos compactos em colunas; smartphone conserva formulário próprio em tela inteira.
 - Próxima rodada autorizada: completar Contas conforme CON-01 a CON-11 e SAL-01 a SAL-05, preservando a base homologada. O usuário confirmou vínculo de contas Cartão de Crédito aos cartões já existentes; não criar cadastros financeiros duplicados. Dashboard será uma rodada posterior.
+
+- Contas foi ampliada no menu provisório ContasTipos: três tipos, crédito ligado a grupos existentes, atual/projetado/período distintos, patrimônio só Investimento, exclusão protegida e saldo inicial nos indicadores novos. Ver docs/contas-tipos-entrega.md. O tipo aplica-se retroativamente; não inferir investimento pelo nome de contas antigas.
+- Decisão de cálculo atual: inicial especial integra receitas/despesas no novo resumo; sua exclusão individual em Lançamentos zera a conta sem apagá-la. A data de ocorrência rege o resultado; competência persistida continua específica da fatura. Pagamentos usam um único registro existente, projetado como transferência.
+- Depois desta entrega, o usuário pediu revisão e proposta de Dashboard enxuto: Consumo+Crédito no operacional, Investimento no patrimônio. Preservar fórmula única, período global, privacidade e interfaces próprias; não substituir o painel antes da avaliação da proposta.

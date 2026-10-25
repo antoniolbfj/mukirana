@@ -12,19 +12,20 @@ Atualizado em 24/10/2026. Supabase `wcczkultokrypdfimbsh`.
   [lancamentos-entrega.md](lancamentos-entrega.md).
 - A versão conectada substitui o protótipo fictício na implantação de avaliação;
   código e publicação registrados em `lancamentos-publicacao.json`.
-- Próxima etapa autorizada: completar Contas com os tipos Consumo, Investimento
-  e Cartão de Crédito. O usuário confirmou vínculo aos cartões existentes.
+- Contas ampliada no menu **Contas (tipos)**: três tipos, vínculo único ao grupo
+  existente, saldos derivados, inicial nos indicadores, exclusão protegida e
+  pagamentos como transferências, com testes locais de upgrade/concorrência e
+  navegador; migração aplicada e 29 ASSERTs remotos em ROLLBACK. Ver [contas-tipos-entrega.md](contas-tipos-entrega.md).
 
 ## Pendências vigentes
 
 1. Homologar Lançamentos conectado em computador/tablet e smartphone; depois
    promover ao acesso principal e retirar o menu provisório.
-2. Completar Contas conforme CON-01 a CON-11: tipos, vínculo de crédito, saldo
-   inicial nos indicadores, exclusão de contas vazias e mudança retroativa de
-   classificação. Preparar saldos atuais/projetados, patrimônio de investimentos
-   e movimento do período conforme SAL-01 a SAL-05. Publicar para homologação.
-3. Desenhar o novo Dashboard após a atualização de Contas; o painel ainda é o da
-   base em produção. Nenhum Dashboard novo foi declarado concluído.
+2. Homologar Contas (tipos), incluindo a classificação das contas antigas de
+   investimento; depois promover a atualização ao acesso principal.
+3. Revisar a proposta e implementar o novo Dashboard com Consumo/Crédito separados
+   do patrimônio em Investimento. O painel principal ainda usa a base anterior;
+   validar metas, classificação fixa/variável e acertos sem duplicidade ao integrá-lo.
 4. Escolher e remodelar as demais telas, incluindo Faturas/pagamentos em rodada
    própria. Compatibilidade financeira não equivale à remodelagem dessas telas.
 5. Ao concluir a remodelagem de todas as telas, revisar a paleta global.

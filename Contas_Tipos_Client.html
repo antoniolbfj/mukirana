@@ -1,0 +1,248 @@
+<script>
+(() => {
+  'use strict';
+  if (window.MukiranaContasTipos) window.MukiranaContasTipos.destroy();
+  const root = document.getElementById('cn-root'); if (!root) return;
+  const ua = navigator.userAgent || '';
+  const tablet = /iPad|Tablet|Android(?!.*Mobile)/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const phone = !tablet && (navigator.userAgentData?.mobile || /iPhone|iPod|Android.+Mobile/i.test(ua) ||
+    (matchMedia('(pointer:coarse)').matches && Math.min(screen.width || innerWidth,screen.height || innerHeight) < 768));
+  root.dataset.interface = phone ? 'phone' : 'large';
+  root.querySelector('#cn-mount').append(root.querySelector(phone ? '#cn-phone-template' : '#cn-large-template').content.cloneNode(true));
+  document.body.classList.toggle('contas-nova-smartphone',phone);
+  const $ = id => root.querySelector('#cn-' + id);
+  const all = selector => Array.from(root.querySelectorAll(selector));
+  const events = new AbortController(), token = localStorage.getItem('mukirana_token') || '';
+  const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const uuid = () => crypto.randomUUID ? crypto.randomUUID() : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g,c=>(Number(c)^crypto.getRandomValues(new Uint8Array(1))[0]&15>>Number(c)/4).toString(16));
+  const cents = value => BigInt(value || '0');
+  function money(value) { const n=cents(value),abs=n<0n?-n:n;return (n<0n?'− ':'')+'R$ '+(abs/100n).toLocaleString('pt-BR')+','+(abs%100n).toString().padStart(2,'0'); }
+  const dateText = value => value ? value.split('-').reverse().join('/') : '';
+  const briefDate = value => value ? new Date(value+'T12:00:00Z').toLocaleDateString('pt-BR',{day:'numeric',month:'short',timeZone:'UTC'}).replace('.','') : '';
+  const icon = shared => shared ? '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6m3 9v-3a6 6 0 0 0-2-4"/></svg>' : '<svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5M4 10h16M6 10v8m6-8v8m6-8v8M3 20h18"/></svg>';
+  let alive=true, accounts=[], info=null, epoch=0, forecastState='loading', deltas={}, periodDeltas={}, draft=null, busy=false;
+  let sign=1, lastFocus=null, activeOverlay=null, actionId=null, toastTimer=null, searchTimer=null;
+  let historyId=null, historyCursor=null, historyRows=[], historyEpoch=0, historyBusy=false, userEpoch=0, people=[];
+  const statusOperations = new Map();let confirmAction=null,confirmBusy=false,confirmId=null;
+  function listen(target,type,fn) { target.addEventListener(type,fn,{signal:events.signal}); }
+  function rpc(name,...args) {
+    return new Promise((resolve,reject)=>{
+      google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[name](token,...args);
+    });
+  }
+  const errorText = error => error && error.message ? String(error.message) : 'Não foi possível concluir. Tente novamente.';
+  const filters = () => typeof obterFiltroPeriodoGlobalMukirana === 'function' ? obterFiltroPeriodoGlobalMukirana() : {};
+  function notice(message,undo) {
+    clearTimeout(toastTimer);$('toast').textContent=message;
+    if(undo){const b=document.createElement('button');b.type='button';b.textContent='Desfazer';b.style.cssText='background:transparent;color:white;text-decoration:underline;margin-left:12px;min-height:44px;font-size:12px';listen(b,'click',undo);$('toast').append(b);}
+    $('toast').hidden=false;toastTimer=setTimeout(()=>{if(alive)$('toast').hidden=true;},undo?8000:4500);
+  }
+  function forecast(a) { return cents(a.registeredForecastCents)+cents(deltas[a.id]); }
+  function filtered() {
+    const q=$('search').value.trim().toLocaleLowerCase('pt-BR'),status=$('status').value,type=$('type-filter').value;
+    return accounts.filter(a=>(status==='all'||a.active===(status==='active'))&&(!type||a.type===type)&&(!q||(a.name+' '+a.ownerName).toLocaleLowerCase('pt-BR').includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
+  }
+  function periodAmount(a){return cents(a.periodCents)+cents(periodDeltas[a.id]);}
+  function predicted(a) { return forecastState==='ready' ? 'Projetado '+money(forecast(a)) : forecastState==='loading' ? 'Calculando previsão…' : 'Previsão indisponível'; }
+  function meta(a) { return a.type+' · '+(a.linkedGroup?'Vinculada a Cartões · ':'')+(a.canEdit ? (a.shared?'Sua conta · compartilhada':'Sua conta · individual') : 'Compartilhada · '+a.ownerName); }
+  function largeRows(list) {
+    return list.map(a=>`<article class="account-row" aria-label="Conta ${esc(a.name)}"><div class="account-name"><div class="account-icon ${a.active?(a.shared?'shared':'bank'):'inactive'}">${icon(a.shared)}</div><div><div class="account-title"><span>${esc(a.name)}</span>${a.active?'':'<span class="tag">Inativa</span>'}</div><p class="account-meta">${esc(meta(a))}</p></div></div><div class="account-amount"><strong class="${cents(a.currentCents)<0n?'negative':''}">${esc(money(a.currentCents))}</strong><small>${esc(predicted(a))}</small></div><div class="row-actions"><button class="btn quiet" data-action="ledger" data-id="${a.id}" aria-label="Ver lançamentos de ${esc(a.name)}">Ver lançamentos</button>${a.canEdit?`<details class="more"><summary aria-label="Mais ações de ${esc(a.name)}">···</summary><div class="menu"><button data-action="edit" data-id="${a.id}">Editar conta</button><button data-action="delete-account" data-id="${a.id}" class="danger">Excluir conta</button><button data-action="status" data-id="${a.id}" class="${a.active?'danger':''}">${a.active?'Inativar conta':'Restaurar conta'}</button></div></details>`:'<span class="tag">Consulta</span>'}</div></article>`).join('');
+  }
+  function phoneRows(list) {
+    return list.map(a=>`<article class="phone-account" aria-label="Conta ${esc(a.name)}"><header class="phone-account-header"><span class="account-icon ${a.active?(a.shared?'shared':'bank'):'inactive'}">${icon(a.shared)}</span><div class="phone-account-title"><h3>${esc(a.name)}${a.active?'':' <span class="tag">Inativa</span>'}</h3><p>${esc(meta(a))}</p></div>${a.canEdit?`<button class="phone-more" data-action="phone-actions" data-id="${a.id}" aria-label="Ações de ${esc(a.name)}">···</button>`:'<span class="tag">Consulta</span>'}</header><button class="phone-open-account" data-action="ledger" data-id="${a.id}" aria-label="Ver lançamentos de ${esc(a.name)}"><span><strong class="${cents(a.currentCents)<0n?'negative':''}">${esc(money(a.currentCents))}</strong><small>${esc(predicted(a))}</small></span><span class="phone-open-label">Lançamentos <svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></span></button></article>`).join('');
+  }
+  function render() {
+    if(!alive||!info)return;
+    const list=filtered(),status=$('status').value;
+    const consume=list.filter(a=>a.type==='Consumo'),invest=list.filter(a=>a.type==='Investimento'),credit=list.filter(a=>a.type==='Cartão de Crédito');const sum=consume.reduce((n,a)=>n+cents(a.currentCents),0n),future=consume.reduce((n,a)=>n+forecast(a),0n);$('investment-current').textContent=money(invest.reduce((n,a)=>n+cents(a.currentCents),0n));$('investment-period').textContent=(forecastState==='ready'?money(invest.reduce((n,a)=>n+periodAmount(a),0n)):forecastState==='error'?'Indisponível':'Calculando…')+' de movimento no período';$('credit-current').textContent=money(credit.reduce((n,a)=>n+cents(a.currentCents),0n));$('credit-forecast').textContent=forecastState==='ready'?'Projetado: '+money(credit.reduce((n,a)=>n+forecast(a),0n)):forecastState==='error'?'Projeção indisponível':'Calculando projeção…';
+    $('current-label').textContent='Disponível em Consumo';
+    $('asof-date').textContent=(phone?'':'Em ')+dateText(info.asOf)+(phone?'':' · somente efetivados');
+    $('forecast-label').textContent='Projetado até '+briefDate(info.forecastDate);
+    $('total-current').textContent=money(sum);$('total-forecast').textContent=forecastState==='ready'?money(future):forecastState==='loading'?'Calculando…':'Indisponível';
+    $('total-change').textContent=forecastState==='ready' ? (future===sum?'Sem movimentação líquida prevista':money(future>sum?future-sum:sum-future)+(future<sum?' abaixo do saldo atual':' acima do saldo atual')) : forecastState==='loading'?'A lista já está pronta para uso.':'Atualize a tela para tentar calcular a previsão.';
+    $('list-count').textContent=list.length+(list.length===1?' conta':' contas')+(status==='active'?(list.length===1?' ativa':' ativas'):status==='inactive'?(list.length===1?' inativa':' inativas'):' na lista');
+    $('account-list').innerHTML=list.length?(phone?phoneRows(list):largeRows(list)):
+      `<div class="empty"><h3>${accounts.length?'Nenhuma conta encontrada':'Sua primeira conta começa aqui'}</h3><p>${accounts.length?'Experimente outro nome ou altere o filtro.':'Cadastre uma conta para acompanhar seus saldos.'}</p><button class="btn" data-action="${accounts.length?'clear':'new'}">${accounts.length?'Limpar filtros':'Nova conta'}</button></div>`;
+    all('[data-status]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.status===status)));
+  }
+  async function reload() {
+    const mine=++epoch;forecastState='loading';root.setAttribute('aria-busy','true');
+    if(!info)$('account-list').innerHTML='<div class="cn-loading">Carregando suas contas…</div>';
+    $('new-account').disabled=!info;
+    try {
+      const f=filters(),r=await rpc('contasTiposListar',f);if(!alive||mine!==epoch)return;
+      accounts=r.accounts;info=r;deltas={};periodDeltas={};render();$('new-account').disabled=false;root.setAttribute('aria-busy','false');
+      if(typeof finalizarCarregamentoTelaMukirana==='function')finalizarCarregamentoTelaMukirana();
+      const pending=sessionStorage.getItem('mukirana_contas_nova_editar');
+      if(pending){sessionStorage.removeItem('mukirana_contas_nova_editar');requestAnimationFrame(()=>{if(alive)openEditor(pending);});}
+      rpc('contasTiposPrevisoes',f).then(p=>{
+        if(!alive||mine!==epoch)return;deltas=p.deltas||{};periodDeltas=p.periodDeltas||{};forecastState='ready';render();
+      }).catch(()=>{if(alive&&mine===epoch){forecastState='error';render();}});
+    } catch(e) {
+      if(!alive||mine!==epoch)return;root.setAttribute('aria-busy','false');
+      if(typeof finalizarCarregamentoTelaMukirana==='function')finalizarCarregamentoTelaMukirana();
+      if(info){forecastState='error';render();notice(errorText(e));}
+      else $('account-list').innerHTML='<div class="cn-error">'+esc(errorText(e))+'<br><button class="btn" data-action="reload">Tentar novamente</button></div>';
+    }
+  }
+  function openOverlay(name) {
+    all('details.more[open]').forEach(d=>d.open=false);
+    lastFocus=document.activeElement;activeOverlay=name;$('app').inert=true;
+    document.body.style.overflow='hidden';$(name+'-overlay').hidden=false;
+  }
+  function closeOverlay(name) {
+    if(busy&&name==='editor')return;
+    $(name+'-overlay').hidden=true;activeOverlay=null;$('app').inert=false;document.body.style.overflow='';
+    if(name==='ledger'){historyEpoch++;historyBusy=false;}
+    if(name==='editor'){userEpoch++;clearTimeout(searchTimer);}
+    if(lastFocus?.isConnected)lastFocus.focus();else $('new-account').focus();
+  }
+  function setBusy(value) {
+    busy=value;all('#cn-account-form input,#cn-account-form select,#cn-account-form button,#cn-editor-overlay [data-close]').forEach(el=>el.disabled=value);
+    $('save-account').textContent=value?'Salvando…':draft?.version?'Salvar alterações':'Criar conta';if(draft)preview();
+  }
+  function parseAmount() {
+    let raw=$('opening-amount').value.trim().replace(/\s/g,'');
+    if(!raw)return '0';
+    if(raw.includes(','))raw=raw.replace(/\./g,'').replace(',','.');
+    if(!/^\d+(?:\.\d{1,2})?$/.test(raw))return null;
+    const parts=raw.split('.');return (BigInt(parts[0])*100n+BigInt((parts[1]||'').padEnd(2,'0')))*BigInt(sign)+'';
+  }
+  function preview() {
+    $('opening-fields').hidden=!$('has-opening').checked;$('sharing-fields').hidden=!$('shared').checked;
+    $('opening-description').textContent='Saldo Inicial da Conta '+($('account-name').value.trim()||'[nome da conta]');
+    const amount=parseAmount(),date=$('opening-date').value;
+    $('opening-date-display').textContent=dateText(date)||'dd/mm/aaaa';
+    $('opening-preview-value').textContent=amount===null?'Informe um valor válido.':amount==='0'?'Sem valor inicial: nenhum lançamento será criado.':money(amount)+' · '+(dateText(date)||'Escolha a data');
+    $('opening-preview').querySelector('.eyebrow').textContent=draft?.version?'Lançamento de saldo inicial':'Lançamento que será criado';
+    const type=$('account-type').value,changed=draft?.version&&type!==draft.originalType,needsLink=type==='Cartão de Crédito'&&!draft?.linkedGroup;
+    $('type-warning').hidden=!changed;$('credit-link').hidden=!needsLink;
+    $('type-help').textContent=type==='Consumo'?'Dinheiro para as despesas do dia a dia.':type==='Investimento'?'Patrimônio guardado. Aportes e resgates são transferências; rendimentos são receitas.':'Compras e pagamentos vêm de Cartões. Um pagamento transfere dinheiro de Consumo para Crédito, sem nova despesa.';
+    $('save-account').disabled=busy||needsLink;$('use-credit').disabled=busy||!accounts.some(x=>x.linkedGroup&&x.canEdit);$('shared').disabled=busy||Boolean(draft?.linkedGroup);
+    $('edit-note').hidden=!draft?.version;
+    if(draft?.version)$('edit-note').textContent=!$('has-opening').checked||amount==='0'?'Ao salvar, o saldo inicial será removido. A conta e os demais lançamentos serão preservados.':'O mesmo lançamento de saldo inicial será atualizado. Os demais lançamentos serão preservados.';
+  }
+  function selectSign(value) {sign=value;all('[data-sign]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.sign)===sign)));preview();}
+  function openEditor(id) {
+    if(!info||busy)return;const a=accounts.find(x=>x.id===id);
+    if(id&&(!a||!a.canEdit)){notice('Somente o dono pode editar esta conta.');return;}
+    draft={id:a?.id||uuid(),version:a?.version||0,operationId:uuid(),hash:null,selected:new Set(a?.participants||[]),linkedGroup:a?.linkedGroup||null,originalType:a?.type||'Consumo'};
+    people=[];userEpoch++;$('account-form').reset();$('form-error').textContent='';$('user-search').value='';$('users-status').textContent='Digite pelo menos 2 caracteres para buscar.';$('users-list').innerHTML='';
+    $('editor-title').textContent=a?'Editar conta':'Nova conta';$('editor-subtitle').textContent=a?'Cadastro e saldo inicial, em um só lugar.':'Comece pelo nome. O restante é opcional.';
+    $('account-type').value=a?.type||'Consumo';$('type-ack').checked=false;$('existing-credit').innerHTML=accounts.filter(x=>x.linkedGroup&&x.canEdit).map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join('');$('use-credit').disabled=!accounts.some(x=>x.linkedGroup&&x.canEdit);$('account-name').value=a?.name||'';$('has-opening').checked=Boolean(a&&cents(a.openingAmountCents)!==0n);
+    const amount=cents(a?.openingAmountCents);$('opening-amount').value=a?(amount<0n?-amount:amount)/100n+','+((amount<0n?-amount:amount)%100n).toString().padStart(2,'0'):'';
+    $('opening-date').value=a?.openingDate||info.today;$('shared').checked=Boolean(a?.shared);selectSign(amount<0n?-1:1);setBusy(false);openOverlay('editor');
+    requestAnimationFrame(()=>{if(alive&&activeOverlay==='editor')$('account-name').focus();});
+    if(a?.shared)searchUsers('');
+  }
+  function renderUsers() {
+    const selected=people.filter(p=>draft.selected.has(p.id)),others=people.filter(p=>!draft.selected.has(p.id));
+    $('users-list').innerHTML=selected.concat(others).map(p=>`<label class="${phone?'phone-person':'person'}"><input type="checkbox" name="cn-participant" value="${esc(p.id)}" ${draft.selected.has(p.id)?'checked':''}><span class="user-label">${esc(p.name)}<small>${esc(p.email)}</small></span></label>`).join('');
+  }
+  async function searchUsers(search) {
+    const mine=++userEpoch,editing=draft;if(!editing||activeOverlay!=='editor')return;
+    $('users-status').textContent='Buscando participantes…';
+    try {
+      const r=await rpc('contasNovaUsuarios',search,editing.version?editing.id:null);
+      if(!alive||mine!==userEpoch||draft!==editing||activeOverlay!=='editor')return;
+      const known=new Map(people.filter(p=>editing.selected.has(p.id)).map(p=>[p.id,p]));r.users.forEach(p=>known.set(p.id,p));people=Array.from(known.values());renderUsers();
+      $('users-status').textContent=editing.selected.size+' participante(s) selecionado(s).'+(search.trim().length<2?' Digite pelo menos 2 caracteres para buscar.':r.users.length?'':' Nenhum usuário encontrado.');
+    } catch(e){if(alive&&mine===userEpoch)$('users-status').textContent=errorText(e);}
+  }
+  async function save(e) {
+    e.preventDefault();if(busy||!draft)return;
+    const amount=$('has-opening').checked?parseAmount():'0',name=$('account-name').value.trim(),date=$('opening-date').value||info.today;
+    if(!name||name.length>160){$('form-error').textContent='Informe um nome com até 160 caracteres.';return;}
+    if(amount===null||cents(amount)>99999999999999n||cents(amount)<-99999999999999n){$('form-error').textContent='Informe um valor válido, com até duas casas decimais.';return;}
+    if($('has-opening').checked&&amount!=='0'&&!$('opening-date').value){$('form-error').textContent='Informe a data do saldo inicial.';return;}
+    const shared=$('shared').checked;if(shared&&!draft.selected.size){$('form-error').textContent='Escolha pelo menos um participante.';return;}
+    const type=$('account-type').value,acknowledgeTypeChange=$('type-ack').checked;if(draft.version&&type!==draft.originalType&&!acknowledgeTypeChange){$('form-error').textContent='Confirme o impacto retroativo da mudança de tipo.';return;}if(type==='Cartão de Crédito'&&!draft.linkedGroup){$('form-error').textContent='Use a conta do cartão existente.';return;}const request={id:draft.id,version:draft.version,name,type,acknowledgeTypeChange,openingAmountCents:amount,openingDate:date,shared,participants:shared?Array.from(draft.selected).sort():[]};
+    const hash=JSON.stringify(request);if(draft.hash&&draft.hash!==hash)draft.operationId=uuid();draft.hash=hash;request.operationId=draft.operationId;
+    $('form-error').textContent='';setBusy(true);
+    try {
+      await rpc('contasTiposSalvar',request);if(!alive)return;setBusy(false);closeOverlay('editor');
+      if(!request.version){$('search').value='';$('status').value='active';$('type-filter').value='';}window.MukiranaLancamentosStore?.reload().catch(()=>{});notice(request.version?'Conta atualizada.':'Conta criada.');await reload();
+    } catch(error){if(alive){setBusy(false);$('form-error').textContent=errorText(error);}}
+  }
+  async function status(a,target) {
+    if(!a?.canEdit)return;
+    let op=statusOperations.get(a.id);
+    if(op?.busy)return;
+    if(!op||op.target!==target)op={id:uuid(),version:a.version,target,busy:false};
+    op.busy=true;statusOperations.set(a.id,op);
+    try {
+      const r=await rpc('contasTiposStatus',{id:a.id,version:op.version,operationId:op.id,active:target});if(!alive)return;
+      statusOperations.delete(a.id);window.MukiranaLancamentosStore?.reload().catch(()=>{});Object.assign(a,r.account);render();reload();
+      notice(target?'Conta restaurada.':'Conta inativada. O histórico foi preservado.',()=>status(a,!target));
+    }catch(error){if(alive){op.busy=false;notice(errorText(error));}}
+  }
+  function openActions(id) {
+    const a=accounts.find(x=>x.id===id);if(!a)return;actionId=id;$('actions-title').textContent=a.name;
+    $('phone-account-actions').innerHTML=`<button data-action="ledger" data-id="${a.id}">Ver lançamentos</button>${a.canEdit?`<button data-action="edit" data-id="${a.id}">Editar conta</button><button data-action="delete-account" data-id="${a.id}" class="danger">Excluir conta</button><button data-action="status" data-id="${a.id}" class="${a.active?'danger':''}">${a.active?'Inativar conta':'Restaurar conta'}</button>`:''}`;
+    openOverlay('actions');$('phone-account-actions').querySelector('button').focus();
+  }
+  function renderHistory() {
+    $('ledger-events').innerHTML=historyRows.length?historyRows.map(e=>`<article class="ledger-row"><span class="ledger-marker ${e.opening?'special':''}">${e.opening?'<svg viewBox="0 0 24 24"><path d="M5 20V4m0 1h13l-3 4 3 4H5"/></svg>':'<svg viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>'}</span><div class="ledger-desc"><strong>${esc(e.description)}</strong><small>${esc(dateText(e.date))}${e.status==='Pendente'?' · Pendente':e.date>info.today?' · Futuro · efetivado':' · Efetivado'}</small>${e.opening?'<span class="pill">Saldo inicial</span><small>Incluído nos indicadores</small>':''}</div><strong class="${cents(e.amountCents)<0n?'negative':''}">${esc(money(e.amountCents))}</strong></article>`).join(''):'<p class="help">Esta conta ainda não tem lançamentos.</p>';
+    $('load-more').hidden=!historyCursor;$('load-more').disabled=historyBusy;
+  }
+  async function loadHistory() {
+    if(historyBusy)return;historyBusy=true;const mine=historyEpoch,id=historyId;$('ledger-error').textContent='Carregando lançamentos…';$('load-more').disabled=true;
+    try {
+      const r=await rpc('contasTiposMovimentos',id,historyCursor);if(!alive||mine!==historyEpoch||historyId!==id)return;
+      historyRows=historyRows.concat(r.items);historyCursor=r.nextCursor;historyBusy=false;$('ledger-error').textContent='';renderHistory();
+    }catch(e){if(alive&&mine===historyEpoch){historyBusy=false;$('ledger-error').textContent=errorText(e);$('load-more').hidden=false;$('load-more').disabled=false;$('load-more').textContent='Tentar novamente';}}
+  }
+  function openHistory(id) {
+    const a=accounts.find(x=>x.id===id);if(!a)return;historyId=id;historyRows=[];historyCursor=null;historyEpoch++;historyBusy=false;
+    $('ledger-title').textContent=a.name;$('ledger-subtitle').textContent=a.type+(a.linkedGroup?' · Compras e pagamentos de Cartões':'');$('ledger-balance').textContent=money(a.currentCents);$('ledger-date-label').textContent='Saldo atual · efetivados até '+dateText(info.today);
+    $('edit-from-ledger').hidden=!a.canEdit;$('ledger-notice').textContent=a.canEdit?'Ajuste o saldo inicial pelo cadastro da conta.':'O proprietário gerencia o cadastro e o saldo inicial.';
+    $('ledger-events').innerHTML='';$('ledger-error').textContent='';$('load-more').hidden=true;$('load-more').textContent='Carregar mais';openOverlay('ledger');
+    $('ledger-overlay').querySelector('[data-close]').focus();loadHistory();
+  }
+  function confirmation(title,message,id,callback,blocked=false,label='Excluir conta') {
+    confirmAction=callback;confirmId=id;$('confirm-title').textContent=title;$('confirm-message').textContent=message;$('confirm-error').textContent='';$('confirm-submit').textContent=label;$('confirm-submit').hidden=blocked;$('confirm-rename').hidden=!blocked;$('confirm-submit').disabled=false;openOverlay('confirm');(blocked?$('confirm-rename'):$('confirm-submit')).focus();
+  }
+  function deleteAccount(a){const operationId=uuid();confirmation('Excluir '+a.name+'?',a.canDelete?(a.linkedGroup?'Esta conta está vazia. O grupo e os cartões vinculados também serão removidos.':'Esta conta está vazia. A exclusão é definitiva.'):'A conta tem movimentações ou vínculos. Preserve o histórico: você pode renomear ou inativar a conta.',a.id,async()=>{await rpc('contasTiposExcluir',{id:a.id,version:a.version,operationId});window.MukiranaLancamentosStore?.reload().catch(()=>{});closeOverlay('confirm');notice('Conta excluída.');await reload();},!a.canDelete);}
+  function changeStatus(a){if(a.linkedGroup)confirmation(a.active?'Inativar conta e cartões?':'Restaurar conta e cartões?','O status acompanha o grupo de Cartões vinculado. Compras e pagamentos serão preservados.',a.id,async()=>{closeOverlay('confirm');await status(a,!a.active);},false,a.active?'Inativar':'Restaurar');else status(a,!a.active);}
+  function action(e) {
+    const target=e.target.closest('[data-action]');if(!target)return;
+    const a=accounts.find(x=>x.id===target.dataset.id),name=target.dataset.action;
+    if(name==='phone-actions'){openActions(a.id);return;}
+    if(activeOverlay==='actions')closeOverlay('actions');
+    if(name==='ledger')openHistory(a.id);if(name==='edit')openEditor(a.id);if(name==='status')changeStatus(a);if(name==='delete-account')deleteAccount(a);
+    if(name==='clear'){$('search').value='';$('status').value='active';$('type-filter').value='';render();}if(name==='reload')reload();if(name==='new')openEditor();
+  }
+  listen($('new-account'),'click',()=>openEditor());listen($('search'),'input',render);listen($('status'),'change',render);listen($('type-filter'),'change',render);
+  all('[data-status]').forEach(b=>listen(b,'click',()=>{$('status').value=b.dataset.status;render();}));
+  listen($('account-list'),'click',action);if(phone)listen($('phone-account-actions'),'click',action);
+  all('[data-sign]').forEach(b=>listen(b,'click',()=>selectSign(Number(b.dataset.sign))));
+  ['account-name','account-type','opening-amount','opening-date','has-opening','shared'].forEach(id=>listen($(id),'input',()=>{
+    preview();if(id==='shared'&&$('shared').checked&&draft)searchUsers('');
+  }));
+  listen($('users-list'),'change',e=>{if(e.target.name==='cn-participant'&&draft){if(e.target.checked)draft.selected.add(e.target.value);else draft.selected.delete(e.target.value);$('users-status').textContent=draft.selected.size+' participante(s) selecionado(s).';}});
+  listen($('user-search'),'input',()=>{clearTimeout(searchTimer);const q=$('user-search').value;if(q.trim().length<2){userEpoch++;$('users-status').textContent='Digite pelo menos 2 caracteres para buscar.';return;}searchTimer=setTimeout(()=>searchUsers(q),300);});
+  listen($('user-search'),'keydown',e=>{if(e.key==='Enter'){e.preventDefault();if($('user-search').value.trim().length>=2)searchUsers($('user-search').value);}});
+  listen($('use-credit'),'click',()=>{const id=$('existing-credit').value;if(id){closeOverlay('editor');openEditor(id);}});
+  listen($('open-cards'),'click',()=>{closeOverlay('editor');if(typeof navegarPara==='function')navegarPara('Cartoes');});
+  listen($('confirm-submit'),'click',async()=>{if(confirmBusy||!confirmAction)return;confirmBusy=true;$('confirm-submit').disabled=true;try{await confirmAction();}catch(e){if(alive){$('confirm-error').textContent=errorText(e);$('confirm-rename').hidden=false;}}finally{confirmBusy=false;if(alive)$('confirm-submit').disabled=false;}});
+  listen($('confirm-rename'),'click',()=>{const id=confirmId;closeOverlay('confirm');openEditor(id);});
+  listen($('account-form'),'submit',save);listen($('load-more'),'click',loadHistory);
+  listen($('edit-from-ledger'),'click',()=>{const id=historyId;closeOverlay('ledger');openEditor(id);});
+  all('[data-close]').forEach(b=>listen(b,'click',()=>{if(!confirmBusy)closeOverlay(b.dataset.close);}));
+  all('.overlay').forEach(o=>listen(o,'click',e=>{if(e.target===o&&!confirmBusy)closeOverlay(o.id.slice(3).split('-')[0]);}));
+  listen(document,'click',e=>all('details.more[open]').forEach(d=>{if(!d.contains(e.target))d.open=false;}));
+  listen(document,'keydown',e=>{
+    if(!root.isConnected)return;
+    if(e.key==='Escape'){if(activeOverlay){e.preventDefault();if(!confirmBusy)closeOverlay(activeOverlay);}else all('details.more[open]').forEach(d=>d.open=false);}
+    if(e.key==='Tab'&&activeOverlay){const f=Array.from($(activeOverlay+'-overlay').querySelectorAll('button:not([disabled]),input:not([disabled]),select,[tabindex="0"]')).filter(el=>el.getClientRects().length);if(!f.length)return;const first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
+  });
+  const observer=new MutationObserver(()=>{if(!root.isConnected)destroy();});observer.observe(root.parentNode,{childList:true});
+  function destroy() {
+    if(!alive)return;alive=false;epoch++;historyEpoch++;userEpoch++;clearTimeout(toastTimer);clearTimeout(searchTimer);events.abort();observer.disconnect();
+    if(window.MukiranaContasTipos===api){document.body.classList.remove('contas-nova-smartphone');document.body.style.overflow='';delete window.MukiranaContasTipos;}
+  }
+  const api={destroy,refresh:reload};window.MukiranaContasTipos=api;
+  if(typeof registrarTelaAtualMukirana==='function')registrarTelaAtualMukirana('ContasTipos',{atualizarPeriodoGlobal:reload,obterContextoNovoLancamento:filters});
+  reload();
+})();
+</script>

@@ -26,7 +26,7 @@ function lancamentosNovoRegras_() {
     return {filters:f,cleared:cleared};
   }
   function summarize(rows){let income='0',expense='0',incoming='0',outgoing='0',opening='0';
-    for(const row of rows){const value=String(row.signedCents);if(!cents(value))throw Error('Valor inválido.');
+    for(const row of rows){const value=String(row.signedCents);if(!cents(value))throw Error('Valor inválido.');if(row.special==='opening')opening=add(opening,value);
       if(row.type==='income')income=add(income,value);
       else if(row.type==='expense')expense=add(expense,negate(value));
       else if(row.type==='transfer'){if(value[0]==='-')outgoing=add(outgoing,negate(value));else incoming=add(incoming,value);}

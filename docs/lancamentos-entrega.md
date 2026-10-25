@@ -30,9 +30,11 @@ Rascunhos são isolados por usuário. Não há salvamento automático.
 - Conjuntos antigos e projeções de recorrências legadas continuam disponíveis;
   projeções são identificadas e editadas no módulo original, sem duplicar geração.
 
-O saldo inicial especial conserva, nesta entrega, a regra da tela Contas já
-homologada: mostrado separadamente do resultado operacional. A revisão de Contas
-solicitada em seguida tratará a diferença de CON-04, além dos três tipos.
+Na versão 39, o saldo inicial conservava a regra anterior, separado do resultado.
+A atualização de [Contas](contas-tipos-entrega.md) passou a incluí-lo nos indicadores
+novos conforme CON-04 e habilitou a exclusão especial que zera o cadastro.
+Também completou o pagamento da fatura como transferência editável e alinhou o
+recorte à data de ocorrência, preservando a competência no módulo de Faturas.
 
 ## Banco e verificação
 

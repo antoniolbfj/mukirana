@@ -219,6 +219,8 @@ function montarContasRpc_(contas, compartilhamentos) {
       ID_Conta: item.id_conta || "",
       ID_Usuario: item.id_usuario || "",
       Nome_Conta: item.nome_conta || "",
+      Tipo_Conta: item.tipo_conta_v3 || 'Consumo',
+      ID_Grupo_Cartao_V3: item.id_grupo_cartao_v3 || '',
       Saldo_Inicial: numeroRpc_(item.saldo_inicial),
       Data_Saldo_Inicial: item.saldo_inicial_data || '',
       Versao: item.versao,

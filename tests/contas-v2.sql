@@ -43,6 +43,8 @@ BEGIN
  ASSERT NOT EXISTS(SELECT 1 FROM jsonb_array_elements(public.rpc_contexto_financeiro_mukirana(dono,'2026-10-01',true)->'lancamentos') x WHERE x->>'tipo'='Saldo Inicial'),'legacy excludes openings';
  INSERT INTO public.grupos_cartoes(id_grupo_cartao,id_titular,nome_grupo,dia_fechamento,dia_vencimento)
  VALUES(grupo,dono,'Fatura teste',10,20);
+ INSERT INTO public.cartoes(id_grupo_cartao,id_usuario,nome_cartao,tipo_cartao) VALUES(grupo,dono,'Titular teste','Titular');
+ INSERT INTO public.lancamentos(tipo,descricao,valor_total,data_ocorrencia,mes_referencia,tipo_origem,id_origem,status,criado_por_id) SELECT 'Despesa','Compra da fatura',10,'2026-10-03','2026-10-01','Cartão',id_cartao,'Efetivado',dono FROM public.cartoes WHERE id_grupo_cartao=grupo;
  INSERT INTO public.pagamentos_faturas(id_grupo_cartao,id_conta,valor,data_pagamento,mes_referencia,criado_por_id)
  VALUES(grupo,conta,2,'2026-10-06','2026-10-01',dono);
  r:=public.rpc_contas_listar_v2(dono,'2026-10-24','2026-10-31');

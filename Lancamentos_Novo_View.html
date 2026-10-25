@@ -20,7 +20,7 @@ window.addEventListener('message',async event=>{
    if(message.type==='draft-load'){try{reply.data=JSON.parse(localStorage.getItem(key));}catch{reply.data=null;}}
    else {if(message.value===null)localStorage.removeItem(key);else{const text=JSON.stringify(message.value);if(text.length>300000)throw Error('O rascunho é muito grande.');localStorage.setItem(key,text);}reply.data=true;}
   }else if(message.type==='navigate'){
-   const allowed=['Contas','Cartoes','FaturasCartao','Recorrencias','Lancamentos'];if(!allowed.includes(message.value?.route))throw Error('Destino inválido.');
+   const allowed=['Contas','ContasTipos','Cartoes','FaturasCartao','Recorrencias','Lancamentos'];if(!allowed.includes(message.value?.route))throw Error('Destino inválido.');
    if(message.value.route==='FaturasCartao'&&message.value.group){const period=store.getPeriod();localStorage.setItem('mukirana_fatura_cartao',JSON.stringify({ID_Grupo_Cartao:message.value.group,Mes_Inicial:period.Mes_Inicial,Mes_Final:period.Mes_Final,Retorno_Tela:'LancamentosNovo'}));}
    navegarPara(message.value.route);reply.data=true;
   }else if(message.type==='editing'){api.editing=message.value?.active===true;reply.data=true;}

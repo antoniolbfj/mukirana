@@ -1,0 +1,54 @@
+-- Somente dados aleatórios nesta transação, integralmente revertida.
+BEGIN;
+SET LOCAL ROLE service_role;
+DO $$
+DECLARE u uuid:=gen_random_uuid();v uuid:=gen_random_uuid();b uuid:=gen_random_uuid();i uuid:=gen_random_uuid();g uuid:=gen_random_uuid();k uuid:=gen_random_uuid();c uuid;cat uuid:=gen_random_uuid();empty_id uuid:=gen_random_uuid();neg uuid:=gen_random_uuid();opening uuid;pay uuid:=gen_random_uuid();op uuid:=gen_random_uuid();d date:=(now() AT TIME ZONE 'America/Sao_Paulo')::date;res jsonb;bank jsonb;invest jsonb;credit jsonb;req jsonb;pay_req jsonb;ver integer;
+BEGIN
+ ASSERT NOT has_function_privilege('anon','public.rpc_contas_listar_v3(uuid,date,date,date)','EXECUTE');
+ ASSERT NOT has_function_privilege('authenticated','public.rpc_contas_mutar_v3(uuid,uuid,jsonb)','EXECUTE');
+ ASSERT NOT has_table_privilege('authenticated','mukirana_contas.operacoes_v3','SELECT');
+ INSERT INTO public.usuarios(id_usuario,nome,email) VALUES(u,'Teste Contas',u||'@example.invalid'),(v,'Outro',v||'@example.invalid');
+ INSERT INTO public.grupos_cartoes(id_grupo_cartao,id_titular,nome_grupo,dia_fechamento,dia_vencimento,limite) VALUES(g,u,'Crédito teste',31,17,1000);
+ SELECT id_conta INTO c FROM public.contas WHERE id_grupo_cartao_v3=g;
+ ASSERT c IS NOT NULL;
+ ASSERT (SELECT count(*) FROM public.contas WHERE id_grupo_cartao_v3=g)=1;
+ ASSERT (SELECT count(*) FROM public.lancamentos WHERE id_origem=c)=0;
+ INSERT INTO public.cartoes(id_cartao,id_grupo_cartao,id_usuario,nome_cartao,tipo_cartao) VALUES(k,g,u,'Titular','Titular');
+ INSERT INTO public.contas(id_conta,id_usuario,nome_conta,tipo_conta_v3,saldo_inicial,saldo_inicial_data) VALUES(b,u,'Consumo teste','Consumo',100,d-40),(i,u,'Investimento teste','Investimento',50,d-40),(empty_id,u,'Vazia teste','Consumo',0,d),(neg,u,'Negativa teste','Consumo',-50,d);
+ INSERT INTO public.categorias(id_categoria,nome,tipo,criado_por) VALUES(cat,'Categoria teste','Despesa',u);
+ INSERT INTO public.lancamentos(tipo,descricao,valor_total,data_ocorrencia,mes_referencia,tipo_origem,id_origem,id_destino,status,criado_por_id) VALUES
+ ('Despesa','Efetivada',20,d,d,'Conta',b,NULL,'Efetivado',u),('Despesa','Pendente',5,d,d,'Conta',b,NULL,'Pendente',u),('Despesa','Futura',30,d+40,d+40,'Conta',b,NULL,'Efetivado',u),('Transferência','Aporte',10,d,d,'Conta',b,i,'Efetivado',u),('Receita','Rendimento',2,d,d,'Conta',i,NULL,'Efetivado',u),('Despesa','Compra cartão',40,d,d,'Cartão',k,NULL,'Efetivado',u);
+ req:=jsonb_build_object('id',pay,'version',0,'type','transfer','mode','single','status','done','origin',b,'destination',c,'amountCents','1200','date',d,'invoiceMonth',to_char(d,'YYYY-MM'),'description','Pagamento único','shares','[]'::jsonb);
+ pay_req:=req;PERFORM public.rpc_lancamentos_pagamento_v3(u,op,req);PERFORM public.rpc_lancamentos_pagamento_v3(u,op,req);
+ ASSERT (SELECT count(*) FROM public.pagamentos_faturas WHERE id_pagamento_fatura=pay)=1;
+ ASSERT NOT EXISTS(SELECT 1 FROM public.lancamentos WHERE id_lancamento=pay);
+ res:=public.rpc_contas_listar_v3(u,d,d+60,d);
+ SELECT x INTO bank FROM jsonb_array_elements(res->'accounts') x WHERE x->>'id'=b::text;
+ SELECT x INTO invest FROM jsonb_array_elements(res->'accounts') x WHERE x->>'id'=i::text;
+ SELECT x INTO credit FROM jsonb_array_elements(res->'accounts') x WHERE x->>'id'=c::text;
+ ASSERT bank->>'currentCents'='5800';ASSERT bank->>'registeredForecastCents'='2300';
+ ASSERT invest->>'currentCents'='6200';ASSERT invest->>'periodCents'='1200';
+ ASSERT credit->>'currentCents'='-2800';ASSERT credit->>'type'='Cartão de Crédito';
+ ASSERT NOT (bank ? 'senha_pin');
+ ASSERT jsonb_array_length(public.rpc_contas_listar_v3(v,d,d,d)->'accounts')=0;
+ BEGIN PERFORM public.rpc_contas_movimentos_v3(v,c);RAISE EXCEPTION 'must_reject';EXCEPTION WHEN OTHERS THEN ASSERT SQLERRM='CN:forbidden';END;
+ BEGIN PERFORM public.rpc_contas_mutar_v3(u,gen_random_uuid(),jsonb_build_object('action','delete','id',b,'version',(bank->>'version')::integer));RAISE EXCEPTION 'must_reject';EXCEPTION WHEN OTHERS THEN ASSERT SQLERRM='CN:has_movements';END;
+ req:=jsonb_build_object('action','save','id',i,'version',(invest->>'version')::integer,'type','Consumo','name','Investimento renomeado','openingAmountCents','5000','openingDate',d-40,'shared',false,'participants','[]'::jsonb);
+ BEGIN PERFORM public.rpc_contas_mutar_v3(u,gen_random_uuid(),req);RAISE EXCEPTION 'must_reject';EXCEPTION WHEN OTHERS THEN ASSERT SQLERRM='CN:type_confirmation';END;
+ res:=public.rpc_contas_mutar_v3(u,gen_random_uuid(),req||jsonb_build_object('acknowledgeTypeChange',true));ASSERT res->'account'->>'type'='Consumo';
+ SELECT id_lancamento,versao_v3 INTO opening,ver FROM public.lancamentos WHERE id_conta_saldo_inicial=neg;
+ op:=gen_random_uuid();PERFORM public.rpc_contas_remover_saldo_v3(u,op,opening,ver);PERFORM public.rpc_contas_remover_saldo_v3(u,op,opening,ver);
+ ASSERT (SELECT saldo_inicial FROM public.contas WHERE id_conta=neg)=0;
+ ASSERT NOT EXISTS(SELECT 1 FROM public.lancamentos WHERE id_lancamento=opening);
+ ASSERT EXISTS(SELECT 1 FROM public.contas WHERE id_conta=neg);
+ req:=jsonb_build_object('action','delete','id',empty_id,'version',1);op:=gen_random_uuid();PERFORM public.rpc_contas_mutar_v3(u,op,req);PERFORM public.rpc_contas_mutar_v3(u,op,req);
+ ASSERT NOT EXISTS(SELECT 1 FROM public.contas WHERE id_conta=empty_id);
+ UPDATE public.contas SET saldo_inicial=-10,saldo_inicial_data=d WHERE id_conta=c;
+ ASSERT public.rpc_cartoes_pagamento_base_v2(u,g,date_trunc('month',d)::date)->>'maxCents'='3800';
+ ASSERT public.rpc_cartoes_detalhar_v2(u,g,date_trunc('month',d)::date,date_trunc('month',d)::date)->'group'->>'registeredCents'='5000';
+ req:=pay_req||jsonb_build_object('id',gen_random_uuid(),'amountCents','3800');PERFORM public.rpc_lancamentos_pagamento_v3(u,gen_random_uuid(),req);
+ BEGIN PERFORM public.rpc_lancamentos_pagamento_v3(u,gen_random_uuid(),req||jsonb_build_object('id',gen_random_uuid(),'amountCents','1'));RAISE EXCEPTION 'must_reject';EXCEPTION WHEN OTHERS THEN ASSERT SQLERRM='LN:invoice_limit';END;
+ ASSERT (public.rpc_lancamentos_listar_v3(u,NULL,NULL)->'payments')='[]'::jsonb;
+ ASSERT (SELECT count(*) FROM jsonb_array_elements(public.rpc_lancamentos_listar_v3(u,NULL,NULL)->'entries') x WHERE x->>'id'=pay::text)=1;
+END $$;
+ROLLBACK;

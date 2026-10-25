@@ -23,6 +23,7 @@ const CartoesNovo_ = Object.freeze({
   group: function(g) {
     if(!g||!this.uuid(g.id)||!Number.isInteger(g.version)||g.version<1||typeof g.name!=='string'||!this.uuid(g.ownerId)||typeof g.ownerName!=='string'||typeof g.canEdit!=='boolean'||typeof g.active!=='boolean'||['owner','additional','history'].indexOf(g.role)<0||!Number.isInteger(g.closingDay)||g.closingDay<1||g.closingDay>31||!Number.isInteger(g.dueDay)||g.dueDay<1||g.dueDay>31||!Number.isInteger(g.cardsCount)||!Array.isArray(g.participants)||!g.participants.every(this.uuid)||(g.canEdit?!this.cents(g.limitCents):g.limitCents!==null))throw new Error('Resposta de cartões inválida. Atualize a tela.');
     const result={id:g.id,version:g.version,name:g.name,ownerId:g.ownerId,ownerName:g.ownerName,canEdit:g.canEdit,active:g.active,role:g.role,limitCents:g.limitCents,closingDay:g.closingDay,dueDay:g.dueDay,cardsCount:g.cardsCount,participants:g.canEdit?g.participants.slice():[]};
+    if(g.openingCents!==undefined){if(g.canEdit? !this.cents(g.openingCents):g.openingCents!==null)throw new Error('Saldo inicial de crédito inválido.');result.openingCents=g.openingCents;result.openingDate=g.openingDate||null;}
     if(g.registeredCents!==undefined){
       if(!this.cents(g.registeredCents))throw new Error('Valor de cartão inválido.');result.registeredCents=g.registeredCents;
       ['paidCents','scheduledPaymentsCents','openCents','creditCents'].forEach(function(k){if(g.canEdit?!ContasNova_.cents(g[k]):g[k]!==null)throw new Error('Resumo de cartão inválido.');result[k]=g[k];});
@@ -138,6 +139,7 @@ function aplicarResumoCartoesNovoNaFatura_(pacote,sessao,intervalo,detalhe,conte
  pacote.Motivo_Bloqueio_Pagamento=period.multi?'Selecione uma única competência para registrar pagamentos.':'Este cartão está disponível somente para consultar o histórico.';
  pacote.Resumo_Escopo=g.canEdit?'Resumo da fatura inteira. Filtros de categoria afetam somente a lista.':'Seus lançamentos. Pagamentos globais não abatem este subtotal; você pode pagar com as contas às quais tem acesso.';
  if(period.multi)pacote.Resumo_Escopo+=' Para pagar, selecione uma única competência na barra de período.';
+ if(g.canEdit&&g.openingCents&&g.openingCents!=='0'&&g.openingDate.slice(0,7)>=period.start&&g.openingDate.slice(0,7)<=period.end)pacote.Resumo_Escopo+=' Inclui saldo inicial da conta em '+g.openingDate.split('-').reverse().join('/')+': '+lancamentosNovoRegras_().money(g.openingCents)+'. Ajuste em Contas.';
  pacote.Meses_Resumo=g.months;
  return pacote;
 }

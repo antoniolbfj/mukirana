@@ -29,9 +29,11 @@ BEGIN
  ('Despesa','Compra adicional',20,'2026-10-15','2026-11-01','Cartão',adicional_card,'Efetivado',adicional);
  ASSERT (SELECT bool_and(mes_referencia='2026-10-01') FROM public.lancamentos WHERE descricao IN ('Nova compra','Crédito','Compra adicional') AND id_origem IN(titular_card,adicional_card)),'new closing for new purchases';
  INSERT INTO public.contas(id_usuario,nome_conta) VALUES(dono,'Conta pagamento teste');
+ UPDATE public.lancamentos SET valor_total=200 WHERE id_lancamento=compra;
  INSERT INTO public.pagamentos_faturas(id_grupo_cartao,id_conta,valor,data_pagamento,mes_referencia,status,criado_por_id)
  SELECT gid,id_conta,x.valor,x.data,x.mes,x.status,dono FROM public.contas CROSS JOIN
- (VALUES(30,'2026-10-20'::date,'2026-10-01'::date,'Efetivado'),(5,'2026-10-23'::date,'2026-10-01'::date,'Pendente'),(200,'2026-11-20'::date,'2026-11-01'::date,'Efetivado')) x(valor,data,mes,status) WHERE id_usuario=dono;
+ (VALUES(30,'2026-10-20'::date,'2026-10-01'::date,'Efetivado'),(5,'2026-10-23'::date,'2026-10-01'::date,'Pendente'),(200,'2026-11-20'::date,'2026-11-01'::date,'Efetivado')) x(valor,data,mes,status) WHERE id_usuario=dono AND nome_conta='Conta pagamento teste';
+ UPDATE public.lancamentos SET valor_total=120 WHERE id_lancamento=compra;
  r:=public.rpc_cartoes_listar_v2(dono,'2026-10-01','2026-11-01');g:=r->'groups'->0;
  ASSERT g->>'registeredCents'='17000','registered includes credit, excludes projections';
  ASSERT g->>'paidCents'='23000' AND g->>'scheduledPaymentsCents'='500','paid vs scheduled';

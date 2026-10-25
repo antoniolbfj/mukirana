@@ -169,7 +169,7 @@ function obterPacoteFaturaCartao(tokenSessao, filtros) {
     Pagamentos: pagamentos.map(function(pagamento) {
       return montarPagamentoFaturaParaTelaController_(pagamento, contexto);
     }),
-    Contas_Origem: contexto.contasAcessiveis.map(function(conta) {
+    Contas_Origem: contexto.contasAcessiveis.filter(function(c){return (!c.Tipo_Conta||c.Tipo_Conta==='Consumo')&&!c.ID_Grupo_Cartao_V3;}).map(function(conta) {
       return {
         ID_Conta: conta.ID_Conta,
         Nome_Conta: conta.Nome_Conta
