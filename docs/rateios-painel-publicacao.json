@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-25",
+  "status": "published and verified",
+  "version": 41,
+  "sourceCommit": "633e50476868a4701d1cdb9dbc0ef99d71114a68",
+  "scriptId": "1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migration": "20261025103532_rateios_v4_acertos_dashboard",
+  "migrationSha256": "facc38dab488ba8a83124b121db002a6f90378b4fc7df11ce8bc5332efa147cf",
+  "production": {
+    "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "previousVersion": 36,
+    "version": 41,
+    "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec",
+    "http": {
+      "productionHttpStatus": 200,
+      "finalHost": "accounts.google.com",
+      "authenticatedBrowserRequired": true
+    },
+    "verifiedVersion": 41
+  },
+  "evaluation": {
+    "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "previousVersion": 40,
+    "version": 41,
+    "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
+    "verifiedVersion": 41
+  },
+  "immutableVerification": {
+    "file": "rateios-painel-fontes-v41.json",
+    "fileCount": 70,
+    "byteForByteMatch": true,
+    "extraRemoteFiles": 0
+  },
+  "databasePreservation": {
+    "entries": 1092,
+    "shares": 942,
+    "settlements": 3,
+    "resolvedReferences": 258,
+    "unresolvedReferences": 0,
+    "inventedApprovals": 0,
+    "ledgerHashBefore": "f103f87353113e552b244a7269d613fb",
+    "ledgerHashAfter": "f103f87353113e552b244a7269d613fb"
+  },
+  "checks": {
+    "remoteSqlAssertions": 28,
+    "remoteSqlTransaction": "ROLLBACK",
+    "persistedTestRows": 0,
+    "localBackendAssertions": 60,
+    "upgradeWithLegacySettlements": "PASS",
+    "settlementConcurrency": "PASS",
+    "ledgerBackendAndConcurrency": "PASS",
+    "accountsBackend": "PASS",
+    "accountsBrowsers": [
+      "desktop",
+      "tablet",
+      "smartphone"
+    ],
+    "ledgerBrowsers": [
+      "desktop",
+      "tablet",
+      "smartphone"
+    ],
+    "dashboardAndSettlementBrowsers": [
+      {
+        "device": "desktop",
+        "result": "PASS",
+        "checks": "painel conectado, tipo, patrimônio, metas, acertos, aprovação, rascunho explícito, perda de resposta, período global, rotação, sem overflow/erros JS"
+      },
+      {
+        "device": "tablet",
+        "result": "PASS",
+        "checks": "painel conectado, tipo, patrimônio, metas, acertos, aprovação, rascunho explícito, perda de resposta, período global, rotação, sem overflow/erros JS"
+      },
+      {
+        "device": "smartphone",
+        "result": "PASS",
+        "checks": "painel conectado, tipo, patrimônio, metas, acertos, aprovação, rascunho explícito, perda de resposta, período global, rotação, sem overflow/erros JS"
+      }
+    ],
+    "securityAdvisor": {
+      "errors": 0,
+      "warnings": 0,
+      "infoRlsServiceOnly": 16
+    },
+    "performanceAdvisor": {
+      "newUnindexedForeignKeys": 0
+    }
+  },
+  "homologation": "pending for new functionality; main-route promotion explicitly authorized",
+  "palette": "deferred until remaining screen redesigns",
+  "webVerification": "evaluation redirects to Google login; authenticated user flow is evaluated locally with real templates/controllers and remote SQL checks",
+  "verifiedAt": "2026-10-25T10:45:55.113913+00:00"
+}

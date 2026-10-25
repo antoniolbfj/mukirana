@@ -4,7 +4,8 @@ Implementação autorizada em 25/10/2026. A autorização mais recente promove a
 telas aos acessos principais e retira as interfaces anteriores do menu, sem exigir
 outra autorização para essa organização. A homologação desta rodada continua sendo
 uma etapa do usuário. A publicação e a conferência da versão imutável são registradas
-em `rateios-painel-publicacao.json`.
+em `rateios-painel-publicacao.json`. Produção e avaliação usam a **versão 41**,
+com 70 arquivos idênticos ao commit `633e504`, conferidos por clonagem imutável.
 
 ## Comportamento entregue
 

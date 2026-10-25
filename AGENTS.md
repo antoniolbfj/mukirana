@@ -36,3 +36,5 @@
 - Autorização mais recente: implementar a rodada aprovada (Rateios/Acertos/Painel) e organizar as novas telas como principais, removendo as antigas do menu. Essa autorização substitui nesta rodada a exigência anterior de aguardar nova homologação para retirar menus provisórios. Preservar histórico financeiro e compatibilidade de acessos, sem manter telas antigas concorrentes.
 
 - Rodada implementada: Rateios/Acertos/Painel/Metas; migração 20261025103532 aplicada em wcczkultokrypdfimbsh. A decisão vigente organiza os acessos principais e retira as telas anteriores do menu. ContasTipos/ContasNova, LancamentosNovo e CartoesNovo são somente aliases. Ver docs/rateios-painel-entrega.md, docs/rateios-painel-publicacao.json e pendencias-requisitos.md para a publicação e pendências mais recentes; as notas de versões 36/40 acima são históricas.
+
+- Publicação vigente: produção e avaliação versão 41, conferidas na API de implantações; 70 arquivos idênticos ao commit 633e504. A atualização de menus está autorizada e concluída; homologação das funcionalidades novas permanece pendente. Os endereços antigos de versões 34/36/40 são históricos.
