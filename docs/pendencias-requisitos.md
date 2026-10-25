@@ -12,7 +12,7 @@ Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da corre�
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
 **versão 52**, com mês global/saldo anterior, fatura contextual, rateios na lista e
 modal de lançamentos em Contas/Painel. Publicação conferida em
-`lancamentos-contextos-publicacao.json`. A versão48 entregou o hub e a retirada
+`painel-periodo-publicacao.json`. A versão48 entregou o hub e a retirada
 de Projetos; a versão47 corrigiu transferências após pagamentos de fatura.
 A versão46 acrescentou a identificação dos ajustes históricos de rateio. Registros anteriores:
 `painel-oficial-publicacao.json` e `conciliacao-rateios-publicacao.json`;
