@@ -1,0 +1,63 @@
+{
+  "verifiedAt": "2026-10-25T17:49:30.200757+00:00",
+  "status": "published and independently verified",
+  "version": 47,
+  "sourceCommit": "863243f33474f444392200689095a35d5462211f",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "productionDatabaseWrites": false,
+  "migrations": [],
+  "fix": "Refresh global ledger store after invoice payment create/edit/delete",
+  "data": "Existing reported payments already projected as invoice-payment transfers; preserved without copies",
+  "files": {
+    "fileCount": 72,
+    "byteForByteMatch": true,
+    "extraRemoteFiles": 0,
+    "changedRuntimeFromV46": [
+      "Faturas_Cartao_View.html",
+      "Pagamentos_Faturas_Model.js"
+    ]
+  },
+  "checks": {
+    "browser": [
+      {
+        "device": "desktop",
+        "createEditStatusDeleteAndFilters": "PASS"
+      },
+      {
+        "device": "tablet",
+        "createEditStatusDeleteAndFilters": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "createEditStatusDeleteAndFilters": "PASS"
+      }
+    ],
+    "baselineWithoutFix": "FAIL as expected: 0 visible movements instead of 2 after saving invoice payment",
+    "accountsFinancialRegressions": "PASS",
+    "syntaxViewModelAndTestGateway": "PASS",
+    "whitespace": "PASS",
+    "http": [
+      {
+        "deployment": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+        "httpStatus": 200,
+        "requiresGoogleSignIn": true
+      },
+      {
+        "deployment": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+        "httpStatus": 200,
+        "requiresGoogleSignIn": true
+      }
+    ]
+  },
+  "homologation": "pending user validation",
+  "production": {
+    "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "version": 47,
+    "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec"
+  },
+  "evaluation": {
+    "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "version": 47,
+    "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec"
+  }
+}

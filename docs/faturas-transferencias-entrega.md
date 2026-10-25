@@ -40,6 +40,17 @@ MUKIRANA_TEST_DB=rateios_v4_accounts node tests/contas-tipos-backend.cjs
 ```
 
 Não há migração nem escrita em dados financeiros de produção nesta rodada.
-Os pagamentos existentes são preservados. A publicação e a conferência dos
-arquivos imutáveis serão registradas em `faturas-transferencias-publicacao.json`.
+Os pagamentos existentes são preservados. Publicada em produção e avaliação na
+**versão47**, no mesmo endereço, com 72 fontes conferidas byte a byte com o commit
+`863243f`. Apenas a view da Fatura e o comentário do modelo diferem da v46.
+
+Os três dispositivos passaram no teste completo. A versão anterior, simulada
+sem a correção, falhou exatamente na navegação após salvar: zero movimentos
+visíveis em vez de dois. A regressão financeira de Contas também passou,
+incluindo persistência única, permissões de adicionais, concorrência, atomicidade,
+saldos e limite de pagamento. Sintaxe e whitespace conferidos.
+
+Ver `faturas-transferencias-publicacao.json` e `faturas-transferencias-fontes-v47.json`.
+Os dois endereços responderam HTTP200 com redirecionamento para autenticação Google;
+isso verifica disponibilidade, sem simular uma sessão real do usuário.
 Homologação de uso permanece com o usuário.

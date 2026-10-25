@@ -10,9 +10,9 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 46**, com a identificação dos ajustes históricos de rateio. A correção
-seguinte da atualização de pagamentos de fatura está implementada; sua publicação
-será registrada em `faturas-transferencias-publicacao.json`. Registros anteriores:
+**versão 47**, com a atualização automática das transferências após pagamentos
+de fatura. Publicação conferida em `faturas-transferencias-publicacao.json`.
+A versão46 acrescentou a identificação dos ajustes históricos de rateio. Registros anteriores:
 `painel-oficial-publicacao.json` e `conciliacao-rateios-publicacao.json`;
 `ux-categorias-publicacao.json` preserva a entrega anterior.
 
