@@ -10,7 +10,9 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 46**, com a identificação dos ajustes históricos de rateio. Registros:
+**versão 46**, com a identificação dos ajustes históricos de rateio. A correção
+seguinte da atualização de pagamentos de fatura está implementada; sua publicação
+será registrada em `faturas-transferencias-publicacao.json`. Registros anteriores:
 `painel-oficial-publicacao.json` e `conciliacao-rateios-publicacao.json`;
 `ux-categorias-publicacao.json` preserva a entrega anterior.
 
@@ -40,6 +42,12 @@ pares de pessoas; obrigações futuras preservadas. Dados antigos e participaç�
 mantidos, com backup privado dos registros afetados. Ver
 [entrega da conciliação](conciliacao-rateios-entrega.md).
 
+Pagamentos feitos em Faturas passam a atualizar automaticamente o cache global
+também na edição e exclusão. Lançamentos mostra a saída da conta de origem e a
+entrada da conta do cartão sem recarregar o navegador. Os pagamentos existentes
+já tinham esse vínculo; nenhuma migração ou duplicação é necessária. Ver
+[correção das faturas](faturas-transferencias-entrega.md).
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -47,6 +55,7 @@ mantidos, com backup privado dos registros afetados. Ver
    e Metas, em computador/tablet e smartphone. Conferir o Painel oficial conectado
    (semáforo, patrimônio, rateios e títulos) com os dados reais. Sua implementação
    e promoção foram autorizadas; a homologação de uso continua separada.
+   Validar também pagamentos de fatura e a atualização imediata de Lançamentos.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.
@@ -64,6 +73,7 @@ mantidos, com backup privado dos registros afetados. Ver
    Usuários/autenticação, sem presumir que funcionalidades existentes estejam
    ausentes. As telas já acompanham os temas; refinamentos próprios de interação
    continuam sujeitos às próximas rodadas e à homologação.
+   A atualização do cache após pagamentos de fatura foi corrigida nesta rodada.
 
 A paleta global com os três temas foi implementada nesta rodada, conforme a nova
 autorização do usuário, e deixa de ser uma pendência de implementação. Ajustes de

@@ -843,6 +843,7 @@
 
     google.script.run
       .withSuccessHandler(function(mensagem) {
+        window.MukiranaLancamentosStore?.reload().catch(function() {});
         atualizarEstadoBotaoSalvarPagamentoFaturaCartao(false);
         fecharModalPagamentoFaturaCartao();
         carregarFaturaCartao();
@@ -878,6 +879,7 @@
     confirmarAcao('Confirma a exclusao definitiva deste pagamento de fatura?', function() {
       google.script.run
         .withSuccessHandler(function(mensagem) {
+          window.MukiranaLancamentosStore?.reload().catch(function() {});
           carregarFaturaCartao();
           if (typeof estaEmTelaContextualMukirana === 'function' &&
               estaEmTelaContextualMukirana() &&

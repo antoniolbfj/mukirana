@@ -2,7 +2,7 @@
  * Modulo: Pagamentos_Faturas_Model.gs
  * Responsabilidade:
  * - Registrar e listar pagamentos de faturas de cartao.
- * - Manter pagamento de fatura separado de despesas, receitas e transferencias.
+ * - Persistir um único pagamento, exibido como transferência entre a conta de origem e a conta do cartão.
  */
 
 
