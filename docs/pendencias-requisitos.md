@@ -10,7 +10,7 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 49**, com mês global/saldo anterior, fatura contextual, rateios na lista e
+**versão 50**, com mês global/saldo anterior, fatura contextual, rateios na lista e
 modal de lançamentos em Contas/Painel. Publicação conferida em
 `lancamentos-contextos-publicacao.json`. A versão48 entregou o hub e a retirada
 de Projetos; a versão47 corrigiu transferências após pagamentos de fatura.

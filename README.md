@@ -4,6 +4,17 @@ Base de trabalho reiniciada em 24/10/2026 a partir do sistema existente em
 produção, descrito na implantação como **Mukirana 1.9**. A orientação atual é
 aprimorar sua experiência de uso a partir dessa versão.
 
+## Rodada atual
+
+Mês global com saldo anterior opcional, rateios na própria lista, categoria pessoal
+padrão e cadastro vinculado à fatura aberta. Contas e Painel abrem Lançamentos em
+modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
+
+Ver [entrega](docs/lancamentos-contextos-entrega.md),
+[publicação](docs/lancamentos-contextos-publicacao.json) e
+[pendências vigentes](docs/pendencias-requisitos.md). Homologação de uso permanece
+pendente; os acessos principais foram atualizados por autorização do usuário.
+
 ## Origem
 
 - Apps Script: `1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd`.
