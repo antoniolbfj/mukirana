@@ -1,5 +1,8 @@
 # UX e temas — entrega
 
+Produção e avaliação publicadas na **versão 44**, com 72 arquivos idênticos ao
+commit `059abf1`, conferidos por clonagem da versão imutável.
+
 A correção de participações foi concluída primeiro, no commit 86ff85e e na versão
 imutável 42. Esta etapa seguinte moderniza somente apresentação e preferência
 visual: nenhum controller, modelo, regra financeira, contrato de escrita, sessão

@@ -8,7 +8,7 @@ Contas e Cartões remodelados foram homologados anteriormente. As novas telas s�
 principais por autorização expressa; os acessos antigos foram arquivados. A rodada
 de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categorização
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
-Claro/Escuro/Sépia e componentes comuns, preservando as regras da correção. O
+Claro/Escuro/Sépia e componentes comuns, preservando as regras da correção. Produção e avaliação vigentes: **versão 44**. O
 registro definitivo desta rodada é `ux-categorias-publicacao.json`.
 
 Categorias e metas agora usam a participação pessoal, com a categoria privada de

@@ -1,0 +1,140 @@
+{
+  "verifiedAt": "2026-10-25T12:12:34.555044+00:00",
+  "status": "published and verified",
+  "version": 44,
+  "scriptId": "1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd",
+  "sourceCommit": "059abf1b767e2cb3af512b30a78750ca25c246fd",
+  "functionalCorrection": {
+    "version": 42,
+    "commit": "86ff85e",
+    "immutableFilesVerified": 70,
+    "migration": "20261025113552_rateios_v5_personal_categories",
+    "remoteAssertions": 31,
+    "transaction": "ROLLBACK",
+    "persistedTestRows": 0
+  },
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "preservedDatabaseHashes": {
+    "ledger": "f103f87353113e552b244a7269d613fb",
+    "shares": "ed6aee0131807ecd6810e227c67076b9",
+    "settlements": "ee65f1fbdd4f33d1e5c4a45700df7792"
+  },
+  "visualPhase": {
+    "backendIdenticalToCorrection": true,
+    "migrationDiffAfterCorrection": false,
+    "themes": [
+      "Claro",
+      "Escuro",
+      "Sépia"
+    ],
+    "preferenceScope": "per user in this browser; does not change the database profile theme enum",
+    "themeChangeDoesRpc": false,
+    "dedicatedInterfaces": [
+      "desktop/tablet",
+      "smartphone"
+    ],
+    "prototype": "docs/prototipos/ux-temas.html",
+    "proposal": "docs/proposta-ux-tres-temas.md"
+  },
+  "immutableSources": "ux-categorias-fontes-v44.json",
+  "fileCount": 72,
+  "checks": {
+    "personalCategoryUnit": "PASS",
+    "personalCategoryIntegration": "PASS",
+    "rateiosV4BackendAssertions": 60,
+    "financialBrowserDevices": [
+      "desktop",
+      "tablet",
+      "smartphone"
+    ],
+    "uxBrowser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS",
+        "checks": "tema sem RPC, valores preservados, contraste, navegação, reload, iframe, formulários, rascunho/rotação"
+      }
+    ],
+    "profileFallbackAndIsolation": "PASS",
+    "keyboard": "PASS",
+    "profileLegacyFieldHiddenValuePreserved": "PASS",
+    "selectedMenuContrast": {
+      "Claro": 5.48,
+      "Escuro": 6.84,
+      "Sépia": 5.22
+    },
+    "syntaxAllJsHtml": "PASS",
+    "securityAdvisors": {
+      "warnings": 0,
+      "errors": 0,
+      "infoServiceOnlyRls": 16
+    }
+  },
+  "homologation": "pending",
+  "production": {
+    "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "version": 44,
+    "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec",
+    "http": {
+      "httpStatus": 200,
+      "finalHost": "accounts.google.com"
+    }
+  },
+  "evaluation": {
+    "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "version": 44,
+    "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
+    "http": {
+      "httpStatus": 200,
+      "finalHost": "accounts.google.com"
+    }
+  }
+}
