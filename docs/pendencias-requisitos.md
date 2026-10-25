@@ -9,8 +9,9 @@ principais por autorização expressa; os acessos antigos foram arquivados. A ro
 de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categorização
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
-O Painel oficial refinado foi publicado depois. Produção e avaliação vigentes:
-**versão 45**. Registro definitivo: `painel-oficial-publicacao.json`; o arquivo
+O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
+**versão 46**, com a identificação dos ajustes históricos de rateio. Registros:
+`painel-oficial-publicacao.json` e `conciliacao-rateios-publicacao.json`;
 `ux-categorias-publicacao.json` preserva a entrega anterior.
 
 Categorias e metas agora usam a participação pessoal, com a categoria privada de
@@ -31,11 +32,13 @@ os três temas e os layouts próprios. Ver [entrega](painel-oficial-entrega.md).
 Publicado e conferido na versão45, com 72 fontes idênticas ao commit `29d680a`.
 Ver `painel-oficial-publicacao.json`; homologação de uso permanece pendente.
 
-Análise posterior dos rateios manuais concluída somente em leitura: 11 movimentos
-históricos relevantes e três receitas recentes para conferência; sete receitas
-antigas sem vínculo. Preservados os dados e a implantação v45. A atualização
-depende da conciliação dos vínculos e das diferenças encontradas. Ver
-[análise do legado](analise-rateios-legados.md).
+Depois da [análise do legado](analise-rateios-legados.md), o usuário autorizou e
+foi concluída a conciliação de **julho a outubro/2026**: 11 movimentos antigos
+reconhecidos como especiais, três receitas novas duplicadas excluídas e cinco
+ajustes de quitação sem caixa. Fechamentos dos quatro meses zerados nos dois
+pares de pessoas; obrigações futuras preservadas. Dados antigos e participações
+mantidos, com backup privado dos registros afetados. Ver
+[entrega da conciliação](conciliacao-rateios-entrega.md).
 
 ## Pendências vigentes
 
@@ -44,22 +47,19 @@ depende da conciliação dos vínculos e das diferenças encontradas. Ver
    e Metas, em computador/tablet e smartphone. Conferir o Painel oficial conectado
    (semáforo, patrimônio, rateios e títulos) com os dados reais. Sua implementação
    e promoção foram autorizadas; a homologação de uso continua separada.
-2. **Conciliar os rateios manuais antigos:** validar o mapa de recebimentos e
-   pagamentos, resolver diferenças e a eventual sobreposição com receitas novas;
-   reaproveitar os lançamentos existentes e tratar explicitamente os registros
-   confirmados como repetidos, sem duplicar movimentos ou a quitação. Análise
-   concluída, nenhuma atualização aplicada.
-3. **Classificar o histórico:** identificar contas antigas de Investimento;
+2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.
-4. **Estornos e análises complementares:** fluxo explícito de correção/estorno de
+3. **Estornos e análises complementares:** fluxo explícito de correção/estorno de
    acertos com ambas as pontas registradas; aprofundar devoluções e análises de
    receitas/despesas fixas e variáveis (IND-05). O painel já calcula comprometimento
-   com base suficiente e sinaliza registros sem classificação.
-5. **Relatórios configuráveis (REL-01 a REL-04):** motor de campos, dimensões,
+   com base suficiente e sinaliza registros sem classificação. A conciliação
+   histórica foi uma operação administrativa pontual; o fluxo geral de estorno
+   de acertos concluídos continua pendente.
+4. **Relatórios configuráveis (REL-01 a REL-04):** motor de campos, dimensões,
    agrupamentos e cálculos, apresentação interativa, PDF e planilha com os mesmos
    resultados e limites de privacidade.
-6. **Revisões específicas dos módulos legados:** conferir requisitos e aprimorar
+5. **Revisões específicas dos módulos legados:** conferir requisitos e aprimorar
    fluxos de Faturas/pagamentos, Categorias, Recorrências antigas, Projetos e
    Usuários/autenticação, sem presumir que funcionalidades existentes estejam
    ausentes. As telas já acompanham os temas; refinamentos próprios de interação

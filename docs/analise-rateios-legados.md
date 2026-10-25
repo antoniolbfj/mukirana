@@ -1,5 +1,9 @@
 # Análise dos pagamentos e recebimentos manuais de rateio
 
+> Esta é a análise anterior à correção. Posteriormente, o usuário autorizou a
+> quitação de julho a outubro e a exclusão dos três novos duplicados, já
+> concluídas. Ver [entrega da conciliação](conciliacao-rateios-entrega.md).
+
 Rodada de 25/10/2026, posterior à publicação do Painel oficial v45. Pedido do
 usuário: localizar os lançamentos manuais anteriores às aprovações e aos acertos
 especiais, para preparar a atualização sem duplicar pagamentos/recebimentos.

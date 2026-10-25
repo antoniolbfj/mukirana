@@ -1,0 +1,78 @@
+{
+  "verifiedAt": "2026-10-25T17:22:26.718825+00:00",
+  "status": "applied, published and independently verified",
+  "version": 46,
+  "sourceCommit": "43b9f2c",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migration": "20261025171520_rateios_v7_adjustment_display",
+  "range": [
+    "2026-07",
+    "2026-10"
+  ],
+  "userExplicitlyIncludedOctober": true,
+  "data": {
+    "oldSpecialEntries": 11,
+    "deletedDuplicateEntries": 3,
+    "cashSettlementLinks": 8,
+    "noncashHistoricalAdjustments": 5,
+    "closedMonths": 4,
+    "pairs": 2,
+    "verifiedZeroMonthClosings": 8,
+    "ledgerCountAfter": 1092,
+    "settlementCountAfter": 13,
+    "allKeptEntriesUnchanged": true,
+    "allSharesUnchanged": true,
+    "accountsAndInvoicesPreserved": true,
+    "futureObligationsPreserved": true,
+    "noRetroactiveApprovals": true,
+    "privateAuditBackup": true,
+    "backupLedgerRows": 14,
+    "backupSettlementRows": 4,
+    "rehearsalWithRollback": "PASS",
+    "independentPostCommitVerification": "PASS"
+  },
+  "files": {
+    "fileCount": 72,
+    "byteForByteMatch": true,
+    "sources": "conciliacao-rateios-fontes-v46.json",
+    "changedRuntimeFromV45": [
+      "Rateios_Novo_Client.html"
+    ]
+  },
+  "checks": {
+    "rateiosRegressionAssertions": 60,
+    "adjustmentsWithoutCashAndActions": "PASS",
+    "escapedNote": "PASS",
+    "syntaxAllJsHtml": "PASS",
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "securityWarnings": 0,
+    "securityErrors": 0
+  },
+  "homologation": "pending user validation",
+  "production": {
+    "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "version": 46,
+    "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec"
+  },
+  "evaluation": {
+    "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "version": 46,
+    "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec"
+  }
+}

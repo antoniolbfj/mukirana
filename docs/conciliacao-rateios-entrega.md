@@ -4,6 +4,12 @@ O usuário autorizou quitar o período com os movimentos já existentes, reconhe
 os lançamentos antigos como especiais e excluir os novos duplicados. A inclusão
 de outubro e da terceira receita nova foi confirmada expressamente.
 
+**Concluída no banco e publicada em produção/avaliação na versão46**. Todos os
+oito fechamentos (quatro meses × dois pares) foram conferidos como zero após o
+COMMIT. Os 11 lançamentos antigos passaram a ser reconhecidos como especiais;
+os três duplicados foram excluídos. Permanecem 1.092 lançamentos e 13 registros
+de acerto, sendo oito vínculos financeiros e cinco ajustes sem caixa.
+
 ## Critério da correção
 
 - Reutilizar os 11 lançamentos históricos, preservando integralmente seus IDs,
@@ -32,6 +38,13 @@ Os dados pessoais e os identificadores da operação permanecem fora do Git, no
 diretório local `/workspace/work/conciliacao-rateios-jul-set/` e no diário privado
 `mukirana_rateios.operacoes` após a conclusão.
 
+A conferência independente posterior confirmou: antigos integralmente iguais,
+três IDs duplicados ausentes, demais 1.092 lançamentos idênticos, participações
+preservadas, nenhuma aprovação criada e ajustes sem botões de registrar outra
+ponta. A conta que continha as duplicidades diminuiu exatamente pela soma das
+três receitas removidas; os saldos das demais contas não mudaram. O diário guarda
+cópia dos 14 movimentos relevantes e dos quatro acertos anteriores.
+
 ## Exibição dos ajustes
 
 Foi necessário distinguir um ajuste de quitação das pontas bancárias na tela de
@@ -50,3 +63,8 @@ teste do ajuste sem caixa e sem ações de pagamento para ambas as pessoas, nota
 escapada, sintaxe de todos os arquivos e navegação real nas interfaces próprias.
 O registro final de aplicação e publicação fica em
 `conciliacao-rateios-publicacao.json`.
+
+Os 72 arquivos da versão46 foram comparados byte a byte ao commit `43b9f2c`.
+Somente `Rateios_Novo_Client.html` difere da v45 no runtime do Apps Script.
+Clasp e GitHub foram atualizados; detalhes das fontes em
+`conciliacao-rateios-fontes-v46.json`. Homologação de uso permanece separada.

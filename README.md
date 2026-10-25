@@ -79,6 +79,13 @@ próprias para computadores/tablets e smartphones. Claro, Escuro e Sépia estão
 
 ## Correção e UX com três temas
 
+Entrega posterior concluída: rateios históricos de **julho a outubro/2026**
+conciliados com os movimentos existentes, com reconhecimento especial dos antigos,
+exclusão dos novos duplicados e ajustes de quitação sem movimento bancário.
+Produção e avaliação vigentes: **versão46**. Ver
+[conciliação](docs/conciliacao-rateios-entrega.md) e
+[publicação](docs/conciliacao-rateios-publicacao.json).
+
 Publicado em produção e avaliação na **versão45**: o **Painel geral oficial** recebe indicadores
 em semáforo, títulos maiores, card de saldo do rateio com navegação e evolução
 patrimonial em largura inteira, com filtros por conta e visões de três meses,
