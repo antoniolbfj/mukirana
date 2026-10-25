@@ -88,5 +88,9 @@ a identidade do usuário vem da sessão validada no Apps Script.
 
 Testes de gravação usam somente PostgreSQL 17 local e dados sintéticos.
 Autenticação remota como usuário final permanece parte da homologação do usuário.
-A versão/commit e a comparação das fontes imutáveis constarão em
-`lancamentos-hub-publicacao.json` após a publicação.
+Publicada em produção e avaliação na **versão48**, preservando o endereço oficial.
+Os 73 arquivos foram baixados da versão imutável e conferidos byte a byte com o
+commit `be295b5`. A API de implantações confirmou ambos os acessos em v48.
+HTTP200 com autenticação Google confirma disponibilidade, sem representar login
+automatizado como o usuário. Ver `lancamentos-hub-publicacao.json` e
+`lancamentos-hub-fontes-v48.json`. Homologação de uso pendente.

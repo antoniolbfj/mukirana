@@ -10,8 +10,9 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 47**, com a atualização automática das transferências após pagamentos
-de fatura. Publicação conferida em `faturas-transferencias-publicacao.json`.
+**versão 48**, com Lançamentos central e retirada de Projetos. Publicação
+conferida em `lancamentos-hub-publicacao.json`. A versão47 corrigiu a atualização
+automática das transferências após pagamentos de fatura.
 A versão46 acrescentou a identificação dos ajustes históricos de rateio. Registros anteriores:
 `painel-oficial-publicacao.json` e `conciliacao-rateios-publicacao.json`;
 `ux-categorias-publicacao.json` preserva a entrega anterior.
@@ -53,8 +54,9 @@ Investimento disponível, valor do período/filtros atualizado ao gravar, lote d
 categoria e fixa/variável, edição na linha/cartão, ordenação, visões salvas e
 atalhos contextuais. Corrigidos o contexto de abertura e o alinhamento da marca.
 **Projetos foi descontinuado**, com histórico preservado e organização por
-categorias/subcategorias. Ver [entrega](lancamentos-hub-entrega.md). Implantação
-em conferência; o registro definitivo será `lancamentos-hub-publicacao.json`.
+categorias/subcategorias. Ver [entrega](lancamentos-hub-entrega.md). Produção e
+avaliação publicadas na versão48, com 73 fontes idênticas ao commit `be295b5`.
+Ver `lancamentos-hub-publicacao.json`; homologação de uso permanece pendente.
 
 ## Pendências vigentes
 
@@ -79,7 +81,8 @@ em conferência; o registro definitivo será `lancamentos-hub-publicacao.json`.
    agrupamentos e cálculos, apresentação interativa, PDF e planilha com os mesmos
    resultados e limites de privacidade.
 5. **Revisões específicas dos módulos legados:** conferir requisitos e aprimorar
-   fluxos de Faturas/pagamentos, Categorias, Recorrências antigas, Usuários/autenticação, sem presumir que funcionalidades existentes estejam
+   fluxos de Faturas/pagamentos, Categorias, Recorrências antigas e
+   Usuários/autenticação, sem presumir que funcionalidades existentes estejam
    ausentes. As telas já acompanham os temas; refinamentos próprios de interação
    continuam sujeitos às próximas rodadas e à homologação.
    A atualização do cache após pagamentos de fatura foi corrigida nesta rodada.

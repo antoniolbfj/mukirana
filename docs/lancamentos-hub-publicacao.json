@@ -1,0 +1,126 @@
+{
+  "verifiedAt": "2026-10-25T19:05:17.039153+00:00",
+  "status": "published and independently verified",
+  "version": 48,
+  "sourceCommit": "be295b53efef381e60932c1efd944c43ce2236f7",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migrations": [
+    "20261025184541_lancamentos_v8_hub_metadata",
+    "20261025185217_lancamentos_v8_retired_projects"
+  ],
+  "financialRecordsRewrittenByMigrations": false,
+  "historicalProjectReferencesPreserved": true,
+  "projectFeatureRetired": true,
+  "savedViewsScope": "per authenticated user in this browser; explicit save",
+  "files": {
+    "fileCount": 73,
+    "byteForByteMatch": true,
+    "extraRemoteFiles": 0,
+    "changedRuntimeFromV47": [
+      "App_Main.js",
+      "Faturas_Cartao_View.html",
+      "Index.html",
+      "Lancamentos_Hub_Client.html",
+      "Lancamentos_Hub_Controller.js",
+      "Lancamentos_Novo_App.html",
+      "Lancamentos_Novo_Client.html",
+      "Lancamentos_Novo_Controller.js",
+      "Lancamentos_Novo_Regras.js",
+      "Lancamentos_Novo_View.html",
+      "Login_View.html",
+      "Projetos_Controller.js",
+      "Recorrencias_Controller.js",
+      "Recorrencias_View.html",
+      "Saldo_Global_Client.html",
+      "UX_Temas_Styles.html"
+    ],
+    "removedRuntimeFromV47": [
+      "Projetos_View.html"
+    ]
+  },
+  "checks": {
+    "hubBackendAssertions": 39,
+    "recurrenceRetirement": "PASS",
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "extraInlineCasesDesktop": "PASS",
+    "extraInlineCasesSmartphone": "PASS",
+    "accountsRegression": "PASS",
+    "ledgerRegression": "PASS",
+    "rateiosRegressionAssertions": 49,
+    "rateiosConcurrency": "PASS",
+    "personalCategoriesAndGoals": "PASS",
+    "patrimony": "PASS",
+    "invoicePaymentsThreeDevices": "PASS",
+    "allRuntimeSyntax": "PASS",
+    "whitespace": "PASS",
+    "http": [
+      {
+        "deployment": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+        "httpStatus": 200,
+        "requiresGoogleSignIn": true
+      },
+      {
+        "deployment": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+        "httpStatus": 200,
+        "requiresGoogleSignIn": true
+      }
+    ]
+  },
+  "homologation": "pending user validation",
+  "production": {
+    "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "version": 48,
+    "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec"
+  },
+  "evaluation": {
+    "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "version": 48,
+    "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec"
+  }
+}
