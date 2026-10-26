@@ -10,13 +10,15 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 56**, com UX de smartphones refinada no Painel e em Lançamentos,
+**versão 57**, com Favoritos retirado e autocompletar do histórico preservado,
+UX de smartphones refinada no Painel e em Lançamentos,
 saldo acumulado em destaque e mês/acumulado do filtro menor em Contas,
 cálculo global consistente, transferências previstas em Contas,
 recebíveis de rateio na previsão e mês/histórico seguindo a checkbox em todos os
 indicadores desta rodada. Preserva seletores de subcategoria acessíveis pelo
 teclado, fatura contextual e modais. Publicação conferida em
-`ux-mobile-publicacao.json`. A versão55 ajustou os valores de Contas;
+`autocomplete-publicacao.json`. A versão56 refinou o UX de smartphones;
+a versão55 ajustou os valores de Contas;
 a versão54 unificou as previsões; a versão52
 reorganizou o Painel e corrigiu
 o saldo devedor até o mês. A versão48 entregou o hub e a retirada
