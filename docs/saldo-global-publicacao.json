@@ -1,5 +1,5 @@
 {
-  "status": "ready for publication",
+  "status": "published and independently verified",
   "version": 54,
   "supabaseProject": "wcczkultokrypdfimbsh",
   "migrations": [],
@@ -64,7 +64,10 @@
     ],
     "productionReadOnlyReview": "PASS - discrepancy reproduced; creditor and month/stock movements reconciled",
     "productionFinancialTestEntriesCreated": false,
-    "authenticatedUserAcceptance": "pending"
+    "authenticatedUserAcceptance": "pending",
+    "renderedSyntax": "PASS - seven bundles",
+    "whitespace": "PASS",
+    "smartphoneDirectRender": "PASS"
   },
   "changedRuntimeFromV53": [
     "Contas_Tipos_Client.html",
@@ -76,5 +79,34 @@
     "Painel_Novo_Controller.js",
     "Rateios_Novo_Client.html",
     "Saldo_Global_Client.html"
-  ]
+  ],
+  "verifiedAt": "2026-10-26T10:13:13.684492+00:00",
+  "sourceCommit": "4d2bcdbc7fe0f5dfb3dd544ff9003c5714212eb3",
+  "deployments": {
+    "production": {
+      "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+      "version": 54,
+      "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "authenticatedFunctionalTest": false
+      }
+    },
+    "evaluation": {
+      "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+      "version": 54,
+      "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "authenticatedFunctionalTest": false
+      }
+    }
+  },
+  "files": {
+    "fileCount": 74,
+    "byteForByteMatch": true,
+    "extraRemoteFiles": 0
+  }
 }
