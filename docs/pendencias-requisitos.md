@@ -94,6 +94,12 @@ projeções de Contas/Painel. Os três cards aplicam a escolha ao respectivo mê
 Indicadores e valores principais de Contas usam o recorte; saldos efetivos são
 identificados separadamente. Ver [entrega atual](saldo-global-entrega.md).
 
+Regularização posterior de dados: um pagamento histórico de fatura faltante foi
+confirmado pelo usuário e cadastrado a partir de outro mês. A competência ficou
+quitada, com uma única transferência especial, duas pontas conciliadas e
+pagamentos existentes preservados. Não houve alteração de código ou da versão54.
+Ver [regularização](regularizacao-fatura-entrega.md).
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -112,6 +118,7 @@ identificados separadamente. Ver [entrega atual](saldo-global-entrega.md).
    pessoa, resultado dos filtros e seleção de subcategorias pelo teclado.
    Validar o disponível igual entre telas, as transferências previstas em Contas,
    a previsão do credor e todos os indicadores com/sem Saldo anterior.
+   Recarregar a sessão e conferir também o pagamento histórico regularizado.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

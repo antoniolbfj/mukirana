@@ -25,6 +25,10 @@ Ver [resultado global e filtro](docs/saldo-global-entrega.md),
 [pendências vigentes](docs/pendencias-requisitos.md). Homologação de uso permanece
 pendente; os acessos principais foram atualizados por autorização do usuário.
 
+Uma [regularização posterior de fatura](docs/regularizacao-fatura-entrega.md)
+registrou o pagamento histórico faltante confirmado pelo usuário, com conferência
+da quitação e da transferência. O código publicado permanece na versão54.
+
 ## Origem
 
 - Apps Script: `1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd`.
