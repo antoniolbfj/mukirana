@@ -13,21 +13,23 @@ modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
 O Painel segue cinco linhas e o saldo devedor do rateio respeita o fim do mês
 escolhido. **Ainda posso gastar** agora desconta os compromissos de rateio,
 sem repetir o desconto quando o pagamento é registrado. As subcategorias
-começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v54.
+começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v55.
 A disponibilidade respeita o mesmo escopo em todas as telas e inclui as previsões
 de recebimento dos rateios. Saldo anterior controla mês/histórico também nos
 cards e nos rateios. Transferências previstas integram as projeções de Contas.
-Ver [resultado global e filtro](docs/saldo-global-entrega.md),
+Contas destaca o saldo acumulado efetivo datado; o resultado do filtro fica menor.
+Ver [valores de Contas e conciliação](docs/contas-saldos-entrega.md),
+[resultado global e filtro](docs/saldo-global-entrega.md),
 [disponibilidade e teclado](docs/disponivel-rateios-entrega.md),
 [correção do Painel](docs/painel-periodo-entrega.md) e
 [entrega anterior](docs/lancamentos-contextos-entrega.md),
-[publicação vigente](docs/saldo-global-publicacao.json) e
+[publicação vigente](docs/contas-saldos-publicacao.json) e
 [pendências vigentes](docs/pendencias-requisitos.md). Homologação de uso permanece
 pendente; os acessos principais foram atualizados por autorização do usuário.
 
 Uma [regularização posterior de fatura](docs/regularizacao-fatura-entrega.md)
 registrou o pagamento histórico faltante confirmado pelo usuário, com conferência
-da quitação e da transferência. O código publicado permanece na versão54.
+da quitação e da transferência, preservando o código da versão54 naquela operação.
 
 ## Origem
 

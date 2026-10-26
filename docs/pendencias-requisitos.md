@@ -10,11 +10,13 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 54**, com cálculo global consistente, transferências previstas em Contas,
+**versão 55**, com saldo acumulado em destaque e mês/acumulado do filtro menor em Contas,
+cálculo global consistente, transferências previstas em Contas,
 recebíveis de rateio na previsão e mês/histórico seguindo a checkbox em todos os
 indicadores desta rodada. Preserva seletores de subcategoria acessíveis pelo
 teclado, fatura contextual e modais. Publicação conferida em
-`saldo-global-publicacao.json`. A versão52 reorganizou o Painel e corrigiu
+`contas-saldos-publicacao.json`. A versão54 unificou as previsões; a versão52
+reorganizou o Painel e corrigiu
 o saldo devedor até o mês. A versão48 entregou o hub e a retirada
 de Projetos; a versão47 corrigiu transferências após pagamentos de fatura.
 A versão46 acrescentou a identificação dos ajustes históricos de rateio. Registros anteriores:
@@ -100,6 +102,13 @@ quitada, com uma única transferência especial, duas pontas conciliadas e
 pagamentos existentes preservados. Não houve alteração de código ou da versão54.
 Ver [regularização](regularizacao-fatura-entrega.md).
 
+A rodada seguinte conciliou o saldo efetivo de uma conta com o valor real
+informado pelo usuário, por um único crédito identificado em Ajustes de entrada.
+Os movimentos anteriores foram preservados. Por solicitação do usuário, Contas
+agora destaca o saldo acumulado efetivo datado e mostra o resultado do filtro
+menor, nos dois layouts. Ver
+[entrega](contas-saldos-entrega.md).
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -119,6 +128,8 @@ Ver [regularização](regularizacao-fatura-entrega.md).
    Validar o disponível igual entre telas, as transferências previstas em Contas,
    a previsão do credor e todos os indicadores com/sem Saldo anterior.
    Recarregar a sessão e conferir também o pagamento histórico regularizado.
+   Conferir o crédito de conciliação autorizado e os rótulos dos valores de Contas,
+   inclusive ao consultar meses antigos e alternar Saldo anterior.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

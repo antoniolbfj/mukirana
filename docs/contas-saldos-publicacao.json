@@ -1,0 +1,50 @@
+{
+  "status": "ready for publication",
+  "version": 55,
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migrations": [],
+  "productionDataCorrection": {
+    "kind": "user-authorized account balance reconciliation",
+    "entryCount": 1,
+    "categoryCreated": false,
+    "canonicalLedgerRPC": true,
+    "previousFinancialHashesPreservedInTransaction": true,
+    "initialBalanceUnchanged": true,
+    "targetEffectiveBalanceVerified": true,
+    "historicalFilteredResultPreserved": true,
+    "privateBeforeAfterAudit": true
+  },
+  "changedRuntimeFromV54": [
+    "Contas_Tipos_Client.html",
+    "Contas_Tipos_Desktop_View.html",
+    "Contas_Tipos_Mobile_View.html"
+  ],
+  "checks": {
+    "scopeAndProjectionsRegression": 19,
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "renderedSyntax": "PASS - seven bundles",
+    "themeStylesUnchanged": true,
+    "independentProductionPostCommitRead": "PASS",
+    "authenticatedUserAcceptance": "pending"
+  },
+  "accountProminence": {
+    "primary": "dated effective accumulated balance",
+    "secondary": "global month/history result"
+  }
+}
