@@ -1,0 +1,143 @@
+{
+  "status": "implemented and locally verified; publication pending",
+  "version": 56,
+  "changedRuntimeFromV55": [
+    "Lancamentos_Novo_App.html",
+    "Lancamentos_Novo_Client.html",
+    "Painel_Novo_App.html",
+    "Painel_Novo_Client.html"
+  ],
+  "runtimeFileCount": 74,
+  "migrations": [],
+  "checks": {
+    "scopeBrowser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "mobileInspection": {
+      "scenarios": [
+        {
+          "scenario": "small",
+          "width": 320,
+          "height": 740,
+          "theme": "claro",
+          "result": "PASS"
+        },
+        {
+          "scenario": "standard",
+          "width": 390,
+          "height": 844,
+          "theme": "claro",
+          "result": "PASS"
+        },
+        {
+          "scenario": "dark",
+          "width": 390,
+          "height": 844,
+          "theme": "escuro",
+          "result": "PASS"
+        },
+        {
+          "scenario": "sepia",
+          "width": 390,
+          "height": 844,
+          "theme": "sepia",
+          "result": "PASS"
+        },
+        {
+          "scenario": "wide",
+          "width": 430,
+          "height": 932,
+          "theme": "sepia",
+          "result": "PASS"
+        },
+        {
+          "scenario": "landscape",
+          "width": 844,
+          "height": 390,
+          "theme": "escuro",
+          "result": "PASS"
+        }
+      ],
+      "writes": false,
+      "checks": [
+        "full long description/account/category",
+        "no card clipping or horizontal overflow",
+        "inline edit and cancel",
+        "selection",
+        "actions",
+        "rateio expansion",
+        "one monthly card and 3 clickable months",
+        "global month/history preserved"
+      ]
+    },
+    "largeScreenComparison": [
+      {
+        "device": "desktop",
+        "view": "Lancamentos_Novo_App",
+        "pixelIdenticalToV55": true
+      },
+      {
+        "device": "desktop",
+        "view": "Painel_Novo_App",
+        "pixelIdenticalToV55": true
+      },
+      {
+        "device": "tablet",
+        "view": "Lancamentos_Novo_App",
+        "pixelIdenticalToV55": true
+      },
+      {
+        "device": "tablet",
+        "view": "Painel_Novo_App",
+        "pixelIdenticalToV55": true
+      }
+    ],
+    "renderedSyntax": "PASS - seven bundles",
+    "productionDataWrites": false,
+    "authenticatedUserAcceptance": "pending"
+  }
+}

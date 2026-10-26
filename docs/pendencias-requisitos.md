@@ -1,6 +1,6 @@
 # Pendências da base atual — Mukirana
 
-Atualizado em 25/10/2026. Supabase `wcczkultokrypdfimbsh`.
+Atualizado em 26/10/2026. Supabase `wcczkultokrypdfimbsh`.
 
 ## Entrega vigente
 
@@ -109,6 +109,12 @@ agora destaca o saldo acumulado efetivo datado e mostra o resultado do filtro
 menor, nos dois layouts. Ver
 [entrega](contas-saldos-entrega.md).
 
+Refinamento posterior exclusivo para smartphones: o Painel reúne os três meses
+em um único card, com cada mês clicável; os cards de Lançamentos exibem descrição,
+valor/situação e metadados em áreas próprias, sem cortar os textos. Cálculos e UX
+de telas maiores preservados. Ver [entrega](ux-mobile-entrega.md) e seu registro
+de publicação. Homologação no aparelho do usuário permanece pendente.
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -130,6 +136,8 @@ menor, nos dois layouts. Ver
    Recarregar a sessão e conferir também o pagamento histórico regularizado.
    Conferir o crédito de conciliação autorizado e os rótulos dos valores de Contas,
    inclusive ao consultar meses antigos e alternar Saldo anterior.
+   Avaliar o card único de meses e a organização completa dos lançamentos no
+   smartphone, incluindo nomes longos, seleção, edição e ações de rateio.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.
