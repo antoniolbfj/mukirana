@@ -117,6 +117,11 @@ valor/situação e metadados em áreas próprias, sem cortar os textos. Cálculo
 de telas maiores preservados. Ver [entrega](ux-mobile-entrega.md) e seu registro
 de publicação. Homologação no aparelho do usuário permanece pendente.
 
+A decisão seguinte retirou Favoritos das interfaces de computador/tablet e
+smartphone. O campo Descrição conserva os exemplos do histórico pessoal por
+autocompletar, sem copiar o valor. Sessões antigas não criam novos favoritos;
+dados anteriores preservados. Ver [entrega](autocomplete-entrega.md).
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -140,6 +145,8 @@ de publicação. Homologação no aparelho do usuário permanece pendente.
    inclusive ao consultar meses antigos e alternar Saldo anterior.
    Avaliar o card único de meses e a organização completa dos lançamentos no
    smartphone, incluindo nomes longos, seleção, edição e ações de rateio.
+   Conferir também o formulário sem favoritos e a seleção de exemplos anteriores
+   pelo autocompletar de Descrição, nos dois layouts e nas modais.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

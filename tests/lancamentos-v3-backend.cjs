@@ -26,13 +26,15 @@ detail=ctx.lancamentosNovoDetalhar('owner-token',shared.id);ctx.lancamentosNovoS
 detail=ctx.lancamentosNovoDetalhar('owner-token',shared.id);result=ctx.lancamentosNovoAcao('owner-token',{operationId:crypto.randomUUID(),action:'delete',id:shared.id,version:detail.entry.version,scope:'one'});assert.equal(result.pendingApproval,true);assert(ctx.lancamentosNovoDetalhar('owner-token',shared.id));
 pack=ctx.lancamentosNovoListar('additional-token',{});approval=pack.approvals.find(a=>a.ids.includes(shared.id));ctx.lancamentosNovoDecidir('additional-token',{id:approval.id,approve:true,category:catAdditional.id});assert.throws(()=>ctx.lancamentosNovoDetalhar('owner-token',shared.id));
 console.log('Lançamentos v3: transferências, centavos grandes, filtros dependentes, sessão, atores, repetição, conflito, geração finita/âncora, edição/exclusão coletiva, rollback de rateio e aprovação: PASS');
-// Favoritos são modelos sem valor e não criam movimentos extras.
-const favorite={...base,id:crypto.randomUUID(),operationId:crypto.randomUUID(),description:'TESTE_FAVORITO_'+crypto.randomUUID().slice(0,8),favorite:true};
-ctx.lancamentosNovoSalvar('owner-token',favorite);pack=ctx.lancamentosNovoListar('owner-token',{});let model=pack.favorites.find(f=>f.name===favorite.description);assert(model);assert.equal(model.model.amountCents,undefined);
-ctx.lancamentosNovoSalvar('owner-token',{...favorite,id:crypto.randomUUID(),operationId:crypto.randomUUID()});pack=ctx.lancamentosNovoListar('owner-token',{});assert.equal(pack.favorites.filter(f=>f.name===favorite.description).length,1);
+// Clientes antigos não criam favoritos; o histórico continua oferecendo exemplos sem valor.
+const favoriteCount=sql('SELECT count(*) FROM mukirana_lancamentos.favoritos');
+const example={...base,id:crypto.randomUUID(),operationId:crypto.randomUUID(),description:'TESTE_EXEMPLO_'+crypto.randomUUID().slice(0,8),favorite:true};
+ctx.lancamentosNovoSalvar('owner-token',example);pack=ctx.lancamentosNovoListar('owner-token',{});
+assert.deepEqual(Array.from(pack.favorites),[]);assert.equal(sql('SELECT count(*) FROM mukirana_lancamentos.favoritos'),favoriteCount);
+const model=pack.history.find(e=>e.id===example.id);assert(model);assert.equal(model.description,example.description);assert.equal(model.amountCents,undefined);
 // Renovação cria um novo conjunto e não pode duplicar o vínculo.
 const renewGroup={...recurring,id:crypto.randomUUID(),operationId:crypto.randomUUID(),date:'2026-10-24'};result=ctx.lancamentosNovoSalvar('owner-token',renewGroup);const renewal={...renewGroup,id:crypto.randomUUID(),operationId:crypto.randomUUID(),date:'2027-01-24',renewFrom:renewGroup.operationId};ctx.lancamentosNovoSalvar('owner-token',renewal);pack=ctx.lancamentosNovoListar('owner-token',{});assert(pack.groups.find(g=>g.id===renewGroup.operationId).renewed);assert.throws(()=>ctx.lancamentosNovoSalvar('owner-token',{...renewal,id:crypto.randomUUID(),operationId:crypto.randomUUID()}));
 // Cadastro contextual usa o tipo real e respeita o nível do nome.
 const quick={id:crypto.randomUUID(),operationId:crypto.randomUUID(),action:'quick-account',name:'TESTE_QUICK_'+crypto.randomUUID().slice(0,8),kind:'Investimento'};ctx.lancamentosNovoCadastroRapido('owner-token',quick);pack=ctx.lancamentosNovoListar('owner-token',{});assert.equal(pack.accounts.find(a=>a.id===quick.id).type,'Investimento');assert.throws(()=>ctx.lancamentosNovoCadastroRapido('owner-token',{...quick,id:crypto.randomUUID(),operationId:crypto.randomUUID()}));
 const categoryQuick={id:crypto.randomUUID(),operationId:crypto.randomUUID(),action:'quick-category',name:'TESTE_CAT_'+crypto.randomUUID().slice(0,8),kind:'Despesa'};ctx.lancamentosNovoCadastroRapido('owner-token',categoryQuick);assert.equal(ctx.lancamentosNovoCadastroRapido('owner-token',categoryQuick).id,categoryQuick.id);
-console.log('Favoritos persistidos sem valor, renovação sem duplicar e cadastros contextuais com tipo/nível: PASS');
+console.log('Favoritos desativados, histórico sem valor, renovação sem duplicar e cadastros contextuais com tipo/nível: PASS');

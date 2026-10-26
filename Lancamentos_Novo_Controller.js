@@ -78,7 +78,7 @@ const LancamentosNovo_ = {
   },
   request: function(r){
     r=r||{};if(!this.uuid(r.operationId))throw new Error('Operação inválida. Atualize a tela.');
-    const keys=['operationId','action','id','version','scope','description','type','amountCents','date','origin','destination','category','classification','mode','frequency','quantity','duration','status','project','favorite','name','parent','kind','approvalId','approve','reason','renewFrom','invoiceMonth','invoiceGroup'];const clean={};
+    const keys=['operationId','action','id','version','scope','description','type','amountCents','date','origin','destination','category','classification','mode','frequency','quantity','duration','status','project','name','parent','kind','approvalId','approve','reason','renewFrom','invoiceMonth','invoiceGroup'];const clean={};
     keys.forEach(function(k){if(r[k]!==undefined)clean[k]=r[k];});
     if(r.shares!==undefined){if(!Array.isArray(r.shares)||r.shares.length>100)throw new Error('Confira os participantes.');clean.shares=r.shares.map(function(p){return {id:p.id,cents:p.cents};});}
     if(r.selected!==undefined){if(!Array.isArray(r.selected)||r.selected.length>6000)throw new Error('Seleção inválida.');clean.selected=r.selected.map(function(p){return{id:p.id,version:p.version};});}
@@ -111,7 +111,7 @@ const LancamentosNovo_ = {
 };
 function lancamentosNovoListar(token,filters){
   const user=obterSessaoObrigatoria(token);ContasNova_.requireSupabase();const period=LancamentosNovo_.period(filters),data=LancamentosNovo_.read(user,Object.assign({invoiceCalendar:true},period));
-  return {user:{id:user.id,name:user.nome||''},period:period,rows:LancamentosNovo_.rows(data),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:data.favorites,approvals:data.approvals,rateios:data.rateios,rateiosSummary:painelNovoResumoRateios_(user,period)};
+  return {user:{id:user.id,name:user.nome||''},period:period,rows:LancamentosNovo_.rows(data),entries:data.entries,accounts:data.accounts,categories:data.categories,projects:data.projects,people:data.people,groups:data.groups,history:data.history,favorites:[],approvals:data.approvals,rateios:data.rateios,rateiosSummary:painelNovoResumoRateios_(user,period)};
 }
 function lancamentosNovoConsultar(token,period,filters){
   const data=lancamentosNovoListar(token,period),core=LancamentosNovo_.core();return core.query(data.rows,filters);
@@ -155,7 +155,6 @@ function lancamentosNovoSalvar(token,request){
     if(!editing&&r.mode==='installment'&&shares.length){if(shares.some(function(p){return Number(p.cents)<schedule.length;}))throw new Error('Cada pessoa precisa ter R$ 0,01 em cada parcela.');portions=helper.portions(Number(e.amountCents),remaining,schedule.length-i-1);remaining=remaining.map(function(p){return{id:p.id,cents:String(Number(p.cents)-Number(portions.find(function(x){return x.id===p.id;}).cents))};});}
     changes.rows.push({id:editing?e.id:helper.childId(r.id,i),version:editing?e.version:0,description:r.description.trim(),type:r.type,amountCents:editing?r.amountCents:e.amountCents,date:date,sourceKind:source.kind,origin:r.origin,destination:r.type==='transfer'?r.destination:null,category:r.type==='transfer'?null:r.category,project:editing?e.project||null:null,classification:r.classification,status:editing?(e.id===original.id?r.status:e.status):i===0?r.status:'pending',index:i+1,shares:portions});
   });
-  if(r.favorite)changes.favorite={description:r.description.trim(),type:r.type,origin:r.origin,category:r.category,classification:r.classification};
   if(r.invoiceGroup&&(!helper.uuid(r.invoiceGroup)||r.version!==0||r.mode!=='single'||source.kind!=='Cartão'||source.group!==r.invoiceGroup))throw new Error('Escolha um cartão desta fatura. Use um lançamento único neste contexto.');
   return helper.rpc(r.invoiceGroup?'rpc_lancamentos_fatura_v9':'rpc_lancamentos_gravar_v3',{p_usuario:user.id,p_operacao:r.operationId,p_request:r,p_changes:changes});
 }

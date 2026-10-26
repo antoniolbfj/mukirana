@@ -1,0 +1,85 @@
+{
+  "status": "implemented and locally verified; publication pending",
+  "version": 57,
+  "changedRuntimeFromV56": [
+    "Lancamentos_Contexto_Controller.js",
+    "Lancamentos_Hub_Client.html",
+    "Lancamentos_Novo_App.html",
+    "Lancamentos_Novo_Client.html",
+    "Lancamentos_Novo_Controller.js"
+  ],
+  "runtimeFileCount": 74,
+  "migrations": [],
+  "checks": {
+    "focused": {
+      "checks": 17,
+      "result": "PASS",
+      "coverage": "ignored legacy favorite flag; no favorite writes; one ledger entry and idempotent retry; metadata history outside selected month; contextual history; author privacy; no copied value"
+    },
+    "hub": {
+      "checks": 39,
+      "result": "PASS",
+      "coverage": "atomic batch, replay, conflicts, balances, private shares/categories, approvals, catalog and service-only grants"
+    },
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS",
+        "contextualModal": false
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS",
+        "contextualModal": false
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS",
+        "contextualModal": true
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS",
+        "contextualModal": false
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS",
+        "contextualModal": false
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS",
+        "contextualModal": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS",
+        "contextualModal": false
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS",
+        "contextualModal": false
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS",
+        "contextualModal": true
+      }
+    ],
+    "renderedSyntax": "PASS - seven bundles",
+    "historicalV3FullSuite": "pre-existing failure at participant visibility; reproduced on v56",
+    "productionDatabaseWrites": false,
+    "authenticatedUserAcceptance": "pending"
+  }
+}
