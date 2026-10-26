@@ -10,14 +10,16 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 57**, com Favoritos retirado e autocompletar do histórico preservado,
+**versão 58**, com pagamento de fatura como transferência parcial/integral/crédito
+e competência preservada com Saldo anterior, Favoritos retirado e histórico por autocompletar,
 UX de smartphones refinada no Painel e em Lançamentos,
 saldo acumulado em destaque e mês/acumulado do filtro menor em Contas,
 cálculo global consistente, transferências previstas em Contas,
 recebíveis de rateio na previsão e mês/histórico seguindo a checkbox em todos os
 indicadores desta rodada. Preserva seletores de subcategoria acessíveis pelo
 teclado, fatura contextual e modais. Publicação conferida em
-`autocomplete-publicacao.json`. A versão56 refinou o UX de smartphones;
+`faturas-pagamento-simples-publicacao.json`. A versão57 retirou Favoritos;
+a versão56 refinou o UX de smartphones;
 a versão55 ajustou os valores de Contas;
 a versão54 unificou as previsões; a versão52
 reorganizou o Painel e corrigiu

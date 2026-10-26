@@ -13,7 +13,7 @@ modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
 O Painel segue cinco linhas e o saldo devedor do rateio respeita o fim do mês
 escolhido. **Ainda posso gastar** agora desconta os compromissos de rateio,
 sem repetir o desconto quando o pagamento é registrado. As subcategorias
-começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v57.
+começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v58.
 A disponibilidade respeita o mesmo escopo em todas as telas e inclui as previsões
 de recebimento dos rateios. Saldo anterior controla mês/histórico também nos
 cards e nos rateios. Transferências previstas integram as projeções de Contas.
@@ -23,12 +23,14 @@ descrição completa, valor/situação e dados organizados. Telas maiores e cál
 preservados. Ver [UX para smartphones](docs/ux-mobile-entrega.md).
 Favoritos retirados nas duas interfaces; Descrição conserva os exemplos do
 histórico por autocompletar. Ver [entrega](docs/autocomplete-entrega.md).
+Pagamento de fatura é transferência parcial, integral ou com crédito, com mês
+fixado na modal e compras preservadas. Ver [entrega](docs/faturas-pagamento-simples-entrega.md).
 Ver [valores de Contas e conciliação](docs/contas-saldos-entrega.md),
 [resultado global e filtro](docs/saldo-global-entrega.md),
 [disponibilidade e teclado](docs/disponivel-rateios-entrega.md),
 [correção do Painel](docs/painel-periodo-entrega.md) e
 [entrega anterior](docs/lancamentos-contextos-entrega.md),
-[publicação vigente](docs/autocomplete-publicacao.json) e
+[publicação vigente](docs/faturas-pagamento-simples-publicacao.json) e
 [pendências vigentes](docs/pendencias-requisitos.md). Homologação de uso permanece
 pendente; os acessos principais foram atualizados por autorização do usuário.
 

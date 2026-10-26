@@ -1,5 +1,5 @@
 {
-  "status": "implemented; database migration applied; Apps Script publication pending",
+  "status": "published and independently verified",
   "version": 58,
   "supabaseProject": "wcczkultokrypdfimbsh",
   "migrations": [
@@ -90,6 +90,35 @@
       "performanceUnindexedFKInfo": 24,
       "performanceUnusedIndexInfo": 9,
       "unchanged": true
+    }
+  },
+  "verifiedAt": "2026-10-26T20:33:04.278942+00:00",
+  "sourceCommit": "9810122eeb8753d65e4bd9ab0254c2fb2b890b3c",
+  "files": {
+    "fileCount": 74,
+    "byteForByteMatch": true,
+    "extraRemoteFiles": 0
+  },
+  "deployments": {
+    "production": {
+      "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+      "version": 58,
+      "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "authenticatedFunctionalTest": false
+      }
+    },
+    "evaluation": {
+      "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+      "version": 58,
+      "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "authenticatedFunctionalTest": false
+      }
     }
   }
 }
