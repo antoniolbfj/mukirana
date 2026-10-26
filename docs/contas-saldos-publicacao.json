@@ -1,5 +1,5 @@
 {
-  "status": "ready for publication",
+  "status": "published and independently verified",
   "version": 55,
   "supabaseProject": "wcczkultokrypdfimbsh",
   "migrations": [],
@@ -46,5 +46,34 @@
   "accountProminence": {
     "primary": "dated effective accumulated balance",
     "secondary": "global month/history result"
+  },
+  "verifiedAt": "2026-10-26T12:15:47.119641+00:00",
+  "sourceCommit": "f9b836152c50712e2a1ef882648c86ddf116f019",
+  "files": {
+    "fileCount": 74,
+    "byteForByteMatch": true,
+    "extraRemoteFiles": 0
+  },
+  "deployments": {
+    "production": {
+      "id": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+      "version": 55,
+      "url": "https://script.google.com/macros/s/AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "authenticatedFunctionalTest": false
+      }
+    },
+    "evaluation": {
+      "id": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+      "version": 55,
+      "url": "https://script.google.com/macros/s/AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS/exec",
+      "http": {
+        "status": 200,
+        "googleAuthentication": true,
+        "authenticatedFunctionalTest": false
+      }
+    }
   }
 }
