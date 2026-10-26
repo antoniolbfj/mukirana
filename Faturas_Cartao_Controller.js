@@ -211,15 +211,8 @@ function registrarPagamentoFaturaCartao(tokenSessao, dados) {
   const sessao = obterSessaoObrigatoria(tokenSessao);
   const pagamento = validarDadosPagamentoFaturaCartaoController_(sessao, dados, "");
 
-  const pagamentoSalvo = inserirPagamentoFaturaModel_(pagamento);
-  const totalEfetivados = efetivarLancamentosFaturaPagaCartaoController_(
-    sessao,
-    pagamentoSalvo || pagamento
-  );
-
-  return totalEfetivados > 0
-    ? "Pagamento de fatura registrado e " + totalEfetivados + " lançamento(s) efetivado(s) com sucesso."
-    : "Pagamento de fatura registrado com sucesso.";
+  inserirPagamentoFaturaModel_(pagamento);
+  return "Pagamento de fatura registrado com sucesso.";
 }
 
 
@@ -228,76 +221,8 @@ function atualizarPagamentoFaturaCartao(tokenSessao, dados) {
   const idPagamento = normalizarTextoConsolidadoController_(dados && dados.ID_Pagamento_Fatura);
   const pagamento = validarDadosPagamentoFaturaCartaoController_(sessao, dados, idPagamento);
 
-  const pagamentoSalvo = atualizarPagamentoFaturaModel_(pagamento);
-  const totalEfetivados = efetivarLancamentosFaturaPagaCartaoController_(
-    sessao,
-    pagamentoSalvo || pagamento
-  );
-
-  return totalEfetivados > 0
-    ? "Pagamento de fatura atualizado e " + totalEfetivados + " lançamento(s) efetivado(s) com sucesso."
-    : "Pagamento de fatura atualizado com sucesso.";
-}
-
-
-/**
- * Efetiva os lançamentos pertencentes à competência de uma fatura paga.
- *
- * O pagamento da fatura reduz a conta, mas não representa uma nova despesa.
- * As despesas reais são os lançamentos do cartão; por isso eles precisam sair
- * de Pendente quando o pagamento for efetivado.
- *
- * @param {Object} sessao Sessão do usuário que registrou o pagamento.
- * @param {Object} pagamento Pagamento validado e salvo.
- * @returns {number} Quantidade de lançamentos efetivados.
- */
-function efetivarLancamentosFaturaPagaCartaoController_(sessao, pagamento) {
-  if (normalizarTextoConsolidadoController_(pagamento && pagamento.Status) !== "Efetivado") {
-    return 0;
-  }
-
-  const idGrupo = normalizarTextoConsolidadoController_(pagamento.ID_Grupo_Cartao);
-  const mesReferencia = normalizarMesReferenciaPagamentoFaturaCartaoController_(pagamento.Mes_Referencia);
-
-  if (!idGrupo || !mesReferencia) {
-    return 0;
-  }
-
-  const contexto = montarContextoFaturaCartaoController_(sessao, mesReferencia, idGrupo, null);
-  const idsCartoesGrupo = {};
-
-  (contexto.cartoesAcessiveis || []).forEach(function(cartao) {
-    if (normalizarTextoConsolidadoController_(cartao.ID_Grupo_Cartao) === idGrupo) {
-      idsCartoesGrupo[normalizarTextoConsolidadoController_(cartao.ID_Cartao)] = true;
-    }
-  });
-
-  const agora = new Date().toISOString();
-  const lancamentosParaEfetivar = (contexto.lancamentosTodos || []).filter(function(lancamento) {
-    const idOrigem = normalizarTextoConsolidadoController_(lancamento.ID_Origem);
-    const mesLancamento = typeof obterMesCompetenciaCartaoLancamentoConsolidadoController_ === "function"
-      ? obterMesCompetenciaCartaoLancamentoConsolidadoController_(lancamento, contexto)
-      : normalizarMesReferenciaPagamentoFaturaCartaoController_(lancamento.Mes_Referencia);
-
-    return idsCartoesGrupo[idOrigem] === true &&
-      mesLancamento === mesReferencia &&
-      normalizarTextoConsolidadoController_(lancamento.Status) === "Pendente";
-  }).map(function(lancamento) {
-    const atualizado = typeof clonarLancamentoParaLote_ === "function"
-      ? clonarLancamentoParaLote_(lancamento)
-      : Object.assign({}, lancamento);
-
-    atualizado.Status = "Efetivado";
-    atualizado.Alterado_Por_ID = sessao.id;
-    atualizado.Data_Alteracao = agora;
-    return atualizado;
-  });
-
-  if (lancamentosParaEfetivar.length > 0) {
-    salvarLancamentosEmLoteModel_(lancamentosParaEfetivar);
-  }
-
-  return lancamentosParaEfetivar.length;
+  atualizarPagamentoFaturaModel_(pagamento);
+  return "Pagamento de fatura atualizado com sucesso.";
 }
 
 
@@ -350,7 +275,7 @@ function normalizarMesReferenciaPagamentoFaturaCartaoController_(valor) {
 
 function validarDadosPagamentoFaturaCartaoController_(sessao, dados, idPagamentoAtual) {
   const idGrupo = normalizarTextoConsolidadoController_(dados && dados.ID_Grupo_Cartao);
-  const mesReferencia = normalizarMesFaturaCartaoController_(dados && dados.Mes_Referencia);
+  const mesReferencia = normalizarTextoConsolidadoController_(dados && dados.Mes_Referencia).replace(/^(\d{4}-\d{2})-\d{2}$/, "$1");
   const idConta = normalizarTextoConsolidadoController_(dados && dados.ID_Conta);
   const valor = converterNumeroConsolidadoController_(dados && dados.Valor);
   const dataPagamento = normalizarTextoConsolidadoController_(dados && dados.Data_Pagamento);
@@ -359,6 +284,10 @@ function validarDadosPagamentoFaturaCartaoController_(sessao, dados, idPagamento
 
   if (!idGrupo) {
     throw new Error("Fatura nao informada para registrar pagamento.");
+  }
+
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(mesReferencia)) {
+    throw new Error("Informe a competência da fatura antes de registrar o pagamento.");
   }
 
   if (!idConta) {
@@ -390,67 +319,16 @@ function validarDadosPagamentoFaturaCartaoController_(sessao, dados, idPagamento
     throw new Error("Conta de origem invalida, inativa ou inacessivel.");
   }
 
-  const idsCartoesGrupo = {};
-  cartoesDoGrupoAcessiveis.forEach(function(cartao) {
-    idsCartoesGrupo[normalizarTextoConsolidadoController_(cartao.ID_Cartao)] = true;
-  });
-
-  const totalFatura = (contexto.lancamentosTodos || []).reduce(function(soma, lancamento) {
-    const mesLancamento = typeof obterMesCompetenciaCartaoLancamentoConsolidadoController_ === "function"
-      ? obterMesCompetenciaCartaoLancamentoConsolidadoController_(lancamento, contexto)
-      : normalizarTextoConsolidadoController_(lancamento.Mes_Referencia);
-    const idOrigem = normalizarTextoConsolidadoController_(lancamento.ID_Origem);
-
-    if (mesLancamento === mesReferencia && idsCartoesGrupo[idOrigem] === true) {
-      return soma + calcularImpactoCompromissoCartaoConsolidadoController_(lancamento.Tipo, lancamento.Valor_Total);
-    }
-
-    return soma;
-  }, 0);
-  const totalPago = filtrarPagamentosFaturaCartaoController_(contexto.pagamentosFaturasTodos || [], idGrupo, {
-    Mes_Inicial: mesReferencia,
-    Mes_Final: ""
-  }).reduce(function(soma, pagamento) {
-    if (pagamento.Status !== "Efetivado" || (idPagamentoAtual && normalizarTextoConsolidadoController_(pagamento.ID_Pagamento_Fatura) === idPagamentoAtual)) {
-      return soma;
-    }
-
-    return soma + converterNumeroConsolidadoController_(pagamento.Valor);
-  }, 0);
   if (idPagamentoAtual) {
     const original = listarPagamentosFaturasModel_().find(function(p) { return p.ID_Pagamento_Fatura === idPagamentoAtual; });
     if (!original || original.ID_Grupo_Cartao !== idGrupo || !contexto.contasAcessiveis.some(function(c) { return c.ID_Conta === original.ID_Conta; })) {
       throw new Error('Você não tem acesso ao pagamento original.');
     }
   }
-  const limiteNovo = bancoUsaSupabase_() ? CartoesNovo_.rpc('rpc_cartoes_pagamento_base_v2', {
+  // Conserva a validação de acesso/atividade da fatura; o saldo não limita transferências.
+  if (bancoUsaSupabase_()) CartoesNovo_.rpc('rpc_cartoes_pagamento_base_v2', {
     p_usuario: sessao.id, p_grupo: idGrupo, p_mes: mesReferencia + '-01', p_excluir: idPagamentoAtual || null
-  }) : null;
-  const saldoEmAberto = limiteNovo ? CartoesNovo_.legacyNumber(limiteNovo.maxCents) : arredondarConsolidadoController_(Math.max(0, totalFatura - totalPago));
-
-  if (valor > saldoEmAberto) {
-    const recorrenciasPrevistas = listarRecorrenciasPrevistasFaturaCartaoController_(
-      contexto,
-      cartoesDoGrupoAcessiveis,
-      { Mes_Inicial: mesReferencia, Mes_Final: "" },
-      {}
-    );
-    const totalRecorrenciasPrevistas = recorrenciasPrevistas.reduce(function(soma, item) {
-      return soma + converterNumeroConsolidadoController_(item.Valor_Total);
-    }, 0);
-    const saldoComPrevisoes = arredondarConsolidadoController_(saldoEmAberto + Math.max(0, totalRecorrenciasPrevistas));
-
-    if (totalRecorrenciasPrevistas > 0 && valor <= saldoComPrevisoes) {
-      throw new Error(
-        "Este valor ainda inclui recorrencias previstas. Gere ou efetive os lancamentos recorrentes da fatura antes de registrar o pagamento. " +
-        "Saldo real em aberto: R$ " + formatarValorMensagemPagamentoFaturaCartaoController_(saldoEmAberto) + ". " +
-        "Recorrencias previstas: R$ " + formatarValorMensagemPagamentoFaturaCartaoController_(totalRecorrenciasPrevistas) + "."
-      );
-    }
-
-    throw new Error("O pagamento informado e maior que o saldo real em aberto da fatura.");
-  }
-
+  });
   return {
     ID_Pagamento_Fatura: idPagamentoAtual || "",
     ID_Grupo_Cartao: idGrupo,

@@ -124,6 +124,12 @@ smartphone. O campo Descrição conserva os exemplos do histórico pessoal por
 autocompletar, sem copiar o valor. Sessões antigas não criam novos favoritos;
 dados anteriores preservados. Ver [entrega](autocomplete-entrega.md).
 
+Pagamento de fatura passa a ser somente transferência da conta de origem para a
+conta do cartão, aceitando saldo residual, quitação ou crédito. O mês é preservado
+ao incluir/editar com Saldo anterior e as compras mantêm sua situação. O teto
+anterior foi retirado do formulário, servidor e trigger; históricos preservados.
+Ver [entrega](faturas-pagamento-simples-entrega.md).
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -149,6 +155,8 @@ dados anteriores preservados. Ver [entrega](autocomplete-entrega.md).
    smartphone, incluindo nomes longos, seleção, edição e ações de rateio.
    Conferir também o formulário sem favoritos e a seleção de exemplos anteriores
    pelo autocompletar de Descrição, nos dois layouts e nas modais.
+   Homologar também pagamentos parciais/integral/crédito e a competência correta
+   com Saldo anterior, tanto pela fatura quanto como transferência em Lançamentos.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

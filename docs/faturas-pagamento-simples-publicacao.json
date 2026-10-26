@@ -1,0 +1,95 @@
+{
+  "status": "implemented; database migration applied; Apps Script publication pending",
+  "version": 58,
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migrations": [
+    "20261026202540_faturas_v12_pagamento_transferencia_credito"
+  ],
+  "changedRuntimeFromV57": [
+    "Faturas_Cartao_Controller.js",
+    "Faturas_Cartao_View.html"
+  ],
+  "runtimeFileCount": 74,
+  "checks": {
+    "backend": {
+      "checks": 25,
+      "result": "PASS",
+      "coverage": "partial/full/credit, edits and additional transfers, canonical ledger legs, replay, no expense or purchase-status changes, month and permission validation"
+    },
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "cacheRegression": [
+      {
+        "device": "desktop",
+        "createEditStatusDeleteAndFilters": "PASS"
+      },
+      {
+        "device": "tablet",
+        "createEditStatusDeleteAndFilters": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "createEditStatusDeleteAndFilters": "PASS"
+      }
+    ],
+    "accountTypesSQL": "PASS",
+    "renderedSyntax": "PASS - seven bundles",
+    "previousBugsReproducedOnV57": true,
+    "financialHashesPreservedInMigration": true,
+    "originalPaymentPreserved": true,
+    "ceilingRemovedInDatabase": true,
+    "securityInvokerAndACLUnchanged": true,
+    "authenticatedUserAcceptance": "pending",
+    "advisors": {
+      "securityInfo": 16,
+      "performanceUnindexedFKInfo": 24,
+      "performanceUnusedIndexInfo": 9,
+      "unchanged": true
+    }
+  }
+}

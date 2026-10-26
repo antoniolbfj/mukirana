@@ -47,7 +47,8 @@ BEGIN
  ASSERT public.rpc_cartoes_pagamento_base_v2(u,g,date_trunc('month',d)::date)->>'maxCents'='3800';
  ASSERT public.rpc_cartoes_detalhar_v2(u,g,date_trunc('month',d)::date,date_trunc('month',d)::date)->'group'->>'registeredCents'='5000';
  req:=pay_req||jsonb_build_object('id',gen_random_uuid(),'amountCents','3800');PERFORM public.rpc_lancamentos_pagamento_v3(u,gen_random_uuid(),req);
- BEGIN PERFORM public.rpc_lancamentos_pagamento_v3(u,gen_random_uuid(),req||jsonb_build_object('id',gen_random_uuid(),'amountCents','1'));RAISE EXCEPTION 'must_reject';EXCEPTION WHEN OTHERS THEN ASSERT SQLERRM='LN:invoice_limit';END;
+ PERFORM public.rpc_lancamentos_pagamento_v3(u,gen_random_uuid(),req||jsonb_build_object('id',gen_random_uuid(),'amountCents','1'));
+ ASSERT public.rpc_cartoes_detalhar_v2(u,g,date_trunc('month',d)::date,date_trunc('month',d)::date)->'group'->>'creditCents'='1','excedente forma crédito';
  ASSERT (public.rpc_lancamentos_listar_v3(u,NULL,NULL)->'payments')='[]'::jsonb;
  ASSERT (SELECT count(*) FROM jsonb_array_elements(public.rpc_lancamentos_listar_v3(u,NULL,NULL)->'entries') x WHERE x->>'id'=pay::text)=1;
 END $$;

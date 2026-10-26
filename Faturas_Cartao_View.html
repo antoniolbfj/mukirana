@@ -417,7 +417,7 @@
     <strong id="fatura_pago">R$ 0,00</strong>
   </div>
   <div class="fatura-resumo-item">
-    <span>Em aberto</span>
+    <span>Saldo da fatura</span>
     <strong id="fatura_em_aberto">R$ 0,00</strong>
   </div>
   <div class="fatura-resumo-item">
@@ -454,9 +454,11 @@
   <div class="fatura-modal-caixa">
     <h3 id="titulo-modal-pagamento-fatura" style="margin-bottom:6px;">Pagar fatura</h3>
     <p class="texto-ajuda" style="margin-bottom:12px;">
-      O pagamento reduz o saldo da conta escolhida e abate o valor em aberto desta fatura. Ele nao entra como despesa, receita ou orcamento.
+      O pagamento transfere o valor para a conta do cartão. O saldo da fatura pode ficar devedor, zerado ou com crédito.
     </p>
     <input type="hidden" id="pag_fatura_id">
+    <input type="hidden" id="pag_fatura_mes">
+    <p id="pag_fatura_referencia" class="texto-ajuda" style="margin-bottom:12px;"></p>
     <div class="grid-2">
       <div class="grupo-campo">
         <label for="pag_fatura_conta">Conta de origem</label>
@@ -667,6 +669,7 @@
     var totalRecorrenciasPrevistas = pacoteFaturaCartao.Valor_Recorrencias_Previstas || 0;
     var pago = pacoteFaturaCartao.Valor_Pago || 0;
     var emAberto = pacoteFaturaCartao.Valor_Em_Aberto || 0;
+    var credito = pacoteFaturaCartao.Valor_Credito || 0;
     var limite = pacoteFaturaCartao.Limite_Total || 0;
     var disponivel = pacoteFaturaCartao.Limite_Disponivel || 0;
     var excedido = pacoteFaturaCartao.Limite_Excedido || 0;
@@ -679,7 +682,11 @@
       ? 'Previsto, separado: R$ ' + formatarNumeroFaturaCartao(totalRecorrenciasPrevistas)
       : '';
     document.getElementById('fatura_pago').textContent = 'R$ ' + formatarNumeroFaturaCartao(pago);
-    document.getElementById('fatura_em_aberto').textContent = 'R$ ' + formatarNumeroFaturaCartao(emAberto);
+    var saldoFatura = credito - emAberto;
+    var saldoElemento = document.getElementById('fatura_em_aberto');
+    saldoElemento.textContent = 'R$ ' + formatarNumeroFaturaCartao(saldoFatura);
+    saldoElemento.classList.toggle('negative', saldoFatura < 0);
+    saldoElemento.classList.toggle('positive', saldoFatura > 0);
     document.getElementById('fatura_qtd').textContent = lancamentos.length;
     document.getElementById('fatura_limite_disponivel').textContent = 'R$ ' + formatarNumeroFaturaCartao(disponivel);
     document.getElementById('fatura_limite_topo').textContent = 'R$ ' + formatarNumeroFaturaCartao(emAberto) + ' de R$ ' + formatarNumeroFaturaCartao(limite);
@@ -756,6 +763,10 @@
     var emEdicao = pagamento && pagamento.ID_Pagamento_Fatura;
     if (pacoteFaturaCartao.Pode_Registrar_Pagamento === false) { mostrarNotificacao(pacoteFaturaCartao.Motivo_Bloqueio_Pagamento || 'Este cartão está disponível somente para consultar o histórico.', 'alerta'); return; }
     popularContasPagamentoFaturaCartao();
+    var periodo = obterPeriodoGlobalFaturaCartao_();
+    var mesPagamento = emEdicao ? String(pagamento.Mes_Referencia || '').slice(0,7) : periodo.Mes_Final || periodo.Mes_Inicial;
+    document.getElementById('pag_fatura_mes').value = mesPagamento || '';
+    document.getElementById('pag_fatura_referencia').textContent = 'Competência: ' + (mesPagamento || '').split('-').reverse().join('/');
     document.getElementById('pag_fatura_id').value = emEdicao ? pagamento.ID_Pagamento_Fatura : '';
     document.getElementById('pag_fatura_conta').value = emEdicao ? (pagamento.ID_Conta || '') : '';
     document.getElementById('pag_fatura_valor').value = formatarNumeroFaturaCartao(emEdicao ? (pagamento.Valor || 0) : valorAberto);
@@ -815,9 +826,11 @@
     var data = document.getElementById('pag_fatura_data').value;
     var status = document.getElementById('pag_fatura_status').value || 'Efetivado';
     var observacao = document.getElementById('pag_fatura_observacao').value || '';
-    var emAberto = pacoteFaturaCartao ? parseFloat(pacoteFaturaCartao.Valor_Em_Aberto || 0) : 0;
-    var pagamentoAtual = idPagamento ? encontrarPagamentoFaturaCartaoPorId(idPagamento) : null;
-    var limitePermitido = emAberto + (pagamentoAtual ? parseFloat(pagamentoAtual.Valor || 0) : 0);
+    var mesPagamento = document.getElementById('pag_fatura_mes').value;
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(mesPagamento)) {
+      mostrarNotificacao('Reabra a fatura para identificar a competência do pagamento.', 'alerta');
+      return;
+    }
 
     if (!idConta) {
       mostrarNotificacao('Selecione a conta de origem do pagamento.', 'alerta');
@@ -826,11 +839,6 @@
 
     if (!valor || valor <= 0) {
       mostrarNotificacao('Informe um valor de pagamento maior que zero.', 'alerta');
-      return;
-    }
-
-    if (!pacoteFaturaCartao.Escopo_Parcial && valor > limitePermitido) {
-      mostrarNotificacao('O pagamento informado e maior que o saldo em aberto da fatura.', 'alerta');
       return;
     }
 
@@ -861,7 +869,7 @@
       [idPagamento ? 'atualizarPagamentoFaturaCartao' : 'registrarPagamentoFaturaCartao'](tokenSessaoFaturaCartao, {
         ID_Pagamento_Fatura: idPagamento,
         ID_Grupo_Cartao: parametrosFaturaCartao.ID_Grupo_Cartao,
-        Mes_Referencia: obterPeriodoGlobalFaturaCartao_().Mes_Inicial,
+        Mes_Referencia: mesPagamento,
         ID_Conta: idConta,
         Valor: valor,
         Data_Pagamento: data,
