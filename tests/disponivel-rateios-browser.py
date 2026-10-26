@@ -38,8 +38,8 @@ with sync_playwright() as p:
    # Filtro de conta conserva o resultado real do recorte, com rótulo explícito.
    f.locator('[data-action=filters]').click();f.locator('[data-filter=account]').select_option(BANK);expect(page.locator('#ln-global-saldo small').first).to_have_text('Resultado do recorte');pack=page.evaluate('MukiranaLancamentosStore.load()');expected=page.evaluate('(p)=>MukiranaLancamentosStore.getCore().query(p.rows,{account:"'+BANK+'"}).summary.resultCents',pack);expect(page.locator('#ln-global-saldo strong')).to_have_text(money(int(expected)));f.locator('[data-action=clear-filters]').click();expect(page.locator('#ln-global-saldo small').first).to_have_text('Ainda posso gastar')
    # Explicação auditável do valor, incluindo a reserva.
-   page.locator('#ln-global-saldo').click();expect(page.locator('#ln-global-dialog')).to_contain_text('Rateios a pagar');expect(page.locator('#ln-global-dialog')).to_contain_text('não é descontado duas vezes');page.locator('#ln-dialog-close').click()
-   page.evaluate("navegarPara('Dashboard')");pf=page.frame_locator('#painel-frame');pf.locator('#months .metric').first.wait_for();assert pf.locator('#months').inner_text().count('Reservado para rateios')>=1
+   page.locator('#ln-global-saldo').click();expect(page.locator('#ln-global-dialog')).to_contain_text('Efeito dos rateios no período');expect(page.locator('#ln-global-dialog')).to_contain_text('sem contar o acerto duas vezes');page.locator('#ln-dialog-close').click()
+   page.evaluate("navegarPara('Dashboard')");pf=page.frame_locator('#painel-frame');pf.locator('#months .metric').first.wait_for();assert pf.locator('#months').inner_text().count('Previsão de rateios')>=1
    page.screenshot(path=str(OUT/(device+'-'+theme+'.png')),full_page=True)
    assert not errors,errors;assert page.evaluate('document.documentElement.scrollWidth<=innerWidth');results.append({'device':device,'theme':theme,'result':'PASS'});print(results[-1],flush=True);context.close()
  browser.close()

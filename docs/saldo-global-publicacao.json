@@ -1,0 +1,80 @@
+{
+  "status": "ready for publication",
+  "version": 54,
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migrations": [],
+  "financialRowsRewritten": false,
+  "globalPeriodAppliesToRateiosAndMonthCards": true,
+  "forecastReceivablesIncluded": true,
+  "projectedTransferLegsPreserved": true,
+  "checks": {
+    "scopeAndProjectedTransferIntegration": 19,
+    "monthlyForecastAndCrossMonthSettlementIntegration": 28,
+    "availabilityRegression": 16,
+    "pureRules": 19,
+    "periodRPCRegression": 47,
+    "rateiosRegression": 63,
+    "accountsWealthCategoriesSignals": "PASS",
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "result": "PASS"
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "result": "PASS"
+      }
+    ],
+    "productionReadOnlyReview": "PASS - discrepancy reproduced; creditor and month/stock movements reconciled",
+    "productionFinancialTestEntriesCreated": false,
+    "authenticatedUserAcceptance": "pending"
+  },
+  "changedRuntimeFromV53": [
+    "Contas_Tipos_Client.html",
+    "Contas_Tipos_Desktop_View.html",
+    "Contas_Tipos_Mobile_View.html",
+    "Lancamentos_Novo_Controller.js",
+    "Lancamentos_Novo_Regras.js",
+    "Painel_Novo_Client.html",
+    "Painel_Novo_Controller.js",
+    "Rateios_Novo_Client.html",
+    "Saldo_Global_Client.html"
+  ]
+}

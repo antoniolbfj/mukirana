@@ -39,14 +39,25 @@ function lancamentosNovoRegras_() {
     const transfers=add(incoming,negate(outgoing));
     return {incomeCents:income,expenseCents:expense,transferInCents:incoming,transferOutCents:outgoing,transferCents:transfers,openingCents:opening,resultCents:add(add(income,negate(expense)),transfers),count:rows.length};
   }
-  // Capacidade de gasto: caixa do recorte menos obrigações ainda sem saída própria.
-  function availability(summary,balances,settlements,end){
-    let payable='0',receivable='0',pendingPayments='0';
-    for(const b of balances||[]){const value=String(b.balanceCents);if(!cents(value))throw Error('Saldo de rateio inválido.');if(compare(value,'0')<0)payable=add(payable,negate(value));else receivable=add(receivable,value);}
-    for(const s of settlements||[]){if(s.side!=='pay'||s.mode==='adjustment'||!['Aguardando_Credor','Efetivado'].includes(s.status))continue;const effective=s.date||s.otherDate;if(!effective||(end&&effective>end))continue;if(s.ownRegistered&&s.date&&(!end||s.date<=end))continue;const amount=String(s.amountCents);if(!cents(amount)||compare(amount,'0')<0)throw Error('Acerto inválido.');pendingPayments=add(pendingPayments,amount);}
-    const reserved=add(payable,pendingPayments);return Object.assign({},summary,{cashResultCents:summary.resultCents,rateioPayableCents:payable,rateioReceivableCents:receivable,pendingSettlementCents:pendingPayments,reservedCents:reserved,availableCents:add(summary.resultCents,negate(reserved))});
+  function spendingRows(rows,accounts,includeInvestment){const catalog=new Map((accounts||[]).map(a=>[a.id,a]));return rows.filter(r=>includeInvestment===true||catalog.get(r.account)?.type!=='Investimento');}
+  // Compensa a diferença entre a data bilateral do acerto e a ponta de caixa própria.
+  function settlementGap(settlements,end){
+    let pay='0',receive='0',timing='0';
+    for(const s of settlements||[]){if(!['pay','receive'].includes(s.side)||s.mode==='adjustment'||!['Aguardando_Credor','Efetivado'].includes(s.status))continue;const effective=s.side==='pay'?(s.date||s.otherDate):(s.otherDate||s.date);if(!effective)continue;const amount=String(s.amountCents);if(!cents(amount)||compare(amount,'0')<0)throw Error('Acerto inválido.');const applied=!end||effective<=end,own=s.ownRegistered&&s.date&&(!end||s.date<=end);if(applied&&!own){if(s.side==='pay')pay=add(pay,amount);else receive=add(receive,amount);}else if(own&&!applied)timing=add(timing,s.side==='pay'?amount:negate(amount));}
+    return {payCents:pay,receiveCents:receive,timingCents:timing,totalCents:add(add(receive,negate(pay)),timing)};
   }
+  function rateioBalances(balances,first){return (balances||[]).map(b=>Object.assign({},b,{balanceCents:first&&b.movementCents!==undefined?b.movementCents:b.balanceCents}));}
+  // O mesmo recorte rege caixa, rateios e acertos: mês ou histórico, conforme a escolha global.
+  function availability(summary,balances,settlements,end,first){
+    let payable='0',receivable='0';
+    for(const b of rateioBalances(balances,first)){const value=String(b.balanceCents);if(!cents(value))throw Error('Saldo de rateio inválido.');if(compare(value,'0')<0)payable=add(payable,negate(value));else receivable=add(receivable,value);}
+    const ending=settlementGap(settlements,end);let opening={payCents:'0',receiveCents:'0',timingCents:'0',totalCents:'0'};
+    if(first){const date=new Date(first+'T12:00:00Z');date.setUTCDate(date.getUTCDate()-1);opening=settlementGap(settlements,date.toISOString().slice(0,10));}
+    const pay=add(ending.payCents,negate(opening.payCents)),receive=add(ending.receiveCents,negate(opening.receiveCents)),timing=add(ending.timingCents,negate(opening.timingCents)),gap=add(ending.totalCents,negate(opening.totalCents)),movement=add(receivable,negate(payable)),effect=add(movement,gap);
+    return Object.assign({},summary,{cashResultCents:summary.resultCents,rateioPayableCents:payable,rateioReceivableCents:receivable,pendingSettlementCents:pay,pendingReceiptCents:receive,settlementTimingCents:timing,settlementGapCents:gap,reservedCents:add(payable,pay),expectedReceiptsCents:add(receivable,receive),rateioMovementCents:movement,rateioEffectCents:effect,availableCents:add(summary.resultCents,effect)});
+  }
+  function periodAvailability(summary,balances,settlements,first,last){return availability(summary,balances,settlements,last,first);}
   function categoryLabel(category,categories){if(!category)return '';if(!category.parent)return category.name;const parent=(categories||[]).find(c=>c.id===category.parent);return category.name+(parent?' (subcategoria de '+parent.name+')':' (subcategoria)');}
   function query(rows,input){const f=clean(input),filtered=windowRows(rows,f).filter(r=>matches(r,f));return {rows:filtered,filters:f,options:facets(rows,f),summary:summarize(filtered)};}
-  return {availability:availability,categoryLabel:categoryLabel,windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
+  return {rateioBalances:rateioBalances,spendingRows:spendingRows,availability:availability,periodAvailability:periodAvailability,categoryLabel:categoryLabel,windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
 }

@@ -10,10 +10,11 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 53**, com reserva dos compromissos de rateio no disponível, seletores de
-subcategoria acessíveis pelo teclado e os recursos anteriores de mês global,
-fatura contextual e modais. Publicação conferida em
-`disponivel-rateios-publicacao.json`. A versão52 reorganizou o Painel e corrigiu
+**versão 54**, com cálculo global consistente, transferências previstas em Contas,
+recebíveis de rateio na previsão e mês/histórico seguindo a checkbox em todos os
+indicadores desta rodada. Preserva seletores de subcategoria acessíveis pelo
+teclado, fatura contextual e modais. Publicação conferida em
+`saldo-global-publicacao.json`. A versão52 reorganizou o Painel e corrigiu
 o saldo devedor até o mês. A versão48 entregou o hub e a retirada
 de Projetos; a versão47 corrigiu transferências após pagamentos de fatura.
 A versão46 acrescentou a identificação dos ajustes históricos de rateio. Registros anteriores:
@@ -24,8 +25,10 @@ Categorias e metas agora usam a participação pessoal, com a categoria privada 
 cada pessoa, independente do acerto. Não somam o original rateado e a própria parte,
 nem contam o acerto como novo consumo. O resultado dos lançamentos mantém
 R−D±transferências e as contas mantêm seus movimentos reais. A disponibilidade
-geral desconta os compromissos de rateio ainda a pagar, sem antecipar recebíveis
-nem descontar novamente pagamentos registrados. Ver
+geral considera os compromissos a pagar e as receitas previstas de rateios,
+sem duplicar pagamentos/recebimentos registrados. O mês/histórico segue o filtro.
+Essa decisão substitui a regra anterior de não antecipar recebíveis. Ver
+[resultado global](saldo-global-entrega.md),
 [disponibilidade](disponivel-rateios-entrega.md) e
 [categorias](correcao-participacoes-categorias.md).
 
@@ -84,6 +87,13 @@ filtros da lista exibem Resultado do recorte com disponibilidade geral no detalh
 As subcategorias começam pelo nome, com a categoria mãe ao final, permitindo
 busca nativa pelo teclado. Ver [entrega](disponivel-rateios-entrega.md).
 
+A decisão seguinte faz todos os resultados desta rodada respeitarem a checkbox:
+sem Saldo anterior, somente o mês; com ela, histórico até o mês. Inclui previsões
+de rateios do credor e preserva a identificação de transferências previstas nas
+projeções de Contas/Painel. Os três cards aplicam a escolha ao respectivo mês.
+Indicadores e valores principais de Contas usam o recorte; saldos efetivos são
+identificados separadamente. Ver [entrega atual](saldo-global-entrega.md).
+
 ## Pendências vigentes
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
@@ -100,6 +110,8 @@ busca nativa pelo teclado. Ver [entrega](disponivel-rateios-entrega.md).
    com e sem Saldo anterior. Validar a dedução dos rateios no disponível,
    pagamentos parciais/totais sem nova dedução, recebimento iniciado pela outra
    pessoa, resultado dos filtros e seleção de subcategorias pelo teclado.
+   Validar o disponível igual entre telas, as transferências previstas em Contas,
+   a previsão do credor e todos os indicadores com/sem Saldo anterior.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

@@ -13,11 +13,15 @@ modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
 O Painel segue cinco linhas e o saldo devedor do rateio respeita o fim do mês
 escolhido. **Ainda posso gastar** agora desconta os compromissos de rateio,
 sem repetir o desconto quando o pagamento é registrado. As subcategorias
-começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v53.
-Ver [disponibilidade e teclado](docs/disponivel-rateios-entrega.md),
+começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v54.
+A disponibilidade respeita o mesmo escopo em todas as telas e inclui as previsões
+de recebimento dos rateios. Saldo anterior controla mês/histórico também nos
+cards e nos rateios. Transferências previstas integram as projeções de Contas.
+Ver [resultado global e filtro](docs/saldo-global-entrega.md),
+[disponibilidade e teclado](docs/disponivel-rateios-entrega.md),
 [correção do Painel](docs/painel-periodo-entrega.md) e
 [entrega anterior](docs/lancamentos-contextos-entrega.md),
-[publicação vigente](docs/disponivel-rateios-publicacao.json) e
+[publicação vigente](docs/saldo-global-publicacao.json) e
 [pendências vigentes](docs/pendencias-requisitos.md). Homologação de uso permanece
 pendente; os acessos principais foram atualizados por autorização do usuário.
 
@@ -89,7 +93,8 @@ fictício permanece somente como documento histórico.
 
 Contas e Cartões anteriores foram homologados. A ampliação de Contas inclui
 Consumo, Investimento e Crédito ligado aos cartões existentes. Lançamentos usa
-R−D±transferências; direitos de rateio ficam separados em A acertar. Acertos são
+R−D±transferências; direitos e obrigações de rateio integram a previsão do disponível,
+com saldo efetivo identificado separadamente. Acertos são
 registrados pelas próprias pessoas como despesa/receita e vinculados uma única vez.
 Patrimônio usa somente contas de Investimento. Cada tela nova tem estruturas
 próprias para computadores/tablets e smartphones. Claro, Escuro e Sépia estão disponíveis na barra e no menu, com preferência por usuário neste navegador.

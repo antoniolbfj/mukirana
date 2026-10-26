@@ -6,11 +6,11 @@
         <div class="metric"><div class="metric-label"><span id="cn-current-label">Disponível em Consumo</span> <svg viewBox="0 0 24 24"><path d="M8 3v4m8-4v4M4 10h16M5 5h14v15H5z"/></svg></div><p class="balance" id="cn-total-current"></p><p class="metric-caption" id="cn-asof-date"></p></div>
         <div class="metric"><div class="metric-label"><span id="cn-forecast-label">Projetado</span></div><p class="balance secondary" id="cn-total-forecast"></p><p class="metric-caption" id="cn-total-change"></p></div>
       </section>
-      <section class="type-summary" aria-label="Investimentos e crédito"><article><p>Patrimônio em Investimento</p><strong id="cn-investment-current"></strong><small id="cn-investment-period"></small></article><article><p>Saldo em Crédito</p><strong id="cn-credit-current"></strong><small id="cn-credit-forecast"></small></article></section>
+      <section class="type-summary" aria-label="Investimentos e crédito"><article><p>Investimento no período</p><strong id="cn-investment-current"></strong><small id="cn-investment-period"></small></article><article><p>Saldo em Crédito</p><strong id="cn-credit-current"></strong><small id="cn-credit-forecast"></small></article></section>
       <section class="table-card" aria-label="Lista de contas">
         <div class="toolbar"><label class="search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="cn-search" type="search" placeholder="Buscar conta" aria-label="Buscar conta pelo nome ou proprietário"></label><select class="select" id="cn-status" aria-label="Filtrar contas por status"><option value="active">Ativas</option><option value="all">Todas</option><option value="inactive">Inativas</option></select></div>
         <label class="type-filter">Tipo<select id="cn-type-filter" class="select" aria-label="Filtrar por tipo de conta"><option value="">Todos os tipos</option><option>Consumo</option><option>Investimento</option><option>Cartão de Crédito</option></select></label>
-        <div class="list-head" aria-hidden="true"><span>Conta</span><span>Saldo e previsão</span><span>Ações</span></div>
+        <div class="list-head" aria-hidden="true"><span>Conta</span><span>Resultado do período</span><span>Ações</span></div>
         <div id="cn-account-list" aria-live="polite"></div>
         <div class="list-foot"><span id="cn-list-count"></span><span class="hint"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4 8 9 8 9s8-5 8-9V6z"/><path d="m8 12 3 3 5-6"/></svg>Somente o dono altera o cadastro</span></div>
       </section>

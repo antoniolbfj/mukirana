@@ -57,8 +57,8 @@ const LancamentosNovo_ = {
     data.entries.forEach(function(e){
       if(!core.cents(e.amountCents)||!ContasNova_.date(e.date))throw new Error('Resposta financeira inválida.');
       if(e.type==='transfer'){
-        if(accounts[e.origin]&&(!data.viewer||accounts[e.origin].owner===data.viewer))append(e,e.origin,core.negate(e.amountCents),'out',accounts[e.origin].name,'');
-        if(accounts[e.destination]&&(!data.viewer||accounts[e.destination].owner===data.viewer))append(e,e.destination,e.amountCents,'in',accounts[e.destination].name,'');
+        if(accounts[e.origin]&&(!data.viewer||accounts[e.origin].owner===data.viewer))append(e,e.origin,core.negate(e.amountCents),'out',accounts[e.origin].name,e.special==='projection'?'projection':'');
+        if(accounts[e.destination]&&(!data.viewer||accounts[e.destination].owner===data.viewer))append(e,e.destination,e.amountCents,'in',accounts[e.destination].name,e.special==='projection'?'projection':'');
       }else{
         if(data.viewer&&e.financeOwner&&e.financeOwner!==data.viewer){if(data.invoiceContext&&e.sourceKind==='Cartão'&&!(e.shares||[]).some(function(p){return p.id===data.viewer;})){const instrument=accounts[e.origin];append(e,instrument&&instrument.ledgerAccount||e.origin,'0','card-view',instrument?instrument.name:'Cartão adicional','card-observation');}return;}
         const a=accounts[e.origin],logical=a&&accounts[a.ledgerAccount]||a,origin=logical?logical.id:'history:'+e.origin;if(data.viewer&&logical&&logical.owner!==data.viewer)return;let movement=e;if(e.opening)movement=Object.assign({},e,{type:e.amountCents.charAt(0)==='-'?'expense':'income',amountCents:e.amountCents.replace(/^-/, '')});append(movement,origin,e.type==='expense'?core.negate(e.amountCents):e.amountCents,'entry',logical?logical.name:'Origem histórica',e.special|| (e.opening?'opening':''));
