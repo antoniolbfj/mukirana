@@ -67,6 +67,11 @@ não altera nem confirma pagamentos históricos. O recebimento adicional e o
 ajuste de saldo ainda apontados no diagnóstico permanecem para conciliação;
 não se força um saldo zero que os registros existentes não sustentem.
 
+Produção e avaliação publicadas na **versão59**, com os 74 arquivos da versão
+imutável baixados em diretório independente e conferidos por bytes/SHA-256 com
+o commit `0612925`. Endereços existentes preservados. Acesso HTTP exige login
+Google; a verificação HTTP não substitui o teste autenticado pelo usuário.
+
 Publicação e hashes: `rateios-aceite-publicacao.json`,
 `rateios-aceite-verificacao-v59.json` e `rateios-aceite-fontes-v59.json`.
 Homologação autenticada pelo usuário permanece separada dos testes locais.

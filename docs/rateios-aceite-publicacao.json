@@ -1,0 +1,178 @@
+{
+  "status": "published and independently verified",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migration": "20261027131420_rateios_v13_aceite_sem_duplicidade",
+  "runtimeFileCount": 74,
+  "changedRuntimeFromV58": [
+    "Painel_Novo_Client.html",
+    "Painel_Novo_Controller.js",
+    "Rateios_Novo_Client.html",
+    "Rateios_Novo_Controller.js"
+  ],
+  "checks": {
+    "focusedBackend": {
+      "checks": 43,
+      "result": "PASS"
+    },
+    "rateiosRegression": {
+      "checks": 63,
+      "result": "PASS"
+    },
+    "periodBalances": {
+      "checks": 47,
+      "result": "PASS"
+    },
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "flow": "single",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "flow": "multiple",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "flow": "invoice",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "flow": "single",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "flow": "multiple",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "flow": "invoice",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "flow": "single",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "flow": "multiple",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "flow": "invoice",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      }
+    ],
+    "renderedBundleSyntax": {
+      "bundles": 7,
+      "result": "PASS"
+    },
+    "financialPreservation": {
+      "transactionalFullRowHashes": "PASS",
+      "tables": [
+        "lancamentos",
+        "rateios",
+        "pagamentos_faturas",
+        "contas",
+        "acertos_rateios"
+      ],
+      "financialWrites": 0
+    },
+    "database": {
+      "functionHash": "56027a42af67b8f1f3e21f8b135b8b3c",
+      "matchesLocalTestedFunction": true,
+      "securityInvoker": true,
+      "anonExecute": false,
+      "authenticatedExecute": false,
+      "advisorsUnchanged": true,
+      "securityInfo": 16,
+      "performanceInfo": 33
+    },
+    "immutableAppsScriptVersion": {
+      "version": 59,
+      "files": 74,
+      "bytesAndSha256": "PASS",
+      "missing": 0,
+      "extra": 0
+    }
+  },
+  "homologation": "pending authenticated user test",
+  "version": 59,
+  "sourceCommit": "06129251fff374ef0c86c1b7b79b8b7798c97bf0",
+  "publishedAt": "2026-10-27T13:19:12.551864+00:00",
+  "scriptId": "1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd",
+  "production": {
+    "deploymentId": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "version": 59
+  },
+  "evaluation": {
+    "deploymentId": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "version": 59
+  },
+  "httpChecks": [
+    {
+      "deployment": "production",
+      "http": 200,
+      "googleLoginRequired": true,
+      "authenticatedFunctionalTest": false
+    },
+    {
+      "deployment": "evaluation",
+      "http": 200,
+      "googleLoginRequired": true,
+      "authenticatedFunctionalTest": false
+    }
+  ],
+  "verification": "Fresh immutable v59 clone in a separate directory; all 74 files match bytes and SHA-256 of the source commit. Deployment list confirms both versions. HTTP checks require Google login and do not replace authenticated homologation."
+}

@@ -1,5 +1,5 @@
 {
-  "status": "implemented and verified; Apps Script publication pending",
+  "status": "published and independently verified",
   "supabaseProject": "wcczkultokrypdfimbsh",
   "migration": "20261027131420_rateios_v13_aceite_sem_duplicidade",
   "runtimeFileCount": 74,
@@ -138,6 +138,13 @@
       "advisorsUnchanged": true,
       "securityInfo": 16,
       "performanceInfo": 33
+    },
+    "immutableAppsScriptVersion": {
+      "version": 59,
+      "files": 74,
+      "bytesAndSha256": "PASS",
+      "missing": 0,
+      "extra": 0
     }
   },
   "homologation": "pending authenticated user test"
