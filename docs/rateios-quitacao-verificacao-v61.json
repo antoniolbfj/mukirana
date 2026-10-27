@@ -102,5 +102,12 @@
   "migration": "20261027181840_rateios_v15_ledger_link",
   "financialWrites": 0,
   "financialPreservation": "full-row hashes asserted inside migration transaction",
-  "homologation": "pending authenticated user test"
+  "homologation": "pending authenticated user test",
+  "immutableAppsScriptVersion": {
+    "version": 61,
+    "files": 74,
+    "bytesAndSha256": "PASS",
+    "missing": 0,
+    "extra": 0
+  }
 }

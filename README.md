@@ -6,6 +6,12 @@ aprimorar sua experiência de uso a partir dessa versão.
 
 ## Rodada atual
 
+Quitação do rateio vinculada ao mesmo acerto, com composição pessoal no Painel,
+lista e modal; mês ou histórico conforme Saldo anterior. Lançamentos especiais e
+faturas vinculadas aparecem em Rateados. Publicação v61 conferida por download
+imutável independente. Ver [entrega](docs/rateios-quitacao-entrega.md) e
+[publicação](docs/rateios-quitacao-publicacao.json).
+
 Mês global com saldo anterior opcional, rateios na própria lista, categoria pessoal
 padrão e cadastro vinculado à fatura aberta. Contas e Painel abrem Lançamentos em
 modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
@@ -13,11 +19,11 @@ modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
 O Painel segue cinco linhas e o saldo devedor do rateio respeita o fim do mês
 escolhido. **Ainda posso gastar** agora desconta os compromissos de rateio,
 sem repetir o desconto quando o pagamento é registrado. As subcategorias
-começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v60.
+começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v61.
 A disponibilidade respeita o mesmo escopo em todas as telas e inclui as previsões
 de recebimento dos rateios. Saldo anterior controla mês/histórico também nos
-cards de resultados. Os cards de Rateios mostram a posição de dívida até o mês,
-com os pagamentos abatidos. Transferências previstas integram as projeções de Contas.
+cards de resultados. Os cards de Rateios mostram créditos menos débitos das partes e dos acertos
+vinculados, respeitando mês/histórico e abatendo cada quitação uma única vez. Transferências previstas integram as projeções de Contas.
 Contas destaca o saldo acumulado efetivo datado; o resultado do filtro fica menor.
 No smartphone, o Painel reúne os três meses em um card e os lançamentos exibem
 descrição completa, valor/situação e dados organizados. Telas maiores e cálculos

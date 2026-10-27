@@ -1,0 +1,155 @@
+{
+  "status": "published and independently verified",
+  "version": 61,
+  "sourceCommit": "5c1a1db11c0e72dfc698b66150d58473df6377d4",
+  "publishedAt": "2026-10-27T18:22:57.268066+00:00",
+  "scriptId": "1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migration": "20261027181840_rateios_v15_ledger_link",
+  "productionFinancialWrites": 0,
+  "runtimeFileCount": 74,
+  "changedRuntimeFromV60": [
+    "Lancamentos_Novo_Controller.js",
+    "Lancamentos_Novo_Regras.js",
+    "Painel_Novo_Client.html",
+    "Painel_Novo_Controller.js",
+    "Rateios_Novo_Client.html"
+  ],
+  "production": {
+    "deploymentId": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "version": 61
+  },
+  "evaluation": {
+    "deploymentId": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "version": 61
+  },
+  "httpChecks": [
+    {
+      "deployment": "production",
+      "http": 200,
+      "googleLoginRequired": true,
+      "authenticatedFunctionalTest": false
+    },
+    {
+      "deployment": "evaluation",
+      "http": 200,
+      "googleLoginRequired": true,
+      "authenticatedFunctionalTest": false
+    }
+  ],
+  "checks": {
+    "result": "PASS",
+    "integrationQuitacao": {
+      "checks": 58,
+      "database": "local fixtures"
+    },
+    "rateiosRegression": {
+      "checks": 63
+    },
+    "previousTotalsCompatibility": {
+      "checks": 21
+    },
+    "periodRegression": {
+      "checks": 47
+    },
+    "browserCases": 54,
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      }
+    ],
+    "renderedBundles": 7,
+    "security": "SECURITY INVOKER; empty search_path; service_role only; same advisory baseline",
+    "migration": "20261027181840_rateios_v15_ledger_link",
+    "financialWrites": 0,
+    "financialPreservation": "full-row hashes asserted inside migration transaction",
+    "homologation": "pending authenticated user test",
+    "immutableAppsScriptVersion": {
+      "version": 61,
+      "files": 74,
+      "bytesAndSha256": "PASS",
+      "missing": 0,
+      "extra": 0
+    }
+  },
+  "homologation": "pending authenticated user test",
+  "verification": "Fresh independent clone of immutable v61; 74 files match source commit by bytes and SHA-256. Deployment list confirms production/evaluation @61. HTTP requires Google login, without authenticated test claimed."
+}
