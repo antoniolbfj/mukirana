@@ -10,7 +10,8 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 58**, com pagamento de fatura como transferência parcial/integral/crédito
+**versão 59**, com aceite de rateios protegido contra duplicidade e saldos
+devedor/credor unificados por mês; preserva pagamento de fatura como transferência parcial/integral/crédito
 e competência preservada com Saldo anterior, Favoritos retirado e histórico por autocompletar,
 UX de smartphones refinada no Painel e em Lançamentos,
 saldo acumulado em destaque e mês/acumulado do filtro menor em Contas,
@@ -18,7 +19,8 @@ cálculo global consistente, transferências previstas em Contas,
 recebíveis de rateio na previsão e mês/histórico seguindo a checkbox em todos os
 indicadores desta rodada. Preserva seletores de subcategoria acessíveis pelo
 teclado, fatura contextual e modais. Publicação conferida em
-`faturas-pagamento-simples-publicacao.json`. A versão57 retirou Favoritos;
+`rateios-aceite-publicacao.json`. A versão58 simplificou pagamentos de faturas;
+a versão57 retirou Favoritos;
 a versão56 refinou o UX de smartphones;
 a versão55 ajustou os valores de Contas;
 a versão54 unificou as previsões; a versão52
@@ -136,7 +138,12 @@ Ver [entrega](faturas-pagamento-simples-entrega.md).
 
 Operação de dados posterior: por autorização do usuário, uma receita duplicada e
 seu acerto separado foram excluídos, mantendo o pagamento original e os demais
-dados. A versão58 permanece vigente. Ver [exclusão e teste do aceite](remocao-acerto-duplicado-entrega.md).
+dados. A exclusão foi uma operação de dados separada. Ver [exclusão e teste do aceite](remocao-acerto-duplicado-entrega.md).
+
+A rodada atual passa a confirmar o pagamento enviado no mesmo acerto e bloqueia
+recebimentos repetidos no servidor. Painel, lista e modal mostram a posição de
+dívida até o mês global, atualizada após as operações; zero é Sem valor pendente.
+Confirmações faltantes ficam separadas. Ver [entrega do aceite](rateios-aceite-entrega.md).
 
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
    além das funcionalidades novas de Contas, Lançamentos, Rateios/Acertos, Painel
@@ -163,6 +170,8 @@ dados. A versão58 permanece vigente. Ver [exclusão e teste do aceite](remocao-
    pelo autocompletar de Descrição, nos dois layouts e nas modais.
    Homologar também pagamentos parciais/integral/crédito e a competência correta
    com Saldo anterior, tanto pela fatura quanto como transferência em Lançamentos.
+   Homologar Confirmar recebimento, seleção de acertos, reenvio seguro e atualização
+   dos saldos zerados/parciais no Painel, lista e modal, inclusive quitação antecipada.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.
@@ -172,10 +181,9 @@ dados. A versão58 permanece vigente. Ver [exclusão e teste do aceite](remocao-
    com base suficiente e sinaliza registros sem classificação. A conciliação
    histórica foi uma operação administrativa pontual; o fluxo geral de estorno
    de acertos concluídos continua pendente.
-   Distinguir e prevenir novo recebimento independente que repita um pagamento
-   ainda pendente: o aceite normal foi validado sem duplicidade, mas a ação geral
-   Receber permite outro acerto com mesmo valor/data. Conferir também o outro
-   recebimento e o ajuste de saldo apontados no diagnóstico, preservados nesta operação.
+   A prevenção de recebimento duplicado no aceite está implementada nesta rodada.
+   Conferir ainda o outro recebimento e o ajuste de saldo apontados no diagnóstico,
+   preservados nesta operação; a rotina geral de estorno continua pendente.
 4. **Relatórios configuráveis (REL-01 a REL-04):** motor de campos, dimensões,
    agrupamentos e cálculos, apresentação interativa, PDF e planilha com os mesmos
    resultados e limites de privacidade.

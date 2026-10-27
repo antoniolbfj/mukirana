@@ -1,0 +1,144 @@
+{
+  "status": "implemented and verified; Apps Script publication pending",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "migration": "20261027131420_rateios_v13_aceite_sem_duplicidade",
+  "runtimeFileCount": 74,
+  "changedRuntimeFromV58": [
+    "Painel_Novo_Client.html",
+    "Painel_Novo_Controller.js",
+    "Rateios_Novo_Client.html",
+    "Rateios_Novo_Controller.js"
+  ],
+  "checks": {
+    "focusedBackend": {
+      "checks": 43,
+      "result": "PASS"
+    },
+    "rateiosRegression": {
+      "checks": 63,
+      "result": "PASS"
+    },
+    "periodBalances": {
+      "checks": 47,
+      "result": "PASS"
+    },
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "flow": "single",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "flow": "multiple",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "flow": "invoice",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "flow": "single",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "flow": "multiple",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "flow": "invoice",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "flow": "single",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "flow": "multiple",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "flow": "invoice",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceiptOrInvoiceRecognition": true,
+        "balancesUpdated": true,
+        "lostResponseRetry": false
+      }
+    ],
+    "renderedBundleSyntax": {
+      "bundles": 7,
+      "result": "PASS"
+    },
+    "financialPreservation": {
+      "transactionalFullRowHashes": "PASS",
+      "tables": [
+        "lancamentos",
+        "rateios",
+        "pagamentos_faturas",
+        "contas",
+        "acertos_rateios"
+      ],
+      "financialWrites": 0
+    },
+    "database": {
+      "functionHash": "56027a42af67b8f1f3e21f8b135b8b3c",
+      "matchesLocalTestedFunction": true,
+      "securityInvoker": true,
+      "anonExecute": false,
+      "authenticatedExecute": false,
+      "advisorsUnchanged": true,
+      "securityInfo": 16,
+      "performanceInfo": 33
+    }
+  },
+  "homologation": "pending authenticated user test"
+}
