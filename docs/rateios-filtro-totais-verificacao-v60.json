@@ -1,0 +1,123 @@
+{
+  "status": "implemented and verified; publication pending",
+  "version": 60,
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "databaseChanges": false,
+  "productionFinancialWrites": 0,
+  "runtimeFileCount": 74,
+  "changedRuntimeFromV59": [
+    "Lancamentos_Novo_Regras.js",
+    "Rateios_Novo_Client.html"
+  ],
+  "checks": {
+    "baseline": {
+      "baseline": "v59",
+      "month": "2026-09",
+      "history": false,
+      "correctMainEntryCount": 3,
+      "actualSettlementCount": 4,
+      "expectedSettlementCount": 2,
+      "actualApprovalCount": 7,
+      "expectedApprovalCount": 3,
+      "bugReproduced": true
+    },
+    "totalsRules": {
+      "checks": 21,
+      "result": "PASS"
+    },
+    "rateiosRegression": {
+      "checks": 63,
+      "result": "PASS"
+    },
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      }
+    ],
+    "browserCases": 54,
+    "renderedBundleSyntax": {
+      "bundles": 7,
+      "result": "PASS"
+    },
+    "layouts": "dedicated large/phone; no horizontal overflow; visual review"
+  },
+  "homologation": "pending authenticated user test"
+}

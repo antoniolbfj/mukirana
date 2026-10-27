@@ -57,7 +57,25 @@ function lancamentosNovoRegras_() {
     return Object.assign({},summary,{cashResultCents:summary.resultCents,rateioPayableCents:payable,rateioReceivableCents:receivable,pendingSettlementCents:pay,pendingReceiptCents:receive,settlementTimingCents:timing,settlementGapCents:gap,reservedCents:add(payable,pay),expectedReceiptsCents:add(receivable,receive),rateioMovementCents:movement,rateioEffectCents:effect,availableCents:add(summary.resultCents,effect)});
   }
   function periodAvailability(summary,balances,settlements,first,last){return availability(summary,balances,settlements,last,first);}
+  // Totais informativos do recorte; a posição de dívida vem do resumo bilateral.
+  function rateioTotals(items,settlements,balances,viewer,first,last){
+    const inside=date=>!!date&&(!first||date>=first)&&(!last||date<=last),value=n=>{if(!cents(n)||compare(n,'0')<0)throw Error('Valor de rateio inválido.');return n;};
+    let expenses='0',paid='0',received='0',expenseCredits='0',incomeCredits='0',incomeDebts='0',adjustments='0',payable='0',receivable='0';
+    for(const item of items||[]){
+      if(!inside(item.date)||!['Despesa','Receita'].includes(item.type))continue;
+      if(item.financeOwner===viewer){const others=(item.shares||[]).filter(p=>p.id!==viewer).reduce((sum,p)=>add(sum,value(p.cents)),'0');if(item.type==='Despesa')expenseCredits=add(expenseCredits,others);else incomeDebts=add(incomeDebts,others);}
+      else if(item.type==='Despesa')expenses=add(expenses,value(item.myCents));else incomeCredits=add(incomeCredits,value(item.myCents));
+    }
+    for(const s of settlements||[]){
+      if(!['Aguardando_Credor','Efetivado'].includes(s.status))continue;
+      if(s.mode==='adjustment'){if(inside(s.date||s.otherDate))adjustments=add(adjustments,s.side==='pay'?value(s.amountCents):negate(value(s.amountCents)));continue;}
+      if(!s.ownRegistered||!inside(s.date))continue;
+      if(s.side==='pay')paid=add(paid,value(s.amountCents));else if(s.side==='receive'&&(!s.invoice||s.ownEntry))received=add(received,value(s.amountCents));
+    }
+    for(const b of balances||[]){if(!cents(b.balanceCents))throw Error('Saldo de rateio inválido.');if(compare(b.balanceCents,'0')<0)payable=add(payable,negate(b.balanceCents));else receivable=add(receivable,b.balanceCents);}
+    return {expensesCents:expenses,paidCents:paid,receivedCents:received,payableCents:payable,receivableCents:receivable,expenseCreditsCents:expenseCredits,incomeCreditsCents:incomeCredits,incomeDebtsCents:incomeDebts,adjustmentsCents:adjustments,pendingPaymentCents:settlementGap(settlements,last).payCents};
+  }
   function categoryLabel(category,categories){if(!category)return '';if(!category.parent)return category.name;const parent=(categories||[]).find(c=>c.id===category.parent);return category.name+(parent?' (subcategoria de '+parent.name+')':' (subcategoria)');}
   function query(rows,input){const f=clean(input),filtered=windowRows(rows,f).filter(r=>matches(r,f));return {rows:filtered,filters:f,options:facets(rows,f),summary:summarize(filtered)};}
-  return {rateioBalances:rateioBalances,spendingRows:spendingRows,availability:availability,periodAvailability:periodAvailability,categoryLabel:categoryLabel,windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
+  return {rateioTotals:rateioTotals,rateioBalances:rateioBalances,spendingRows:spendingRows,availability:availability,periodAvailability:periodAvailability,categoryLabel:categoryLabel,windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
 }

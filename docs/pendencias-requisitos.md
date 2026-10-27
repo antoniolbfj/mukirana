@@ -10,8 +10,9 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 59**, com aceite de rateios protegido contra duplicidade e saldos
-devedor/credor unificados por mês; preserva pagamento de fatura como transferência parcial/integral/crédito
+**versão 60**, com modal de Rateios filtrada por período e totais explícitos de
+despesas, pagamentos e saldo devedor. Preserva aceite protegido contra duplicidade,
+saldos devedor/credor unificados por mês e pagamento de fatura como transferência parcial/integral/crédito
 e competência preservada com Saldo anterior, Favoritos retirado e histórico por autocompletar,
 UX de smartphones refinada no Painel e em Lançamentos,
 saldo acumulado em destaque e mês/acumulado do filtro menor em Contas,
@@ -19,7 +20,8 @@ cálculo global consistente, transferências previstas em Contas,
 recebíveis de rateio na previsão e mês/histórico seguindo a checkbox em todos os
 indicadores desta rodada. Preserva seletores de subcategoria acessíveis pelo
 teclado, fatura contextual e modais. Publicação conferida em
-`rateios-aceite-publicacao.json`. A versão58 simplificou pagamentos de faturas;
+`rateios-filtro-totais-publicacao.json`. A versão59 protegeu o aceite de rateios;
+a versão58 simplificou pagamentos de faturas;
 a versão57 retirou Favoritos;
 a versão56 refinou o UX de smartphones;
 a versão55 ajustou os valores de Contas;
@@ -145,6 +147,11 @@ recebimentos repetidos no servidor. Painel, lista e modal mostram a posição de
 dívida até o mês global, atualizada após as operações; zero é Sem valor pendente.
 Confirmações faltantes ficam separadas. Ver [entrega do aceite](rateios-aceite-entrega.md).
 
+A rodada seguinte filtra a seção Acertos e aprovações e seu contador pelo mês/
+histórico, com valor e quantidade das ocorrências do recorte. Acrescenta destaque
+para despesas rateadas a acertar, total pago e saldo devedor, além dos recebíveis
+e da composição. Sem alterar o banco. Ver [filtro e totais](rateios-filtro-totais-entrega.md).
+
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
    além das funcionalidades novas de Contas, Lançamentos, Rateios/Acertos, Painel
    e Metas, em computador/tablet e smartphone. Conferir o Painel oficial conectado
@@ -172,6 +179,8 @@ Confirmações faltantes ficam separadas. Ver [entrega do aceite](rateios-aceite
    com Saldo anterior, tanto pela fatura quanto como transferência em Lançamentos.
    Homologar Confirmar recebimento, seleção de acertos, reenvio seguro e atualização
    dos saldos zerados/parciais no Painel, lista e modal, inclusive quitação antecipada.
+   Conferir também o filtro da modal pelo card do Painel, os valores/contagens de
+   aprovações no recorte e os três totais, com/sem histórico e nos dois layouts.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

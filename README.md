@@ -13,7 +13,7 @@ modal; o Painel inclui Saldo das contas e cards em uma ou duas colunas.
 O Painel segue cinco linhas e o saldo devedor do rateio respeita o fim do mês
 escolhido. **Ainda posso gastar** agora desconta os compromissos de rateio,
 sem repetir o desconto quando o pagamento é registrado. As subcategorias
-começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v59.
+começam pelo nome para permitir a busca pelo teclado. Produção/avaliação: v60.
 A disponibilidade respeita o mesmo escopo em todas as telas e inclui as previsões
 de recebimento dos rateios. Saldo anterior controla mês/histórico também nos
 cards de resultados. Os cards de Rateios mostram a posição de dívida até o mês,
@@ -29,12 +29,15 @@ fixado na modal e compras preservadas. Ver [entrega](docs/faturas-pagamento-simp
 O aceite vincula o recebimento ao pagamento existente e impede nova receita
 duplicada. Os saldos do Painel/lista/modal atualizam após as operações. Ver
 [aceite e saldos de rateios](docs/rateios-aceite-entrega.md).
+A modal pelo card do Painel filtra também Acertos e aprovações. Rateios destaca
+despesas da sua parte, total pago e saldo devedor, separando recebíveis e
+compensações. Ver [filtro e totais](docs/rateios-filtro-totais-entrega.md).
 Ver [valores de Contas e conciliação](docs/contas-saldos-entrega.md),
 [resultado global e filtro](docs/saldo-global-entrega.md),
 [disponibilidade e teclado](docs/disponivel-rateios-entrega.md),
 [correção do Painel](docs/painel-periodo-entrega.md) e
 [entrega anterior](docs/lancamentos-contextos-entrega.md),
-[publicação vigente](docs/rateios-aceite-publicacao.json) e
+[publicação vigente](docs/rateios-filtro-totais-publicacao.json) e
 [pendências vigentes](docs/pendencias-requisitos.md). Homologação de uso permanece
 pendente; os acessos principais foram atualizados por autorização do usuário.
 
