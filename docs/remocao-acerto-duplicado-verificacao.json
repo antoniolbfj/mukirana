@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-27",
+  "status": "authorized deletion committed and verified; acceptance investigated",
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "scriptVersion": 58,
+  "runtimeChanged": false,
+  "schemaChanged": false,
+  "newDeploymentRequired": false,
+  "normalAcceptance": "same settlement and one receipt; debt is reduced once",
+  "independentReceive": "can create another settlement with the same amount/date; prevention pending",
+  "checks": {
+    "userAuthorizedExactDeletion": true,
+    "receiptRowsDeleted": 1,
+    "settlementRowsDeleted": 1,
+    "originalPaymentPreservedByteForByte": true,
+    "originalSettlementPreserved": true,
+    "otherFinancialHashesPreservedInTransaction": true,
+    "otherReceiptAndAdjustmentPreserved": true,
+    "foreignReferencesChecked": true,
+    "privateBeforeAfterAudit": true,
+    "independentPostCommitVerification": true,
+    "backend": {
+      "checks": 10,
+      "result": "PASS",
+      "normalAcceptance": "same settlement, one receipt, no second debt reduction",
+      "retry": "idempotent; fresh duplicate acceptance rejected",
+      "independentReceive": "new settlement accepted; debt reduced again",
+      "browserFixtures": 3
+    },
+    "browser": [
+      {
+        "device": "desktop",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceipt": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "tablet",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceipt": true,
+        "lostResponseRetry": false
+      },
+      {
+        "device": "smartphone",
+        "result": "PASS",
+        "sameSettlement": true,
+        "oneReceipt": true,
+        "lostResponseRetry": true
+      }
+    ],
+    "independentReceiptWhilePaymentPendingReproduced": true
+  }
+}

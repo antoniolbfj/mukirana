@@ -1,6 +1,6 @@
 # Pendências da base atual — Mukirana
 
-Atualizado em 26/10/2026. Supabase `wcczkultokrypdfimbsh`.
+Atualizado em 27/10/2026. Supabase `wcczkultokrypdfimbsh`.
 
 ## Entrega vigente
 
@@ -134,6 +134,10 @@ Ver [entrega](faturas-pagamento-simples-entrega.md).
 
 ## Pendências vigentes
 
+Operação de dados posterior: por autorização do usuário, uma receita duplicada e
+seu acerto separado foram excluídos, mantendo o pagamento original e os demais
+dados. A versão58 permanece vigente. Ver [exclusão e teste do aceite](remocao-acerto-duplicado-entrega.md).
+
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
    além das funcionalidades novas de Contas, Lançamentos, Rateios/Acertos, Painel
    e Metas, em computador/tablet e smartphone. Conferir o Painel oficial conectado
@@ -168,6 +172,10 @@ Ver [entrega](faturas-pagamento-simples-entrega.md).
    com base suficiente e sinaliza registros sem classificação. A conciliação
    histórica foi uma operação administrativa pontual; o fluxo geral de estorno
    de acertos concluídos continua pendente.
+   Distinguir e prevenir novo recebimento independente que repita um pagamento
+   ainda pendente: o aceite normal foi validado sem duplicidade, mas a ação geral
+   Receber permite outro acerto com mesmo valor/data. Conferir também o outro
+   recebimento e o ajuste de saldo apontados no diagnóstico, preservados nesta operação.
 4. **Relatórios configuráveis (REL-01 a REL-04):** motor de campos, dimensões,
    agrupamentos e cálculos, apresentação interativa, PDF e planilha com os mesmos
    resultados e limites de privacidade.
