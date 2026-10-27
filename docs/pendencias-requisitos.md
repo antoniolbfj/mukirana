@@ -10,8 +10,9 @@ de Rateios/Acertos/Painel/Metas foi publicada na v41; a correção da categoriza
 pessoal foi publicada separadamente na v42. O refinamento visual seguinte acrescenta
 Claro/Escuro/Sépia e componentes comuns na v44, preservando as regras da correção.
 O Painel oficial refinado foi publicado na v45. Produção e avaliação vigentes:
-**versão 60**, com modal de Rateios filtrada por período e totais explícitos de
-despesas, pagamentos e saldo devedor. Preserva aceite protegido contra duplicidade,
+**versão 61**, com quitação vinculada e créditos menos débitos do
+rateio pessoal no Painel, lista e modal. Mês/histórico seguem Saldo anterior.
+A composição inclui as partes e cada acerto uma única vez. Preserva aceite protegido contra duplicidade,
 saldos devedor/credor unificados por mês e pagamento de fatura como transferência parcial/integral/crédito
 e competência preservada com Saldo anterior, Favoritos retirado e histórico por autocompletar,
 UX de smartphones refinada no Painel e em Lançamentos,
@@ -152,6 +153,13 @@ histórico, com valor e quantidade das ocorrências do recorte. Acrescenta desta
 para despesas rateadas a acertar, total pago e saldo devedor, além dos recebíveis
 e da composição. Sem alterar o banco. Ver [filtro e totais](rateios-filtro-totais-entrega.md).
 
+A rodada de quitação aplica a decisão mais recente: receitas menos despesas das
+partes pessoais e dos pagamentos vinculados; não a soma bancária completa nem a
+posição sempre acumulada. O aceite conserva o mesmo acerto. O filtro Rateados
+inclui os lançamentos especiais e as faturas vinculadas. Datas existentes,
+pagamentos complementares e histórico permanecem preservados.
+Ver [quitação e filtro](rateios-quitacao-entrega.md).
+
 1. **Homologar a rodada:** validar a correção de categorias/metas e os três temas,
    além das funcionalidades novas de Contas, Lançamentos, Rateios/Acertos, Painel
    e Metas, em computador/tablet e smartphone. Conferir o Painel oficial conectado
@@ -181,6 +189,9 @@ e da composição. Sem alterar o banco. Ver [filtro e totais](rateios-filtro-tot
    dos saldos zerados/parciais no Painel, lista e modal, inclusive quitação antecipada.
    Conferir também o filtro da modal pelo card do Painel, os valores/contagens de
    aprovações no recorte e os três totais, com/sem histórico e nos dois layouts.
+   Homologar também quitação parcial/total/complementar, composição dos créditos e
+   débitos, aceite sem novo abatimento e igualdade de Painel/modal/lista com e sem
+   Saldo anterior.
 2. **Classificar o histórico:** identificar contas antigas de Investimento;
    revisar fixa/variável e categorias pessoais pendentes. A classificação reservada
    Aguardando Categorização só aparece quando há participação sem categoria.

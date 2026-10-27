@@ -57,6 +57,17 @@ function lancamentosNovoRegras_() {
     return Object.assign({},summary,{cashResultCents:summary.resultCents,rateioPayableCents:payable,rateioReceivableCents:receivable,pendingSettlementCents:pay,pendingReceiptCents:receive,settlementTimingCents:timing,settlementGapCents:gap,reservedCents:add(payable,pay),expectedReceiptsCents:add(receivable,receive),rateioMovementCents:movement,rateioEffectCents:effect,availableCents:add(summary.resultCents,effect)});
   }
   function periodAvailability(summary,balances,settlements,first,last){return availability(summary,balances,settlements,last,first);}
+  // Extrato do rateio: partes e acertos vinculados, sem repetir as duas pontas de caixa.
+  function rateioStatement(summary,first){
+    const balances=rateioBalances(summary?.balances||[],first);
+    let income='0',expense='0',paid='0',received='0',adjustments='0';
+    for(const b of balances){
+      const net=String(b.balanceCents),credit=b.incomeCents===undefined?(compare(net,'0')>0?net:'0'):b.incomeCents,debit=b.expenseCents===undefined?(compare(net,'0')<0?negate(net):'0'):b.expenseCents;
+      if(!cents(credit)||!cents(debit)||compare(credit,'0')<0||compare(debit,'0')<0||add(credit,negate(debit))!==net)throw Error('Extrato de rateio inconsistente. Atualize os dados.');
+      income=add(income,credit);expense=add(expense,debit);paid=add(paid,b.paidCents||'0');received=add(received,b.receivedCents||'0');adjustments=add(adjustments,b.adjustmentsCents||'0');
+    }
+    return {incomeCents:income,expenseCents:expense,resultCents:add(income,negate(expense)),paidCents:paid,receivedCents:received,adjustmentsCents:adjustments};
+  }
   // Totais informativos do recorte; a posição de dívida vem do resumo bilateral.
   function rateioTotals(items,settlements,balances,viewer,first,last){
     const inside=date=>!!date&&(!first||date>=first)&&(!last||date<=last),value=n=>{if(!cents(n)||compare(n,'0')<0)throw Error('Valor de rateio inválido.');return n;};
@@ -77,5 +88,5 @@ function lancamentosNovoRegras_() {
   }
   function categoryLabel(category,categories){if(!category)return '';if(!category.parent)return category.name;const parent=(categories||[]).find(c=>c.id===category.parent);return category.name+(parent?' (subcategoria de '+parent.name+')':' (subcategoria)');}
   function query(rows,input){const f=clean(input),filtered=windowRows(rows,f).filter(r=>matches(r,f));return {rows:filtered,filters:f,options:facets(rows,f),summary:summarize(filtered)};}
-  return {rateioTotals:rateioTotals,rateioBalances:rateioBalances,spendingRows:spendingRows,availability:availability,periodAvailability:periodAvailability,categoryLabel:categoryLabel,windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
+  return {rateioStatement:rateioStatement,rateioTotals:rateioTotals,rateioBalances:rateioBalances,spendingRows:spendingRows,availability:availability,periodAvailability:periodAvailability,categoryLabel:categoryLabel,windowRows:windowRows,dimensions:dimensions,add:add,compare:compare,multiply:multiply,negate:negate,cents:cents,money:money,clean:clean,matches:matches,facets:facets,valid:valid,normalize:normalize,summarize:summarize,query:query};
 }

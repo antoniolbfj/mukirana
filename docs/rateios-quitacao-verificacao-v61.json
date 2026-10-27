@@ -1,0 +1,106 @@
+{
+  "result": "PASS",
+  "integrationQuitacao": {
+    "checks": 58,
+    "database": "local fixtures"
+  },
+  "rateiosRegression": {
+    "checks": 63
+  },
+  "previousTotalsCompatibility": {
+    "checks": 21
+  },
+  "periodRegression": {
+    "checks": 47
+  },
+  "browserCases": 54,
+  "browser": [
+    {
+      "device": "desktop",
+      "theme": "claro",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    },
+    {
+      "device": "desktop",
+      "theme": "escuro",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    },
+    {
+      "device": "desktop",
+      "theme": "sepia",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    },
+    {
+      "device": "tablet",
+      "theme": "claro",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    },
+    {
+      "device": "tablet",
+      "theme": "escuro",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    },
+    {
+      "device": "tablet",
+      "theme": "sepia",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    },
+    {
+      "device": "smartphone",
+      "theme": "claro",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    },
+    {
+      "device": "smartphone",
+      "theme": "escuro",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    },
+    {
+      "device": "smartphone",
+      "theme": "sepia",
+      "cases": 6,
+      "result": "PASS",
+      "monthHistoryEmptyAndOwnReceiptDate": true,
+      "fullGroupDecisionPreserved": true,
+      "expensePaidDebtTotals": true
+    }
+  ],
+  "renderedBundles": 7,
+  "security": "SECURITY INVOKER; empty search_path; service_role only; same advisory baseline",
+  "migration": "20261027181840_rateios_v15_ledger_link",
+  "financialWrites": 0,
+  "financialPreservation": "full-row hashes asserted inside migration transaction",
+  "homologation": "pending authenticated user test"
+}
