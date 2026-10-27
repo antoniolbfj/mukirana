@@ -191,8 +191,9 @@ e da composição. Sem alterar o banco. Ver [filtro e totais](rateios-filtro-tot
    histórica foi uma operação administrativa pontual; o fluxo geral de estorno
    de acertos concluídos continua pendente.
    A prevenção de recebimento duplicado no aceite está implementada nesta rodada.
-   Conferir ainda o outro recebimento e o ajuste de saldo apontados no diagnóstico,
-   preservados nesta operação; a rotina geral de estorno continua pendente.
+   Completar as pontas próprias de caixa ainda ausentes nos acertos existentes,
+   sem recriar vínculos ou repetir o abatimento da dívida. Pagamentos complementares
+   legítimos permanecem distintos. A rotina geral de estorno continua pendente.
 4. **Relatórios configuráveis (REL-01 a REL-04):** motor de campos, dimensões,
    agrupamentos e cálculos, apresentação interativa, PDF e planilha com os mesmos
    resultados e limites de privacidade.
