@@ -62,5 +62,8 @@ conferidos visualmente com dados fictícios.
 Somente `Lancamentos_Novo_Regras.js` e `Rateios_Novo_Client.html` mudaram no runtime.
 Não há migração, consulta ou escrita financeira em produção nesta rodada.
 O Supabase permanece com a migração de proteção do aceite v13. Homologação de uso
-continua separada dos testes locais. Ver `rateios-filtro-totais-publicacao.json`,
+continua separada dos testes locais. Produção e avaliação publicadas na **versão60**,
+com os 74 arquivos baixados da versão imutável em diretório independente e
+conferidos por bytes/SHA-256 com o commit `44a8433`. Os endereços existentes foram
+preservados e exigem login Google; HTTP não substitui o teste autenticado. Ver `rateios-filtro-totais-publicacao.json`,
 `rateios-filtro-totais-verificacao-v60.json` e `rateios-filtro-totais-fontes-v60.json`.

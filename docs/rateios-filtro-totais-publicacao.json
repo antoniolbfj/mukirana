@@ -1,0 +1,156 @@
+{
+  "status": "published and independently verified",
+  "version": 60,
+  "supabaseProject": "wcczkultokrypdfimbsh",
+  "databaseChanges": false,
+  "productionFinancialWrites": 0,
+  "runtimeFileCount": 74,
+  "changedRuntimeFromV59": [
+    "Lancamentos_Novo_Regras.js",
+    "Rateios_Novo_Client.html"
+  ],
+  "checks": {
+    "baseline": {
+      "baseline": "v59",
+      "month": "2026-09",
+      "history": false,
+      "correctMainEntryCount": 3,
+      "actualSettlementCount": 4,
+      "expectedSettlementCount": 2,
+      "actualApprovalCount": 7,
+      "expectedApprovalCount": 3,
+      "bugReproduced": true
+    },
+    "totalsRules": {
+      "checks": 21,
+      "result": "PASS"
+    },
+    "rateiosRegression": {
+      "checks": 63,
+      "result": "PASS"
+    },
+    "browser": [
+      {
+        "device": "desktop",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "desktop",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "desktop",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "tablet",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "claro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "escuro",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      },
+      {
+        "device": "smartphone",
+        "theme": "sepia",
+        "cases": 6,
+        "result": "PASS",
+        "monthHistoryEmptyAndOwnReceiptDate": true,
+        "fullGroupDecisionPreserved": true,
+        "expensePaidDebtTotals": true
+      }
+    ],
+    "browserCases": 54,
+    "renderedBundleSyntax": {
+      "bundles": 7,
+      "result": "PASS"
+    },
+    "layouts": "dedicated large/phone; no horizontal overflow; visual review",
+    "immutableAppsScriptVersion": {
+      "version": 60,
+      "files": 74,
+      "bytesAndSha256": "PASS",
+      "missing": 0,
+      "extra": 0
+    }
+  },
+  "homologation": "pending authenticated user test",
+  "sourceCommit": "44a84336ad461757e2579d80546dff7545e1a22d",
+  "publishedAt": "2026-10-27T13:51:31.155483+00:00",
+  "scriptId": "1ySSYm83KZiFi_1nT-cgsPFtN8in5lvHQocl856b0XzLz303USM-c-2Fd",
+  "production": {
+    "deploymentId": "AKfycbwGr4qlPunBsone1CXhlbNhHHL_4TeqERmgFtAHrE7HbOPu6baECBQFEsyCRM18tJSz",
+    "version": 60
+  },
+  "evaluation": {
+    "deploymentId": "AKfycbwfdVNi6mnDWpkDUbYVAYvMj_MbfCWtbcyptd_5MlgreYnI20xp3L-CPWsz1cB6DXzS",
+    "version": 60
+  },
+  "httpChecks": [
+    {
+      "deployment": "production",
+      "http": 200,
+      "googleLoginRequired": true,
+      "authenticatedFunctionalTest": false
+    },
+    {
+      "deployment": "evaluation",
+      "http": 200,
+      "googleLoginRequired": true,
+      "authenticatedFunctionalTest": false
+    }
+  ],
+  "verification": "Fresh immutable v60 clone in a separate directory; 74 files match bytes and SHA-256 of the source commit. Both deployments confirmed at v60. HTTP requires Google login; authenticated user homologation remains pending."
+}

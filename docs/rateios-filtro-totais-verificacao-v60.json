@@ -1,5 +1,5 @@
 {
-  "status": "implemented and verified; publication pending",
+  "status": "published and independently verified",
   "version": 60,
   "supabaseProject": "wcczkultokrypdfimbsh",
   "databaseChanges": false,
@@ -117,7 +117,14 @@
       "bundles": 7,
       "result": "PASS"
     },
-    "layouts": "dedicated large/phone; no horizontal overflow; visual review"
+    "layouts": "dedicated large/phone; no horizontal overflow; visual review",
+    "immutableAppsScriptVersion": {
+      "version": 60,
+      "files": 74,
+      "bytesAndSha256": "PASS",
+      "missing": 0,
+      "extra": 0
+    }
   },
   "homologation": "pending authenticated user test"
 }
